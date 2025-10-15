@@ -1,0 +1,120 @@
+-  **Topics**
+
+   -  **M0 - Introduction**
+      -  Welcome to Project React
+      -  Downloads and Setup Requirements
+      -  Project Overview
+      -  Dependencies
+      -  Linting and Formatting
+      -  API Overview
+      -  UI Components
+      -  Environment Variables
+      -  Running the Project
+      -  Working with the Project
+      -  Implementing Module 0
+      -  Validation Checklist
+   -  **M1 - React Fundamentals**
+      -  Introduction to React
+      -  Why Use React?
+      -  JSX Overview
+      -  JSX Iteration and Conditional Rendering
+      -  Components
+      -  Component Props
+      -  Component Lifecycle
+      -  Introduction to Hooks
+      -  Styling and Tailwind
+      -  Implementing Module 1
+      -  Validation Checklist
+   -  **M2 - State and Event Handlers**
+      -  Introduction to State
+      -  State in React
+      -  Event Handlers
+      -  Handling Click Events
+      -  Handling Change Events
+      -  Handling Form Submission Events
+      -  Event Handlers Best Practices
+      -  The useState Hook
+      -  Controlled and Uncontrolled Components
+      -  Implementing Module 2
+      -  Validation Checklist
+   -  **M3 - Effects and Data Fetching**
+      -  Introduction to Effects
+      -  Effects in React
+      -  The useEffect Hook
+      -  The useRef Hook
+      -  Introduction to Data Fetching
+      -  Data Fetching in React (part 1)
+      -  Data Fetching in React (part 2)
+      -  Data Fetching in React (part 3)
+      -  Data Fetching Best Practices
+      -  Implementing Module 3
+      -  Validation Checklist
+   -  **M4 - Routes and Navigation**
+      -  Introduction to Navigation
+      -  Client vs Server Side Routing
+      -  Routing in React
+      -  React Router (part 1)
+      -  React Router (part 2)
+      -  React Router (part 3)
+      -  Routing Best Practices
+      -  Implementing Module 4
+      -  Validation Checklist
+   -  **M5 - Hooks and Performance**
+      -  Introduction to Performance
+      -  Performance in React
+      -  The useMemo Hook
+      -  The useCallback Hook
+      -  Custom Hooks in React
+      -  Custom Hooks Best Practices
+      -  Custom Components in React
+      -  Custom Component Best Practices
+      -  Implementing Module 5
+      -  Validation Checklist
+   -  **M6 - State Management**
+      -  Introduction to State Management
+      -  State Management in React
+      -  Prop Drilling
+      -  The useContext Hook
+      -  Redux (part 1)
+      -  Redux (part 2)
+      -  Redux (part 3)
+      -  Redux Custom Components
+      -  Redux Best Practices
+      -  Implementing Module 6
+      -  Validation Checklist
+   -  **M7 - Forms and Authentication**
+      -  Introduction to Forms
+      -  Forms in React
+      -  React Hook Form (part 1)
+      -  React Hook Form (part 2)
+      -  React Hook Form (part 3)
+      -  Form Best Practices
+      -  Introduction to Authentication
+      -  Authentication in React
+      -  Authentication Best Practices
+      -  Implementing Module 7
+      -  Validation Checklist
+   -  **M8 - Deploying**
+      -  Deploying to Vercel
+   -  **MX - Extended**
+      -  Introduction
+      -  Improving Forms and Inputs
+      -  Implementing React Query
+      -  Implementing Users and Profiles
+      -  Implementing Listing Creation
+      -  Implementing Reviews
+      -  Testing With Cypress
+      -  Note on React 19
+      -  Conclusion
+      -  Validation Checklist
+
+   **Example for Validation Checklist in M0 - Introduction**
+
+        -  Validation Checklist After implementing the Welcome component, verify:
+            -  [ ] **Environment**: Project runs without errors at
+                    `http://localhost:3000`
+            -  [ ] **API Integration**: User count displays correctly
+            -  [ ] **State Management**: Timer updates every second
+            -  [ ] **Styling**: Component looks polished and responsive
+            -  [ ] **Code Quality**: ESLint shows no errors
+            -  [ ] **Formatting**: Prettier has formatted all files consistently

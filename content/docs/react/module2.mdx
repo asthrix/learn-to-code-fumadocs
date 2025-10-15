@@ -1,0 +1,606 @@
+---
+title: Module 2 - React Components Deep Dive
+description:
+   Master React components, props, composition patterns, and conditional
+   rendering
+---
+
+# Module 2: React Components Deep Dive
+
+In this module, we'll explore React components in depth, learn about props,
+composition patterns, and how to build more complex UIs.
+
+## Component Types
+
+React supports two main types of components:
+
+### 1. Function Components (Recommended)
+
+```jsx
+// Function Component
+function Welcome(props) {
+   return <h1>Hello, {props.name}!</h1>;
+}
+
+// Arrow Function Component
+const Welcome = (props) => {
+   return <h1>Hello, {props.name}!</h1>;
+};
+
+// Simplified Arrow Function
+const Welcome = ({ name }) => <h1>Hello, {name}!</h1>;
+```
+
+### 2. Class Components (Legacy)
+
+```jsx
+import React, { Component } from "react";
+
+class Welcome extends Component {
+   render() {
+      return <h1>Hello, {this.props.name}!</h1>;
+   }
+}
+```
+
+**Note**: We'll focus on function components as they're the modern standard.
+
+## Props in Detail
+
+Props (properties) are how we pass data to components. They are read-only and
+help make components reusable.
+
+### Basic Props Usage
+
+```jsx
+// Parent Component
+function App() {
+   return (
+      <div>
+         <UserProfile
+            username='john_doe'
+            email='john@example.com'
+            isOnline={true}
+            joinDate={new Date("2023-01-15")}
+         />
+      </div>
+   );
+}
+
+// Child Component
+function UserProfile({ username, email, isOnline, joinDate }) {
+   return (
+      <div className='user-profile'>
+         <h2>@{username}</h2>
+         <p>Email: {email}</p>
+         <p>Status: {isOnline ? "🟢 Online" : "⚫ Offline"}</p>
+         <p>Member since: {joinDate.toLocaleDateString()}</p>
+      </div>
+   );
+}
+```
+
+### Default Props
+
+```jsx
+function Button({ text, color, size, onClick }) {
+   return (
+      <button
+         onClick={onClick}
+         style={{
+            backgroundColor: color,
+            fontSize: size === "large" ? "18px" : "14px",
+            padding: size === "large" ? "12px 24px" : "8px 16px",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            color: "white",
+         }}
+      >
+         {text}
+      </button>
+   );
+}
+
+// Default values using destructuring
+function Button({
+   text = "Click me",
+   color = "#007bff",
+   size = "medium",
+   onClick = () => {},
+}) {
+   return (
+      <button
+         onClick={onClick}
+         style={{
+            backgroundColor: color,
+            fontSize: size === "large" ? "18px" : "14px",
+            padding: size === "large" ? "12px 24px" : "8px 16px",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            color: "white",
+         }}
+      >
+         {text}
+      </button>
+   );
+}
+```
+
+### Props Destructuring
+
+```jsx
+// Without destructuring
+function UserCard(props) {
+   return (
+      <div>
+         <h3>{props.user.name}</h3>
+         <p>{props.user.email}</p>
+         <p>{props.user.role}</p>
+      </div>
+   );
+}
+
+// With destructuring
+function UserCard({ user }) {
+   return (
+      <div>
+         <h3>{user.name}</h3>
+         <p>{user.email}</p>
+         <p>{user.role}</p>
+      </div>
+   );
+}
+
+// Nested destructuring
+function UserCard({ user: { name, email, role } }) {
+   return (
+      <div>
+         <h3>{name}</h3>
+         <p>{email}</p>
+         <p>{role}</p>
+      </div>
+   );
+}
+```
+
+## Conditional Rendering
+
+React allows you to conditionally render components or elements:
+
+### Using If-Else
+
+```jsx
+function WelcomeMessage({ user }) {
+   if (user) {
+      return <h1>Welcome back, {user.name}!</h1>;
+   } else {
+      return <h1>Please sign in.</h1>;
+   }
+}
+```
+
+### Using Ternary Operator
+
+```jsx
+function WelcomeMessage({ user }) {
+   return (
+      <div>
+         {user ? <h1>Welcome back, {user.name}!</h1> : <h1>Please sign in.</h1>}
+      </div>
+   );
+}
+```
+
+### Using Logical AND (&&)
+
+```jsx
+function Notifications({ notifications }) {
+   return (
+      <div>
+         <h2>Dashboard</h2>
+         {notifications.length > 0 && (
+            <div className='notifications'>
+               <h3>You have {notifications.length} new notifications</h3>
+               <ul>
+                  {notifications.map((notification, index) => (
+                     <li key={index}>{notification.message}</li>
+                  ))}
+               </ul>
+            </div>
+         )}
+      </div>
+   );
+}
+```
+
+## Rendering Lists
+
+### Basic List Rendering
+
+```jsx
+function TodoList({ todos }) {
+   return (
+      <ul>
+         {todos.map((todo, index) => (
+            <li key={index}>
+               {todo.text} - {todo.completed ? "✅" : "❌"}
+            </li>
+         ))}
+      </ul>
+   );
+}
+
+// Better approach with unique IDs
+function TodoList({ todos }) {
+   return (
+      <ul>
+         {todos.map((todo) => (
+            <li key={todo.id}>
+               {todo.text} - {todo.completed ? "✅" : "❌"}
+            </li>
+         ))}
+      </ul>
+   );
+}
+```
+
+### Advanced List with Components
+
+```jsx
+function TodoItem({ todo, onToggle, onDelete }) {
+   return (
+      <li
+         style={{
+            display: "flex",
+            alignItems: "center",
+            padding: "10px",
+            borderBottom: "1px solid #eee",
+         }}
+      >
+         <input
+            type='checkbox'
+            checked={todo.completed}
+            onChange={() => onToggle(todo.id)}
+            style={{ marginRight: "10px" }}
+         />
+         <span
+            style={{
+               flex: 1,
+               textDecoration: todo.completed ? "line-through" : "none",
+               color: todo.completed ? "#999" : "#333",
+            }}
+         >
+            {todo.text}
+         </span>
+         <button
+            onClick={() => onDelete(todo.id)}
+            style={{
+               backgroundColor: "#ff4757",
+               color: "white",
+               border: "none",
+               padding: "5px 10px",
+               borderRadius: "4px",
+               cursor: "pointer",
+            }}
+         >
+            Delete
+         </button>
+      </li>
+   );
+}
+
+function TodoList({ todos, onToggle, onDelete }) {
+   return (
+      <ul style={{ listStyle: "none", padding: 0 }}>
+         {todos.map((todo) => (
+            <TodoItem
+               key={todo.id}
+               todo={todo}
+               onToggle={onToggle}
+               onDelete={onDelete}
+            />
+         ))}
+      </ul>
+   );
+}
+```
+
+## Component Composition
+
+### Children Prop
+
+```jsx
+function Card({ children, title }) {
+   return (
+      <div
+         style={{
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            padding: "16px",
+            margin: "16px 0",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+         }}
+      >
+         {title && <h3>{title}</h3>}
+         {children}
+      </div>
+   );
+}
+
+function App() {
+   return (
+      <div>
+         <Card title='User Profile'>
+            <p>Name: John Doe</p>
+            <p>Email: john@example.com</p>
+            <button>Edit Profile</button>
+         </Card>
+
+         <Card title='Settings'>
+            <label>
+               <input type='checkbox' /> Enable notifications
+            </label>
+            <label>
+               <input type='checkbox' /> Dark mode
+            </label>
+         </Card>
+      </div>
+   );
+}
+```
+
+### Layout Components
+
+```jsx
+function Layout({ children }) {
+   return (
+      <div
+         style={{
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+         }}
+      >
+         <Header />
+         <main style={{ flex: 1, padding: "20px" }}>{children}</main>
+         <Footer />
+      </div>
+   );
+}
+
+function Header() {
+   return (
+      <header
+         style={{
+            backgroundColor: "#333",
+            color: "white",
+            padding: "1rem",
+            textAlign: "center",
+         }}
+      >
+         <h1>My App</h1>
+      </header>
+   );
+}
+
+function Footer() {
+   return (
+      <footer
+         style={{
+            backgroundColor: "#f8f9fa",
+            padding: "1rem",
+            textAlign: "center",
+            borderTop: "1px solid #dee2e6",
+         }}
+      >
+         <p>&copy; 2024 My App. All rights reserved.</p>
+      </footer>
+   );
+}
+```
+
+## Practical Example: Blog Post Component
+
+Let's build a comprehensive blog post component:
+
+```jsx
+function BlogPost({ post, showFullContent = false }) {
+   const { title, author, publishDate, content, tags, readTime } = post;
+
+   return (
+      <article
+         style={{
+            maxWidth: "800px",
+            margin: "0 auto",
+            padding: "20px",
+            border: "1px solid #e1e5e9",
+            borderRadius: "8px",
+            marginBottom: "20px",
+         }}
+      >
+         <header>
+            <h1 style={{ color: "#1a1a1a", marginBottom: "10px" }}>{title}</h1>
+            <div
+               style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  color: "#666",
+                  fontSize: "14px",
+                  marginBottom: "20px",
+               }}
+            >
+               <span>By {author}</span>
+               <span>{new Date(publishDate).toLocaleDateString()}</span>
+               <span>{readTime} min read</span>
+            </div>
+         </header>
+
+         <div style={{ lineHeight: "1.6", marginBottom: "20px" }}>
+            {showFullContent ? content : `${content.substring(0, 200)}...`}
+         </div>
+
+         {tags && tags.length > 0 && (
+            <div style={{ marginTop: "20px" }}>
+               {tags.map((tag, index) => (
+                  <span
+                     key={index}
+                     style={{
+                        display: "inline-block",
+                        backgroundColor: "#e9ecef",
+                        color: "#495057",
+                        padding: "4px 8px",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        marginRight: "8px",
+                        marginBottom: "8px",
+                     }}
+                  >
+                     #{tag}
+                  </span>
+               ))}
+            </div>
+         )}
+      </article>
+   );
+}
+
+function BlogList({ posts }) {
+   return (
+      <div>
+         <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
+            Latest Blog Posts
+         </h1>
+         {posts.map((post) => (
+            <BlogPost key={post.id} post={post} />
+         ))}
+      </div>
+   );
+}
+
+// Usage
+function App() {
+   const blogPosts = [
+      {
+         id: 1,
+         title: "Getting Started with React",
+         author: "Jane Smith",
+         publishDate: "2024-01-15",
+         content:
+            "React is a powerful library for building user interfaces. In this post, we'll explore the fundamentals of React and learn how to build your first component. React components are the building blocks of any React application...",
+         tags: ["react", "javascript", "tutorial"],
+         readTime: 5,
+      },
+      {
+         id: 2,
+         title: "Understanding React Hooks",
+         author: "John Doe",
+         publishDate: "2024-01-20",
+         content:
+            "React Hooks revolutionized how we write React components. They allow us to use state and other React features in function components. In this comprehensive guide, we'll explore useState, useEffect, and custom hooks...",
+         tags: ["react", "hooks", "advanced"],
+         readTime: 8,
+      },
+   ];
+
+   return <BlogList posts={blogPosts} />;
+}
+```
+
+## Exercise: Product Catalog
+
+Create a product catalog with the following components:
+
+1. **ProductCard** - Display individual product
+2. **ProductList** - Display list of products
+3. **FilterBar** - Filter products by category
+4. **SearchBox** - Search products by name
+
+```jsx
+function ProductCard({ product }) {
+   return (
+      <div
+         style={{
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            padding: "16px",
+            margin: "10px",
+            width: "250px",
+            textAlign: "center",
+         }}
+      >
+         <img
+            src={product.image}
+            alt={product.name}
+            style={{ width: "100%", height: "200px", objectFit: "cover" }}
+         />
+         <h3>{product.name}</h3>
+         <p style={{ color: "#666" }}>{product.category}</p>
+         <p style={{ fontSize: "18px", fontWeight: "bold", color: "#007bff" }}>
+            ${product.price}
+         </p>
+         <button
+            style={{
+               backgroundColor: "#007bff",
+               color: "white",
+               border: "none",
+               padding: "10px 20px",
+               borderRadius: "4px",
+               cursor: "pointer",
+            }}
+         >
+            Add to Cart
+         </button>
+      </div>
+   );
+}
+
+function ProductList({ products }) {
+   return (
+      <div
+         style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            padding: "20px",
+         }}
+      >
+         {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+         ))}
+      </div>
+   );
+}
+```
+
+## Key Concepts Mastered
+
+1. **Function vs Class Components**: Modern React uses function components
+2. **Props**: Data flow from parent to child components
+3. **Destructuring**: Clean way to extract props
+4. **Conditional Rendering**: Show/hide elements based on conditions
+5. **List Rendering**: Display arrays of data
+6. **Component Composition**: Building complex UIs from simple components
+7. **Children Prop**: Flexible component content
+
+## Best Practices
+
+1. **Keep components small and focused**
+2. **Use descriptive prop names**
+3. **Always provide keys for list items**
+4. **Prefer function components**
+5. **Use composition over inheritance**
+6. **Extract reusable components**
+
+## Summary
+
+In this module, you've learned: ✅ Advanced component patterns  
+✅ Props and prop destructuring  
+✅ Conditional rendering techniques  
+✅ List rendering with keys  
+✅ Component composition  
+✅ Building reusable UI components
+
+Next up: Module 3 where we'll add interactivity with state and event handling!
