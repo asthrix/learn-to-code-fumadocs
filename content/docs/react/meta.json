@@ -1,0 +1,14 @@
+{
+   "title": "React Course",
+   "description": "Build modern, scalable web applications with React",
+   "pages": [
+      "intro",
+      "m0",
+      "m1",
+      "module1",
+      "module2",
+      "module3",
+      "module4",
+      "module5"
+   ]
+}
