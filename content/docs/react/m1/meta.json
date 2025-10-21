@@ -1,0 +1,18 @@
+{
+   "title": "M1 - React Fundamentals",
+   "pages": [
+      "index",
+      "intro-react",
+      "why-react",
+      "jsx-overview",
+      "jsx-rendering",
+      "components",
+      "props",
+      "lifecycle",
+      "hooks-intro",
+      "styling",
+      "implementation",
+      "validation"
+   ],
+   "defaultOpen": true
+}

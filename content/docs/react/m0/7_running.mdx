@@ -1,0 +1,751 @@
+---
+title: "Running the Development Server"
+description:
+   "Master Vite's development server, hot module replacement, and debugging
+   tools"
+module: "M0"
+lesson: "7"
+difficulty: "beginner"
+duration: "20"
+project_phase: "Development workflow"
+prerequisites: ["Environment Variables and Configuration"]
+learning_objectives:
+   - "Start and manage the Vite development server"
+   - "Understand hot module replacement (HMR)"
+   - "Use browser DevTools effectively"
+   - "Debug common development issues"
+tags: ["vite", "dev-server", "hmr", "debugging", "workflow"]
+---
+
+# Running the Development Server
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Know how to start and stop the development server
+-  [ ] Understand how hot module replacement (HMR) works
+-  [ ] Use browser DevTools for debugging
+-  [ ] Troubleshoot common development issues
+-  [ ] Optimize your development workflow
+
+## Project Context
+
+The development server is your primary tool while building TaskFlow Pro. Vite's
+lightning-fast HMR means changes appear in your browser instantly, and its
+built-in debugging capabilities make it easy to catch errors early.
+Understanding how to work efficiently with the dev server will make you a more
+productive developer.
+
+---
+
+## Starting the Development Server
+
+### Basic Commands
+
+```bash
+# Start development server
+npm run dev
+
+# Alternative (same thing)
+npm start
+
+# Start with custom port
+npm run dev -- --port 3000
+
+# Start and open browser automatically
+npm run dev -- --open
+
+# Start with specific host
+npm run dev -- --host 0.0.0.0  # Accessible from network
+```
+
+### What Happens When You Start
+
+```
+$ npm run dev
+
+  VITE v4.4.9  ready in 423 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.1.100:5173/
+  ➜  press h to show help
+```
+
+**Breakdown:**
+
+1. **Vite starts** - Version and startup time shown
+2. **Local URL** - Access from your computer
+3. **Network URL** - Access from other devices on same network
+4. **Keyboard shortcuts** - Press 'h' to see available commands
+
+---
+
+## Understanding Vite's Development Server
+
+### How It Works
+
+```
+Your Code          Vite Server         Browser
+─────────         ─────────────        ───────
+src/App.jsx  →    Transform JSX   →    Modern JS
+src/main.css →    Process CSS     →    CSS Module
+
+                  [No bundling!]
+                  [Native ESM]
+                  [On-demand compilation]
+```
+
+**Key Differences from Traditional Tools:**
+
+-  **No bundling** - Files served individually via ES modules
+-  **On-demand** - Only compiles files you request
+-  **Fast startup** - No need to bundle entire app
+-  **Instant updates** - Hot module replacement (HMR)
+
+### Performance Comparison
+
+```
+Traditional Bundler (Webpack):
+Start: 15-30 seconds
+Rebuild: 2-5 seconds
+
+Vite:
+Start: ~400ms
+Rebuild: &lt;100ms  ⚡
+```
+
+---
+
+## Hot Module Replacement (HMR)
+
+### What is HMR?
+
+**Hot Module Replacement** updates modules in the browser without a full page
+reload, preserving application state.
+
+```jsx
+// You're filling out a form
+function TaskForm() {
+  const [title, setTitle] = useState('Meeting with team');
+  const [description, setDescription] = useState('Discuss Q1 goals...');
+
+  return (
+    <form>
+      <input value={title} onChange={e => setTitle(e.target.value)} />
+      <textarea value={description} onChange={e => setDescription(e.target.value)} />
+    </form>
+  );
+}
+
+// You change the button color
+<button className="bg-blue-500">Submit</button>
+// to
+<button className="bg-green-500">Submit</button>
+
+// ✅ With HMR: Button color updates instantly, form data preserved!
+// ❌ Without HMR: Full reload, form data lost!
+```
+
+### HMR in Action
+
+**Scenario 1: CSS Changes**
+
+```css
+/* Change background color */
+.app {
+   background: #f0f0f0; /* Change to #ffffff */
+}
+```
+
+Result: Background updates instantly, no reload
+
+**Scenario 2: React Component Changes**
+
+```jsx
+// Add a new prop
+<TaskCard
+   title='Task 1'
+   // Add this line:
+   priority='high'
+/>
+```
+
+Result: Component re-renders, state preserved
+
+**Scenario 3: State-Breaking Changes**
+
+```jsx
+// Change useState default
+const [count, setCount] = useState(0); // to useState(10)
+```
+
+Result: Full reload required (state initialization changed)
+
+### HMR Boundaries
+
+```
+src/
+├── App.jsx              ← Changes here reload whole app
+├── main.jsx             ← Changes here reload whole app
+├── components/
+│   ├── TaskCard.jsx     ← ✅ HMR works great
+│   └── TaskList.jsx     ← ✅ HMR works great
+└── utils/
+    └── helpers.js       ← ⚠️ May require full reload
+```
+
+**HMR works best with:**
+
+-  React components
+-  CSS/Tailwind classes
+-  Component props and JSX
+
+**HMR may not work with:**
+
+-  Top-level state changes
+-  Module exports changes
+-  Build configuration changes
+
+---
+
+## Development Workflow
+
+### Efficient Development Loop
+
+```bash
+# Terminal 1: Development Server
+npm run dev
+
+# Terminal 2: Run tests (optional)
+npm run test:watch
+
+# Terminal 3: Type checking (optional)
+npm run typecheck:watch
+```
+
+### Recommended Setup
+
+```
+┌─────────────────────────────────────┐
+│  VS Code                            │
+│  ┌───────────────┬─────────────┐   │
+│  │               │             │   │
+│  │  Code Editor  │  Browser    │   │
+│  │               │  DevTools   │   │
+│  │  App.jsx      │  Console    │   │
+│  │               │  Network    │   │
+│  └───────────────┴─────────────┘   │
+│  ┌─────────────────────────────┐   │
+│  │  Integrated Terminal        │   │
+│  │  $ npm run dev              │   │
+│  └─────────────────────────────┘   │
+└─────────────────────────────────────┘
+```
+
+### Keyboard Shortcuts
+
+```
+Vite Dev Server:
+h  - Show help
+r  - Restart server
+u  - Show server URL
+o  - Open in browser
+c  - Clear console
+q  - Quit
+
+VS Code:
+Cmd+` - Toggle terminal
+Cmd+B - Toggle sidebar
+Cmd+Shift+P - Command palette
+```
+
+---
+
+## Browser DevTools
+
+### Console Tab
+
+```javascript
+// Logging levels
+console.log("Regular message"); // Info
+console.info("Information"); // Info  ℹ️
+console.warn("Warning message"); // Warning ⚠️
+console.error("Error message"); // Error ❌
+
+// Grouping
+console.group("User Actions");
+console.log("Clicked button");
+console.log("Form submitted");
+console.groupEnd();
+
+// Tables
+const tasks = [
+   { id: 1, title: "Task 1", status: "done" },
+   { id: 2, title: "Task 2", status: "pending" },
+];
+console.table(tasks);
+
+// Timing
+console.time("API Call");
+await fetchTasks();
+console.timeEnd("API Call"); // API Call: 234ms
+```
+
+### Elements Tab
+
+```
+Inspect element → Right-click element → Inspect
+
+Use Cases:
+- View element styles
+- Edit CSS in real-time
+- Check computed styles
+- Examine HTML structure
+- Test responsive layouts
+```
+
+### Network Tab
+
+```
+Monitor:
+- API requests
+- Response times
+- Failed requests
+- Request/response headers
+- Response data
+
+Useful for:
+- Debugging API calls
+- Performance optimization
+- Checking request payloads
+```
+
+### React DevTools
+
+```bash
+# Install React DevTools extension
+# Chrome: https://chrome.google.com/webstore
+# Firefox: https://addons.mozilla.org
+
+Features:
+- Component tree inspection
+- Props and state viewing
+- Hook state tracking
+- Component profiling
+```
+
+**Example Usage:**
+
+```jsx
+function TaskCard({ title, completed }) {
+   const [isHovered, setIsHovered] = useState(false);
+
+   // View in React DevTools:
+   // Props: { title: "Task 1", completed: false }
+   // State: { isHovered: false }
+
+   return <div>{title}</div>;
+}
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Terminal Visible
+
+**Why:** Catch errors immediately
+
+```bash
+# ✅ Good: Terminal visible while coding
+┌──────────────┬──────────┐
+│              │          │
+│  Code        │ Browser  │
+│              │          │
+├──────────────┴──────────┤
+│  $ npm run dev          │
+│  ✓ Ready in 423ms       │
+└─────────────────────────┘
+
+# ❌ Bad: Hidden terminal
+# You miss build errors!
+```
+
+### 2. Use Browser DevTools Effectively
+
+**Why:** Faster debugging
+
+```javascript
+// ✅ Good: Descriptive logs
+console.log("TaskCard rendered:", { id, title, status });
+console.warn("API response slow:", responseTime);
+
+// ❌ Bad: Unclear logs
+console.log(task); // What is this?
+console.log("here"); // Where is "here"?
+```
+
+### 3. Save Files Frequently
+
+**Why:** HMR triggers on save
+
+```
+Cmd+S (Mac) / Ctrl+S (Windows)
+
+Configure VS Code Auto Save:
+File → Auto Save (check it!)
+
+Or: Set delay in settings:
+"files.autoSave": "afterDelay",
+"files.autoSaveDelay": 1000
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Not Restarting After Config Changes
+
+**Problem:** Changes to config files need server restart
+
+```javascript
+// Changed vite.config.js
+export default defineConfig({
+  server: {
+    port: 3000,  // Changed from 5173
+  },
+});
+
+// ❌ Bad: Keep server running
+// Still on port 5173!
+
+// ✅ Good: Restart server
+// Ctrl+C to stop
+npm run dev
+// Now on port 3000 ✓
+```
+
+**Files that require restart:**
+
+-  `vite.config.js`
+-  `package.json`
+-  `.env` files
+-  `tailwind.config.js`
+-  `postcss.config.js`
+
+### 2. Ignoring Console Errors
+
+**Problem:** Errors break functionality silently
+
+```bash
+# Browser Console:
+Warning: Each child in a list should have a unique "key" prop.
+
+# ❌ Bad: Ignore warning
+# App works but may have bugs later
+
+# ✅ Good: Fix immediately
+{tasks.map(task => (
+  <TaskCard key={task.id} {...task} />
+))}
+```
+
+### 3. Port Already in Use
+
+**Problem:** Another process using the port
+
+```bash
+# Error message:
+Port 5173 is in use, trying another one...
+Port 5174 is in use, trying another one...
+
+# ❌ Bad: Keep trying random ports
+
+# ✅ Good: Kill the other process
+# macOS/Linux:
+lsof -ti:5173 | xargs kill -9
+
+# Or: Use different port
+npm run dev -- --port 3000
+```
+
+---
+
+## Troubleshooting Guide
+
+### Issue: Server Won't Start
+
+```bash
+# Check Node version
+node --version  # Should be 18+
+
+# Clear npm cache
+rm -rf node_modules
+npm install
+
+# Check for port conflicts
+lsof -i :5173  # macOS/Linux
+netstat -ano | findstr :5173  # Windows
+```
+
+### Issue: Changes Not Reflecting
+
+```bash
+# 1. Hard refresh browser
+Cmd+Shift+R (Mac)
+Ctrl+Shift+R (Windows)
+
+# 2. Clear Vite cache
+rm -rf node_modules/.vite
+
+# 3. Restart dev server
+# Stop (Ctrl+C) and restart
+npm run dev
+```
+
+### Issue: Page is Blank
+
+```javascript
+// Check browser console for errors
+// Common causes:
+
+// 1. Syntax error
+const Component = () => {
+  return (
+    <div>  {/* Missing closing tag */}
+  );
+};
+
+// 2. Import error
+import { App } from './App';  // Should be default import
+
+// 3. Render error
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+// Check if element exists!
+```
+
+### Issue: Slow Performance
+
+```bash
+# Check what's running
+top  # macOS/Linux
+taskmgr  # Windows
+
+# Reduce memory usage:
+# - Close unused tabs
+# - Restart VS Code
+# - Disable unnecessary extensions
+
+# Optimize Vite:
+# vite.config.js
+export default defineConfig({
+  server: {
+    watch: {
+      ignored: ['**/node_modules/**', '**/.git/**'],
+    },
+  },
+});
+```
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Set Up Your Development Workflow
+
+Let's optimize your development environment!
+
+#### Step 1: Start Development Server
+
+```bash
+# Navigate to project
+cd ~/Developer/React-Course/taskflow-pro
+
+# Start server
+npm run dev
+
+# Expected output:
+# VITE v4.4.9  ready in 423 ms
+# ➜  Local:   http://localhost:5173/
+```
+
+#### Step 2: Test Hot Module Replacement
+
+Update `src/App.jsx`:
+
+```jsx
+function App() {
+   return (
+      <div className='min-h-screen bg-gray-100 p-8'>
+         <header className='bg-white rounded-lg shadow p-6 mb-6'>
+            <h1 className='text-3xl font-bold text-gray-900'>TaskFlow Pro</h1>
+            <p className='text-gray-600 mt-2'>Modern Task Management</p>
+         </header>
+
+         <main className='bg-white rounded-lg shadow p-6'>
+            <h2 className='text-xl font-semibold mb-4'>
+               Welcome to Your Workspace
+            </h2>
+            <p className='text-gray-700'>Start building amazing things! 🚀</p>
+         </main>
+      </div>
+   );
+}
+
+export default App;
+```
+
+**Save the file** → Browser updates instantly! ⚡
+
+#### Step 3: Try CSS Changes
+
+Update a color in `App.jsx`:
+
+```jsx
+// Change bg-gray-100 to bg-blue-50
+<div className="min-h-screen bg-blue-50 p-8">
+```
+
+**Save** → Background color changes instantly!
+
+#### Step 4: Add Console Logging
+
+```jsx
+function App() {
+   console.log("App rendered at:", new Date().toLocaleTimeString());
+   console.log("Environment:", import.meta.env.MODE);
+
+   // ... rest of component
+}
+```
+
+Open browser console (F12) → See logs
+
+#### Step 5: Install React DevTools
+
+1. Open Chrome/Firefox
+2. Go to Extensions/Add-ons store
+3. Search "React Developer Tools"
+4. Install extension
+5. Restart browser
+6. Open DevTools → See "Components" tab
+
+#### Step 6: Create Development Dashboard
+
+Add to `src/App.jsx`:
+
+```jsx
+function DevDashboard() {
+   if (import.meta.env.PROD) return null;
+
+   return (
+      <div className='fixed bottom-4 right-4 bg-black text-white p-4 rounded-lg text-sm'>
+         <h3 className='font-bold mb-2'>Dev Info</h3>
+         <div className='space-y-1'>
+            <p>Mode: {import.meta.env.MODE}</p>
+            <p>Time: {new Date().toLocaleTimeString()}</p>
+            <p>Port: {window.location.port}</p>
+         </div>
+      </div>
+   );
+}
+
+function App() {
+   return (
+      <div className='min-h-screen bg-gray-100 p-8'>
+         {/* ... existing content ... */}
+         <DevDashboard />
+      </div>
+   );
+}
+```
+
+#### Expected Results:
+
+-  ✅ Dev server running on http://localhost:5173
+-  ✅ Changes appear instantly (HMR working)
+-  ✅ Console shows environment logs
+-  ✅ React DevTools showing component tree
+-  ✅ Dev dashboard visible (dev mode only)
+
+---
+
+## ✅ Validation Checklist
+
+After completing this lesson, verify:
+
+### **Server Management**
+
+-  [ ] Can start development server with `npm run dev`
+-  [ ] Can stop server with Ctrl+C
+-  [ ] Server starts without errors
+-  [ ] Can access app at http://localhost:5173
+-  [ ] Understand what the startup output means
+
+### **Hot Module Replacement**
+
+-  [ ] CSS changes update without reload
+-  [ ] Component changes update without reload
+-  [ ] State is preserved during updates
+-  [ ] Terminal shows HMR updates
+-  [ ] Understand when full reload is needed
+
+### **Browser DevTools**
+
+-  [ ] Can open DevTools (F12 or Cmd+Option+I)
+-  [ ] Can view console messages
+-  [ ] Can inspect elements and styles
+-  [ ] Can view network requests
+-  [ ] React DevTools installed and working
+
+### **Workflow**
+
+-  [ ] Terminal visible while coding
+-  [ ] Browser and editor side-by-side
+-  [ ] Can see changes instantly
+-  [ ] Know keyboard shortcuts
+-  [ ] Can troubleshoot common issues
+
+### **Understanding**
+
+-  [ ] You understand how Vite's dev server works
+-  [ ] You know what HMR is and why it's valuable
+-  [ ] You can use browser DevTools effectively
+-  [ ] You can troubleshoot common problems
+-  [ ] You have an efficient development setup
+
+---
+
+<div className='bg-blue-50 border border-blue-200 rounded-lg p-6 my-8'>
+   <h3 className='text-lg font-semibold text-blue-900 mb-3'>💡 Pro Tip</h3>
+   <p className='text-blue-800 mb-2'>
+      Set up <strong>VS Code's integrated terminal</strong> to keep your dev
+      server visible while coding:
+   </p>
+   <ul className='list-disc list-inside text-blue-800 space-y-1 ml-4'>
+      <li>
+         Press <code>Cmd+&#96;</code> to toggle terminal
+      </li>
+      <li>
+         Split terminals with <code>Cmd+&#92;</code>
+      </li>
+      <li>One for dev server, one for commands</li>
+      <li>Never lose sight of errors! 👀</li>
+   </ul>
+</div>
+
+<div className='mt-8 flex justify-between items-center'>
+   <a
+      href='/docs/react/m0/environment'
+      className='text-blue-600 hover:text-blue-800 font-medium'
+   >
+      ← Previous: Environment Variables
+   </a>
+   <a
+      href='/docs/react/m0/implementation'
+      className='bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium inline-flex items-center'
+   >
+      Next: M0 Implementation Guide →
+   </a>
+</div>

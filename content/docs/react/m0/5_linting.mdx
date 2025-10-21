@@ -1,0 +1,862 @@
+---
+title: "Linting and Code Formatting"
+description: "Configure ESLint and Prettier to maintain code quality and consistency in TaskFlow Pro"
+module: "M0"
+lesson: "5"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Code quality setup"
+prerequisites: ["Dependencies and Package Management"]
+learning_objectives:
+  - "Understand what linting is and why it's essential"
+  - "Configure ESLint for React development"
+  - "Set up Prettier for automatic code formatting"
+  - "Integrate linting and formatting into your workflow"
+tags: ["eslint", "prettier", "code-quality", "linting", "formatting", "best-practices"]
+---
+
+# Linting and Code Formatting
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+- [ ] Understand what linting is and why professional developers use it
+- [ ] Configure ESLint to catch errors and enforce React best practices
+- [ ] Set up Prettier for consistent, automatic code formatting
+- [ ] Integrate both tools into your VS Code workflow
+- [ ] Know how to fix common linting errors
+
+## Project Context
+
+Professional React development requires tools that catch errors before they reach production and ensure consistent code style across your team. ESLint and Prettier are industry-standard tools that every React developer should master. In this lesson, we'll configure both tools for TaskFlow Pro to maintain high code quality from day one.
+
+---
+
+## What is Linting?
+
+**Linting** is the automated checking of code for programmatic and stylistic errors. Think of it as a spell-checker and grammar-checker for your code.
+
+### Why Linting Matters
+
+**Catch Errors Early**
+```javascript
+// Without ESLint - Runtime error
+function TaskCard() {
+  const [count, setCount] = useState(0);  // ❌ Forgot to import
+  return <div>{count}</div>;
+}
+
+// ESLint catches this immediately:
+// ⚠️ 'useState' is not defined
+// ⚠️ React must be in scope when using JSX
+```
+
+**Enforce Best Practices**
+```javascript
+// ESLint catches React-specific issues
+useEffect(() => {
+  fetchTasks();
+}, []);  // ⚠️ Missing dependency: 'fetchTasks'
+
+if (condition) {
+  useState(0);  // ❌ Hooks must be called at top level
+}
+```
+
+**Maintain Consistency**
+```javascript
+// ESLint enforces team standards
+const unused = 'variable';  // ⚠️ 'unused' is assigned but never used
+console.log(data)           // ⚠️ Missing semicolon
+```
+
+### Industry Adoption
+
+- **97% of React projects** use ESLint
+- **Facebook, Google, Airbnb** have their own ESLint configs
+- **Required by most companies** for code reviews
+- **Integrated into CI/CD pipelines** at scale
+
+---
+
+## ESLint: Your Code Quality Guard
+
+### What ESLint Does
+
+ESLint analyzes your code and reports:
+- **Syntax errors** before runtime
+- **Logic errors** and bugs
+- **React-specific issues** (hooks rules, prop-types, etc.)
+- **Code style violations** (spacing, naming, etc.)
+- **Best practice violations**
+
+### ESLint Configuration for TaskFlow Pro
+
+#### Step 1: Install ESLint
+
+```bash
+# Install ESLint and React plugins
+npm install -D eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-react-refresh
+```
+
+**Packages explained:**
+- `eslint` - Core linting engine
+- `eslint-plugin-react` - React-specific rules
+- `eslint-plugin-react-hooks` - Hooks rules (critical!)
+- `eslint-plugin-react-refresh` - Vite hot reload rules
+
+#### Step 2: Create ESLint Configuration
+
+Create `.eslintrc.json` in your project root:
+
+```json
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:react/jsx-runtime"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "react",
+    "react-hooks",
+    "react-refresh"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "warn",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "no-unused-vars": "warn",
+    "no-console": "warn",
+    "react-refresh/only-export-components": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}
+```
+
+#### Configuration Explained
+
+**Environment Settings**
+```json
+"env": {
+  "browser": true,  // Browser globals (window, document)
+  "es2021": true,   // Modern JavaScript features
+  "node": true      // Node.js globals (process, __dirname)
+}
+```
+
+**Extends (Preset Rules)**
+```json
+"extends": [
+  "eslint:recommended",              // JavaScript best practices
+  "plugin:react/recommended",        // React best practices
+  "plugin:react-hooks/recommended",  // Hooks rules
+  "plugin:react/jsx-runtime"         // JSX without React import
+]
+```
+
+**Key Rules**
+```json
+"rules": {
+  // Allow JSX without importing React (React 17+)
+  "react/react-in-jsx-scope": "off",
+  
+  // Warn about missing prop-types
+  "react/prop-types": "warn",
+  
+  // Enforce hooks rules (CRITICAL)
+  "react-hooks/rules-of-hooks": "error",
+  "react-hooks/exhaustive-deps": "warn",
+  
+  // Warn about unused variables
+  "no-unused-vars": "warn",
+  
+  // Warn about console.log (remove before production)
+  "no-console": "warn"
+}
+```
+
+#### Step 3: Add ESLint Scripts
+
+Update `package.json`:
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext js,jsx --fix"
+  }
+}
+```
+
+**Scripts explained:**
+- `npm run lint` - Check for errors
+- `npm run lint:fix` - Auto-fix fixable errors
+
+---
+
+## Prettier: Consistent Code Formatting
+
+### What Prettier Does
+
+Prettier automatically formats code to ensure consistency:
+
+**Before Prettier:**
+```javascript
+// Inconsistent formatting
+const TaskCard=({title,description})=>{return <div className="task-card"><h3>{title}</h3><p>{description}</p></div>}
+function ProjectCard({name,id}){
+  return(
+    <div className='project'>
+      <h2>{ name}</h2>
+       <span>ID: {id }</span>
+        </div>
+  )
+}
+```
+
+**After Prettier:**
+```javascript
+// Consistent, readable formatting
+const TaskCard = ({ title, description }) => {
+  return (
+    <div className="task-card">
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+};
+
+function ProjectCard({ name, id }) {
+  return (
+    <div className="project">
+      <h2>{name}</h2>
+      <span>ID: {id}</span>
+    </div>
+  );
+}
+```
+
+### Benefits of Prettier
+
+- ✅ **Zero configuration** needed (opinionated defaults)
+- ✅ **Automatic** - No manual formatting
+- ✅ **Consistent** - Same style everywhere
+- ✅ **Fast** - Formats on save
+- ✅ **End debates** - No arguing about code style
+
+### Prettier Configuration
+
+#### Step 1: Install Prettier
+
+```bash
+# Install Prettier
+npm install -D prettier
+
+# Install ESLint-Prettier integration
+npm install -D eslint-config-prettier eslint-plugin-prettier
+```
+
+**Packages explained:**
+- `prettier` - Core formatter
+- `eslint-config-prettier` - Disables ESLint formatting rules that conflict
+- `eslint-plugin-prettier` - Runs Prettier as an ESLint rule
+
+#### Step 2: Create Prettier Configuration
+
+Create `.prettierrc` in your project root:
+
+```json
+{
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "trailingComma": "es5",
+  "printWidth": 80,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf"
+}
+```
+
+#### Configuration Explained
+
+```json
+{
+  "semi": true,              // Add semicolons
+  "singleQuote": true,       // Use single quotes (vs double)
+  "tabWidth": 2,             // 2 spaces per tab
+  "useTabs": false,          // Use spaces (not tabs)
+  "trailingComma": "es5",    // Trailing commas where valid
+  "printWidth": 80,          // Wrap lines at 80 characters
+  "bracketSpacing": true,    // { foo: bar } vs {foo: bar}
+  "arrowParens": "always",   // (x) => x vs x => x
+  "endOfLine": "lf"          // Unix line endings
+}
+```
+
+#### Step 3: Create Prettier Ignore File
+
+Create `.prettierignore`:
+
+```
+# Dependencies
+node_modules
+
+# Build output
+dist
+build
+
+# Environment files
+.env
+.env.local
+
+# Package files
+package-lock.json
+```
+
+#### Step 4: Update ESLint Configuration
+
+Update `.eslintrc.json` to integrate Prettier:
+
+```json
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:react/jsx-runtime",
+    "prettier"  // ← Add this last
+  ],
+  "plugins": [
+    "react",
+    "react-hooks",
+    "react-refresh",
+    "prettier"  // ← Add this
+  ],
+  "rules": {
+    "prettier/prettier": "warn"  // ← Add this
+    // ... other rules
+  }
+}
+```
+
+#### Step 5: Add Prettier Scripts
+
+Update `package.json`:
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx",
+    "lint:fix": "eslint . --ext js,jsx --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,json,css,md}\""
+  }
+}
+```
+
+---
+
+## VS Code Integration
+
+### Install VS Code Extensions
+
+1. **ESLint Extension**
+   - Search: "ESLint"
+   - Publisher: Microsoft
+   - Installs: Shows errors inline as you type
+
+2. **Prettier Extension**
+   - Search: "Prettier - Code formatter"
+   - Publisher: Prettier
+   - Installs: Format on save
+
+### Configure VS Code Settings
+
+Add to `.vscode/settings.json` (create if doesn't exist):
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact"
+  ]
+}
+```
+
+**What this does:**
+- Formats code on save with Prettier
+- Fixes ESLint errors automatically on save
+- Applies to JavaScript and JSX files
+
+---
+
+## ✅ Best Practices
+
+### 1. Run Linting Before Commits
+
+**Why:** Catch errors before they reach version control
+
+```bash
+# Good workflow
+npm run lint        # Check for errors
+npm run format      # Format code
+git add .
+git commit -m "Add feature"
+
+# Better: Use git hooks (later lesson)
+```
+
+### 2. Fix Warnings Promptly
+
+**Why:** Warnings become errors at scale
+
+```javascript
+// Warnings you should fix:
+console.log('Debug info');        // Remove before production
+const unused = 'variable';        // Remove unused variables
+useEffect(() => {
+  doSomething();
+}, []);  // Add missing dependencies
+```
+
+### 3. Don't Disable Rules Without Reason
+
+**Why:** Rules exist to prevent bugs
+
+```javascript
+// Bad: Disabling rules arbitrarily
+/* eslint-disable */
+const buggyCode = () => {
+  // This bypasses all protection
+};
+
+// Good: Disable specific rules with justification
+/* eslint-disable-next-line no-console */
+console.log('Intentional debug log for production issue');
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Ignoring ESLint Errors
+
+**Problem:** Errors compound and cause production bugs
+
+```javascript
+// ESLint shows error
+useEffect(() => {
+  fetchData(userId);
+}, []);  // ⚠️ Missing dependency: 'userId'
+
+// Bad: Ignore the warning
+// Result: Bug - won't refetch when userId changes
+
+// Good: Fix the warning
+useEffect(() => {
+  fetchData(userId);
+}, [userId]);  // ✅ Correct
+```
+
+**Solution:** Always address ESLint errors and warnings. They catch real bugs.
+
+### 2. Inconsistent Formatting
+
+**Problem:** Makes code reviews harder and looks unprofessional
+
+```javascript
+// Bad: Mixed formatting styles
+const TaskCard = ({ title, description })=>{
+    return(
+  <div className='task'>
+      <h3>{ title}</h3>
+    <p>{description }</p>
+        </div>
+    )
+}
+
+// Good: Consistent Prettier formatting
+const TaskCard = ({ title, description }) => {
+  return (
+    <div className="task">
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+};
+```
+
+**Solution:** Set up format on save. Never manually format code.
+
+### 3. Wrong ESLint Configuration
+
+**Problem:** Too strict or too lenient
+
+```json
+// Too strict - development becomes frustrating
+{
+  "rules": {
+    "no-console": "error",  // Can't even debug!
+    "react/prop-types": "error"  // Too strict for learning
+  }
+}
+
+// Too lenient - misses important issues
+{
+  "rules": {
+    "react-hooks/rules-of-hooks": "warn",  // Should be "error"
+    "no-unused-vars": "off"  // Hides code quality issues
+  }
+}
+
+// Good balance - catches issues without frustration
+{
+  "rules": {
+    "no-console": "warn",  // Warns but doesn't block
+    "react/prop-types": "warn",  // Encourages but flexible
+    "react-hooks/rules-of-hooks": "error"  // Critical rule
+  }
+}
+```
+
+**Solution:** Use the configuration provided. It's balanced for learning and production.
+
+---
+
+## Understanding Common ESLint Errors
+
+### 1. React Hooks Rules
+
+```javascript
+// ❌ Error: Hooks can't be called conditionally
+if (condition) {
+  const [state, setState] = useState(0);
+}
+
+// ✅ Correct: Hooks at top level
+const [state, setState] = useState(0);
+if (condition) {
+  setState(1);
+}
+
+// ❌ Error: Missing dependency
+useEffect(() => {
+  console.log(count);
+}, []);  // ESLint warns about missing 'count'
+
+// ✅ Correct: Include all dependencies
+useEffect(() => {
+  console.log(count);
+}, [count]);
+```
+
+### 2. Unused Variables
+
+```javascript
+// ⚠️ Warning: 'data' is assigned but never used
+const TaskCard = ({ title, description, data }) => {
+  return (
+    <div>
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+};
+
+// ✅ Fix: Remove unused prop
+const TaskCard = ({ title, description }) => {
+  return (
+    <div>
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+};
+```
+
+### 3. Missing Dependencies
+
+```javascript
+// ⚠️ Warning: 'fetchTasks' should be in dependency array
+const [tasks, setTasks] = useState([]);
+
+useEffect(() => {
+  fetchTasks();
+}, []);
+
+// ✅ Fix Option 1: Include in dependencies
+useEffect(() => {
+  fetchTasks();
+}, [fetchTasks]);
+
+// ✅ Fix Option 2: Define inside useEffect
+useEffect(() => {
+  const fetchTasks = async () => {
+    const data = await api.getTasks();
+    setTasks(data);
+  };
+  fetchTasks();
+}, []);
+```
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Configure Linting and Formatting
+
+Let's set up ESLint and Prettier for TaskFlow Pro!
+
+#### Step 1: Install Dependencies
+
+```bash
+# Navigate to your project
+cd ~/Developer/React-Course/taskflow-pro
+
+# Install ESLint
+npm install -D eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-react-refresh
+
+# Install Prettier
+npm install -D prettier eslint-config-prettier eslint-plugin-prettier
+```
+
+#### Step 2: Create Configuration Files
+
+Create `.eslintrc.json`:
+
+```bash
+cat > .eslintrc.json << 'EOF'
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:react/jsx-runtime",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": ["react", "react-hooks", "react-refresh", "prettier"],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "warn",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "no-unused-vars": "warn",
+    "no-console": "warn",
+    "prettier/prettier": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}
+EOF
+```
+
+Create `.prettierrc`:
+
+```bash
+cat > .prettierrc << 'EOF'
+{
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "trailingComma": "es5",
+  "printWidth": 80,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf"
+}
+EOF
+```
+
+Create `.prettierignore`:
+
+```bash
+cat > .prettierignore << 'EOF'
+node_modules
+dist
+build
+.env
+.env.local
+package-lock.json
+EOF
+```
+
+#### Step 3: Update package.json Scripts
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext js,jsx --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,json,css,md}\""
+  }
+}
+```
+
+#### Step 4: Create VS Code Settings
+
+Create `.vscode/settings.json`:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
+```
+
+#### Step 5: Test Your Setup
+
+```bash
+# Run linting
+npm run lint
+
+# Format all files
+npm run format
+
+# Check formatting
+npm run format:check
+```
+
+#### Step 6: Test Format on Save
+
+1. Open `src/App.jsx`
+2. Mess up the formatting (remove spaces, semicolons)
+3. Save the file (`Cmd+S` or `Ctrl+S`)
+4. Watch it auto-format! ✨
+
+#### Expected Result:
+
+- ✅ ESLint configured and working
+- ✅ Prettier configured and working
+- ✅ VS Code shows inline errors
+- ✅ Code formats automatically on save
+- ✅ `npm run lint` runs without errors
+- ✅ `npm run format` formats all files
+
+---
+
+## ✅ Validation Checklist
+
+After completing this lesson, verify:
+
+### **Installation**
+- [ ] ESLint packages are installed (check package.json devDependencies)
+- [ ] Prettier packages are installed
+- [ ] `.eslintrc.json` file exists with correct configuration
+- [ ] `.prettierrc` file exists with correct configuration
+- [ ] `.prettierignore` file exists
+
+### **Configuration**
+- [ ] ESLint extends correct presets (React, Hooks)
+- [ ] Prettier is integrated with ESLint
+- [ ] VS Code settings.json is configured
+- [ ] Package.json has lint and format scripts
+- [ ] All configuration files are in version control
+
+### **Functionality**
+- [ ] `npm run lint` runs without errors (or shows expected warnings)
+- [ ] `npm run lint:fix` auto-fixes issues
+- [ ] `npm run format` formats code
+- [ ] VS Code shows ESLint errors inline
+- [ ] Code formats automatically on save
+- [ ] ESLint errors appear in Problems panel
+
+### **Understanding**
+- [ ] You understand what linting is and why it's important
+- [ ] You know the difference between ESLint and Prettier
+- [ ] You can interpret common ESLint errors
+- [ ] You know how to disable rules when necessary
+- [ ] You understand the React Hooks linting rules
+
+### **Workflow Integration**
+- [ ] You've tested format on save in VS Code
+- [ ] You can run lint before commits
+- [ ] You know how to read and fix ESLint warnings
+- [ ] Code quality is part of your development workflow
+
+---
+
+<div className="bg-blue-50 border border-blue-200 rounded-lg p-6 my-8">
+  <h3 className="text-lg font-semibold text-blue-900 mb-3">💡 Professional Development</h3>
+  <p className="text-blue-800 mb-4">
+    ESLint and Prettier might seem like extra work now, but they're industry-standard tools that 
+    professional developers rely on daily. They catch bugs before they reach production, enforce 
+    consistency across teams, and make code reviews easier.
+  </p>
+  <p className="text-blue-800 font-medium">
+    Get comfortable with linting errors - they're helping you write better code! 🎯
+  </p>
+</div>
+
+<div className="mt-8 flex justify-between items-center">
+  <a href="/docs/react/m0/dependencies" className="text-blue-600 hover:text-blue-800 font-medium">
+    ← Previous: Dependencies
+  </a>
+  <a href="/docs/react/m0/environment" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium inline-flex items-center">
+    Next: Environment Variables →
+  </a>
+</div>

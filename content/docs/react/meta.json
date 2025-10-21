@@ -1,14 +1,6 @@
 {
    "title": "React Course",
+   "root": true,
    "description": "Build modern, scalable web applications with React",
-   "pages": [
-      "intro",
-      "m0",
-      "m1",
-      "module1",
-      "module2",
-      "module3",
-      "module4",
-      "module5"
-   ]
+   "pages": ["intro", "m0", "m1", "m2", "m3", "m4", "m5", "m6", "m7", "m8"]
 }

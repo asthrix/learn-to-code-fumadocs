@@ -1,5 +1,6 @@
 {
    "title": "CSS Mastery",
+   "root": true,
    "description": "Master styling and layout with modern CSS",
    "pages": ["intro", "module1", "module2", "module3", "module4"]
 }
