@@ -1,0 +1,224 @@
+---
+title: "Introduction to React"
+description:
+   "Discover what React is, where it shines, and how it powers TaskFlow Pro."
+module: "M1"
+lesson: "1"
+difficulty: "beginner"
+duration: "20"
+project_phase: "UI scaffolding"
+prerequisites: ["/docs/react-new/m1/0_index"]
+learning_objectives:
+   - "Explain React's core purpose and design"
+   - "Describe how the virtual DOM improves rendering"
+   - "Identify React's role across TaskFlow Pro"
+   - "Set up references for continued learning"
+tags: ["react", "intro", "virtual-dom"]
+---
+
+import { Accordions, Accordion } from '@/components/accordion';
+
+# Introduction to React
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Define React as a library for building user interfaces.
+-  [ ] Summarise the virtual DOM and why it matters.
+-  [ ] Connect React concepts to TaskFlow Pro features.
+-  [ ] Bookmark key documentation to use throughout the course.
+
+## Project Context
+
+React is the engine behind TaskFlow Pro. Understanding its mindset helps you
+design components that scale gracefully as the project grows.
+
+---
+
+## What Is React?
+
+React is a declarative JavaScript library for building fast, interactive user
+interfaces. It was created at Meta and is now maintained by a massive
+open-source community.
+
+### Why Declarative?
+
+Declarative UI lets you describe _what_ the interface should look like for a
+given state, and React handles _how_ to update the DOM efficiently.
+
+### Basic Example
+
+```tsx
+function Greeting() {
+   return <h1 className='text-2xl font-semibold'>Welcome back!</h1>;
+}
+```
+
+### Practical Example
+
+```tsx
+import type { User } from "@/types";
+
+type WelcomeProps = { user: User | null };
+
+export function WelcomeBanner({ user }: WelcomeProps) {
+   return (
+      <section className='rounded-lg border bg-card p-6'>
+         <h2 className='text-xl font-semibold'>
+            {user ? `Hello, ${user.firstName}` : "Welcome to TaskFlow Pro"}
+         </h2>
+         <p className='mt-2 text-sm text-muted-foreground'>
+            React makes it simple to render different UI based on state.
+         </p>
+      </section>
+   );
+}
+```
+
+---
+
+## The Virtual DOM at a Glance
+
+React keeps a lightweight representation of the DOM in memory. When state
+changes, it diffs the new tree against the previous one and applies the minimal
+number of updates to the real DOM.
+
+-  Fewer direct DOM manipulations → better performance.
+-  Predictable rendering → easier to reason about UI changes.
+
+---
+
+## ✅ Best Practices
+
+### 1. Think in Components
+
+**Why:** Breaking the UI into small pieces keeps code reusable and testable.
+
+```tsx
+function TaskList() {
+   return (
+      <div>
+         <TaskFilters />
+         <TaskItems />
+      </div>
+   );
+}
+```
+
+### 2. Keep Source of Truth Centralised
+
+**Why:** Single state sources help React reconcile updates without surprises.
+
+```tsx
+const [tasks, setTasks] = useState<Task[]>(initialTasks);
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Treating React Like jQuery
+
+**Problem:** Direct DOM manipulation conflicts with React's rendering.
+
+```tsx
+// Bad
+document.querySelector("#task-count").textContent = "5";
+```
+
+**Solution:** Let React render based on state.
+
+```tsx
+<p id='task-count'>{tasks.length}</p>
+```
+
+### 2. Ignoring Official Docs
+
+**Problem:** Outdated tutorials cause confusion.
+
+**Solution:** Rely on [react.dev](https://react.dev) for up-to-date guidance.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Create a React Reference Note
+
+1. Add `notes/react-foundations.md`.
+2. Document definitions for "component", "state", and "props".
+3. List three features in TaskFlow Pro that React enables (e.g., dynamic task
+   lists).
+4. Commit with `git commit -am "docs: add react foundations notes"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Create the notes file and capture how React powers TaskFlow Pro.
+         Here's a concise example you can adapt to your product vision.
+      </p>
+
+      ```md
+      # React Foundations
+
+      ## Core Terms
+      - **Component**: Reusable UI building block; our Header, Sidebar, and TaskCard are components that render based on props.
+      - **State**: Data that changes over time; TaskFlow Pro tracks task status, filters, and active workspace via state.
+      - **Props**: Read-only inputs passed to components; TaskCard receives a task object, display variant, and callbacks.
+
+      ## TaskFlow Pro Examples
+      - The dashboard header re-renders when the active workspace name changes.
+      - Sidebar links highlight the current view without manual DOM updates.
+      - Task cards show priority badges and due dates sourced from React state.
+      ```
+
+      <p className='mt-3'>Stage and commit once the content mirrors your language:</p>
+
+      ```bash
+      git add notes/react-foundations.md
+      git commit -m "docs: add react foundations notes"
+      ```
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+You now have a quick-reference guide to reinforce core terminology while coding.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Notes file exists with definitions and feature examples.
+
+### Code Quality
+
+-  [ ] Commit history remains clean with a focused message.
+
+### Understanding
+
+-  [ ] You can explain React's declarative nature in your own words.
+-  [ ] You can describe how the virtual DOM accelerates rendering.
+
+### Project Integration
+
+-  [ ] Notes reference future lessons for props, state, and hooks.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m1/0_index'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Module Overview
+   </a>
+   <a
+      href='/docs/react-new/m1/2_why-react'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Why React?
+   </a>
+</div>

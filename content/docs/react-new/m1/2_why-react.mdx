@@ -1,0 +1,197 @@
+---
+title: "Why React?"
+description:
+   "Understand why teams choose React and how its ecosystem supports TaskFlow
+   Pro."
+module: "M1"
+lesson: "2"
+difficulty: "beginner"
+duration: "20"
+project_phase: "UI scaffolding"
+prerequisites: ["/docs/react-new/m1/1_intro-react"]
+learning_objectives:
+   - "Identify business and technical reasons to adopt React"
+   - "Compare React with alternative frameworks"
+   - "Connect ecosystem tools to course modules"
+   - "Highlight companies succeeding with React"
+tags: ["react", "ecosystem", "decision"]
+---
+
+import { Accordions, Accordion } from '@/components/accordion';
+
+# Why React?
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] List the benefits React brings to modern web applications.
+-  [ ] Compare React with Vanilla JS and full frameworks like Angular.
+-  [ ] Map ecosystem tools to upcoming TaskFlow Pro modules.
+-  [ ] Share real-world examples of React at scale.
+
+## Project Context
+
+Choosing React is a strategic decision. You will leverage its flexibility,
+community, and tooling across every feature of TaskFlow Pro.
+
+---
+
+## Business Case
+
+-  **Developer Velocity:** Component reuse speeds up feature delivery.
+-  **Talent Pool:** React is widely taught, easing hiring.
+-  **Community Support:** Thousands of libraries accelerate development.
+
+### Basic Example
+
+```md
+React powers Facebook, Netflix, Shopify, Airbnb, and countless SaaS startups.
+```
+
+### Practical Example
+
+```tsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
+export function AppProviders({ children }: { children: React.ReactNode }) {
+   return (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+   );
+}
+```
+
+React's ecosystem integrates seamlessly, letting you drop in tools like React
+Query in Module 3.
+
+---
+
+## React vs Alternatives
+
+| Feature        | React                            | Angular                        | Vue                         |
+| -------------- | -------------------------------- | ------------------------------ | --------------------------- |
+| Philosophy     | Library (bring your own tooling) | Framework (batteries included) | Progressive framework       |
+| Learning Curve | Gentle start, depth later        | Steeper upfront                | Between React and Angular   |
+| Ecosystem      | Huge third-party library set     | Official CLI, opinionated      | Balanced third-party + core |
+
+---
+
+## ✅ Best Practices
+
+### 1. Adopt Tools Gradually
+
+**Why:** React's flexibility lets you add libraries only when needed.
+
+```md
+Module timeline:
+
+-  M1: React + Tailwind
+-  M3: Axios + React Query (optional)
+-  M7: React Hook Form
+```
+
+### 2. Benchmark Needs Against Ecosystem
+
+**Why:** Avoid reinventing the wheel; rely on proven libraries when they reduce
+risk.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Installing Everything Day One
+
+**Problem:** Bloated dependencies complicate onboarding.
+
+**Solution:** Add packages when a module requires them and document why.
+
+### 2. Ignoring Browser Support
+
+**Problem:** New APIs may not work without polyfills.
+
+**Solution:** Use tools like `@vitejs/plugin-legacy` when supporting older
+browsers.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Ecosystem Roadmap
+
+1. Update `docs/dependencies.md` with a section titled "When We Introduce It".
+2. For each dependency (React Router, React Hook Form, etc.), note the module
+   where it appears.
+3. Add a short reason (e.g., "Routing" or "Forms").
+4. Commit with `git commit -am "docs: map dependencies to modules"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Extend <code>docs/dependencies.md</code> with a module-aware table so every
+         dependency ties back to a TaskFlow Pro milestone. The matrix below keeps the
+         roadmap aligned with the final project scope.
+      </p>
+
+      ```md
+      ## When We Introduce It
+
+      | Package | Introduced In | Why It Matters |
+      | --- | --- | --- |
+      | react-router-dom | Module 4 · Routing | Power dashboard ↔ task board navigation and deep links. |
+      | @tanstack/react-query | Module MX · Extended Capabilities | Handle task fetching, caching, and optimistic updates. |
+      | react-hook-form | Module 7 · Forms & Auth | Manage task create/edit flows with validation. |
+      | zustand | Module 6 · State Management | Provide lightweight global state for preferences. |
+      | tailwindcss-animate | Module 5 · Hooks & Performance | Add micro-interactions to the command palette. |
+      ```
+
+      <p className='mt-3'>Document additional libraries as the backlog evolves, then commit:</p>
+
+      ```bash
+      git add docs/dependencies.md
+      git commit -m "docs: map dependencies to modules"
+      ```
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Future contributors can see which module introduces each library and why.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Dependency roadmap includes all tools referenced in Module 1–7.
+
+### Code Quality
+
+-  [ ] Reasons are concise and action-oriented.
+
+### Understanding
+
+-  [ ] You can articulate why React was chosen over alternatives.
+
+### Project Integration
+
+-  [ ] Notes reference the roadmap when planning future modules.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m1/1_intro-react'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Introduction to React
+   </a>
+   <a
+      href='/docs/react-new/m1/3_jsx-overview'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · JSX Overview
+   </a>
+</div>

@@ -1,0 +1,204 @@
+---
+title: "Project Overview"
+description:
+   "Understand TaskFlow Pro's features, architecture, and success criteria."
+module: "M0"
+lesson: "3"
+difficulty: "beginner"
+duration: "20"
+project_phase: "Orientation"
+prerequisites: ["/docs/react-new/m0/2_setup"]
+learning_objectives:
+   - "Summarise the TaskFlow Pro feature set"
+   - "Describe the high-level architecture"
+   - "Identify the tech stack and design system"
+   - "Capture success metrics for the final project"
+tags: ["overview", "architecture", "product"]
+---
+
+# Project Overview
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Outline the user-facing features of TaskFlow Pro.
+-  [ ] Understand the architecture layers you will build.
+-  [ ] Recognise how the UI kit and API connect.
+-  [ ] Define what "done" means for the final project.
+
+## Project Context
+
+Before writing a line of code we need a mental model for the finished app. This
+lesson clarifies what we are building and why each module matters.
+
+---
+
+## Product Summary
+
+TaskFlow Pro helps teams capture, organise, and deliver work. Users can create
+projects, add tasks with due dates and priorities, and monitor progress through
+dashboards.
+
+### Feature Milestones
+
+-  **M1:** Chrome for the app—global header, sidebar, and task cards.
+-  **M2:** Full CRUD for tasks with inline editing.
+-  **M3:** Remote persistence via REST API + optimistic updates.
+-  **M4:** Dedicated routes for Dashboard, Projects, Settings.
+-  **M5–M7:** Performance, global state, forms, and authentication.
+-  **M8:** Production-grade deployment to Vercel.
+
+### Basic Example
+
+```ts
+export const taskflowModules = [
+   { id: "m1", theme: "fundamentals", outcome: "UI shell ready" },
+   { id: "m2", theme: "state", outcome: "CRUD interactions live" },
+];
+```
+
+### Practical Example
+
+```ts
+export type Task = {
+   id: string;
+   title: string;
+   description: string;
+   dueDate: string;
+   priority: "low" | "medium" | "high";
+   status: "todo" | "in-progress" | "done";
+};
+
+export type Project = {
+   id: string;
+   name: string;
+   summary: string;
+   tasks: Task[];
+};
+```
+
+These types guide the UI shape you will implement in upcoming modules.
+
+---
+
+## Architecture at a Glance
+
+-  **Client:** Vite + React + TypeScript.
+-  **Styles:** Tailwind CSS with a small design token layer.
+-  **State:** Hooks and Context; later modules introduce Redux patterns.
+-  **Data:** REST API served locally via mock server → replaced with hosted
+   endpoint in MX.
+
+---
+
+## ✅ Best Practices
+
+### 1. Establish Domain Language Early
+
+**Why:** Consistent naming keeps code readable across files and contributors.
+
+```md
+Glossary snippet:
+
+-  Task: atomic piece of work
+-  Project: collection of tasks
+-  View: route-level screen
+```
+
+### 2. Document Success Criteria
+
+**Why:** Prevents scope creep and keeps modules focused.
+
+```md
+Success = responsive UI, persistent tasks, accessible forms, deployed build.
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Skipping Architecture Notes
+
+**Problem:** Without a blueprint decisions become inconsistent.
+
+```md
+// Bad: "Figure it out later" in planning doc.
+```
+
+**Solution:**
+
+```md
+Add diagrams or bullet points before coding.
+```
+
+### 2. Overloading Module 0
+
+**Problem:** Trying to build features before foundations leads to rewrites.
+
+```md
+// Bad: starting authentication before base layout exists.
+```
+
+**Solution:**
+
+```md
+Follow the roadmap; finish one milestone before the next.
+```
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Create a Project Blueprint
+
+1. Add `docs/project-overview.md`.
+2. Include sections for features, personas, and success metrics.
+3. Paste the TypeScript interfaces above into the doc for quick reference.
+4. Commit with `git commit -am "docs: add project overview"`.
+
+#### Expected Result
+
+You and future collaborators can instantly grasp what TaskFlow Pro should
+deliver.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] `docs/project-overview.md` exists with feature bullets.
+-  [ ] Interfaces for `Task` and `Project` are recorded.
+
+### Code Quality
+
+-  [ ] Commit groups documentation changes only.
+-  [ ] Filenames use kebab-case or lower-case where appropriate.
+
+### Understanding
+
+-  [ ] You can explain the app in under 30 seconds.
+-  [ ] You know which module handles routing vs. data fetching.
+
+### Project Integration
+
+-  [ ] Notes file links to the overview doc.
+-  [ ] Backlog of future stretch goals (optional) recorded separately.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m0/2_setup'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Downloads & Setup
+   </a>
+   <a
+      href='/docs/react-new/m0/4_dependencies'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Dependencies
+   </a>
+</div>

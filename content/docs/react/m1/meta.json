@@ -1,18 +1,19 @@
 {
    "title": "M1 - React Fundamentals",
    "pages": [
+      "0_index",
       "index",
-      "intro-react",
-      "why-react",
-      "jsx-overview",
-      "jsx-rendering",
-      "components",
-      "props",
-      "lifecycle",
-      "hooks-intro",
-      "styling",
-      "implementation",
-      "validation"
+      "1_intro-react",
+      "2_why-react",
+      "3_jsx-overview",
+      "4_jsx-rendering",
+      "5_components",
+      "6_props",
+      "7_lifecycle",
+      "8_hooks-intro",
+      "9_styling",
+      "10_implementation",
+      "11_validation"
    ],
    "defaultOpen": true
 }

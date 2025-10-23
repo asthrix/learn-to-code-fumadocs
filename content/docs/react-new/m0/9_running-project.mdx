@@ -1,0 +1,172 @@
+---
+title: "Running the Project"
+description:
+   "Start the Vite dev server and confirm everything renders correctly."
+module: "M0"
+lesson: "9"
+difficulty: "beginner"
+duration: "15"
+project_phase: "Environment & workflow"
+prerequisites: ["/docs/react-new/m0/8_environment-variables"]
+learning_objectives:
+   - "Run the development server with npm scripts"
+   - "Troubleshoot common startup issues"
+   - "Use VS Code tasks or package.json scripts to automate commands"
+   - "Preview the starter UI and confirm hot reload works"
+tags: ["vite", "dev-server", "workflow"]
+---
+
+# Running the Project
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Start the Vite dev server and open TaskFlow Pro in the browser.
+-  [ ] Verify hot module replacement (HMR) works for quick feedback.
+-  [ ] Configure a VS Code task or npm script alias for speed.
+-  [ ] Log common errors and fixes for future reference.
+
+## Project Context
+
+You will run the dev server dozens of times per module. Learn the lifecycle
+now—start API, start Vite, refresh on changes—so future lessons focus purely on
+features.
+
+---
+
+## Start the Dev Server
+
+```bash
+npm install
+npm run dev
+```
+
+Open the printed URL (typically `http://localhost:5173`).
+
+### Basic Example
+
+```bash
+VITE v5.0.0  ready in 123 ms
+➜  Local:   http://localhost:5173/
+```
+
+### Practical Example
+
+Add an npm script to run API + web concurrently (optional for later modules):
+
+```json
+{
+   "scripts": {
+      "dev": "vite",
+      "dev:full": "concurrently \"npm run api\" \"npm run dev\""
+   }
+}
+```
+
+Install `concurrently` with `npm install -D concurrently` if you enable
+`dev:full`.
+
+---
+
+## ✅ Best Practices
+
+### 1. Use Terminal Split View
+
+**Why:** Keep API logs and Vite logs visible together.
+
+```bash
+# VS Code shortcut
+Ctrl+`
+# Split terminal
+Ctrl+Shift+5 (Windows) / Cmd+Shift+5 (macOS)
+```
+
+### 2. Capture Error Fixes
+
+**Why:** When Vite fails to compile, note solutions for teammates.
+
+```md
+-  "Port already in use" → run `lsof -i :5173` and kill the process.
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting to Start the API
+
+**Problem:** Pages relying on data show errors.
+
+```md
+// Bad: launching only Vite and wondering why fetches fail.
+```
+
+**Solution:** Start API (`npm run api`) before or alongside `npm run dev`.
+
+### 2. Leaving Servers Running
+
+**Problem:** Extra background processes hog ports or CPU.
+
+```bash
+# Bad: multiple Vite instances running after closing the tab.
+```
+
+**Solution:** Stop servers with `Ctrl+C` (twice on Windows) when done.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Create a VS Code Task (optional but helpful)
+
+1. Add `.vscode/tasks.json` with a task that runs `npm run dev`.
+2. Bind it to a shortcut or set `"npm run dev"` as the default build task
+   (Terminal → Configure Default Build Task).
+3. Document the command in `notes/workflow.md`.
+
+#### Expected Result
+
+Launching the dev server becomes a two-click or shortcut action, making frequent
+restarts painless.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] `npm run dev` starts and displays the Vite dashboard.
+-  [ ] Browser automatically refreshes after editing `src/App.tsx`.
+
+### Code Quality
+
+-  [ ] `.vscode/tasks.json` is committed for team reuse.
+-  [ ] Terminal output is recorded in your notes (screenshots or copy/paste).
+
+### Understanding
+
+-  [ ] You can explain the difference between `npm run dev` and `npm run build`.
+-  [ ] You know how to stop the server cleanly on your OS.
+
+### Project Integration
+
+-  [ ] Workflow notes include troubleshooting tips for startup errors.
+-  [ ] `package.json` scripts remain tidy and documented.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m0/8_environment-variables'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Environment Variables
+   </a>
+   <a
+      href='/docs/react-new/m0/10_working-with-project'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Working with the Project
+   </a>
+</div>

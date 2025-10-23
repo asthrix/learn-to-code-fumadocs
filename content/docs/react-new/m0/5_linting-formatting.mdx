@@ -1,0 +1,195 @@
+---
+title: "Linting & Formatting"
+description:
+   "Configure ESLint and Prettier so TaskFlow Pro stays consistent from the
+   start."
+module: "M0"
+lesson: "5"
+difficulty: "beginner"
+duration: "25"
+project_phase: "Environment & workflow"
+prerequisites: ["/docs/react-new/m0/4_dependencies"]
+learning_objectives:
+   - "Install and configure ESLint for React + TypeScript"
+   - "Integrate Prettier with VS Code"
+   - "Add scripts to run linting from npm"
+   - "Understand how linting policies protect code quality"
+tags: ["eslint", "prettier", "tooling"]
+---
+
+# Linting & Formatting
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Configure ESLint with React, TypeScript, and accessibility rules.
+-  [ ] Pair Prettier with ESLint so formatting happens on save.
+-  [ ] Add `npm run lint` to enforce standards in CI/CD later.
+-  [ ] Document code style conventions for contributors.
+
+## Project Context
+
+A consistent style saves time reviewing pull requests and debugging. TaskFlow
+Pro uses ESLint to catch bugs and Prettier to keep formatting predictable.
+
+---
+
+## Configure ESLint
+
+Install dependencies:
+
+```bash
+npm install -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y eslint-config-prettier
+```
+
+Create `.eslintrc.cjs`:
+
+```js
+module.exports = {
+   root: true,
+   parser: "@typescript-eslint/parser",
+   plugins: ["@typescript-eslint", "react", "react-hooks", "jsx-a11y"],
+   extends: [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended",
+      "plugin:jsx-a11y/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier",
+   ],
+};
+```
+
+---
+
+## Configure Prettier
+
+Install Prettier and Tailwind plugin:
+
+```bash
+npm install -D prettier prettier-plugin-tailwindcss
+```
+
+Create `prettier.config.cjs`:
+
+```js
+module.exports = {
+   singleQuote: true,
+   trailingComma: "all",
+   printWidth: 90,
+   plugins: ["prettier-plugin-tailwindcss"],
+};
+```
+
+Add `.prettierignore` to skip build output and lockfiles.
+
+---
+
+## ✅ Best Practices
+
+### 1. Wire Lint to npm Scripts
+
+**Why:** Keeps commands memorable and ready for CI jobs.
+
+```json
+{
+   "scripts": {
+      "lint": "eslint --ext .ts,.tsx src",
+      "format": "prettier --write ."
+   }
+}
+```
+
+### 2. Enable Format on Save
+
+**Why:** Immediate feedback avoids large formatting diffs.
+
+```json
+{
+   "editor.formatOnSave": true,
+   "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mixing Global and Local Config
+
+**Problem:** Global VS Code settings conflict with workspace rules.
+
+```md
+// Bad: overriding repo Prettier config with personal defaults.
+```
+
+**Solution:** Use `.vscode/settings.json` committed to the repo.
+
+### 2. Ignoring Lint Warnings
+
+**Problem:** Warnings accumulate until they block merges.
+
+```bash
+# Bad: npm run lint exits with warnings you shrug off.
+```
+
+**Solution:** Treat warnings as errors and fix them immediately.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Add Lint + Format Configuration
+
+1. Install ESLint and Prettier packages listed above.
+2. Create `.eslintrc.cjs`, `prettier.config.cjs`, `.eslintignore`,
+   `.prettierignore`.
+3. Update `package.json` scripts with `lint` and `format` commands.
+4. Add `.vscode/settings.json` enabling format-on-save.
+
+#### Expected Result
+
+Running `npm run lint` highlights issues; saving files reorders Tailwind classes
+automatically.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] `npm run lint` runs without errors on the clean scaffold.
+-  [ ] Prettier formats files when you save in VS Code.
+
+### Code Quality
+
+-  [ ] `.eslintignore` excludes `dist`, `node_modules`, and `coverage`.
+-  [ ] Lint config extends from `eslint-config-prettier` to avoid conflicts.
+
+### Understanding
+
+-  [ ] You can explain how ESLint and Prettier complement each other.
+-  [ ] You know where to adjust formatting (Prettier) vs. logic rules (ESLint).
+
+### Project Integration
+
+-  [ ] Automation scripts documented in `docs/dependencies.md`.
+-  [ ] Notes include a reminder to add linting to CI in Module 8.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m0/4_dependencies'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Dependencies
+   </a>
+   <a
+      href='/docs/react-new/m0/6_api-overview'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · API Overview
+   </a>
+</div>
