@@ -1,0 +1,239 @@
+---
+title: "Implementing Module 0"
+description:
+   "Bootstrap the TaskFlow Pro codebase with Vite, Tailwind, and shared layout
+   scaffolding."
+module: "M0"
+lesson: "11"
+difficulty: "beginner"
+duration: "45"
+project_phase: "Initial build"
+prerequisites: ["/docs/react-new/m0/10_working-with-project"]
+learning_objectives:
+   - "Generate the Vite + React + TypeScript project"
+   - "Integrate Tailwind CSS and design tokens"
+   - "Create base layout components"
+   - "Wire lint/format scripts and run initial checks"
+tags: ["implementation", "vite", "tailwind"]
+---
+
+# Implementing Module 0
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Bootstrap the TaskFlow Pro app from scratch using Vite.
+-  [ ] Set up Tailwind CSS with custom theme tokens.
+-  [ ] Add a base layout with placeholder Header and Sidebar regions.
+-  [ ] Run lint/format scripts to confirm configuration.
+
+## Project Context
+
+This is the first hands-on build lesson. You will produce the repository
+foundation that later modules extend.
+
+---
+
+## Step 1: Generate the Project
+
+```bash
+npm create vite@latest taskflow-pro -- --template react-ts
+cd taskflow-pro
+npm install
+```
+
+Clean up boilerplate files (`src/assets`, `src/App.css`, etc.) to prepare for
+Tailwind.
+
+---
+
+## Step 2: Configure Tailwind
+
+```bash
+npx tailwindcss init -p
+```
+
+Update `tailwind.config.js`:
+
+```js
+module.exports = {
+   content: ["./index.html", "./src/**/*.{ts,tsx}"],
+   theme: {
+      extend: {
+         colors: {
+            "fd-primary": "#2563eb",
+            "fd-primary-foreground": "#ffffff",
+            "fd-accent": "#e0f2fe",
+         },
+      },
+   },
+};
+```
+
+Replace `src/index.css` with Tailwind directives (`@tailwind base;`, etc.).
+
+---
+
+## Step 3: Create Layout Shell
+
+`src/App.tsx`:
+
+```tsx
+import "./index.css";
+
+export function App() {
+   return (
+      <div className='flex min-h-screen bg-slate-950 text-slate-100'>
+         <aside className='hidden w-64 border-r border-white/10 bg-black/30 p-6 md:block'>
+            <h1 className='text-xl font-semibold'>TaskFlow Pro</h1>
+            <p className='mt-2 text-sm text-white/60'>
+               Navigation coming in Module 1.
+            </p>
+         </aside>
+         <main className='flex-1 p-6'>
+            <header className='mb-6 flex items-center justify-between'>
+               <div>
+                  <h2 className='text-2xl font-semibold'>Welcome aboard</h2>
+                  <p className='text-sm text-white/60'>
+                     Module 0 is all about setup.
+                  </p>
+               </div>
+            </header>
+            <section className='rounded-lg border border-white/10 bg-black/20 p-6'>
+               <p className='text-sm text-white/70'>
+                  Replace this placeholder with real content once Module 1
+                  begins.
+               </p>
+            </section>
+         </main>
+      </div>
+   );
+}
+```
+
+`src/main.tsx`:
+
+```tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { App } from "./App";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+   <React.StrictMode>
+      <App />
+   </React.StrictMode>
+);
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Remove Unused Assets Immediately
+
+**Why:** Keeps git history clean and avoids unused code warnings.
+
+```bash
+rm -rf src/assets src/App.css src/index.css
+```
+
+### 2. Commit After Each Major Step
+
+**Why:** Easier to revert if configuration needs adjusting.
+
+```bash
+git commit -am "chore: scaffold taskflow pro"
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting Tailwind Directives
+
+**Problem:** Styles do not load.
+
+```css
+/* Bad: missing Tailwind directives */
+```
+
+**Solution:**
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+### 2. Skipping Lint Run
+
+**Problem:** Configuration issues surface later when harder to debug.
+
+```bash
+# Bad: ignoring lint output after initial setup.
+```
+
+**Solution:**
+
+```bash
+npm run lint
+```
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Complete the Scaffold
+
+1. Generate the Vite project and install dependencies.
+2. Integrate Tailwind with custom theme tokens.
+3. Replace boilerplate App with the layout shown above.
+4. Run `npm run lint` and `npm run format -- --check` (if configured).
+5. Commit with `git commit -am "feat: bootstrap taskflow pro shell"`.
+
+#### Expected Result
+
+Opening `http://localhost:5173` shows a clean dark layout with placeholder
+content and no lint errors.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Vite dev server boots without errors.
+-  [ ] Layout displays sidebar, header, and content area.
+
+### Code Quality
+
+-  [ ] No unused imports or TypeScript errors remain.
+-  [ ] Tailwind directives and config match course tokens.
+
+### Understanding
+
+-  [ ] You can explain how `main.tsx` mounts the React tree.
+-  [ ] You know where to place future shared layout components.
+
+### Project Integration
+
+-  [ ] Notes capture any setup hiccups and fixes.
+-  [ ] Commit message references the lesson for traceability.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m0/10_working-with-project'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Working with the Project
+   </a>
+   <a
+      href='/docs/react-new/m0/12_validation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Validation Checklist
+   </a>
+</div>

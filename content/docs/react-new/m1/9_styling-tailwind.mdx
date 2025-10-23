@@ -1,0 +1,193 @@
+---
+title: "Styling & Tailwind"
+description:
+   "Style TaskFlow Pro using Tailwind CSS utilities and custom design tokens."
+module: "M1"
+lesson: "9"
+difficulty: "beginner"
+duration: "30"
+project_phase: "UI scaffolding"
+prerequisites: ["/docs/react-new/m1/8_introduction-hooks"]
+learning_objectives:
+   - "Apply Tailwind utility classes effectively"
+   - "Create component-level style primitives"
+   - "Use the local design tokens defined in Module 0"
+   - "Leverage Fumadocs UI components in MDX"
+tags: ["tailwind", "styling", "design-system"]
+---
+
+# Styling & Tailwind
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Style components with Tailwind utility classes.
+-  [ ] Reference custom colors and spacing defined in `tailwind.config`.
+-  [ ] Create reusable class helpers for consistent looks.
+-  [ ] Integrate Fumadocs UI components for documentation snippets.
+
+## Project Context
+
+TaskFlow Pro leans on Tailwind for rapid styling. You already set up tokens in
+Module 0—now you'll apply them to real components.
+
+---
+
+## Tailwind Utilities Recap
+
+-  Compose classes directly in JSX (`className="grid gap-6"`).
+-  Utilities are mobile-first and override in order.
+-  Use `cn` helper (already in `src/lib/cn.ts`) to conditionally merge classes.
+
+### Basic Example
+
+```tsx
+<div className='rounded-lg border border-border bg-card p-6 shadow-sm' />
+```
+
+### Practical Example
+
+```tsx
+import { cn } from "@/lib/cn";
+
+type BadgeProps = {
+   variant?: "default" | "success" | "danger";
+   children: React.ReactNode;
+};
+
+const variantClasses: Record<NonNullable<BadgeProps["variant"]>, string> = {
+   default: "bg-muted text-muted-foreground",
+   success: "bg-emerald-500/10 text-emerald-500",
+   danger: "bg-red-500/10 text-red-500",
+};
+
+export function Badge({ variant = "default", children }: BadgeProps) {
+   return (
+      <span
+         className={cn(
+            "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium",
+            variantClasses[variant]
+         )}
+      >
+         {children}
+      </span>
+   );
+}
+```
+
+---
+
+## Using Local UI Components
+
+You can adopt shared components from `src/components/ui`, such as
+`buttonVariants`.
+
+```tsx
+import { buttonVariants } from "@/components/ui/button";
+
+<a className={buttonVariants({ variant: "primary" })} href='#'>
+   Add Task
+</a>;
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Group Utilities Logically
+
+**Why:** Improves readability.
+
+```tsx
+className =
+   "flex items-center justify-between rounded-lg border bg-card px-4 py-3";
+```
+
+### 2. Extract Patterns into Components
+
+**Why:** Simplifies future design tweaks.
+
+```tsx
+function Card({ children }: { children: React.ReactNode }) {
+   return (
+      <article className='rounded-lg border bg-card p-6 shadow-sm'>
+         {children}
+      </article>
+   );
+}
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mixing Inline Styles with Tailwind
+
+**Problem:** Harder to enforce consistency.
+
+**Solution:** Rely on utilities and extend Tailwind when necessary.
+
+### 2. Forgetting Dark Mode Considerations
+
+**Problem:** Styles unreadable in dark theme.
+
+**Solution:** Use Tailwind color tokens that adapt automatically.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Style Header & Sidebar
+
+1. Update `src/components/layout/Header.tsx` and `Sidebar.tsx` (create if
+   missing).
+2. Apply Tailwind classes using tokens (`bg-card`, `text-muted-foreground`,
+   etc.).
+3. Use `buttonVariants` for primary CTA in the header (e.g., "New Task").
+4. Document the class choices in `docs/ui-components.md` under a "Styling"
+   subsection.
+5. Commit with `git commit -am "feat: style header and sidebar"`.
+
+#### Expected Result
+
+The app shell now matches the design language established in Module 0.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Header and sidebar render with new styling.
+-  [ ] Buttons use shared variants.
+
+### Code Quality
+
+-  [ ] No inline styles remain unless justified.
+-  [ ] `cn` helper used for conditional classes.
+
+### Understanding
+
+-  [ ] You can explain which utilities control spacing vs color.
+
+### Project Integration
+
+-  [ ] Documentation references Tailwind tokens for future updates.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m1/8_introduction-hooks'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Introduction to Hooks
+   </a>
+   <a
+      href='/docs/react-new/m1/10_implementation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Implementation
+   </a>
+</div>

@@ -1,0 +1,734 @@
+---
+title: "Environment Variables and Configuration"
+description: "Learn to manage environment-specific settings and secrets securely in TaskFlow Pro"
+module: "M0"
+lesson: "6"
+difficulty: "beginner"
+duration: "25"
+project_phase: "Configuration management"
+prerequisites: ["Linting and Code Formatting"]
+learning_objectives:
+  - "Understand what environment variables are and why they're used"
+  - "Create and manage .env files for different environments"
+  - "Access environment variables in React applications"
+  - "Keep secrets secure and out of version control"
+tags: ["environment-variables", "configuration", "env-files", "security", "dotenv"]
+---
+
+# Environment Variables and Configuration
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+- [ ] Understand what environment variables are and their importance
+- [ ] Create and manage `.env` files for different environments
+- [ ] Access environment variables in your React application
+- [ ] Know what should and shouldn't be stored in environment variables
+- [ ] Keep API keys and secrets secure
+
+## Project Context
+
+TaskFlow Pro will connect to APIs, use different configurations for development and production, and handle sensitive data like authentication tokens. Environment variables allow you to manage these settings securely without hardcoding values into your source code. This is essential for professional development and deployment.
+
+---
+
+## What Are Environment Variables?
+
+**Environment variables** are key-value pairs that exist outside your code and vary based on the environment (development, staging, production).
+
+### Why Environment Variables Matter
+
+**Security**
+```javascript
+// ❌ Bad: API key in code
+const API_KEY = 'sk_live_abc123xyz789';  // Exposed in version control!
+
+// ✅ Good: API key in environment variable
+const API_KEY = import.meta.env.VITE_API_KEY;  // Secure, not in git
+```
+
+**Flexibility**
+```javascript
+// ❌ Bad: Hardcoded URLs
+const API_URL = 'https://api.taskflow.com';  // Same URL everywhere
+
+// ✅ Good: Environment-specific URLs
+// Development: http://localhost:3001
+// Production:  https://api.taskflow.com
+const API_URL = import.meta.env.VITE_API_URL;
+```
+
+**Different Configurations**
+```
+Development:   Local database, verbose logging, dev tools
+Staging:       Test database, moderate logging, debug tools
+Production:    Live database, minimal logging, optimized
+```
+
+---
+
+## Environment Variables in Vite
+
+### Vite's Environment Variable System
+
+Vite uses a **prefix-based system** for security:
+
+```javascript
+// ✅ Accessible in client code (starts with VITE_)
+import.meta.env.VITE_API_URL
+import.meta.env.VITE_APP_NAME
+
+// ❌ NOT accessible (no VITE_ prefix)
+import.meta.env.DATABASE_URL
+import.meta.env.PRIVATE_KEY
+```
+
+**Why the prefix?**
+- **Security:** Prevents accidental exposure of server-side secrets
+- **Explicit:** Must intentionally mark variables as client-safe
+- **Build-time:** Values are embedded during build, not runtime
+
+### Built-in Vite Variables
+
+Vite provides these automatically:
+
+```javascript
+// Current mode (development, production, etc.)
+import.meta.env.MODE  // 'development' or 'production'
+
+// Base URL
+import.meta.env.BASE_URL  // '/' by default
+
+// Is development mode?
+import.meta.env.DEV  // true in dev, false in production
+
+// Is production mode?
+import.meta.env.PROD  // false in dev, true in production
+
+// Server-side rendering
+import.meta.env.SSR  // boolean
+```
+
+---
+
+## Creating Environment Files
+
+### File Types
+
+```
+.env                  # Default, all environments
+.env.local            # Local overrides (not in git)
+.env.development      # Development environment
+.env.development.local # Local dev overrides
+.env.production       # Production environment
+.env.production.local  # Local prod overrides
+```
+
+### Priority Order
+
+```
+Production build:
+1. .env.production.local
+2. .env.production
+3. .env.local
+4. .env
+
+Development mode:
+1. .env.development.local
+2. .env.development
+3. .env.local
+4. .env
+```
+
+Higher numbers = higher priority (overrides lower)
+
+---
+
+## TaskFlow Pro Environment Configuration
+
+### Development Environment
+
+Create `.env.development`:
+
+```bash
+# App Configuration
+VITE_APP_NAME=TaskFlow Pro
+VITE_APP_VERSION=0.1.0
+VITE_APP_DESCRIPTION=Modern Task Management
+
+# API Configuration
+VITE_API_URL=http://localhost:3001/api
+VITE_API_TIMEOUT=5000
+
+# Features
+VITE_ENABLE_ANALYTICS=false
+VITE_ENABLE_DEBUG=true
+VITE_SHOW_DEV_TOOLS=true
+
+# Authentication (Mock)
+VITE_AUTH_ENABLED=false
+```
+
+### Production Environment
+
+Create `.env.production`:
+
+```bash
+# App Configuration
+VITE_APP_NAME=TaskFlow Pro
+VITE_APP_VERSION=0.1.0
+VITE_APP_DESCRIPTION=Modern Task Management
+
+# API Configuration
+VITE_API_URL=https://api.taskflow-pro.com/api
+VITE_API_TIMEOUT=10000
+
+# Features
+VITE_ENABLE_ANALYTICS=true
+VITE_ENABLE_DEBUG=false
+VITE_SHOW_DEV_TOOLS=false
+
+# Authentication
+VITE_AUTH_ENABLED=true
+```
+
+### Local Environment (Not in Git)
+
+Create `.env.local`:
+
+```bash
+# Personal API Keys (NEVER COMMIT THIS FILE)
+VITE_API_KEY=your-personal-api-key-here
+
+# Personal Settings
+VITE_USER_ID=dev-user-123
+VITE_FEATURE_FLAGS=experimental-features-enabled
+```
+
+### Example Template
+
+Create `.env.example`:
+
+```bash
+# Copy this to .env.local and fill in your values
+
+# API Configuration
+VITE_API_URL=http://localhost:3001/api
+VITE_API_KEY=your-api-key-here
+
+# App Settings
+VITE_APP_NAME=TaskFlow Pro
+VITE_ENABLE_DEBUG=true
+```
+
+---
+
+## Accessing Environment Variables
+
+### In React Components
+
+```jsx
+// src/config/env.js
+export const config = {
+  app: {
+    name: import.meta.env.VITE_APP_NAME || 'TaskFlow Pro',
+    version: import.meta.env.VITE_APP_VERSION || '0.1.0',
+    description: import.meta.env.VITE_APP_DESCRIPTION || '',
+  },
+  api: {
+    url: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+    timeout: parseInt(import.meta.env.VITE_API_TIMEOUT || '5000'),
+    key: import.meta.env.VITE_API_KEY || '',
+  },
+  features: {
+    analytics: import.meta.env.VITE_ENABLE_ANALYTICS === 'true',
+    debug: import.meta.env.VITE_ENABLE_DEBUG === 'true',
+    devTools: import.meta.env.VITE_SHOW_DEV_TOOLS === 'true',
+  },
+};
+```
+
+### Using Configuration
+
+```jsx
+// src/services/api.js
+import { config } from '../config/env';
+
+export const fetchTasks = async () => {
+  const response = await fetch(`${config.api.url}/tasks`, {
+    headers: {
+      'Authorization': `Bearer ${config.api.key}`,
+      'Content-Type': 'application/json',
+    },
+    timeout: config.api.timeout,
+  });
+  
+  return response.json();
+};
+```
+
+### Conditional Rendering
+
+```jsx
+// src/components/DebugPanel.jsx
+import { config } from '../config/env';
+
+function DebugPanel() {
+  // Only show in development
+  if (!config.features.debug) {
+    return null;
+  }
+  
+  return (
+    <div className="debug-panel">
+      <h3>Debug Information</h3>
+      <p>Environment: {import.meta.env.MODE}</p>
+      <p>API URL: {config.api.url}</p>
+      <p>Version: {config.app.version}</p>
+    </div>
+  );
+}
+```
+
+### Mode-Specific Code
+
+```jsx
+function App() {
+  // Development-specific code
+  if (import.meta.env.DEV) {
+    console.log('Running in development mode');
+    console.log('API URL:', import.meta.env.VITE_API_URL);
+  }
+  
+  // Production-specific code
+  if (import.meta.env.PROD) {
+    // Initialize analytics
+    // Error tracking
+    // Performance monitoring
+  }
+  
+  return <div>App Content</div>;
+}
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Use VITE_ Prefix for Client Variables
+
+**Why:** Only these are accessible in client code
+
+```bash
+# ✅ Good: Client-safe variables
+VITE_API_URL=https://api.example.com
+VITE_APP_NAME=TaskFlow Pro
+
+# ❌ Bad: Won't be accessible
+API_URL=https://api.example.com  # Missing VITE_ prefix
+SECRET_KEY=abc123               # Should never be in client anyway!
+```
+
+### 2. Never Commit Secrets
+
+**Why:** Exposed in version control forever
+
+```bash
+# .gitignore
+.env.local
+.env*.local
+.env.development.local
+.env.production.local
+
+# These ARE committed:
+.env
+.env.example
+.env.development
+.env.production
+```
+
+**What to commit:**
+- ✅ `.env.example` - Template for developers
+- ✅ `.env.development` - Public dev configuration
+- ✅ `.env.production` - Public prod configuration
+
+**What NOT to commit:**
+- ❌ `.env.local` - Personal API keys
+- ❌ `.env*.local` - Any local overrides with secrets
+
+### 3. Provide Sensible Defaults
+
+**Why:** App works even if variables aren't set
+
+```javascript
+// Good: Always provide fallbacks
+const config = {
+  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+  timeout: parseInt(import.meta.env.VITE_TIMEOUT || '5000'),
+  debug: import.meta.env.VITE_DEBUG === 'true' || false,
+};
+
+// Bad: No fallbacks
+const config = {
+  apiUrl: import.meta.env.VITE_API_URL,  // undefined if not set!
+  timeout: parseInt(import.meta.env.VITE_TIMEOUT),  // NaN if not set!
+};
+```
+
+### 4. Type Conversion
+
+**Why:** Environment variables are always strings
+
+```javascript
+// All environment variables are strings!
+console.log(typeof import.meta.env.VITE_PORT);  // 'string'
+
+// Convert appropriately
+const port = parseInt(import.meta.env.VITE_PORT || '3000');
+const isDebug = import.meta.env.VITE_DEBUG === 'true';
+const timeout = parseFloat(import.meta.env.VITE_TIMEOUT || '5.5');
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Storing Secrets in Client-Side Code
+
+**Problem:** Client-side code is publicly accessible
+
+```javascript
+// ❌ NEVER DO THIS: Secret in client code
+const secretKey = import.meta.env.VITE_SECRET_KEY;  // Visible to anyone!
+const privateKey = import.meta.env.VITE_PRIVATE_KEY;  // Not private!
+
+// Anyone can see these in:
+// - Browser DevTools
+// - Built JavaScript files
+// - Source maps
+```
+
+**Solution:** Keep secrets on the server
+
+```javascript
+// ✅ Good: Public configuration only
+const API_URL = import.meta.env.VITE_API_URL;  // Public endpoint
+const APP_NAME = import.meta.env.VITE_APP_NAME;  // Public name
+
+// ✅ Good: Server-side secrets (backend API)
+// In your Node.js backend:
+const SECRET_KEY = process.env.SECRET_KEY;  // Server-side only
+```
+
+### 2. Forgetting to Restart Dev Server
+
+**Problem:** Changes to .env files require restart
+
+```bash
+# You change .env file
+VITE_API_URL=https://new-api.com
+
+# ❌ Bad: Keep dev server running
+# Old value still used!
+
+# ✅ Good: Restart dev server
+# Stop server (Ctrl+C)
+npm run dev
+# New value loaded!
+```
+
+**Solution:** Always restart after changing environment files
+
+### 3. Wrong Variable Names
+
+**Problem:** Typos or wrong prefixes
+
+```javascript
+// ❌ Wrong: Typo
+const apiUrl = import.meta.env.VITE_API_ULR;  // undefined
+
+// ❌ Wrong: No prefix
+const apiUrl = import.meta.env.API_URL;  // undefined
+
+// ✅ Correct: Right name with prefix
+const apiUrl = import.meta.env.VITE_API_URL;
+```
+
+**Solution:** Use TypeScript or create a config validator
+
+---
+
+## Security Considerations
+
+### What Can Be Public
+
+```bash
+# ✅ Safe for client-side
+VITE_APP_NAME=TaskFlow Pro
+VITE_API_URL=https://api.example.com
+VITE_FEATURE_ENABLED=true
+VITE_ANALYTICS_ID=UA-123456-1  # Public analytics ID
+```
+
+### What Must Stay Private
+
+```bash
+# ❌ NEVER expose these client-side
+DATABASE_URL=postgresql://...
+SECRET_KEY=abc123...
+PRIVATE_API_KEY=sk_live_...
+JWT_SECRET=secret...
+ENCRYPTION_KEY=...
+```
+
+### Safe API Key Patterns
+
+```javascript
+// ❌ Bad: Secret API key in client
+const stripe = new Stripe(import.meta.env.VITE_STRIPE_SECRET_KEY);
+
+// ✅ Good: Public key in client, secret key on server
+const stripe = new Stripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
+// Backend handles secret operations:
+// POST /api/create-payment
+// Uses SECRET_KEY server-side
+```
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Set Up Environment Configuration
+
+Let's create a proper environment configuration for TaskFlow Pro!
+
+#### Step 1: Create Environment Files
+
+```bash
+# Navigate to project
+cd ~/Developer/React-Course/taskflow-pro
+
+# Create development environment
+cat > .env.development << 'EOF'
+# App Configuration
+VITE_APP_NAME=TaskFlow Pro
+VITE_APP_VERSION=0.1.0
+
+# API Configuration
+VITE_API_URL=http://localhost:3001/api
+VITE_API_TIMEOUT=5000
+
+# Features
+VITE_ENABLE_DEBUG=true
+VITE_SHOW_DEV_TOOLS=true
+EOF
+
+# Create production environment
+cat > .env.production << 'EOF'
+# App Configuration
+VITE_APP_NAME=TaskFlow Pro
+VITE_APP_VERSION=0.1.0
+
+# API Configuration
+VITE_API_URL=https://api.taskflow-pro.com/api
+VITE_API_TIMEOUT=10000
+
+# Features
+VITE_ENABLE_DEBUG=false
+VITE_SHOW_DEV_TOOLS=false
+EOF
+
+# Create example template
+cat > .env.example << 'EOF'
+# Copy this to .env.local for local development
+
+# App Configuration
+VITE_APP_NAME=TaskFlow Pro
+VITE_APP_VERSION=0.1.0
+
+# API Configuration
+VITE_API_URL=http://localhost:3001/api
+VITE_API_KEY=your-api-key-here
+EOF
+```
+
+#### Step 2: Update .gitignore
+
+```bash
+# Add to .gitignore
+cat >> .gitignore << 'EOF'
+
+# Environment files with secrets
+.env.local
+.env*.local
+EOF
+```
+
+#### Step 3: Create Configuration Module
+
+Create `src/config/env.js`:
+
+```javascript
+/**
+ * Application configuration
+ * Centralizes all environment variables with type conversion and defaults
+ */
+
+export const config = {
+  app: {
+    name: import.meta.env.VITE_APP_NAME || 'TaskFlow Pro',
+    version: import.meta.env.VITE_APP_VERSION || '0.1.0',
+    mode: import.meta.env.MODE,
+    isDev: import.meta.env.DEV,
+    isProd: import.meta.env.PROD,
+  },
+  
+  api: {
+    url: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+    timeout: parseInt(import.meta.env.VITE_API_TIMEOUT || '5000', 10),
+    key: import.meta.env.VITE_API_KEY || '',
+  },
+  
+  features: {
+    debug: import.meta.env.VITE_ENABLE_DEBUG === 'true',
+    devTools: import.meta.env.VITE_SHOW_DEV_TOOLS === 'true',
+  },
+};
+
+// Log configuration in development
+if (config.app.isDev) {
+  console.log('App Configuration:', {
+    name: config.app.name,
+    version: config.app.version,
+    apiUrl: config.api.url,
+    debug: config.features.debug,
+  });
+}
+
+export default config;
+```
+
+#### Step 4: Use Configuration in App
+
+Update `src/App.jsx`:
+
+```jsx
+import { config } from './config/env';
+
+function App() {
+  return (
+    <div className="app">
+      <header>
+        <h1>{config.app.name}</h1>
+        <p>Version: {config.app.version}</p>
+      </header>
+      
+      {config.features.devTools && (
+        <div className="dev-tools">
+          <h3>Development Tools</h3>
+          <p>Environment: {config.app.mode}</p>
+          <p>API URL: {config.api.url}</p>
+        </div>
+      )}
+      
+      <main>
+        <p>Your TaskFlow Pro content here</p>
+      </main>
+    </div>
+  );
+}
+
+export default App;
+```
+
+#### Step 5: Test Configuration
+
+```bash
+# Start development server
+npm run dev
+
+# Check console for configuration log
+# Should show development settings
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+# Should show production settings
+```
+
+#### Expected Result:
+
+- ✅ Environment files created
+- ✅ .gitignore updated
+- ✅ Configuration module working
+- ✅ App displays correct environment values
+- ✅ Different settings in dev vs prod
+- ✅ Configuration logs in console (dev only)
+
+---
+
+## ✅ Validation Checklist
+
+After completing this lesson, verify:
+
+### **File Creation**
+- [ ] `.env.development` file exists with development settings
+- [ ] `.env.production` file exists with production settings
+- [ ] `.env.example` file exists as a template
+- [ ] `.gitignore` includes `.env.local` and `.env*.local`
+- [ ] `src/config/env.js` exists and exports configuration
+
+### **Configuration**
+- [ ] All variables use `VITE_` prefix
+- [ ] Sensible defaults are provided
+- [ ] Type conversion is handled (parseInt, boolean checks)
+- [ ] Configuration object is well-structured
+- [ ] Development logging is implemented
+
+### **Security**
+- [ ] No secrets committed to version control
+- [ ] `.env.local` is in .gitignore
+- [ ] Only public configuration in environment files
+- [ ] `.env.example` has placeholders for secrets
+- [ ] Understanding of what can be client-side
+
+### **Functionality**
+- [ ] Can access environment variables in components
+- [ ] Different values in development vs production
+- [ ] Dev tools show only in development
+- [ ] Configuration logs appear in development
+- [ ] App builds successfully for production
+
+### **Understanding**
+- [ ] You understand why environment variables are important
+- [ ] You know the difference between dev and prod environments
+- [ ] You understand the VITE_ prefix requirement
+- [ ] You know what should never be in client-side code
+- [ ] You can create and use environment-specific settings
+
+---
+
+<div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 my-8">
+  <h3 className="text-lg font-semibold text-yellow-900 mb-3">⚠️ Security Reminder</h3>
+  <p className="text-yellow-800 mb-4">
+    <strong>Never commit secrets to version control!</strong> Even if you delete them later, 
+    they remain in git history forever. Always use .env.local for sensitive data and ensure 
+    it's in your .gitignore.
+  </p>
+  <p className="text-yellow-800 font-medium">
+    If you accidentally commit a secret, consider it compromised and regenerate it immediately! 🔐
+  </p>
+</div>
+
+<div className="mt-8 flex justify-between items-center">
+  <a href="/docs/react/m0/linting" className="text-blue-600 hover:text-blue-800 font-medium">
+    ← Previous: Linting and Formatting
+  </a>
+  <a href="/docs/react/m0/running" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium inline-flex items-center">
+    Next: Running the Project →
+  </a>
+</div>

@@ -1,0 +1,196 @@
+---
+title: "JSX Iteration & Conditional Rendering"
+description: "Render lists and conditional UI states using JSX patterns."
+module: "M1"
+lesson: "4"
+difficulty: "beginner"
+duration: "25"
+project_phase: "UI scaffolding"
+prerequisites: ["/docs/react-new/m1/3_jsx-overview"]
+learning_objectives:
+   - "Render arrays using `map` and keys"
+   - "Display conditional UI using ternaries and logical operators"
+   - "Handle empty states gracefully"
+   - "Avoid pitfalls with keys and fragment usage"
+tags: ["jsx", "iteration", "conditional-rendering"]
+---
+
+# JSX Iteration & Conditional Rendering
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Use `Array.map` to render lists with unique keys.
+-  [ ] Display alternative UI based on data or loading states.
+-  [ ] Handle empty, loading, and error scenarios in JSX.
+-  [ ] Avoid common mistakes with keys and nested conditionals.
+
+## Project Context
+
+TaskFlow Pro shows task lists, filters, and status messages. Mastering
+conditional rendering keeps the UI informative and friendly.
+
+---
+
+## Rendering Lists
+
+### Basic Example
+
+```tsx
+const items = ["Plan", "Build", "Ship"];
+
+<ul>
+   {items.map((item) => (
+      <li key={item}>{item}</li>
+   ))}
+</ul>;
+```
+
+### Practical Example
+
+```tsx
+type TaskListProps = { tasks: Task[] };
+
+export function TaskList({ tasks }: TaskListProps) {
+   if (tasks.length === 0) {
+      return (
+         <p className='text-sm text-muted-foreground'>
+            No tasks yet. Add one above.
+         </p>
+      );
+   }
+
+   return (
+      <ul className='space-y-3'>
+         {tasks.map((task) => (
+            <li key={task.id}>
+               <TaskCard task={task} />
+            </li>
+         ))}
+      </ul>
+   );
+}
+```
+
+Keys should be stable identifiers (IDs), not indexes, to help React diff lists
+efficiently.
+
+---
+
+## Conditional Rendering Techniques
+
+-  **Ternary:** `isLoading ? <Spinner /> : <Content />`
+-  **Logical AND:** `tasks.length && <TaskList tasks={tasks} />`
+-  **Early Return:** Return alternate UI before main markup.
+
+---
+
+## ✅ Best Practices
+
+### 1. Handle All States Explicitly
+
+**Why:** Prevents confusing blank screens.
+
+```tsx
+if (isLoading) return <Spinner />;
+if (error) return <ErrorState message={error.message} />;
+if (tasks.length === 0) return <EmptyState />;
+```
+
+### 2. Extract Complex Conditions
+
+**Why:** Helper functions keep JSX readable.
+
+```tsx
+const hasOverdueTasks = tasks.some((task) => task.dueDate < today);
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Using Array Index as Key
+
+**Problem:** React misidentifies items when order changes.
+
+```tsx
+{
+   tasks.map((task, index) => <TaskCard key={index} task={task} />);
+}
+```
+
+**Solution:** Use a unique ID.
+
+```tsx
+{
+   tasks.map((task) => <TaskCard key={task.id} task={task} />);
+}
+```
+
+### 2. Nested Ternaries
+
+**Problem:** Hard to read and debug.
+
+**Solution:** Move logic to helper components or functions.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Build an Agenda Component
+
+1. Create `src/components/dashboard/Agenda.tsx`.
+2. Accept props `{ tasks: Task[]; isLoading: boolean; error?: Error }`.
+3. Render:
+   -  A skeleton state (`<SkeletonCard />`) when `isLoading`.
+   -  An error message when `error`.
+   -  An ordered list of up to five upcoming tasks sorted by due date.
+   -  An empty state when no tasks remain.
+4. Import and render `Agenda` in the dashboard section of `App.tsx` (placeholder
+   for now).
+5. Commit with `git commit -am "feat: add dashboard agenda"`.
+
+#### Expected Result
+
+The UI reflects the correct state (loading, error, empty, populated) using clear
+JSX patterns.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Agenda displays top five tasks sorted by due date.
+-  [ ] Loading and error states render correctly.
+
+### Code Quality
+
+-  [ ] Keys use task IDs.
+-  [ ] Conditional logic is readable and tested.
+
+### Understanding
+
+-  [ ] You can explain why keys matter for list rendering.
+
+### Project Integration
+
+-  [ ] Notes reference Agenda for reuse in later modules.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m1/3_jsx-overview'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← JSX Overview
+   </a>
+   <a
+      href='/docs/react-new/m1/5_components'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Components
+   </a>
+</div>
