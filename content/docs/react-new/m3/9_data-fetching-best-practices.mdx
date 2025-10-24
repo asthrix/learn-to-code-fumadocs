@@ -1,0 +1,207 @@
+---
+title: "Data Fetching Best Practices"
+description:
+   "Consolidate patterns for reliability, performance, and maintainability in
+   TaskFlow Pro's data layer."
+module: "M3"
+lesson: "9"
+difficulty: "advanced"
+duration: "25"
+project_phase: "Data integration"
+prerequisites: ["/docs/react-new/m3/8_data-fetching-part-3"]
+learning_objectives:
+   - "Adopt conventions for data fetching and caching"
+   - "Document error handling and retry strategies"
+   - "Plan monitoring for production readiness"
+   - "Create a reusable checklist for future modules"
+tags: ["data", "best-practices", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Data Fetching Best Practices
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Summarize conventions for TaskFlow Pro's data layer.
+-  [ ] Document error handling patterns for future contributors.
+-  [ ] Plan observability hooks (logging, analytics) around API calls.
+-  [ ] Create a reusable checklist for new endpoints.
+
+## Project Context
+
+Module 3 introduces a robust data layer. Codifying best practices now ensures
+consistency as new modules add features like routing, performance optimizations,
+and authentication.
+
+---
+
+## Guiding Principles
+
+1. **Single source of truth:** Hooks orchestrate data; components consume.
+2. **Predictable retries:** Backoff strategies prevent cascading failures.
+3. **Visibility:** Log errors and loading states for easier diagnostics.
+4. **Extensibility:** Adhere to patterns that scale with TanStack Query or other
+   data libraries.
+
+### Basic Example (Logging Wrapper)
+
+```ts
+async function withLogging<T>(label: string, operation: () => Promise<T>) {
+   const start = performance.now();
+   try {
+      const result = await operation();
+      console.info(`[${label}] success in`, performance.now() - start, "ms");
+      return result;
+   } catch (error) {
+      console.error(`[${label}] failed`, error);
+      throw error;
+   }
+}
+```
+
+### Practical Example (Mutation Policy)
+
+```ts
+await withLogging("tasks.create", () =>
+   retryWithBackoff(() => createTask(payload))
+);
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Standardize Error Display
+
+**Why:** Students and future teammates quickly understand what went wrong.
+
+```tsx
+{
+   error && (
+      <Callout type='error' title='Unable to load tasks'>
+         {error}
+      </Callout>
+   );
+}
+```
+
+### 2. Measure Staleness Explicitly
+
+**Why:** When migrating to TanStack Query, `staleTime` maps directly to TTL.
+
+```ts
+const isStale = Date.now() - entry.updatedAt > CACHE_TTL;
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting to Invalidate Cache After Mutations
+
+**Problem:** Users see old data after creating or deleting tasks.
+
+**Solution:** Update or clear the relevant cache entry inside mutation handlers.
+
+### 2. Logging Sensitive Payloads
+
+**Problem:** Production logs may include user-generated content.
+
+**Solution:** Redact sensitive fields before logging, or log metadata only.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Create a shared data checklist and enforce best practices:
+
+1. Add `docs/data-fetching-checklist.md` summarizing the conventions above
+   (cache TTL, retries, logging, optimistic updates).
+2. Update `notes/module-3-effects-plan.md` with a "Monitoring" section that
+   lists metrics and logs to capture.
+3. Review existing code for adherence (headers, retry usage, cache invalidation)
+   and note TODOs in the checklist.
+4. Commit with `git commit -am "docs: document data best practices"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Document data-layer conventions so the rest of the course stays consistent.
+      </p>
+
+      ```md filename="docs/data-fetching-checklist.md"
+      # TaskFlow Pro · Data Fetching Checklist
+
+      - [ ] Use `fetchJson` for all network requests.
+      - [ ] Wrap async work with `retryWithBackoff` for transient errors.
+      - [ ] Update or invalidate cache keys after every mutation.
+      - [ ] Display actionable error messages (title + hint).
+      - [ ] Record success/failure logs (omit sensitive payloads).
+      - [ ] Respect cache TTL (`30s`) before refetching.
+      - [ ] Abort requests on unmount via `AbortController`.
+      - [ ] Confirm optimistic updates have rollback paths.
+      ```
+
+      ```md filename="notes/module-3-effects-plan.md"
+      ## Monitoring
+      - Log fetch success/failure with timing
+      - Track retry attempts and bubble metrics to analytics
+      - Flag cache invalidations for debugging race conditions
+      ```
+
+      ```bash
+      git add docs/data-fetching-checklist.md notes/module-3-effects-plan.md
+      git commit -m "docs: document data best practices"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+The data layer has documented conventions and a checklist for future endpoints,
+reducing drift as TaskFlow Pro evolves.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Checklist covers fetch, cache, retry, and logging policies.
+-  [ ] Monitoring section notes key metrics.
+
+### Code Quality
+
+-  [ ] Documentation files live alongside existing notes.
+-  [ ] TODOs reference actual code patterns.
+
+### Understanding
+
+-  [ ] You can explain how each best practice supports reliability.
+-  [ ] You can identify when to invalidate vs. update cache entries.
+
+### Project Integration
+
+-  [ ] Future modules (routing, auth) can reuse the checklist.
+-  [ ] Monitoring plan feeds into Module MX testing efforts.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m3/8_data-fetching-part-3'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Data Fetching Part 3
+   </a>
+   <a
+      href='/docs/react-new/m3/10_implementation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Implementing Module 3
+   </a>
+</div>

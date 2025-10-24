@@ -1,0 +1,224 @@
+---
+title: "Introduction to Effects"
+description:
+   "Define side effects in React and map the ones TaskFlow Pro needs before
+   wiring code."
+module: "M3"
+lesson: "1"
+difficulty: "intermediate"
+duration: "25"
+project_phase: "Data integration"
+prerequisites: ["/docs/react-new/m3/0_index"]
+learning_objectives:
+   - "Explain what counts as a side effect in React"
+   - "Identify effect-driven responsibilities in TaskFlow Pro"
+   - "Outline loading, error, and success flows for API calls"
+   - "Capture open questions for data persistence"
+tags: ["effects", "planning", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Introduction to Effects
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Define side effects and the problems they solve in React applications.
+-  [ ] List every side effect TaskFlow Pro must perform in Module 3.
+-  [ ] Describe how effects coordinate with the state layer from Module 2.
+-  [ ] Document data requirements and unknowns before writing code.
+
+## Project Context
+
+Module 3 connects TaskFlow Pro to external data. Side effects bridge the
+declarative UI with imperative work: fetching from an API, persisting changes,
+and syncing browser state. Planning the effect surface keeps implementation
+focused and avoids surprise regressions.
+
+---
+
+## What Are Side Effects?
+
+Side effects are operations that reach outside React's render cycle—network
+requests, logging, subscriptions, or manual DOM updates. React batches renders
+for predictability; effects ensure imperative work runs after the DOM is in
+sync.
+
+### Basic Example
+
+```tsx
+useEffect(() => {
+   console.log("TaskFlow Pro dashboard rendered");
+});
+```
+
+### Practical Example
+
+```tsx
+useEffect(() => {
+   document.title = `TaskFlow Pro · ${stats.completed}/${stats.total} done`;
+}, [stats.completed, stats.total]);
+```
+
+---
+
+## Side Effects in TaskFlow Pro
+
+Module 3 introduces new responsibilities:
+
+-  **Initial data load:** Retrieve tasks from the API when the dashboard mounts.
+-  **Persistence:** Save creates, updates, and deletions back to the server.
+-  **Sync indicators:** Toggle loading states, optimistic updates, and retries.
+-  **Meta updates:** Update document title and analytics when stats change.
+
+Visualize these responsibilities alongside the Module 2 state map so every
+effect has a defined owner.
+
+---
+
+## ✅ Best Practices
+
+### 1. Categorize Effects Up Front
+
+**Why:** Grouping side effects (data, subscriptions, UI sync) helps assign them
+to specific components or hooks.
+
+```ts
+export const effectCategories = {
+   data: ["fetchTasks", "persistTask"],
+   ui: ["updateDocumentTitle"],
+   analytics: ["trackTaskCompletion"],
+};
+```
+
+### 2. Tie Effects to User Stories
+
+**Why:** Planning effects around user flows keeps implementation focused on
+outcomes instead of one-off utilities.
+
+```md
+## Persisting a New Task
+
+-  Trigger: Composer submit
+-  Effect: POST `/api/tasks`
+-  Optimistic Update: Add placeholder task with temp id
+-  Reconciliation: Replace with server payload
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Treating Every Operation as a Single Effect
+
+**Problem:** Large effects become hard to test and reason about.
+
+**Solution:** Split responsibilities into focused hooks like `useFetchTasks` and
+`usePersistTask`.
+
+### 2. Forgetting Cleanup Paths
+
+**Problem:** Pending requests continue after the component unmounts, causing
+state updates on unmounted components.
+
+**Solution:** Plan for abort controllers or unsubscribe callbacks while drafting
+the effect inventory.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Outline how TaskFlow Pro will use effects in Module 3:
+
+1. Create `notes/module-3-effects-plan.md`.
+2. List every effect you expect to build (initial load, optimistic updates,
+   retries, analytics hooks).
+3. For each effect, note the trigger, data needed, owner component/hook, and
+   cleanup strategy.
+4. Highlight unknowns (e.g., final API shape, pagination) for future follow-up.
+5. Commit with `git commit -am "docs: draft module 3 effects plan"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Capture effect requirements before coding so you can evaluate scope and dependencies during implementation.
+      </p>
+
+      ```md filename="notes/module-3-effects-plan.md"
+      # Module 3 · Effects & Data Plan
+
+      ## Effect Inventory
+      - Initial Task Fetch (Dashboard mount)
+      - Persist Task Create (Composer submit)
+      - Persist Task Update (Inline rename, complete toggle)
+      - Persist Task Delete (Task actions)
+      - Update Document Title (Stats change)
+      - Track Analytics (optional, future module)
+
+      ## Template
+      | Effect | Trigger | Owner | Data | Cleanup |
+      | --- | --- | --- | --- | --- |
+      | Initial Task Fetch | Dashboard mount | `useTasksState` | `/api/tasks` GET | AbortController |
+      | Persist Task Create | Composer submit | `usePersistTask` | `/api/tasks` POST | Abort on unmount |
+
+      ## Open Questions
+      - Do we need pagination or infinite scroll?
+      - How will authentication tokens be injected?
+      - Should analytics fire on optimistic updates or server confirmation?
+      ```
+
+      ```bash
+      git add notes/module-3-effects-plan.md
+      git commit -m "docs: draft module 3 effects plan"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+You now have a documented effect inventory that guides implementation decisions
+and communication with stakeholders.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Every Module 3 effect is listed with a trigger and owner.
+-  [ ] Initial task load and persistence flows are captured.
+
+### Code Quality
+
+-  [ ] The plan separates effect categories for easier maintenance.
+-  [ ] Cleanup strategies are identified for long-lived effects.
+
+### Understanding
+
+-  [ ] You can explain why effects run after render.
+-  [ ] You can describe how Module 2 state flows interact with effects.
+
+### Project Integration
+
+-  [ ] Notes reference `useTasksState` and future hooks consistently.
+-  [ ] Open questions are logged for later modules.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m3/0_index'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Module Overview
+   </a>
+   <a
+      href='/docs/react-new/m3/2_effects-in-react'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Effects in React
+   </a>
+</div>
