@@ -1,0 +1,160 @@
+---
+title: "Zustand Selectors"
+description:
+   "Optimise renders with derived selectors, slices, and middleware in Zustand."
+module: "M6"
+lesson: "6"
+difficulty: "advanced"
+duration: "30"
+project_phase: "Global state"
+prerequisites: ["/docs/react-new/m6/5_zustand-introduction"]
+learning_objectives:
+   - "Compose selectors to reduce component re-renders"
+   - "Split stores into slices for maintainability"
+   - "Leverage middleware for devtools and persistence"
+   - "Adopt patterns that scale with TaskFlow Pro"
+tags: ["zustand", "selectors", "state-management"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Zustand Selectors
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Use selectors to subscribe to precise store segments.
+-  [ ] Compose stores from slices for modularity.
+-  [ ] Add devtools, immutability, and persistence middleware.
+-  [ ] Document best practices for the team.
+
+## Selecting State
+
+```tsx
+import { shallow } from "zustand/shallow";
+
+const useSidebarPreferences = () =>
+   usePreferencesStore(
+      (state) => ({ theme: state.theme, density: state.density }),
+      shallow
+   );
+```
+
+-  `shallow` prevents re-renders when selected values are equal.
+-  Prefer exposing custom hooks for complex selections.
+
+---
+
+## Store Slices
+
+```tsx
+type PreferencesSlice = {
+   theme: "light" | "dark";
+   setTheme: (theme: "light" | "dark") => void;
+};
+
+type ShortcutsSlice = {
+   shortcutsEnabled: boolean;
+   toggleShortcuts: () => void;
+};
+
+type PreferencesStore = PreferencesSlice & ShortcutsSlice;
+
+const createPreferencesSlice = (
+   set: Setter<PreferencesStore>
+): PreferencesSlice => ({
+   theme: "light",
+   setTheme: (theme) => set({ theme }),
+});
+
+const createShortcutsSlice = (
+   set: Setter<PreferencesStore>
+): ShortcutsSlice => ({
+   shortcutsEnabled: true,
+   toggleShortcuts: () =>
+      set((state) => ({ shortcutsEnabled: !state.shortcutsEnabled })),
+});
+
+export const usePreferencesStore = create<PreferencesStore>()((set) => ({
+   ...createPreferencesSlice(set),
+   ...createShortcutsSlice(set),
+}));
+```
+
+-  Slices keep large stores maintainable and encourage separation of concerns.
+
+---
+
+## Middleware
+
+```tsx
+import { devtools, persist } from "zustand/middleware";
+
+export const usePreferencesStore = create<PreferencesState>()(
+   devtools(
+      persist(
+         (set) => ({
+            theme: "light",
+            setTheme: (theme) => set({ theme }),
+         }),
+         { name: "preferences" }
+      ),
+      { name: "PreferencesStore" }
+   )
+);
+```
+
+-  `persist` stores state in localStorage or custom storage providers.
+-  Devtools middleware integrates with Redux DevTools for inspection.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='TaskFlow Pro Patterns'>
+      <p>Adopt selectors and middleware for production readiness.</p>
+
+      ```tsx filename="src/state/preferencesStore.ts"
+      import { create } from "zustand";
+      import { devtools, persist } from "zustand/middleware";
+
+      export const usePreferencesStore = create<PreferencesState>()(
+         devtools(
+            persist(
+               (set) => ({
+                  theme: "light",
+                  density: "comfortable",
+                  setTheme: (theme) => set({ theme }),
+                  setDensity: (density) => set({ density }),
+               }),
+               { name: "preferences" }
+            )
+         )
+      );
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Selectors utilise shallow comparison where appropriate.
+-  [ ] Store slices isolate concerns cleanly.
+-  [ ] Middleware enhances developer experience without bloating bundle size.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m6/5_zustand-introduction'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Zustand Introduction
+   </a>
+   <a
+      href='/docs/react-new/m6/7_zustand-async'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Zustand Async Flows
+   </a>
+</div>

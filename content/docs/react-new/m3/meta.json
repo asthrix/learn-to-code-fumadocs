@@ -1,4 +1,17 @@
 {
    "title": "M3 · Effects & Data",
-   "pages": ["0_index"]
+   "pages": [
+      "0_index",
+      "1_introduction-effects",
+      "2_effects-in-react",
+      "3_use-effect-deep-dive",
+      "4_use-ref-hook",
+      "5_introduction-data-fetching",
+      "6_data-fetching-part-1",
+      "7_data-fetching-part-2",
+      "8_data-fetching-part-3",
+      "9_data-fetching-best-practices",
+      "10_implementation",
+      "11_validation"
+   ]
 }

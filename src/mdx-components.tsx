@@ -10,10 +10,13 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
       ...TabsComponents,
       ...components,
       // HTML `ref` attribute conflicts with `forwardRef`
-      pre: ({ ref: _ref, ...props }) => (
-         <CodeBlock {...props}>
-            <Pre>{props.children}</Pre>
-         </CodeBlock>
-      ),
+      pre: ({ ref, ...props }) => {
+         void ref;
+         return (
+            <CodeBlock {...props}>
+               <Pre>{props.children}</Pre>
+            </CodeBlock>
+         );
+      },
    };
 }

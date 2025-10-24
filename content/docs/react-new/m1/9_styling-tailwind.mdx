@@ -16,6 +16,8 @@ learning_objectives:
 tags: ["tailwind", "styling", "design-system"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Styling & Tailwind
 
 ## Learning Objectives
@@ -148,6 +150,88 @@ function Card({ children }: { children: React.ReactNode }) {
 4. Document the class choices in `docs/ui-components.md` under a "Styling"
    subsection.
 5. Commit with `git commit -am "feat: style header and sidebar"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Apply Tailwind tokens so the dashboard shell matches our design language while
+         staying ready for Module 2 state work.
+      </p>
+
+      ```tsx filename="src/components/layout/Header.tsx"
+      import { buttonVariants } from '@/components/ui/button';
+
+      export function Header() {
+         return (
+            <header className='border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+               <div className='mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4'>
+                  <div>
+                     <p className='text-xs uppercase tracking-wide text-muted-foreground'>TaskFlow Pro</p>
+                     <h1 className='text-lg font-semibold text-foreground'>Workspace Overview</h1>
+                  </div>
+                  <nav className='flex items-center gap-3'>
+                     <a href='#roadmap' className={buttonVariants({ variant: 'ghost' })}>
+                        View Roadmap
+                     </a>
+                     <button type='button' className={buttonVariants({ variant: 'primary' })}>
+                        New Task
+                     </button>
+                  </nav>
+               </div>
+            </header>
+         );
+      }
+      ```
+
+      ```tsx filename="src/components/layout/Sidebar.tsx"
+      import { Badge } from '@/components/ui/badge';
+
+      const links = [
+         { id: 'dashboard', label: 'Dashboard', href: '#', badge: 'Now' },
+         { id: 'tasks', label: 'Tasks', href: '#', badge: '12' },
+         { id: 'reports', label: 'Reports', href: '#', badge: 'Soon' },
+      ];
+
+      export function Sidebar() {
+         return (
+            <aside className='w-64 shrink-0 rounded-2xl border border-border bg-card p-6 shadow-sm'>
+               <h2 className='text-xs font-semibold uppercase tracking-wide text-muted-foreground'>Navigation</h2>
+               <ul className='mt-4 space-y-1'>
+                  {links.map((link) => (
+                     <li key={link.id}>
+                        <a
+                           href={link.href}
+                           className='flex items-center justify-between rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground'
+                        >
+                           <span className='font-medium'>{link.label}</span>
+                           {link.badge ? (
+                              <Badge variant={link.badge === 'Now' ? 'default' : 'secondary'}>
+                                 {link.badge}
+                              </Badge>
+                           ) : null}
+                        </a>
+                     </li>
+                  ))}
+               </ul>
+            </aside>
+         );
+      }
+      ```
+
+      ```md filename="docs/ui-components.md"
+      #### Styling Tokens
+      - Header uses `bg-background/80` and blur to lift above page content.
+      - Sidebar relies on `bg-card`, `border-border`, and rounded corners for continuity.
+      - CTAs leverage `buttonVariants` so action buttons match the global system.
+      ```
+
+      ```bash
+      git add src/components/layout/Header.tsx src/components/layout/Sidebar.tsx docs/ui-components.md
+      git commit -m "feat: style header and sidebar"
+      ```
+
+   </Accordion>
+</Accordions>
 
 #### Expected Result
 

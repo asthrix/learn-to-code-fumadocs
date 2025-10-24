@@ -1,0 +1,79 @@
+---
+title: "Note on React 19"
+description:
+   "Plan for upcoming React 19 features and compatibility with TaskFlow Pro."
+module: "MX"
+lesson: "8"
+difficulty: "advanced"
+duration: "20"
+project_phase: "Advanced polish"
+prerequisites: ["/docs/react-new/mx/7_cypress-testing"]
+learning_objectives:
+   - "Understand key React 19 changes impacting the stack"
+   - "Assess required dependency upgrades"
+   - "Outline migration strategy and testing plan"
+   - "Track release timeline and communication"
+tags: ["react", "migration", "planning"]
+---
+
+# Note on React 19
+
+## Feature Highlights
+
+-  Actions and `use` hook for data fetching.
+-  Enhanced server components with streaming improvements.
+-  Built-in `<Suspense>` for async transitions.
+
+## Dependency Audit
+
+| Package               | Current | React 19 Support | Notes                         |
+| --------------------- | ------- | ---------------- | ----------------------------- |
+| Next.js               | 15.5.4  | ✅               | Upgrade when React 19 stable  |
+| React Hook Form       | 7.x     | ✅               | Check peer dependency range   |
+| Zustand               | 4.x     | ✅               | Works with new `use` patterns |
+| Redux Toolkit         | 1.9     | ✅               | Only used in legacy examples  |
+| @tanstack/react-query | 5.x     | ✅               | Add suspense boundaries       |
+
+---
+
+## Migration Plan
+
+1. Create a React 19 branch and run
+   `npx @next/codemod@latest next-setup-react-19` (once available).
+2. Update testing snapshots and adjust Suspense boundaries.
+3. Validate server actions with TaskFlow Pro APIs.
+4. Roll out behind feature flag `react19_enabled`.
+
+---
+
+## Testing Strategy
+
+-  Run full Cypress suite plus manual smoke for drag-and-drop.
+-  Monitor hydration warnings in browser console.
+-  Capture performance metrics pre/post upgrade.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Dependency audit completed and shared with team.
+-  [ ] Migration branch plan documented.
+-  [ ] Testing strategy covers regression + performance.
+-  [ ] Stakeholder communication scheduled around release window.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/mx/7_cypress-testing'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Testing with Cypress
+   </a>
+   <a
+      href='/docs/react-new/mx/9_conclusion'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Conclusion
+   </a>
+</div>

@@ -1,0 +1,142 @@
+---
+title: "Module 3 Validation"
+description:
+   "Verify TaskFlow Pro's effects and data integrations are production ready."
+module: "M3"
+lesson: "11"
+difficulty: "advanced"
+duration: "20"
+project_phase: "Data integration"
+prerequisites: ["/docs/react-new/m3/10_implementation"]
+learning_objectives:
+   - "Test loading, error, and empty states"
+   - "Confirm optimistic updates and rollbacks"
+   - "Audit caching and retry behavior"
+   - "Document follow-up work for Module 4"
+tags: ["validation", "testing", "data"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Module 3 Validation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Run through an end-to-end validation checklist for the data layer.
+-  [ ] Confirm effects clean up properly and avoid duplicate requests.
+-  [ ] Verify optimistic updates, caching, and retries work as expected.
+-  [ ] Record follow-up tasks for routing and performance modules.
+
+## Project Context
+
+Validation consolidates Module 3 work. Treat this as a mini QA pass to ensure
+TaskFlow Pro behaves reliably before layering on routing in Module 4.
+
+---
+
+## Manual Test Plan
+
+1. **Initial load:** Ensure tasks appear with a brief skeleton state.
+2. **Empty state:** Clear tasks via the API or toggle filters to confirm the
+   empty callout.
+3. **Error path:** Force the API to return `500` (modify mock) and confirm error
+   messaging + logging.
+4. **Optimistic create/update/delete:** Verify UI updates immediately and rolls
+   back on forced failures.
+5. **Caching:** Navigate between filters; data should show instantly if cached
+   within 30 seconds.
+6. **Retry:** Simulate flaky network (offline devtools) and confirm retries
+   before failure.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Initial load shows skeletons, then renders task list.
+-  [ ] Empty state callout appears when no tasks match filters.
+-  [ ] Error callout displays friendly message with retry guidance.
+-  [ ] Optimistic updates reflect immediately for create/update/delete.
+-  [ ] Optimistic rollbacks restore prior data on failure.
+-  [ ] Cache returns results instantly when revisiting recent filters.
+-  [ ] Retry helper attempts operations before surfacing failure.
+-  [ ] Scroll position resets when filters change.
+
+### Code Quality
+
+-  [ ] `useTasksState` effects include complete dependency arrays.
+-  [ ] Abort controllers clean up in every effect.
+-  [ ] Cache helpers live in `src/lib/api/cache.ts` with TTL constants.
+-  [ ] Logs use consistent labels (`[tasks.fetch]`, `[tasks.create]`, etc.).
+-  [ ] Notes and checklist files updated with latest findings.
+
+### Understanding
+
+-  [ ] You can explain how caching, optimistic updates, and retries interact.
+-  [ ] You can diagram the effect lifecycle for fetch + mutations.
+-  [ ] You can justify TTL and retry count based on product needs.
+
+### Project Integration
+
+-  [ ] `notes/module-3-effects-plan.md` reflects final behavior.
+-  [ ] `docs/data-fetching-checklist.md` includes any new learnings.
+-  [ ] Follow-up tasks for Module 4 (routing) recorded in notes.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Capture validation outcomes for future reference:
+
+1. Update `notes/module-3-effects-plan.md` with a "Validation" section
+   summarizing test results and outstanding risks.
+2. Add any TODOs uncovered to `docs/data-fetching-checklist.md`.
+3. Commit with `git commit -am "docs: record module 3 validation"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Keep validation artifacts close to the plan so the team can reference them when extending the data layer.
+      </p>
+
+      ```md filename="notes/module-3-effects-plan.md"
+      ## Validation Summary
+      - Initial load: ✅
+      - Empty state: ✅
+      - Error handling: ✅ (shows callout, logs details)
+      - Optimistic updates: ✅ (rolled back on forced failure)
+      - Caching: ✅ (returns results within 30s window)
+      - Retry: ⚠️ Monitor latency when network recovers slowly
+      ```
+
+      ```bash
+      git add notes/module-3-effects-plan.md docs/data-fetching-checklist.md
+      git commit -m "docs: record module 3 validation"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Module 3 is validated, documented, and ready for Module 4's routing work.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m3/10_implementation'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Implementing Module 3
+   </a>
+   <a
+      href='/docs/react-new/m4/0_index'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Module 4 Overview
+   </a>
+</div>

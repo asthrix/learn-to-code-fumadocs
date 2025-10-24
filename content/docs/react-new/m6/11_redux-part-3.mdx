@@ -1,0 +1,135 @@
+---
+title: "Redux Part 3"
+description:
+   "Handle async workflows with thunks, RTK Query patterns, and optimistic
+   updates."
+module: "M6"
+lesson: "11"
+difficulty: "advanced"
+duration: "40"
+project_phase: "Global state"
+prerequisites: ["/docs/react-new/m6/10_redux-part-2"]
+learning_objectives:
+   - "Implement thunks for TaskFlow Pro API calls"
+   - "Manage optimistic updates and error rollbacks"
+   - "Leverage RTK Query patterns for caching"
+   - "Instrument async actions with analytics hooks"
+tags: ["redux", "async", "thunks"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Redux Part 3
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Dispatch async thunks that integrate with API services.
+-  [ ] Handle optimistic UI updates safely.
+-  [ ] Cache responses with RTK Query or custom middleware.
+-  [ ] Emit analytics events tied to async flows.
+
+## Async Thunks
+
+```tsx
+import { createAsyncThunk } from "@reduxjs/toolkit";
+
+export const fetchProjects = createAsyncThunk(
+   "projects/fetch",
+   async (_, { extra }) => {
+      const api = extra.api as ApiClient;
+      const response = await api.getProjects();
+      return response.projects;
+   }
+);
+```
+
+Handle lifecycle actions in slices using `builder.addCase`.
+
+---
+
+## Optimistic Updates
+
+```tsx
+export const createTask = createAsyncThunk(
+   "tasks/create",
+   async (payload: CreateTaskInput, { dispatch, rejectWithValue, extra }) => {
+      dispatch(tasksSlice.actions.addOptimisticTask(payload));
+      try {
+         const task = await (extra.api as ApiClient).createTask(payload);
+         return task;
+      } catch (error) {
+         return rejectWithValue({ error, optimisticId: payload.id });
+      }
+   }
+);
+```
+
+In the slice reducer:
+
+```tsx
+builder
+   .addCase(createTask.fulfilled, (state, action) => {
+      tasksAdapter.upsertOne(state, action.payload);
+   })
+   .addCase(createTask.rejected, (state, action) => {
+      if (action.payload) {
+         tasksAdapter.removeOne(state, action.payload.optimisticId);
+      }
+   });
+```
+
+---
+
+## RTK Query Pattern
+
+-  Use `createApi` for declarative endpoints when polling or caching multiple
+   resources.
+-  Combine with entity adapters for seamless integration with existing
+   selectors.
+-  Keep business logic in thunks when flows require orchestration across slices.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='TaskFlow Pro Async Workflows'>
+      <p>Introduce thunks for project/task synchronisation.</p>
+
+      ```tsx filename="src/state/projectsThunks.ts"
+      import { createAsyncThunk } from "@reduxjs/toolkit";
+      import { setAll } from "@/state/projectsSlice";
+
+      export const syncProjects = createAsyncThunk("projects/sync", async (_, { dispatch, extra }) => {
+         const api = (extra as { api: ApiClient }).api;
+         const projects = await api.fetchProjects();
+         dispatch(setAll(projects));
+         return projects.length;
+      });
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Async thunks handle success, error, and loading states.
+-  [ ] Optimistic updates roll back cleanly on failure.
+-  [ ] Analytics or logging captures key lifecycle events.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m6/10_redux-part-2'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Redux Part 2
+   </a>
+   <a
+      href='/docs/react-new/m6/12_redux-custom-components'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Redux Custom Components
+   </a>
+</div>

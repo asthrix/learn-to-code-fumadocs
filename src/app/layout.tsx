@@ -1,17 +1,30 @@
-import '@/app/global.css';
-import { RootProvider } from 'fumadocs-ui/provider/next';
-import { Inter } from 'next/font/google';
+import "@/app/global.css";
+import { RootProvider } from "fumadocs-ui/provider/next";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+
+const appUrl =
+   process.env.NEXT_PUBLIC_APP_URL ??
+   (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
+export const metadata: Metadata = {
+   metadataBase: new URL(appUrl),
+   title: "TaskFlow Pro with React",
+   description: "Project-based React curriculum that ships TaskFlow Pro.",
+};
 
 const inter = Inter({
-  subsets: ['latin'],
+   subsets: ["latin"],
 });
 
-export default function Layout({ children }: LayoutProps<'/'>) {
-  return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
-      <body className="flex flex-col min-h-screen">
-        <RootProvider>{children}</RootProvider>
-      </body>
-    </html>
-  );
+export default function Layout({ children }: LayoutProps<"/">) {
+   return (
+      <html lang='en' className={inter.className} suppressHydrationWarning>
+         <body className='flex flex-col min-h-screen'>
+            <RootProvider>{children}</RootProvider>
+         </body>
+      </html>
+   );
 }

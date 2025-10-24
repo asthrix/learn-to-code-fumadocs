@@ -16,6 +16,8 @@ learning_objectives:
 tags: ["lifecycle", "react", "effects"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Component Lifecycle
 
 ## Learning Objectives
@@ -133,6 +135,64 @@ useEffect(() => {
 4. Document scenarios where this tool helps (e.g., verifying cleanup) in
    `notes/react-foundations.md`.
 5. Commit with `git commit -am "chore: add lifecycle logger"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Create an internal logger that verifies mount/unmount behaviour without leaking
+         into production builds.
+      </p>
+
+      ```tsx filename="src/components/system/LifecycleLogger.tsx"
+      import { useEffect } from 'react';
+
+      export function LifecycleLogger({ name = 'LifecycleLogger' }: { name?: string }) {
+         useEffect(() => {
+            if (!import.meta.env.DEV) return undefined;
+
+            console.groupCollapsed(`[${name}] mounted`);
+            console.log('Props and environment ready');
+            console.groupEnd();
+
+            return () => {
+               console.groupCollapsed(`[${name}] unmounted`);
+               console.log('Cleaned up listeners and timers');
+               console.groupEnd();
+            };
+         }, [name]);
+
+         return null;
+      }
+      ```
+
+      ```tsx filename="src/App.tsx"
+      import { LifecycleLogger } from '@/components/system/LifecycleLogger';
+
+      export function App() {
+         return (
+            <DashboardShell>
+               <LifecycleLogger name='DashboardShell' />
+               {/* Existing dashboard content */}
+            </DashboardShell>
+         );
+      }
+      ```
+
+      ```md filename="notes/react-foundations.md"
+      ## Lifecycle Logger Usage
+
+      - Toggle sidebar collapse to watch mount/unmount logs.
+      - Verify effect cleanups before adding analytics or WebSocket code.
+      - Remove component or guard with `import.meta.env.DEV` before production deploys.
+      ```
+
+      ```bash
+      git add src/components/system/LifecycleLogger.tsx src/App.tsx notes/react-foundations.md
+      git commit -m "chore: add lifecycle logger"
+      ```
+
+   </Accordion>
+</Accordions>
 
 #### Expected Result
 

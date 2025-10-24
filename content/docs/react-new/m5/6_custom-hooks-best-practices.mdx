@@ -1,0 +1,190 @@
+---
+title: "Custom Hooks Best Practices"
+description:
+   "Establish conventions for writing, documenting, and testing custom hooks in
+   TaskFlow Pro."
+module: "M5"
+lesson: "6"
+difficulty: "advanced"
+duration: "25"
+project_phase: "Performance"
+prerequisites: ["/docs/react-new/m5/5_custom-hooks"]
+learning_objectives:
+   - "Define naming, structure, and API conventions for hooks"
+   - "Document hook behaviour and assumptions"
+   - "Design testing strategies for hooks"
+   - "Create a reusable checklist for future hooks"
+tags: ["custom-hooks", "best-practices", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Custom Hooks Best Practices
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Adopt naming and structure conventions for hooks.
+-  [ ] Document hook requirements and return types.
+-  [ ] Outline a testing strategy for critical hooks.
+-  [ ] Produce a checklist to standardise future hooks.
+
+## Project Context
+
+As TaskFlow Pro grows, hooks power data access, memoisation, and routing. Clear
+conventions prevent brittle APIs and make hooks easy to test and reuse across
+modules.
+
+---
+
+## Hook Conventions
+
+-  Prefix with `use` to comply with the Rules of Hooks.
+-  Return objects with stable keys.
+-  Accept a single configuration object when options grow.
+-  Provide default values to avoid `undefined` checks in consumers.
+
+### Basic Example
+
+```tsx
+type UseDebounceOptions = { delay?: number };
+
+function useDebounce<T>(value: T, { delay = 200 }: UseDebounceOptions = {}) {
+   const [debounced, setDebounced] = useState(value);
+   useEffect(() => {
+      const timeout = setTimeout(() => setDebounced(value), delay);
+      return () => clearTimeout(timeout);
+   }, [value, delay]);
+   return debounced;
+}
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Document Contract and Caveats
+
+**Why:** Consumers need to know what the hook guarantees.
+
+```md
+## useProjectTasks
+
+-  Returns: `{ tasks, completed, remaining }`
+-  Expects: `projectId` string or `null`
+-  Caches: Memoises results until tasks array changes
+```
+
+### 2. Co-locate Tests With Hook
+
+**Why:** `__tests__/useProjectTasks.test.ts` keeps context nearby.
+
+```tsx
+import { renderHook } from "@testing-library/react";
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Returning Unstable Arrays
+
+**Problem:** Consumers relying on index positions break easily.
+
+**Solution:** Prefer named object returns.
+
+### 2. Mixing UI Concerns
+
+**Problem:** Hooks that manipulate DOM elements complicate reuse.
+
+**Solution:** Keep hooks focused on data/state; delegate UI to components.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Codify hook standards:
+
+1. Create `docs/hooks-style-guide.md` summarising conventions (naming, return
+   shapes, testing).
+2. Update `notes/module-5-performance-plan.md` with a "Hook Standards" section
+   linking to the style guide.
+3. Add TODOs for hook unit tests to `IMPLEMENTATION_STATUS.md` (Module MX
+   section) if appropriate.
+4. Commit with `git commit -am "docs: add custom hook standards"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Centralise conventions so every new hook follows the same playbook.</p>
+
+      ```md filename="docs/hooks-style-guide.md"
+      # Hooks Style Guide
+
+      - Prefix with `use` and follow the Rules of Hooks
+      - Return objects with stable keys instead of arrays
+      - Accept configuration objects for optional parameters
+      - Memoise returned values when references matter
+      - Document expected inputs, outputs, and side effects
+      - Provide test coverage for critical data hooks
+      ```
+
+      ```md filename="notes/module-5-performance-plan.md"
+      ## Hook Standards
+      - Style guide: `docs/hooks-style-guide.md`
+      - Pending tests: `useProjectTasks`, `useTaskFilters` (Module MX)
+      ```
+
+      ```bash
+      git add docs/hooks-style-guide.md notes/module-5-performance-plan.md
+      git commit -m "docs: add custom hook standards"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Hook conventions are documented, reducing onboarding time and ensuring
+consistent APIs across the project.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Style guide includes naming, return shape, and testing policies.
+-  [ ] Plan references the new guide.
+
+### Code Quality
+
+-  [ ] Documentation files live in logical directories (`docs/`, `notes/`).
+-  [ ] TODOs reference future modules when necessary.
+
+### Understanding
+
+-  [ ] You can explain how the style guide influences future hooks.
+-  [ ] You know when to request tests for critical hooks.
+
+### Project Integration
+
+-  [ ] Hook standards align with Module 3 caching and Module 4 routing patterns.
+-  [ ] Future modules can link back to the guide without duplication.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m5/5_custom-hooks'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Custom Hooks
+   </a>
+   <a
+      href='/docs/react-new/m5/7_custom-components-patterns'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Custom Components Patterns
+   </a>
+</div>

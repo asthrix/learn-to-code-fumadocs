@@ -1,0 +1,230 @@
+---
+title: "Event Handlers"
+description:
+   "Wire event handlers so TaskFlow Pro responds instantly to user actions."
+module: "M2"
+lesson: "3"
+difficulty: "beginner"
+duration: "25"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react-new/m2/2_state-in-react"]
+learning_objectives:
+   - "Attach event handlers to React components"
+   - "Pass callbacks through props cleanly"
+   - "Keep handler bodies focused and testable"
+tags: ["events", "handlers", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Event Handlers
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Register click and change handlers on React components.
+-  [ ] Forward callbacks through props without unnecessary re-renders.
+-  [ ] Separate event data extraction from business logic.
+-  [ ] Plan shared handlers for TaskFlow Pro filters.
+
+## Project Context
+
+TaskFlow Pro relies on handlers to update filters, toggle status, and open
+modals. Clean handler design avoids duplicated code while keeping components
+simple.
+
+---
+
+## Anatomy of a React Event
+
+React wraps native events inside `SyntheticEvent`. You can access native details
+via `event.currentTarget` or `event.target`, and you should call
+`event.preventDefault()` when overriding default form behaviour.
+
+```tsx
+function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
+   event.preventDefault();
+   // business logic
+}
+```
+
+---
+
+## Passing Handlers as Props
+
+Lift logic by defining handlers in parent components and passing them down as
+props. Use `useCallback` when child components rely on referential equality.
+
+```tsx
+const handleFilterChange = useCallback(
+   (status: TaskStatus) => setFilters((previous) => ({ ...previous, status })),
+   []
+);
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Side Effects Out of Handlers
+
+**Why:** Handlers should read event data, then delegate to functions that update
+state.
+
+```tsx
+function onFilterClick(status: TaskStatus) {
+   updateStatusFilter(status);
+}
+```
+
+### 2. Reuse Handler Factories
+
+**Why:** Prevents repeating inline arrow functions.
+
+```tsx
+const createStatusHandler = (status: TaskStatus) => () => onFilterClick(status);
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting to Stop Event Propagation
+
+**Problem:** Nested buttons may trigger parent handlers.
+
+**Solution:** Call `event.stopPropagation()` when necessary.
+
+### 2. Binding in JSX
+
+**Problem:** `onClick={handleClick.bind(null, status)}` creates new functions on
+every render.
+
+**Solution:** Use factory helpers or `useCallback`.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Build a Task Toolbar
+
+1. Create `src/components/tasks/TaskToolbar.tsx`.
+2. Accept props
+   `{ status: TaskStatusFilter; onStatusChange(status: TaskStatusFilter): void; onSearch(value: string): void; }`.
+3. Render:
+   -  A button group for `All`, `Todo`, `In Progress`, `Done`
+   -  An input for searching tasks
+   -  Each control calls the provided handlers with relevant values
+4. Export `TaskStatusFilter = "all" | "todo" | "in-progress" | "done"`.
+5. Commit with `git commit -am "feat: add task toolbar component"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Centralise filter handlers inside a toolbar so TaskFlow Pro can reuse the
+         component across views.
+      </p>
+
+      ```tsx filename="src/components/tasks/TaskToolbar.tsx"
+      import { useCallback } from 'react';
+      import { cn } from '@/lib/cn';
+      import { buttonVariants } from '@/components/ui/button';
+
+      export type TaskStatusFilter = 'all' | 'todo' | 'in-progress' | 'done';
+
+      type TaskToolbarProps = {
+         status: TaskStatusFilter;
+         onStatusChange: (status: TaskStatusFilter) => void;
+         onSearch: (value: string) => void;
+      };
+
+      const STATUS_OPTIONS: TaskStatusFilter[] = ['all', 'todo', 'in-progress', 'done'];
+
+      export function TaskToolbar({ status, onStatusChange, onSearch }: TaskToolbarProps) {
+         const handleSearch = useCallback(
+            (event: React.ChangeEvent<HTMLInputElement>) => onSearch(event.target.value),
+            [onSearch],
+         );
+
+         return (
+            <section className='flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-sm'>
+               <div className='flex flex-wrap items-center gap-2'>
+                  {STATUS_OPTIONS.map((option) => (
+                     <button
+                        key={option}
+                        type='button'
+                        onClick={() => onStatusChange(option)}
+                        className={cn(
+                           buttonVariants({ variant: option === status ? 'primary' : 'ghost' }),
+                           'capitalize',
+                        )}
+                     >
+                        {option.replace('-', ' ')}
+                     </button>
+                  ))}
+               </div>
+               <label className='relative inline-flex items-center'>
+                  <span className='sr-only'>Search tasks</span>
+                  <input
+                     type='search'
+                     onChange={handleSearch}
+                     placeholder='Search tasks'
+                     className='w-56 rounded-lg border border-border bg-background px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
+                  />
+               </label>
+            </section>
+         );
+      }
+      ```
+
+      ```bash
+      git add src/components/tasks/TaskToolbar.tsx
+      git commit -m "feat: add task toolbar component"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+You have a reusable toolbar that normalises status and search handlers.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Buttons call `onStatusChange` with the correct status.
+-  [ ] Search input calls `onSearch` with the current value.
+
+### Code Quality
+
+-  [ ] Handler helpers avoid inline function recreation.
+-  [ ] Types capture all valid status values.
+
+### Understanding
+
+-  [ ] You can explain why React wraps events in `SyntheticEvent`.
+
+### Project Integration
+
+-  [ ] Toolbar will slot into Module 2's dashboard implementation.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m2/2_state-in-react'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← State in React
+   </a>
+   <a
+      href='/docs/react-new/m2/4_handling-click-events'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Handling Click Events
+   </a>
+</div>

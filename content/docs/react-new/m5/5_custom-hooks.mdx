@@ -1,0 +1,210 @@
+---
+title: "Custom Hooks"
+description:
+   "Extract reusable logic from TaskFlow Pro components into well-structured
+   custom hooks."
+module: "M5"
+lesson: "5"
+difficulty: "intermediate"
+duration: "30"
+project_phase: "Performance"
+prerequisites: ["/docs/react-new/m5/4_use-callback"]
+learning_objectives:
+   - "Identify logic suitable for custom hooks"
+   - "Create hooks that encapsulate data fetching and memoisation"
+   - "Design stable APIs for hook consumers"
+   - "Document hook contracts and testing strategies"
+tags: ["custom-hooks", "react", "performance"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Custom Hooks
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Spot shared logic ready to be extracted into hooks.
+-  [ ] Build custom hooks for project data and derived analytics.
+-  [ ] Expose clear APIs with stable return shapes.
+-  [ ] Plan tests and documentation for new hooks.
+
+## Project Context
+
+TaskFlow Pro currently mixes data fetching, memoisation, and UI concerns inside
+components. Custom hooks improve reuse, readability, and testability.
+
+---
+
+## What Makes a Good Custom Hook?
+
+-  One responsibility (data fetching, memoising, event handling).
+-  Stable return contract (objects with fixed keys, arrays with documented
+   order).
+-  Integration with React hooks (`useMemo`, `useCallback`, `useEffect`).
+
+### Basic Example
+
+```tsx
+function useMediaQuery(query: string) {
+   const [matches, setMatches] = useState(false);
+   useEffect(() => {
+      const media = window.matchMedia(query);
+      setMatches(media.matches);
+      const listener = (event: MediaQueryListEvent) =>
+         setMatches(event.matches);
+      media.addEventListener("change", listener);
+      return () => media.removeEventListener("change", listener);
+   }, [query]);
+   return matches;
+}
+```
+
+### Practical Example
+
+```tsx
+function useProjectTasks(projectId: string | null) {
+   const { tasksByProject } = useTasksState();
+   return useMemo(() => {
+      if (!projectId) return [];
+      return tasksByProject[projectId] ?? [];
+   }, [projectId, tasksByProject]);
+}
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Return Objects, Not Arrays
+
+**Why:** Named properties reduce confusion and support refactoring.
+
+### 2. Hide Implementation Details
+
+**Why:** Consumers shouldn’t know whether data is memoised or fetched from
+cache.
+
+```tsx
+const { tasks, isLoading, error } = useProjectTasks(projectId);
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Re-exporting Component Logic
+
+**Problem:** Hooks that simply wrap component props add indirection.
+
+**Solution:** Extract genuine shared logic (state + effects + memoisation).
+
+### 2. Returning Unstable References
+
+**Problem:** Each call returns new objects or functions, negating performance
+gains.
+
+**Solution:** Use `useMemo`/`useCallback` inside the hook.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Create reusable hooks:
+
+1. Add `src/hooks/useProjectTasks.ts` to expose project-specific task data and
+   counts.
+2. Add `src/hooks/useTaskFilters.ts` to encapsulate filter state, URL sync, and
+   transitions (building on Module 4).
+3. Update components (`ProjectDetailPage`, `TaskToolbar`) to consume the new
+   hooks and remove duplicate logic.
+4. Document hook APIs in `notes/module-5-performance-plan.md` under a new
+   "Custom Hooks" section.
+5. Commit with `git commit -am "feat: add project and filter hooks"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Extract shared logic into hooks with predictable interfaces.</p>
+
+      ```ts filename="src/hooks/useProjectTasks.ts"
+      import { useMemo } from "react";
+      import { useTasksState } from "@/hooks/useTasksState";
+
+      export function useProjectTasks(projectId: string | null) {
+         const { tasksByProject } = useTasksState();
+
+         return useMemo(() => {
+            if (!projectId) {
+               return { tasks: [], completed: 0, remaining: 0 };
+            }
+            const tasks = tasksByProject[projectId] ?? [];
+            const completed = tasks.filter((task) => task.status === "completed").length;
+            return {
+               tasks,
+               completed,
+               remaining: tasks.length - completed,
+            };
+         }, [projectId, tasksByProject]);
+      }
+      ```
+
+      ```md filename="notes/module-5-performance-plan.md"
+      ## Custom Hooks
+      - `useProjectTasks(projectId)` → returns memoised tasks + counts
+      - `useTaskFilters()` → exposes `status`, `search`, setters, and URL sync
+      ```
+
+      ```bash
+      git add src/hooks/useProjectTasks.ts notes/module-5-performance-plan.md
+      git commit -m "feat: add project and filter hooks"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Components now consume focused hooks while heavy logic lives in reusable,
+testable modules.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Hooks return stable objects with current data.
+-  [ ] Components display the same UI after refactor.
+
+### Code Quality
+
+-  [ ] Hooks include memoisation where necessary.
+-  [ ] Documentation records hook responsibilities.
+
+### Understanding
+
+-  [ ] You can explain why each hook exists.
+-  [ ] You can extend hooks without breaking consumers.
+
+### Project Integration
+
+-  [ ] Hooks align with Module 4 routing and Module 3 data layer.
+-  [ ] Notes capture hook contracts for future testing.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m5/4_use-callback'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← `useCallback`
+   </a>
+   <a
+      href='/docs/react-new/m5/6_custom-hooks-best-practices'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Custom Hooks Best Practices
+   </a>
+</div>

@@ -1,0 +1,193 @@
+---
+title: "`useCallback`"
+description:
+   "Stabilise function references to prevent child components from re-rendering
+   unnecessarily."
+module: "M5"
+lesson: "4"
+difficulty: "intermediate"
+duration: "25"
+project_phase: "Performance"
+prerequisites: ["/docs/react-new/m5/3_use-memo"]
+learning_objectives:
+   - "Explain how `useCallback` memoises functions"
+   - "Stabilise TaskFlow Pro handler props"
+   - "Combine `useMemo` and `useCallback` safely"
+   - "Avoid pitfalls such as stale closures"
+tags: ["useCallback", "performance", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# `useCallback`
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Understand when stabilising function references is useful.
+-  [ ] Memoise event handlers passed to TaskFlow Pro components.
+-  [ ] Avoid stale closures using complete dependency arrays.
+-  [ ] Measure re-render reductions using the React Profiler.
+
+## Project Context
+
+TaskFlow Pro passes many callbacks down to `TaskCard`, `TaskToolbar`, and
+`ProjectSidebar`. Without `useCallback`, each render creates new function
+references, causing memoised children to re-render.
+
+---
+
+## Understanding `useCallback`
+
+`useCallback(fn, deps)` returns the same function instance until dependencies
+change.
+
+### Basic Example
+
+```tsx
+const handleClick = useCallback(() => {
+   track("button_clicked");
+}, []);
+```
+
+### Practical Example
+
+```tsx
+const handleToggleStatus = useCallback(
+   (taskId: string) => toggleTaskStatus(taskId),
+   [toggleTaskStatus]
+);
+```
+
+Combine with `useMemo` to pass stable arrays or objects containing handlers.
+
+---
+
+## ✅ Best Practices
+
+### 1. Memoise Inline Callbacks Passed to Children
+
+**Why:** Prevents memoised child components from re-rendering unnecessarily.
+
+### 2. Pair with `useMemo` for Derived Config
+
+**Why:** When returning objects containing callbacks, memoise the object too.
+
+```tsx
+const actions = useMemo(
+   () => ({ onRename: handleRenameTask, onDelete: handleDeleteTask }),
+   [handleRenameTask, handleDeleteTask]
+);
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Missing Dependencies
+
+**Problem:** Leaving dependencies out causes stale closures.
+
+**Solution:** Include every value referenced inside the callback.
+
+### 2. Overusing `useCallback`
+
+**Problem:** Adding callbacks everywhere can add complexity.
+
+**Solution:** Focus on hot paths where memoised children rely on stable
+references.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Stabilise key handlers:
+
+1. Memoise dashboard callbacks (`handleCreateTask`, `handleToggleStatus`,
+   `handleRenameTask`, `handleDeleteTask`) within `useTasksState` or the
+   dashboard page.
+2. Ensure `TaskCard`, `TaskComposer`, and `ProjectSidebar` receive stable props,
+   enabling `React.memo` usage in later lessons.
+3. Update `notes/module-5-performance-plan.md` with before/after render counts.
+4. Commit with `git commit -am "perf: stabilise task handlers"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Use `useCallback` so child components can skip re-rendering when data hasn’t changed.</p>
+
+      ```tsx filename="src/hooks/useTasksState.ts"
+      const handleToggleStatus = useCallback(
+         async (taskId: string) => {
+            await toggleTaskStatus(taskId);
+         },
+         [toggleTaskStatus]
+      );
+
+      const handleRenameTask = useCallback(
+         async (taskId: string, title: string) => {
+            await renameTask(taskId, title);
+         },
+         [renameTask]
+      );
+      ```
+
+      ```md filename="notes/module-5-performance-plan.md"
+      ## Callback Results
+      - `TaskCard` renders per toggle: 4 → 1
+      - `ProjectSidebar` renders per filter: 3 → 1
+      ```
+
+      ```bash
+      git add src/hooks/useTasksState.ts notes/module-5-performance-plan.md
+      git commit -m "perf: stabilise task handlers"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Handlers remain stable between renders, allowing memoised components to skip
+updates and improving interactivity.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Memoised callbacks still run with up-to-date state.
+-  [ ] Profiling shows fewer renders of child components.
+
+### Code Quality
+
+-  [ ] Dependencies arrays include all referenced values.
+-  [ ] Memoised callbacks reside close to their consumers.
+
+### Understanding
+
+-  [ ] You can explain when to choose `useCallback` vs `useMemo`.
+-  [ ] You can identify stale closure symptoms.
+
+### Project Integration
+
+-  [ ] Dashboard and sidebar components benefit from stable props.
+-  [ ] Notes capture measurable improvements for future reference.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m5/3_use-memo'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← `useMemo`
+   </a>
+   <a
+      href='/docs/react-new/m5/5_custom-hooks'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Custom Hooks
+   </a>
+</div>

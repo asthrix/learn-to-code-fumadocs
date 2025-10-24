@@ -1,0 +1,135 @@
+---
+title: "React Hook Form Dynamic Fields"
+description:
+   "Build multi-step and dynamic forms with field arrays, conditional sections,
+   and persisted drafts."
+module: "M7"
+lesson: "5"
+difficulty: "advanced"
+duration: "35"
+project_phase: "Authentication"
+prerequisites: ["/docs/react-new/m7/4_react-hook-form-validation"]
+learning_objectives:
+   - "Implement field arrays for invite acceptance"
+   - "Create multi-step forms with preserved state"
+   - "Conditionally render sections based on prior answers"
+   - "Persist drafts and resume progress"
+tags: ["react-hook-form", "dynamic-forms", "field-array"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# React Hook Form Dynamic Fields
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Use `useFieldArray` for team invite lists.
+-  [ ] Create multi-step flows that retain values.
+-  [ ] Render conditional fields (e.g., company size) without losing validation.
+-  [ ] Persist drafts to resume onboarding later.
+
+## Field Arrays
+
+```tsx
+const { control, register } = useForm<InviteTeamInput>({
+   defaultValues: { teammates: [{ email: "" }] },
+});
+
+const { fields, append, remove } = useFieldArray({
+   control,
+   name: "teammates",
+});
+
+return (
+   <div>
+      {fields.map((field, index) => (
+         <input
+            key={field.id}
+            {...register(`teammates.${index}.email`)}
+            placeholder='Teammate email'
+         />
+      ))}
+      <button type='button' onClick={() => append({ email: "" })}>
+         Add teammate
+      </button>
+   </div>
+);
+```
+
+---
+
+## Multi-step Forms
+
+-  Use Zustand store or URL state to keep track of step + form values.
+-  `form.trigger()` before advancing steps ensures validation.
+-  Provide breadcrumbs and progress indicator for clarity.
+
+```tsx
+const { step, nextStep, previousStep } = useOnboardingStore();
+const onNext = async () => {
+   const valid = await form.trigger();
+   if (valid) {
+      nextStep();
+   }
+};
+```
+
+---
+
+## Conditional Sections
+
+-  Hide fields with `shouldUnregister: true` to remove unused data.
+-  Use `watch` to respond to user selections in real time.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='TaskFlow Pro Flow'>
+      <p>Implement the multi-step sign-up wizard.</p>
+
+      ```tsx filename="src/features/onboarding/OnboardingWizard.tsx"
+      const form = useSignUpForm(useOnboardingStore((state) => state.draft));
+      const companyType = form.watch("companyType");
+
+      return (
+         <Stepper step={step} onNext={handleNext} onBack={previousStep}>
+            <Step title='Account'>
+               <AccountStep form={form} />
+            </Step>
+            <Step title='Workspace'>
+               <WorkspaceStep form={form} showCompanyFields={companyType === "team"} />
+            </Step>
+            <Step title='Invite'>
+               <InviteStep form={form} />
+            </Step>
+         </Stepper>
+      );
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Field arrays cover adding/removing invitees.
+-  [ ] Multi-step wizard persists draft state across refresh.
+-  [ ] Conditional fields unregister when hidden.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m7/4_react-hook-form-validation'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← React Hook Form Validation
+   </a>
+   <a
+      href='/docs/react-new/m7/6_form-ux-best-practices'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Form UX Best Practices
+   </a>
+</div>

@@ -1,4 +1,16 @@
 {
    "title": "MX · Extended",
-   "pages": ["0_index"]
+   "pages": [
+      "0_index",
+      "1_introduction",
+      "2_improving-forms-inputs",
+      "3_react-query",
+      "4_users-profiles",
+      "5_listing-creation",
+      "6_reviews",
+      "7_cypress-testing",
+      "8_react-19-note",
+      "9_conclusion",
+      "10_validation-checklist"
+   ]
 }

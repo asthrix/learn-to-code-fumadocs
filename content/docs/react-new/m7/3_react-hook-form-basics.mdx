@@ -1,0 +1,139 @@
+---
+title: "React Hook Form Basics"
+description:
+   "Set up React Hook Form, register fields, and manage submission state for
+   TaskFlow Pro."
+module: "M7"
+lesson: "3"
+difficulty: "intermediate"
+duration: "30"
+project_phase: "Authentication"
+prerequisites: ["/docs/react-new/m7/2_forms-in-react"]
+learning_objectives:
+   - "Install and configure React Hook Form"
+   - "Register inputs and handle submission"
+   - "Display validation errors and submission states"
+   - "Persist form data across navigation when needed"
+tags: ["react-hook-form", "forms", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# React Hook Form Basics
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Install and configure React Hook Form in TaskFlow Pro.
+-  [ ] Register inputs for sign-up and login forms.
+-  [ ] Handle submission states (loading, success, error).
+-  [ ] Persist form data when switching between steps.
+
+## Installing React Hook Form
+
+```bash
+npm install react-hook-form zod @hookform/resolvers
+```
+
+---
+
+## Basic Form Example
+
+```tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const signUpSchema = z.object({
+   name: z.string().min(2),
+   email: z.string().email(),
+   password: z.string().min(8),
+});
+
+type SignUpInput = z.infer<typeof signUpSchema>;
+
+export function SignUpForm() {
+   const {
+      register,
+      handleSubmit,
+      formState: { errors, isSubmitting },
+   } = useForm<SignUpInput>({ resolver: zodResolver(signUpSchema) });
+
+   const onSubmit = async (values: SignUpInput) => {
+      await authClient.signUp(values);
+   };
+
+   return (
+      <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+         <input type='text' placeholder='Name' {...register("name")} />
+         {errors.name && <p role='alert'>{errors.name.message}</p>}
+
+         <input type='email' placeholder='Email' {...register("email")} />
+         {errors.email && <p role='alert'>{errors.email.message}</p>}
+
+         <input
+            type='password'
+            placeholder='Password'
+            {...register("password")}
+         />
+         {errors.password && <p role='alert'>{errors.password.message}</p>}
+
+         <button type='submit' disabled={isSubmitting}>
+            Create account
+         </button>
+      </form>
+   );
+}
+```
+
+---
+
+## Persisting Draft Data
+
+-  Use `useForm`'s `defaultValues` with Zustand or Context to hydrate drafts.
+-  Sync to local storage when steps span multiple pages.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='TaskFlow Pro Setup'>
+      <p>Wire React Hook Form into the project scaffold.</p>
+
+      ```tsx filename="src/forms/useSignUpForm.ts"
+      import { useForm } from "react-hook-form";
+      import { zodResolver } from "@hookform/resolvers/zod";
+      import { signUpSchema } from "@/validation/schemas";
+
+      export function useSignUpForm(defaultValues?: Partial<SignUpInput>) {
+         return useForm<SignUpInput>({
+            resolver: zodResolver(signUpSchema),
+            defaultValues,
+         });
+      }
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] React Hook Form installed with schema resolver.
+-  [ ] Sign-up form registers fields and handles submit state.
+-  [ ] Draft persistence plan recorded in module plan.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m7/2_forms-in-react'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Forms in React
+   </a>
+   <a
+      href='/docs/react-new/m7/4_react-hook-form-validation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · React Hook Form Validation
+   </a>
+</div>
