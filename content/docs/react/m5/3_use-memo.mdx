@@ -1,0 +1,188 @@
+---
+title: "`useMemo`"
+description:
+   "Memoise expensive calculations in TaskFlow Pro to reduce unnecessary
+   renders."
+module: "M5"
+lesson: "3"
+difficulty: "intermediate"
+duration: "25"
+project_phase: "Performance"
+prerequisites: ["/docs/react/m5/2_performance-in-react"]
+learning_objectives:
+   - "Explain when to use `useMemo`"
+   - "Memoise derived task statistics"
+   - "Avoid stale memo values via dependency arrays"
+   - "Instrument memoised computations with metrics"
+tags: ["useMemo", "performance", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# `useMemo`
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Recognise scenarios where memoisation improves performance.
+-  [ ] Memoise TaskFlow Pro derived data (`stats`, `filteredTasks`).
+-  [ ] Configure dependency arrays correctly to avoid stale values.
+-  [ ] Measure improvements after memoising.
+
+## Project Context
+
+TaskFlow Pro recomputes filtered lists and statistics whenever filters or tasks
+change. `useMemo` ensures the calculations run only when inputs change.
+
+---
+
+## Understanding `useMemo`
+
+`useMemo` caches the result of a computation until dependencies change.
+
+### Basic Example
+
+```tsx
+const expensiveValue = useMemo(() => computeExpensive(input), [input]);
+```
+
+### Practical Example
+
+```tsx
+const filteredTasks = useMemo(
+   () => filterTasks(tasks, { status: statusFilter, search }),
+   [tasks, statusFilter, search]
+);
+```
+
+---
+
+## Dependency Arrays
+
+-  Include all values used inside the memo callback.
+-  Only omit dependencies when you intentionally freeze the value.
+-  Use linters (`eslint-plugin-react-hooks`) to catch missing deps.
+
+---
+
+## ✅ Best Practices
+
+### 1. Memoise Derived Data, Not Components
+
+**Why:** Keep viewer components simple; memoise data in hooks.
+
+### 2. Measure Before and After
+
+**Why:** Verify that memoisation reduces render time.
+
+```tsx
+const stats = useMemo(() => calculateStats(tasks), [tasks]);
+console.log("stats computed");
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Memoising Primitive Values
+
+**Problem:** Memoising simple values adds overhead without payoff.
+
+**Solution:** Reserve `useMemo` for expensive calculations.
+
+### 2. Forgetting to Memoise Derived Dependencies
+
+**Problem:** `filteredTasks` stays memoised, but `stats` recomputes because it
+depends on `filteredTasks` reference.
+
+**Solution:** Memoise in consistent layers.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Apply memoisation within `useTasksState`:
+
+1. Memoise `filteredTasks` and `stats` using `useMemo`.
+2. Memoise computed counts per project (for Module 4 project sidebar).
+3. Update `notes/module-5-performance-plan.md` with recorded improvements (e.g.,
+   profiling screenshot or timing logs).
+4. Commit with `git commit -am "perf: memoise task selectors"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Memoise expensive selectors inside the state hook and log the difference.</p>
+
+      ```tsx filename="src/hooks/useTasksState.ts"
+      const filteredTasks = useMemo(() => {
+         return filterTasks(tasks, {
+            status: statusFilter === "all" ? undefined : statusFilter,
+            search,
+         });
+      }, [tasks, statusFilter, search]);
+
+      const stats = useMemo(() => calculateStats(tasks), [tasks]);
+
+      const tasksByProject = useMemo(() => groupTasksByProject(tasks), [tasks]);
+      ```
+
+      ```md filename="notes/module-5-performance-plan.md"
+      ## Memoisation Results
+      - `filterTasks` duration: 170ms → 58ms (React Profiler average)
+      - `DashboardStats` renders: 6 → 2 per search keystroke
+      ```
+
+      ```bash
+      git add src/hooks/useTasksState.ts notes/module-5-performance-plan.md
+      git commit -m "perf: memoise task selectors"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+TaskFlow Pro computes derived data only when dependencies change, reducing
+render time during filtering and navigation.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] `filteredTasks` and `stats` update correctly when tasks change.
+-  [ ] Profiling shows reduced render time or fewer commits.
+
+### Code Quality
+
+-  [ ] All dependencies are listed in `useMemo` arrays.
+-  [ ] Memoised values live near the logic that depends on them.
+
+### Understanding
+
+-  [ ] You can explain when `useMemo` is beneficial.
+-  [ ] You can interpret profiling differences before and after memoisation.
+
+### Project Integration
+
+-  [ ] Memo results feed into Dashboard and Project UI.
+-  [ ] Notes track improvements for future reference.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m5/2_performance-in-react'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Performance in React
+   </a>
+   <a
+      href='/docs/react/m5/4_use-callback'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · `useCallback`
+   </a>
+</div>

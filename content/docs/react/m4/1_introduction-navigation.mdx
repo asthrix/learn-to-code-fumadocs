@@ -1,0 +1,198 @@
+---
+title: "Introduction to Navigation"
+description:
+   "Map TaskFlow Pro's multi-page experience and draft the routing plan before
+   coding."
+module: "M4"
+lesson: "1"
+difficulty: "intermediate"
+duration: "20"
+project_phase: "Navigation"
+prerequisites: ["/docs/react/m4/0_index"]
+learning_objectives:
+   - "Explain why TaskFlow Pro needs routing in Module 4"
+   - "Identify primary and secondary routes"
+   - "Document layout and nested navigation requirements"
+   - "Capture open questions for future authentication"
+tags: ["routing", "planning", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Introduction to Navigation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Describe the user journeys routing will unlock in TaskFlow Pro.
+-  [ ] List all top-level and nested routes targeted in Module 4.
+-  [ ] Sketch which components own layout, navigation, and content.
+-  [ ] Note unanswered questions that affect later modules (auth, deep links).
+
+## Project Context
+
+Tasks now persist thanks to Module 3. Module 4 organizes them across views:
+dashboard analytics, project filters, and settings. A deliberate routing plan
+keeps links predictable and prepares the codebase for authentication in
+Module 7.
+
+---
+
+## Why Routing Matters
+
+Single-page apps still need URL structure. Routing:
+
+-  Creates shareable URLs so teammates can load task details directly.
+-  Splits the UI into focused contexts (dashboard vs settings).
+-  Enables code-splitting and performance optimizations in later modules.
+
+### Basic Example
+
+```plaintext
+/
+/projects
+/settings
+/projects/:projectId
+```
+
+### Practical Example
+
+```plaintext
+/dashboard -> Task overview and quick stats
+/projects -> Filtered list by project
+/projects/:projectId -> Task list scoped to a project
+/settings/profile -> User preferences (future auth work)
+```
+
+---
+
+## Route Inventory
+
+Break the experience into layers:
+
+-  **Top-level layout:** Header, Sidebar, outlet for page content.
+-  **Primary routes:** `/dashboard`, `/projects`, `/settings`.
+-  **Nested routes:** `/projects/:projectId`, `/settings/profile`,
+   `/settings/notifications`.
+-  **Fallbacks:** 404 page, loading states for lazy routes.
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep URLs Human-Friendly
+
+**Why:** Descriptive paths (`/projects/inbox`) help users and search engines.
+
+### 2. Co-locate Layouts with Routes
+
+**Why:** Shared UI (sidebar, breadcrumbs) stays synced with navigation state.
+
+```tsx
+<Route element={<DashboardLayout />}>
+   <Route path='dashboard' element={<DashboardPage />} />
+</Route>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Overloading a Single Route
+
+**Problem:** Shoving multiple contexts into `/` makes URLs ambiguous.
+
+**Solution:** Create dedicated routes, even if the UI looks similar.
+
+### 2. Forgetting Nested Navigation
+
+**Problem:** Settings tabs break when users refresh deep URLs.
+
+**Solution:** Plan nested routes (`/settings/profile`) so each tab gets a URL.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Create a routing plan document:
+
+1. Add `notes/module-4-routing-plan.md` outlining top-level, nested, and future
+   routes.
+2. Include a table with columns for `Path`, `Purpose`, `Layout`, `Notes`.
+3. Highlight dependencies (e.g., requires authenticated user).
+4. Commit with `git commit -am "docs: draft module 4 routing plan"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Capture the routing blueprint before touching code to keep Module 4 focused.
+      </p>
+
+      ```md filename="notes/module-4-routing-plan.md"
+      # Module 4 · Routing Plan
+
+      | Path | Purpose | Layout | Notes |
+      | --- | --- | --- | --- |
+      | /dashboard | Default analytics view | DashboardLayout | Landing page after login |
+      | /projects | Browse tasks by project | ProjectsLayout | Filters sidebar + list |
+      | /projects/:projectId | Project details | ProjectsLayout | Loads project tasks |
+      | /settings | Settings overview | SettingsLayout | Redirect to /settings/profile |
+      | /settings/profile | Profile preferences | SettingsLayout | Requires auth (Module 7) |
+      | /settings/notifications | Notification prefs | SettingsLayout | Placeholder for Module 7 |
+      | * | 404 fallback | PublicLayout | Show helpful links |
+      ```
+
+      ```bash
+      git add notes/module-4-routing-plan.md
+      git commit -m "docs: draft module 4 routing plan"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+You now have a documented route inventory covering current goals and future
+enhancements.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Route table covers dashboard, projects, settings, and 404.
+-  [ ] Nested routes account for project detail and settings subpages.
+
+### Code Quality
+
+-  [ ] Document lives in `notes/` alongside earlier module plans.
+-  [ ] Notes include dependencies for future modules.
+
+### Understanding
+
+-  [ ] You can explain how routing improves UX over a single page.
+-  [ ] You know which layouts render for each route.
+
+### Project Integration
+
+-  [ ] Plan references existing components (Sidebar, Dashboard shell).
+-  [ ] Auth-related paths are marked for Modules 7+.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m4/0_index'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Module Overview
+   </a>
+   <a
+      href='/docs/react/m4/2_client-vs-server-routing'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Client vs Server Routing
+   </a>
+</div>

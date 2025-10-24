@@ -1,0 +1,204 @@
+---
+title: "Introduction to Performance"
+description:
+   "Define the performance goals for TaskFlow Pro and document the areas that
+   need optimisation."
+module: "M5"
+lesson: "1"
+difficulty: "intermediate"
+duration: "20"
+project_phase: "Performance"
+prerequisites: ["/docs/react/m5/0_index"]
+learning_objectives:
+   - "Describe why performance matters for TaskFlow Pro"
+   - "Identify slow renders and expensive computations"
+   - "Draft a performance plan for Module 5"
+   - "Record monitoring metrics to track improvements"
+tags: ["performance", "planning", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Introduction to Performance
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Explain the user-facing performance goals for TaskFlow Pro.
+-  [ ] Spot components that re-render too often or perform heavy work.
+-  [ ] Plan memoisation and custom hook strategies for Module 5.
+-  [ ] Document metrics to monitor as you optimise.
+
+## Project Context
+
+Module 4 introduced routing; now TaskFlow Pro serves multiple pages and
+datasets. Without optimisations, derived statistics and filter operations can
+feel sluggish. We start by defining what "fast" means for TaskFlow Pro and
+gather a list of hotspots.
+
+---
+
+## What Performance Means
+
+Performance spans perceived responsiveness, render speed, and network
+responsiveness. Focus on:
+
+-  Render frequency: how often components re-render.
+-  Expensive computations: filters, sorts, derived metrics.
+-  Network payloads: ready for Module 6+ but note heavy API results.
+
+### Basic Example
+
+```tsx
+console.time("filterTasks");
+const filtered = tasks.filter(matchesFilters);
+console.timeEnd("filterTasks");
+```
+
+### Practical Example
+
+```tsx
+performance.mark("dashboard_render:start");
+renderDashboard();
+performance.measure("dashboard_render", "dashboard_render:start");
+```
+
+---
+
+## Spotting Bottlenecks
+
+-  React DevTools Profiler reveals components that commit frequently.
+-  `why-did-you-render` helps catch unnecessary re-renders.
+-  Browser performance panel measures scripting and rendering time.
+
+Document findings before optimising so gains are measurable.
+
+---
+
+## ✅ Best Practices
+
+### 1. Measure Before Optimising
+
+**Why:** Data drives decisions and avoids micro-optimisations.
+
+```md
+| Component | Issue | Evidence | | DashboardStats | Re-renders on every
+keystroke | React Profiler screenshot |
+```
+
+### 2. Set Target Budgets
+
+**Why:** Clear goals (e.g., task filter under 50ms) keep efforts scoped.
+
+```md
+-  Filter response time: < 50ms
+-  Dashboard initial render: < 1s on mid-tier laptops
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Premature Optimisation
+
+**Problem:** Tweaking components without proof wastes time.
+
+**Solution:** Profile first, optimise second.
+
+### 2. Ignoring User Perception
+
+**Problem:** Fast code with poor perceived performance still feels slow.
+
+**Solution:** Pair code optimisations with skeletons, debouncing, and clear
+feedback.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Create a performance plan document:
+
+1. Add `notes/module-5-performance-plan.md` with sections for "Current Metrics",
+   "Hotspots", and "Targets".
+2. Profile the dashboard filter interaction and record findings.
+3. List components to memoise (`DashboardStats`, `TaskList`, `ProjectSidebar`).
+4. Commit with `git commit -am "docs: draft module 5 performance plan"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Capture baseline metrics and the optimisation backlog before changing code.</p>
+
+      ```md filename="notes/module-5-performance-plan.md"
+      # Module 5 · Performance Plan
+
+      ## Current Metrics
+      - Dashboard initial render: 1.4s (React Profiler)
+      - Filter update: 180ms when 200 tasks loaded
+
+      ## Hotspots
+      - `DashboardStats` recalculates derived metrics every keystroke
+      - `TaskList` re-renders entire list when toggling a single task
+      - `ProjectSidebar` fetches project list on every render
+
+      ## Targets
+      - Filter updates under 60ms
+      - Derived stats memoised with `useMemo`
+      - Shared fetch logic moved into reusable hooks
+      ```
+
+      ```bash
+      git add notes/module-5-performance-plan.md
+      git commit -m "docs: draft module 5 performance plan"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+You now have a written plan detailing the performance goals, hotspots, and
+success metrics for Module 5.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Plan lists at least three hotspots with evidence.
+-  [ ] Target metrics align with course learning goals.
+
+### Code Quality
+
+-  [ ] Notes document uses consistent sections (metrics, hotspots, targets).
+-  [ ] Measurements reference profiling tools.
+
+### Understanding
+
+-  [ ] You can articulate why each hotspot matters.
+-  [ ] You can explain the difference between actual speed and perceived speed.
+
+### Project Integration
+
+-  [ ] Plan references existing components (DashboardStats, TaskList,
+       ProjectSidebar).
+-  [ ] Targets feed into upcoming lessons on `useMemo`, `useCallback`, and
+       custom hooks.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m5/0_index'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Module Overview
+   </a>
+   <a
+      href='/docs/react/m5/2_performance-in-react'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Performance in React
+   </a>
+</div>

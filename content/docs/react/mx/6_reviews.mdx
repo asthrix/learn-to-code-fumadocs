@@ -1,0 +1,152 @@
+---
+title: "Implementing Reviews"
+description:
+   "Add review and rating capabilities with moderation and analytics hooks."
+module: "MX"
+lesson: "6"
+difficulty: "advanced"
+duration: "30"
+project_phase: "Advanced polish"
+prerequisites: ["/docs/react/mx/5_listing-creation"]
+learning_objectives:
+   - "Model review data with moderation fields"
+   - "Build review submission UI with optimistic updates"
+   - "Detect abuse via simple heuristics"
+   - "Surface review analytics in dashboards"
+tags: ["reviews", "moderation", "analytics"]
+---
+
+# Implementing Reviews
+
+## Schema
+
+```prisma filename="prisma/schema.prisma"
+model Review {
+   id         String   @id @default(cuid())
+   listingId  String
+   authorId   String
+   rating     Int
+   comment    String
+   status     ReviewStatus @default(PENDING)
+   createdAt  DateTime @default(now())
+   updatedAt  DateTime @updatedAt
+}
+
+enum ReviewStatus {
+   PENDING
+   APPROVED
+   REJECTED
+}
+```
+
+-  Add database index on `(listingId, status)` for listing detail queries.
+
+---
+
+## Submission UI
+
+```tsx filename="src/features/reviews/ReviewForm.tsx"
+export const ReviewForm = ({ listingId }: { listingId: string }) => {
+   const { register, handleSubmit, reset } = useForm<ReviewInput>();
+   const mutation = useCreateReview(listingId);
+
+   const onSubmit = handleSubmit(async (values) => {
+      await mutation.mutateAsync(values);
+      reset();
+   });
+
+   return (
+      <form onSubmit={onSubmit} className='space-y-4'>
+         <RatingGroup {...register("rating", { valueAsNumber: true })} />
+         <Textarea label='Comment' {...register("comment")} />
+         <button type='submit' className='btn btn-primary'>
+            Submit review
+         </button>
+      </form>
+   );
+};
+```
+
+## Optimistic Updates
+
+```ts filename="src/features/reviews/api.ts"
+export const useCreateReview = (listingId: string) => {
+   const queryClient = useQueryClient();
+   return useMutation({
+      mutationFn: (payload: ReviewInput) =>
+         http.post(`/listings/${listingId}/reviews`, payload),
+      onMutate: async (payload) => {
+         await queryClient.cancelQueries({ queryKey: ["reviews", listingId] });
+         const previous = queryClient.getQueryData<Review[]>([
+            "reviews",
+            listingId,
+         ]);
+         queryClient.setQueryData(
+            ["reviews", listingId],
+            (reviews: Review[] = []) => [
+               {
+                  id: crypto.randomUUID(),
+                  status: "PENDING",
+                  ...payload,
+                  optimistic: true,
+               },
+               ...reviews,
+            ]
+         );
+         return { previous };
+      },
+      onError: (_err, _payload, context) => {
+         queryClient.setQueryData(["reviews", listingId], context?.previous);
+      },
+      onSettled: () =>
+         queryClient.invalidateQueries({ queryKey: ["reviews", listingId] }),
+   });
+};
+```
+
+---
+
+## Moderation Heuristics
+
+-  Auto-reject comments containing blocklisted phrases.
+-  Flag reviews with identical content submitted within five minutes.
+-  Provide admin UI to approve/override decisions.
+
+## Analytics
+
+```ts filename="src/features/reviews/metrics.ts"
+export const computeAverageRating = (reviews: Review[]) => {
+   const approved = reviews.filter((review) => review.status === "APPROVED");
+   if (!approved.length) return null;
+   const sum = approved.reduce((total, review) => total + review.rating, 0);
+   return Number((sum / approved.length).toFixed(1));
+};
+```
+
+Display rating breakdown chart in dashboards and send weekly digest to owners.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Review schema deployed with moderation status.
+-  [ ] Submission UI handles optimistic create/reset flows.
+-  [ ] Moderation heuristics documented and configurable.
+-  [ ] Analytics pipeline surfaces average ratings and volume.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/mx/5_listing-creation'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Implementing Listing Creation
+   </a>
+   <a
+      href='/docs/react/mx/7_cypress-testing'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Testing with Cypress
+   </a>
+</div>

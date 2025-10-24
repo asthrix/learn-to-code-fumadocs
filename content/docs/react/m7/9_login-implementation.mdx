@@ -1,0 +1,126 @@
+---
+title: "Login Implementation"
+description:
+   "Build the TaskFlow Pro login form with React Hook Form, Zod, and TanStack
+   Query."
+module: "M7"
+lesson: "9"
+difficulty: "advanced"
+duration: "40"
+project_phase: "Authentication"
+prerequisites: ["/docs/react/m7/8_auth-service-and-context"]
+learning_objectives:
+   - "Create login form with RHF and Zod validation"
+   - "Handle mutation success and error states"
+   - "Wire remember-me behavior"
+   - "Track analytics events for login"
+tags: ["react-hook-form", "authentication", "tanstack-query"]
+---
+
+# Login Implementation
+
+## Schema
+
+```ts filename="src/lib/validation/login-schema.ts"
+import { z } from "zod";
+
+export const loginSchema = z.object({
+   email: z.string().email({ message: "Enter a valid email" }),
+   password: z.string().min(8, "Password must be at least 8 characters"),
+   rememberMe: z.boolean().optional(),
+});
+
+export type LoginFormValues = z.infer<typeof loginSchema>;
+```
+
+---
+
+## Form Component
+
+```tsx filename="src/components/auth/LoginForm.tsx"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { loginSchema, LoginFormValues } from "@/lib/validation/login-schema";
+import { AuthService } from "@/lib/auth-service";
+import { useIsAuthenticated } from "@/hooks/useAuth";
+import { trackAuthEvent } from "@/lib/analytics";
+
+export const LoginForm = () => {
+   const { register, handleSubmit, formState } = useForm<LoginFormValues>({
+      resolver: zodResolver(loginSchema),
+      defaultValues: { rememberMe: true },
+   });
+   const { isAuthenticated } = useIsAuthenticated();
+
+   const mutation = useMutation({
+      mutationFn: AuthService.login,
+      onSuccess: () => {
+         trackAuthEvent("login_success");
+      },
+      onError: () => trackAuthEvent("login_error"),
+   });
+
+   const onSubmit = (values: LoginFormValues) => {
+      mutation.mutate(values);
+      if (values.rememberMe) {
+         localStorage.setItem("remembered-email", values.email);
+      } else {
+         localStorage.removeItem("remembered-email");
+      }
+   };
+
+   if (isAuthenticated) return <p>You are already signed in.</p>;
+
+   return (
+      <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+         </div>
+            {formState.errors.email && <p>{formState.errors.email.message}</p>}
+         </div>
+         </div>
+            {formState.errors.password && <p>{formState.errors.password.message}</p>}
+         </div>
+         <label className='flex items-center gap-2'>
+            <input type='checkbox' {...register("rememberMe")} /> Remember me
+         </label>
+         <button type='submit' disabled={mutation.isPending}>
+            {mutation.isPending ? "Signing in…" : "Sign in"}
+         </button>
+         {mutation.isError && <p className='text-red-500'>Invalid credentials.</p>}
+      </form>
+   );
+};
+```
+
+---
+
+## UX Enhancements
+
+-  Pre-fill email from localStorage on mount.
+-  Provide `Forgot password` link to reset flow.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Schema rejects invalid emails/passwords.
+-  [ ] Remember me toggles persisted email.
+-  [ ] Error state communicates next steps.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m7/8_auth-service-and-context'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Auth Service & Context
+   </a>
+   <a
+      href='/docs/react/m7/10_password-reset-flow'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Password Reset Flow
+   </a>
+</div>
+```

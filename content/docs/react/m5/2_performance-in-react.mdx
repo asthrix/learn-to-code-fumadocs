@@ -1,0 +1,195 @@
+---
+title: "Performance in React"
+description:
+   "Understand how React renders, reconciles, and batches updates so you can
+   optimise TaskFlow Pro effectively."
+module: "M5"
+lesson: "2"
+difficulty: "intermediate"
+duration: "25"
+project_phase: "Performance"
+prerequisites: ["/docs/react/m5/1_introduction-performance"]
+learning_objectives:
+   - "Explain React's render and reconciliation process"
+   - "Identify sources of unnecessary re-renders"
+   - "Apply batching and transition concepts to TaskFlow Pro"
+   - "Plan measurement strategies using React DevTools"
+tags: ["react", "performance", "rendering"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Performance in React
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Describe how React's render and commit phases influence performance.
+-  [ ] Recognise patterns that trigger unnecessary re-renders in TaskFlow Pro.
+-  [ ] Use React's batching and transition APIs to smooth updates.
+-  [ ] Incorporate profiling data into the Module 5 plan.
+
+## Project Context
+
+TaskFlow Pro manipulates task lists, filters, and analytics in near real time.
+Understanding React's lifecycle lets you reason about when components render and
+how to reduce the work required.
+
+---
+
+## React Rendering Basics
+
+1. **Render phase:** React calls components to produce the next UI tree.
+2. **Commit phase:** React applies DOM mutations and runs layout effects.
+3. **Paint & idle:** Browser paints and handles background work.
+
+React re-renders when props or state change. Memoisation helps prevent
+unnecessary renders when inputs remain unchanged.
+
+---
+
+## Batching Updates
+
+React automatically batches state updates inside event handlers.
+
+### Basic Example
+
+```tsx
+setFilter(nextFilter);
+setSearch(nextSearch);
+// React batches both calls into a single render
+```
+
+### Practical Example
+
+```tsx
+startTransition(() => {
+   setSearch(query);
+   setStatusFilter("all");
+});
+```
+
+`startTransition` marks updates as non-urgent so UI stays responsive.
+
+---
+
+## Profiling with React DevTools
+
+1. Record a session while typing in the search field.
+2. Inspect flame charts for `TaskList` and `DashboardStats`.
+3. Note components that re-render despite unchanged data.
+
+Use these observations to prioritise memoisation targets.
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Component Boundaries Clean
+
+**Why:** Smaller components make it obvious when props change.
+
+### 2. Measure with Production Builds
+
+**Why:** Development builds add extra checks; production profiling shows
+realistic performance.
+
+```bash
+npm run build && npm run start
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Overusing Memoisation
+
+**Problem:** Memoising everything adds complexity and memory overhead.
+
+**Solution:** Optimise only when profiling shows a benefit.
+
+### 2. Ignoring Suspense and Transitions
+
+**Problem:** Without transitions, typing in search fields can feel laggy.
+
+**Solution:** Use `startTransition` for large list filtering or asynchronous
+updates.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Connect theory to practice:
+
+1. Profile the dashboard while filtering tasks; capture a screenshot or note
+   flame chart hotspots.
+2. Update `notes/module-5-performance-plan.md` with a "Profiling" section
+   summarising findings and linking to assets.
+3. Identify which updates should use `startTransition` (e.g., search filter).
+4. Commit with `git commit -am "docs: profile module 5 baseline"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Translate profiling insights into actionable next steps.</p>
+
+      ```md filename="notes/module-5-performance-plan.md"
+      ## Profiling Notes
+      - Search input triggers 6 renders in `TaskList` for a single keystroke
+      - `DashboardStats` recomputes derived counts on every toggle
+      - Candidate transitions: search query updates, status filter changes
+      ```
+
+      ```bash
+      git add notes/module-5-performance-plan.md
+      git commit -m "docs: profile module 5 baseline"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+You understand React's rendering model, documented profiling insights, and
+prepared to apply memoisation in subsequent lessons.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Profiling section includes at least three observations.
+-  [ ] Transition candidates tie back to real UI interactions.
+
+### Code Quality
+
+-  [ ] Notes cite the profiling tool and context.
+-  [ ] Documentation stays alongside the Module 5 plan.
+
+### Understanding
+
+-  [ ] You can explain render vs commit phases.
+-  [ ] You know when batching happens automatically.
+
+### Project Integration
+
+-  [ ] Insights reference specific TaskFlow Pro components.
+-  [ ] Transition ideas feed into upcoming memoisation lessons.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m5/1_introduction-performance'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Introduction to Performance
+   </a>
+   <a
+      href='/docs/react/m5/3_use-memo'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · `useMemo`
+   </a>
+</div>

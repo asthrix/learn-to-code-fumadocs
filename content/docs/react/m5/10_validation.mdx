@@ -1,0 +1,172 @@
+---
+title: "Validating Module 5"
+description:
+   "Measure render performance, confirm behavioural parity, and document
+   remaining follow-ups."
+module: "M5"
+lesson: "10"
+difficulty: "intermediate"
+duration: "30"
+project_phase: "Performance"
+prerequisites: ["/docs/react/m5/9_implementation"]
+learning_objectives:
+   - "Profile critical flows after performance refactors"
+   - "Verify memoised components preserve existing behaviour"
+   - "Capture baseline metrics for future regressions"
+   - "Log follow-up tasks for advanced optimisation"
+tags: ["validation", "performance", "qa"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Validating Module 5
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Measure render timings with React DevTools profiler.
+-  [ ] Confirm lazy-loaded panels and virtual lists behave on slow networks.
+-  [ ] Run automated checks (lint, tests, type checks) after refactors.
+-  [ ] Document performance baselines and TODOs.
+
+## Project Context
+
+Performance work is only done when the user experience is verified. This
+validation pass ensures TaskFlow Pro remains stable and measurable after
+memoisation and hook refactors.
+
+---
+
+## Profiling Checklist
+
+1. Record a profiler session for dashboard interactions with 200+ tasks.
+2. Compare commit durations before/after memoisation (target < 8 ms).
+3. Inspect flame chart for repeated renders of memoised components.
+
+---
+
+## Behavioural Checks
+
+-  Scroll through the virtualised task list; ensure items recycle correctly.
+-  Toggle filters rapidly; deferred value should keep typing smooth.
+-  Trigger analytics panel suspense fallback by throttling network to "Slow 3G".
+
+---
+
+## ✅ Best Practices
+
+### 1. Automate Metrics Capture
+
+Use `pnpm exec react-scan` or Lighthouse performance audits in CI.
+
+### 2. Record Baselines
+
+Store current FPS, memory, and interaction timings in project docs for
+regression detection.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Trusting Dev Builds
+
+Validate using `npm run build && npm run start` to mimic production bundling.
+
+### 2. Skipping Accessibility Checks
+
+New lazy boundaries may break screen reader announcements—rerun Axe audit.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Complete the validation loop:
+
+1. Run `npm run lint`, `npm run test`, and `npm run type-check` (or equivalent)
+   to ensure stability.
+2. Record profiler results and note timings in
+   `notes/module-5-performance-plan.md` under "Validation".
+3. Update `docs/performance-architecture.md` with the current baseline metrics.
+4. Create GitHub issues (or TODOs) for remaining gaps (e.g., server-driven
+   metrics) and link them from the notes file.
+5. Commit with `git commit -am "chore: validate module 5 performance"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Ensure performance upgrades are measurable and documented.</p>
+
+      ```bash
+      npm run lint
+      npm run test
+      npm run type-check
+      npm run build
+      ```
+
+      ```md filename="notes/module-5-performance-plan.md"
+      ## Validation
+      - React DevTools commit duration: 6.3 ms avg (dashboard filter)
+      - Virtual list scroll FPS: 55–60 on mid-tier laptop
+      - TODO: Automate profiler run in CI (Module MX)
+      ```
+
+      ```md filename="docs/performance-architecture.md"
+      ## Baseline Metrics (2025-10-24)
+      - Dashboard initial render: 1.2s (Slow 4G)
+      - Filter interaction: < 80ms frame budget
+      - Insights panel suspense fallback duration: 350ms
+      ```
+
+      ```bash
+      git add notes/module-5-performance-plan.md docs/performance-architecture.md
+      git commit -m "chore: validate module 5 performance"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Performance improvements are validated, documented, and ready for future
+monitoring as TaskFlow Pro evolves.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Virtual list, filters, and analytics behave in production mode.
+-  [ ] Lazy boundaries show fallbacks without blocking navigation.
+
+### Code Quality
+
+-  [ ] Linting, tests, and type checks pass post-refactor.
+-  [ ] Validation notes store metrics and TODOs.
+
+### Understanding
+
+-  [ ] You can explain performance improvements to stakeholders.
+-  [ ] You know which metrics to monitor in future sprints.
+
+### Project Integration
+
+-  [ ] Architecture docs include baseline numbers.
+-  [ ] Issues or TODOs track remaining optimisation ideas.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m5/9_implementation'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Implementing Module 5
+   </a>
+   <a
+      href='/docs/react/m6/0_index'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Module 6 Overview
+   </a>
+</div>

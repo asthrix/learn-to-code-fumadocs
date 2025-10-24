@@ -1,785 +1,204 @@
 ---
-title: "TaskFlow Pro - Project Overview"
-description: "Explore the TaskFlow Pro architecture, features, and technology stack you'll build throughout this course"
+title: "Project Overview"
+description:
+   "Understand TaskFlow Pro's features, architecture, and success criteria."
 module: "M0"
 lesson: "3"
 difficulty: "beginner"
-duration: "30"
-project_phase: "Project Planning and Architecture"
-prerequisites: ["Welcome to React Development", "Setup and Requirements"]
+duration: "20"
+project_phase: "Orientation"
+prerequisites: ["/docs/react/m0/2_setup"]
 learning_objectives:
-  - "Understand the complete TaskFlow Pro project architecture"
-  - "Know the features you'll build across all modules"
-  - "Understand the technology stack and why each tool was chosen"
-  - "Visualize the final application structure"
-tags: ["project-overview", "taskflow-pro", "architecture", "planning"]
+   - "Summarise the TaskFlow Pro feature set"
+   - "Describe the high-level architecture"
+   - "Identify the tech stack and design system"
+   - "Capture success metrics for the final project"
+tags: ["overview", "architecture", "product"]
 ---
 
-# TaskFlow Pro - Project Overview
+# Project Overview
 
 ## Learning Objectives
 
 By the end of this lesson, you will:
 
-- [ ] Understand what TaskFlow Pro is and what makes it production-ready
-- [ ] Know all the features you'll build module by module
-- [ ] Understand the complete technology stack
-- [ ] Visualize the project's file structure and architecture
-- [ ] Be excited about building your portfolio project!
+-  [ ] Outline the user-facing features of TaskFlow Pro.
+-  [ ] Understand the architecture layers you will build.
+-  [ ] Recognise how the UI kit and API connect.
+-  [ ] Define what "done" means for the final project.
 
 ## Project Context
 
-TaskFlow Pro is the complete application you'll build throughout this course. Unlike toy projects that teach isolated concepts, TaskFlow Pro is a **real, deployable task management application** that demonstrates production-grade React development. By the end, you'll have a portfolio piece that showcases your skills to employers.
+Before writing a line of code we need a mental model for the finished app. This
+lesson clarifies what we are building and why each module matters.
 
 ---
 
-## What is TaskFlow Pro?
+## Product Summary
 
-**TaskFlow Pro** is a modern, feature-rich task management application designed to help users organize their work and personal tasks efficiently. Think of it as a simplified version of popular tools like Todoist, Asana, or Trello - but built entirely by you.
+TaskFlow Pro helps teams capture, organise, and deliver work. Users can create
+projects, add tasks with due dates and priorities, and monitor progress through
+dashboards.
 
-### Why Task Management?
+### Feature Milestones
 
-Task management applications are perfect for learning React because they:
+-  **M1:** Chrome for the app—global header, sidebar, and task cards.
+-  **M2:** Full CRUD for tasks with inline editing.
+-  **M3:** Remote persistence via REST API + optimistic updates.
+-  **M4:** Dedicated routes for Dashboard, Projects, Settings.
+-  **M5–M7:** Performance, global state, forms, and authentication.
+-  **M8:** Production-grade deployment to Vercel.
 
-- **Cover all React fundamentals** - Components, state, effects, routing
-- **Require real-world patterns** - CRUD operations, forms, authentication
-- **Are relatable** - Everyone uses task management in some form
-- **Are impressive** - A complete app shows more skill than simple demos
-- **Can be extended** - Easy to add your own creative features
+### Basic Example
 
-### Production-Ready Standards
+```ts
+export const taskflowModules = [
+   { id: "m1", theme: "fundamentals", outcome: "UI shell ready" },
+   { id: "m2", theme: "state", outcome: "CRUD interactions live" },
+];
+```
 
-TaskFlow Pro isn't just a learning project - it's built with **industry standards**:
+### Practical Example
 
-- ✅ **Modern React patterns** (Hooks, functional components)
-- ✅ **Type safety** (JSX with proper prop validation)
-- ✅ **Professional UI** (Tailwind CSS, responsive design)
-- ✅ **Best practices** (ESLint, Prettier, organized file structure)
-- ✅ **Deployment-ready** (Optimized build, environment configuration)
-- ✅ **Maintainable code** (Clear naming, component composition)
+```ts
+export type Task = {
+   id: string;
+   title: string;
+   description: string;
+   dueDate: string;
+   priority: "low" | "medium" | "high";
+   status: "todo" | "in-progress" | "done";
+};
+
+export type Project = {
+   id: string;
+   name: string;
+   summary: string;
+   tasks: Task[];
+};
+```
+
+These types guide the UI shape you will implement in upcoming modules.
 
 ---
 
-## TaskFlow Pro Features
-
-### Module-by-Module Feature Development
-
-Here's what you'll build in each module:
-
-#### **M0 - Introduction** (Current Module)
-**Features:**
-- Development environment setup
-- Project structure and tooling
-- Basic app shell with navigation
-
-**Technical Focus:**
-- Node.js and npm
-- Vite build tool
-- ESLint and Prettier
-- Git version control
-
-**Result:** A working development environment ready for React development
-
----
-
-#### **M1 - React Fundamentals**
-**Features:**
-- Professional header with branding
-- Responsive sidebar navigation
-- Beautiful task display cards
-- Basic layout structure
-
-**Technical Focus:**
-- Functional components
-- JSX syntax
-- Props and component composition
-- Tailwind CSS styling
-
-**Result:** Static UI components that look professional
-
----
-
-#### **M2 - State & Event Handlers**
-**Features:**
-- Create new tasks
-- Edit existing tasks
-- Delete tasks
-- Mark tasks as complete/incomplete
-- Task priority setting
-
-**Technical Focus:**
-- useState hook
-- Event handlers
-- Controlled components
-- Form handling
-
-**Result:** Fully interactive task management (without persistence yet)
-
----
-
-#### **M3 - Effects & Data Fetching**
-**Features:**
-- Connect to backend API
-- Persist tasks to database
-- Loading states and spinners
-- Error handling and retry logic
-- Automatic data synchronization
-
-**Technical Focus:**
-- useEffect hook
-- useRef hook
-- Fetch API and async/await
-- Error boundaries
-- Data persistence patterns
-
-**Result:** Tasks save permanently and sync across sessions
-
----
-
-#### **M4 - Routes & Navigation**
-**Features:**
-- Dashboard view (task overview)
-- Projects page (organize by project)
-- Settings page (user preferences)
-- Smooth page transitions
-- Active route highlighting
-
-**Technical Focus:**
-- React Router
-- Client-side routing
-- Route parameters
-- Nested routes
-- Protected routes
-
-**Result:** Multi-page application with seamless navigation
-
----
-
-#### **M5 - Hooks & Performance**
-**Features:**
-- Fast, optimized rendering
-- Custom hooks for reusable logic
-- Task filtering (by priority, status)
-- Search functionality
-- Smooth animations
-
-**Technical Focus:**
-- useMemo and useCallback
-- Custom hooks
-- Performance profiling
-- React DevTools
-- Optimization patterns
-
-**Result:** Fast, efficient application with reusable logic
-
----
-
-#### **M6 - State Management**
-**Features:**
-- Global user preferences
-- Theme switching (light/dark mode)
-- Persistent user settings
-- Centralized data management
-
-**Technical Focus:**
-- Context API
-- useContext hook
-- Global state patterns
-- State architecture
-- Avoiding prop drilling
-
-**Result:** Clean, maintainable state management
-
----
-
-#### **M7 - Forms & Authentication**
-**Features:**
-- User registration
-- User login/logout
-- Profile management
-- Password reset
-- Protected content
-- Advanced form validation
-
-**Technical Focus:**
-- React Hook Form
-- Form validation
-- JWT authentication
-- Protected routes
-- localStorage management
-- Security best practices
-
-**Result:** Complete user authentication system
-
----
-
-#### **M8 - Deploying**
-**Features:**
-- Production-optimized build
-- Live deployment
-- Custom domain (optional)
-- Environment configuration
-- Performance monitoring
-
-**Technical Focus:**
-- Production builds
-- Vercel deployment
-- Environment variables
-- CI/CD basics
-- Performance optimization
-
-**Result:** Live application accessible on the internet
-
----
-
-#### **MX - Extended** (Advanced Features)
-**Features:**
-- Drag-and-drop task reordering
-- Real-time collaboration
-- File attachments
-- Task comments and activity log
-- Advanced filtering and sorting
-- Comprehensive testing
-
-**Technical Focus:**
-- Advanced React patterns
-- Testing with Cypress
-- WebSocket integration
-- Advanced state patterns
-- Production monitoring
-
-**Result:** Enterprise-grade features and comprehensive testing
-
----
-
-## Technology Stack
-
-### Core Technologies
-
-#### **React 18**
-```
-Why: Industry-standard UI library
-Used by: Facebook, Netflix, Airbnb
-Benefits: Component-based, efficient, large ecosystem
-```
-
-#### **Vite**
-```
-Why: Fast, modern build tool
-Benefits: Instant server start, fast HMR, optimized builds
-Alternative: Create React App (older, slower)
-```
-
-#### **Tailwind CSS**
-```
-Why: Utility-first CSS framework
-Benefits: Fast development, consistent design, responsive
-Used by: GitHub, Netflix, NASA
-```
-
-#### **React Router**
-```
-Why: Standard routing library for React
-Benefits: Declarative routing, nested routes, route protection
-Alternative: Next.js (for server-side rendering)
-```
-
-### Development Tools
-
-#### **ESLint**
-```
-Why: Code quality and consistency
-Benefits: Catch errors early, enforce standards
-Standard: Used in all professional React projects
-```
-
-#### **Prettier**
-```
-Why: Automatic code formatting
-Benefits: Consistent style, no debates about formatting
-Standard: Industry-standard formatter
-```
-
-#### **Git**
-```
-Why: Version control
-Benefits: Track changes, collaborate, backup code
-Standard: Used universally in software development
-```
-
-### Optional/Advanced Tools (Later Modules)
-
-- **React Hook Form** - Advanced form handling
-- **Axios** - HTTP client (alternative to fetch)
-- **React Query** - Data fetching and caching
-- **Zustand/Redux** - State management (alternatives to Context)
-- **Vitest** - Unit testing
-- **Cypress** - End-to-end testing
-
----
-
-## Project Architecture
-
-### File Structure
-
-```
-taskflow-pro/
-├── public/                      # Static assets
-│   ├── icons/                  # App icons
-│   └── images/                 # Images
-│
-├── src/                        # Source code
-│   ├── components/             # React components
-│   │   ├── common/            # Reusable UI components
-│   │   │   ├── Button.jsx
-│   │   │   ├── Input.jsx
-│   │   │   ├── Modal.jsx
-│   │   │   └── LoadingSpinner.jsx
-│   │   ├── layout/            # Layout components
-│   │   │   ├── Header.jsx
-│   │   │   ├── Sidebar.jsx
-│   │   │   └── Footer.jsx
-│   │   └── tasks/             # Task-specific components
-│   │       ├── TaskCard.jsx
-│   │       ├── TaskList.jsx
-│   │       ├── TaskForm.jsx
-│   │       └── TaskFilters.jsx
-│   │
-│   ├── pages/                  # Page components
-│   │   ├── Dashboard.jsx
-│   │   ├── Projects.jsx
-│   │   ├── Settings.jsx
-│   │   └── Auth/
-│   │       ├── Login.jsx
-│   │       └── Register.jsx
-│   │
-│   ├── hooks/                  # Custom hooks
-│   │   ├── useTasks.js
-│   │   ├── useAuth.js
-│   │   └── useLocalStorage.js
-│   │
-│   ├── services/               # API services
-│   │   ├── api.js
-│   │   ├── taskService.js
-│   │   └── authService.js
-│   │
-│   ├── context/                # Context providers
-│   │   ├── AuthContext.jsx
-│   │   └── ThemeContext.jsx
-│   │
-│   ├── utils/                  # Utility functions
-│   │   ├── dateHelpers.js
-│   │   ├── validators.js
-│   │   └── formatters.js
-│   │
-│   ├── styles/                 # Global styles
-│   │   └── index.css
-│   │
-│   ├── App.jsx                 # Main app component
-│   └── main.jsx                # Entry point
-│
-├── .env.example                # Environment variables template
-├── .eslintrc.json             # ESLint configuration
-├── .prettierrc                # Prettier configuration
-├── .gitignore                 # Git ignore rules
-├── package.json               # Dependencies and scripts
-├── vite.config.js             # Vite configuration
-├── tailwind.config.js         # Tailwind configuration
-└── README.md                  # Project documentation
-```
-
-### Component Hierarchy
-
-```
-App
-├── Header
-│   ├── Logo
-│   ├── Navigation
-│   └── UserMenu
-│
-├── Sidebar
-│   ├── QuickFilters
-│   └── ProjectList
-│
-└── MainContent
-    ├── Dashboard
-    │   ├── TaskStats
-    │   └── TaskList
-    │       └── TaskCard (multiple)
-    │
-    ├── Projects
-    │   ├── ProjectGrid
-    │   └── ProjectCard (multiple)
-    │
-    └── Settings
-        ├── ProfileSettings
-        ├── AppearanceSettings
-        └── NotificationSettings
-```
-
----
-
-## Design Philosophy
-
-### Component-Based Architecture
-
-**Principle:** Build small, reusable components that compose into larger features
-
-```jsx
-// Small, focused components
-<Button variant="primary">Add Task</Button>
-<TaskCard task={taskData} />
-
-// Compose into larger features
-<TaskList>
-  <TaskCard task={task1} />
-  <TaskCard task={task2} />
-  <TaskCard task={task3} />
-</TaskList>
-```
-
-### Unidirectional Data Flow
-
-**Principle:** Data flows down through props, changes flow up through callbacks
-
-```
-App (state)
- ↓ props
-TaskList
- ↓ props
-TaskCard
- ↑ callbacks
-TaskList
- ↑ callbacks
-App (updates state)
-```
-
-### Single Responsibility
-
-**Principle:** Each component should do one thing well
-
-```
-✅ Good: TaskCard displays a task
-✅ Good: TaskForm handles task creation
-✅ Good: TaskList manages multiple tasks
-
-❌ Bad: TaskManager does everything
-```
-
----
-
-## Development Workflow
-
-### Daily Development Cycle
-
-```
-1. Pull latest changes (git pull)
-2. Create feature branch (git checkout -b feature-name)
-3. Write code
-4. Test in browser (npm run dev)
-5. Check for errors (ESLint)
-6. Format code (Prettier)
-7. Commit changes (git commit)
-8. Push to repository (git push)
-9. Test deployment (optional)
-```
-
-### Module Completion Cycle
-
-```
-1. Learn new concept
-2. See examples
-3. Implement in TaskFlow Pro
-4. Test functionality
-5. Verify with validation checklist
-6. Commit your progress
-7. Move to next lesson
-```
-
----
-
-## TaskFlow Pro vs. Real-World Apps
-
-### What TaskFlow Pro Has in Common with Production Apps
-
-✅ **Component architecture** - Same patterns as Facebook, Netflix
-✅ **State management** - Same hooks and patterns
-✅ **Routing** - Same React Router library
-✅ **API integration** - Same async patterns
-✅ **Authentication** - Same JWT approach
-✅ **Deployment** - Same build and deploy process
-
-### What Production Apps Add (Beyond This Course)
-
-- **Backend API** - Node.js/Express, Python/Django, etc.
-- **Database** - PostgreSQL, MongoDB, etc.
-- **Advanced features** - Real-time updates, notifications, etc.
-- **Scale handling** - Caching, load balancing, etc.
-- **DevOps** - Monitoring, logging, error tracking
-- **Team processes** - Code reviews, CI/CD pipelines
-
-**The Good News:** The React skills you learn here transfer directly to production applications. The patterns, practices, and code you write are production-quality.
-
----
-
-## Success Metrics
-
-By project completion, you'll have built an application that:
-
-### **Functionality**
-- ✅ Creates, reads, updates, and deletes tasks
-- ✅ Persists data across sessions
-- ✅ Handles user authentication
-- ✅ Provides smooth navigation
-- ✅ Works on desktop and mobile
-
-### **Code Quality**
-- ✅ Follows React best practices
-- ✅ Uses modern hooks patterns
-- ✅ Has clean, maintainable code
-- ✅ Passes ESLint with no errors
-- ✅ Has consistent formatting
-
-### **User Experience**
-- ✅ Loads quickly
-- ✅ Responds instantly to interactions
-- ✅ Shows loading states appropriately
-- ✅ Handles errors gracefully
-- ✅ Looks professional and polished
-
-### **Deployment**
-- ✅ Builds without errors
-- ✅ Deploys to production
-- ✅ Has custom domain (optional)
-- ✅ Performs well in production
-- ✅ Is accessible on the internet
+## Architecture at a Glance
+
+-  **Client:** Vite + React + TypeScript.
+-  **Styles:** Tailwind CSS with a small design token layer.
+-  **State:** Hooks and Context; later modules introduce Redux patterns.
+-  **Data:** REST API served locally via mock server → replaced with hosted
+   endpoint in MX.
 
 ---
 
 ## ✅ Best Practices
 
-### 1. Plan Before You Code
+### 1. Establish Domain Language Early
 
-**Why:** Understanding the architecture saves time and prevents rewrites
+**Why:** Consistent naming keeps code readable across files and contributors.
 
-```
-✅ Good: Review the lesson, understand the goal, then code
-✅ Good: Refer to the project structure when creating files
-✅ Good: Follow the module progression systematically
+```md
+Glossary snippet:
 
-❌ Bad: Jump ahead without understanding foundations
-❌ Bad: Skip lessons or rush through concepts
-❌ Bad: Create files without following the structure
+-  Task: atomic piece of work
+-  Project: collection of tasks
+-  View: route-level screen
 ```
 
-### 2. Build Incrementally
+### 2. Document Success Criteria
 
-**Why:** Small, tested additions are easier to debug than large changes
+**Why:** Prevents scope creep and keeps modules focused.
 
-```javascript
-// Good: Add one feature at a time
-// 1. Create TaskCard component
-// 2. Test it renders
-// 3. Add styling
-// 4. Test appearance
-// 5. Add interactivity
-// 6. Test interactions
-
-// Bad: Build everything at once, then try to debug
-```
-
-### 3. Commit Often
-
-**Why:** Regular commits create checkpoint you can return to
-
-```bash
-# Good: Commit after each feature
-git commit -m "Add TaskCard component"
-git commit -m "Add task creation form"
-git commit -m "Add task editing functionality"
-
-# Bad: One giant commit at the end
-git commit -m "Built entire app"
+```md
+Success = responsive UI, persistent tasks, accessible forms, deployed build.
 ```
 
 ---
 
 ## ❌ Common Mistakes
 
-### 1. Skipping the Validation Checklists
+### 1. Skipping Architecture Notes
 
-**Problem:** Missing issues that compound over time
+**Problem:** Without a blueprint decisions become inconsistent.
 
-```
-❌ Bad: "My code works, I'll skip the checklist"
-Result: Small issues become big problems later
-
-✅ Good: Complete every validation checklist
-Result: Catch issues early, build confidence
+```md
+// Bad: "Figure it out later" in planning doc.
 ```
 
-**Solution:** Treat validation checklists as mandatory. They ensure you're building on solid foundations.
+**Solution:**
 
-### 2. Not Following the File Structure
-
-**Problem:** Disorganized code becomes unmaintainable
-
-```javascript
-// Bad: Putting everything in one folder
-src/
-├── Component1.jsx
-├── Component2.jsx
-├── Component3.jsx
-// ... 50 more files
-
-// Good: Organized by purpose
-src/
-├── components/
-│   ├── common/
-│   ├── layout/
-│   └── tasks/
-├── pages/
-└── hooks/
+```md
+Add diagrams or bullet points before coding.
 ```
 
-**Solution:** Follow the provided file structure exactly. It's designed for scalability and maintainability.
+### 2. Overloading Module 0
 
-### 3. Copying Code Without Understanding
+**Problem:** Trying to build features before foundations leads to rewrites.
 
-**Problem:** Can't debug or modify code you don't understand
-
-```
-❌ Bad: Copy code, hope it works, move on
-Result: Stuck when something breaks
-
-✅ Good: Read code, understand it, type it yourself
-Result: Learn patterns, can debug and extend
+```md
+// Bad: starting authentication before base layout exists.
 ```
 
-**Solution:** Type code examples yourself. Read comments. Understand why, not just what.
+**Solution:**
+
+```md
+Follow the roadmap; finish one milestone before the next.
+```
 
 ---
 
 ## 🔨 Implement in TaskFlow Pro
 
-### Task: Create Your Project Plan Document
+### Task: Create a Project Blueprint
 
-Let's create a personal project plan to track your TaskFlow Pro journey.
+1. Add `docs/project-overview.md`.
+2. Include sections for features, personas, and success metrics.
+3. Paste the TypeScript interfaces above into the doc for quick reference.
+4. Commit with `git commit -am "docs: add project overview"`.
 
-#### Step 1: Create a Project Journal
+#### Expected Result
 
-In your project folder, create a `PROJECT_JOURNAL.md` file:
-
-```markdown
-# TaskFlow Pro - Development Journal
-
-## Project Goal
-Build a production-ready task management application using React
-
-## Learning Path
-- [x] M0: Environment setup
-- [ ] M1: React fundamentals
-- [ ] M2: State and events
-- [ ] M3: Effects and data
-- [ ] M4: Routes and navigation
-- [ ] M5: Hooks and performance
-- [ ] M6: State management
-- [ ] M7: Forms and authentication
-- [ ] M8: Deployment
-- [ ] MX: Advanced features
-
-## Features Completed
-- [ ] Header component
-- [ ] Sidebar navigation
-- [ ] Task cards
-- [ ] Task creation
-- [ ] Task editing
-- [ ] Task deletion
-- [ ] API integration
-- [ ] Data persistence
-- [ ] Multi-page routing
-- [ ] User authentication
-- [ ] Production deployment
-
-## Notes and Learnings
-[Add your notes, challenges, and solutions as you progress]
-
-## Questions and Ideas
-[Track questions for later research and feature ideas]
-```
-
-#### Step 2: Review the Architecture
-
-Take 5 minutes to:
-1. Look at the file structure diagram above
-2. Visualize how components will connect
-3. Think about the data flow
-4. Get excited about what you'll build!
-
-#### Step 3: Set Your Goal
-
-Write down your personal goal for this course:
-- When do you want to finish?
-- What will you do with your completed TaskFlow Pro?
-- Who will you show it to?
-
-#### Expected Result:
-
-You have a clear understanding of the TaskFlow Pro project, its architecture, and the journey ahead. You're ready to start building!
+You and future collaborators can instantly grasp what TaskFlow Pro should
+deliver.
 
 ---
 
 ## ✅ Validation Checklist
 
-After completing this lesson, verify:
+### Functionality
 
-### **Understanding**
-- [ ] You understand what TaskFlow Pro is and what makes it production-ready
-- [ ] You know all the features you'll build across the modules
-- [ ] You understand the technology stack and why each tool was chosen
-- [ ] You can visualize the project's file structure
-- [ ] You understand the component-based architecture
+-  [ ] `docs/project-overview.md` exists with feature bullets.
+-  [ ] Interfaces for `Task` and `Project` are recorded.
 
-### **Planning**
-- [ ] You've created a PROJECT_JOURNAL.md file
-- [ ] You've reviewed the module-by-module feature breakdown
-- [ ] You've set a realistic timeline for completion
-- [ ] You understand the daily development workflow
-- [ ] You're committed to following the structure
+### Code Quality
 
-### **Architecture Knowledge**
-- [ ] You understand the file structure organization
-- [ ] You know where different types of files will go
-- [ ] You understand component hierarchy
-- [ ] You grasp unidirectional data flow
-- [ ] You know the difference between pages and components
+-  [ ] Commit groups documentation changes only.
+-  [ ] Filenames use kebab-case or lower-case where appropriate.
 
-### **Expectations**
-- [ ] You understand this is a real, deployable application
-- [ ] You know TaskFlow Pro will be portfolio-worthy
-- [ ] You're excited about the features you'll build
-- [ ] You understand the commitment required (40+ hours)
-- [ ] You're ready to follow best practices from day one
+### Understanding
+
+-  [ ] You can explain the app in under 30 seconds.
+-  [ ] You know which module handles routing vs. data fetching.
+
+### Project Integration
+
+-  [ ] Notes file links to the overview doc.
+-  [ ] Backlog of future stretch goals (optional) recorded separately.
 
 ---
 
-<div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-lg my-8">
-  <h3 className="text-xl font-bold mb-3">🎯 You're Building Something Real!</h3>
-  <p className="mb-4">
-    TaskFlow Pro isn't just a tutorial project—it's a production-grade application you'll deploy 
-    and show to potential employers. Every line of code you write uses industry-standard patterns 
-    and best practices.
-  </p>
-  <p className="font-medium">
-    By the end of this course, you'll have a portfolio project that demonstrates real React skills! 🚀
-  </p>
-</div>
-
-<div className="mt-8 flex justify-between items-center">
-  <a href="/docs/react/m0/setup" className="text-blue-600 hover:text-blue-800 font-medium">
-    ← Previous: Setup and Requirements
-  </a>
-  <a href="/docs/react/m0/dependencies" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium inline-flex items-center">
-    Next: Dependencies and Tools →
-  </a>
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m0/2_setup'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Downloads & Setup
+   </a>
+   <a
+      href='/docs/react/m0/4_dependencies'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Dependencies
+   </a>
 </div>

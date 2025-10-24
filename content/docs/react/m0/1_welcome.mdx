@@ -1,432 +1,201 @@
 ---
-title: "Welcome to React Development"
+title: "Welcome to Project React"
 description:
-   "Introduction to the React course and the TaskFlow Pro project you'll build
-   throughout this learning journey"
+   "Get the big picture for TaskFlow Pro and how you'll learn React by building
+   it."
 module: "M0"
 lesson: "1"
 difficulty: "beginner"
-duration: "15"
-project_phase: "Course Introduction"
-prerequisites: []
+duration: "20"
+project_phase: "Orientation"
+prerequisites: ["/docs/react/m0/0_index"]
 learning_objectives:
-   - "Understand the course structure and learning approach"
-   - "See what you'll build: TaskFlow Pro application"
-   - "Learn about project-based learning methodology"
-   - "Set expectations for the learning journey"
-tags: ["introduction", "course-overview", "taskflow-pro"]
+   - "Describe the TaskFlow Pro product vision"
+   - "Explain how project-based learning accelerates retention"
+   - "Identify the skills you'll gain by finishing the course"
+   - "Note the support resources you'll rely on"
+tags: ["introduction", "taskflow-pro", "motivation"]
 ---
 
-# Welcome to React Development
+# Welcome to Project React
 
 ## Learning Objectives
 
 By the end of this lesson, you will:
 
--  [ ] Understand what React is and why it's valuable
--  [ ] Know what you'll build in this course (TaskFlow Pro)
--  [ ] Understand the project-based learning approach
--  [ ] Be excited and ready to start your React journey!
+-  [ ] Tell the TaskFlow Pro story in one sentence.
+-  [ ] Understand how each module ladders up to a deployed app.
+-  [ ] Recognise why we pair explanations with hands-on steps.
+-  [ ] Know where to ask for help when you get stuck.
 
 ## Project Context
 
-Welcome! You're about to embark on a transformative journey learning **React**,
-the most popular JavaScript library for building user interfaces. Throughout
-this course, you'll build **TaskFlow Pro**, a complete, production-ready task
-management application.
+TaskFlow Pro is a modern task management app inspired by tools like Asana and
+Linear. It is the red thread for the entire course; every snippet, refactor, and
+checklist keeps the project moving toward a production deployment.
 
 ---
 
-## What is React?
+## Why Project-Based?
 
-**React** is a JavaScript library created by Facebook (Meta) for building user
-interfaces. It's used by thousands of companies including Facebook, Instagram,
-Netflix, Airbnb, and Uber to create fast, interactive web applications.
+### Learning That Sticks
 
-### Why Learn React?
+We learn faster when new ideas are attached to something tangible. Instead of
+memorising React APIs, you apply them immediately to features that ship inside
+TaskFlow Pro.
 
-**Industry Demand**
+### Skill Growth Over Trivia
 
--  React is the #1 most requested skill in frontend developer job postings
--  Average React developer salary is among the highest in web development
--  Used by Fortune 500 companies and startups alike
+Recruiters care about shipped projects. Completing this course leaves you with
+an application you understand deeply, alongside habits that mirror real-world
+teams.
 
-**Modern Development**
+### Basic Example
 
--  **Component-based architecture** makes code reusable and maintainable
--  **Declarative approach** simplifies complex UI logic
--  **Rich ecosystem** with thousands of libraries and tools
--  **Active community** providing support and resources
+```tsx
+function WelcomeMessage() {
+   return <p>Welcome to TaskFlow Pro — your productivity coach!</p>;
+}
+```
 
-**Career Growth**
+### Practical Example
 
--  Opens doors to React Native (mobile development)
--  Leads naturally to Next.js (full-stack development)
--  Valuable foundation for other modern frameworks
+```tsx
+import type { ReactNode } from "react";
+
+type LessonTeaserProps = {
+   icon: ReactNode;
+   title: string;
+   blurb: string;
+};
+
+export function LessonTeaser({ icon, title, blurb }: LessonTeaserProps) {
+   return (
+      <article className='flex items-start gap-3 rounded-lg border bg-card p-4'>
+         <span className='text-xl' aria-hidden>
+            {icon}
+         </span>
+         <div>
+            <h3 className='text-base font-semibold'>{title}</h3>
+            <p className='text-sm text-muted-foreground'>{blurb}</p>
+         </div>
+      </article>
+   );
+}
+```
+
+Use components like `LessonTeaser` across modules to remind learners what they
+are about to build.
 
 ---
 
-## Meet TaskFlow Pro
+## ✅ Best Practices
 
-Throughout this course, you won't just learn React concepts in isolation. You'll
-build a **real, production-grade application** called **TaskFlow Pro**.
+### 1. Anchor Concepts to Outcomes
 
-### What is TaskFlow Pro?
+**Why:** Learners retain information when it solves a visible problem.
 
-TaskFlow Pro is a modern, feature-rich task management application designed to
-help users organize their work and life. Think of it as a simplified version of
-tools like Todoist or Asana.
-
-### Core Features You'll Build
-
-**Module by Module Progression:**
-
-```
-M0: Project Setup
-├── Development environment
-├── Project structure
-└── Basic app shell
-
-M1: React Fundamentals
-├── Header component
-├── TaskCard components
-└── Basic layout structure
-
-M2: State & Events
-├── Task creation
-├── Task editing
-├── Task deletion
-└── Interactive features
-
-M3: Effects & Data
-├── API integration
-├── Data persistence
-├── Loading states
-└── Error handling
-
-M4: Routes & Navigation
-├── Multi-page routing
-├── Dashboard view
-├── Projects view
-└── Settings page
-
-M5: Hooks & Performance
-├── Custom hooks
-├── Performance optimization
-├── Memoization
-└── Advanced patterns
-
-M6: State Management
-├── Context API
-├── Global state
-├── User preferences
-└── Theme management
-
-M7: Forms & Auth
-├── User authentication
-├── Form validation
-├── User profiles
-└── Protected routes
-
-M8: Deployment
-├── Production build
-├── Vercel deployment
-├── CI/CD setup
-└── Performance monitoring
-
-MX: Advanced Features
-├── Drag-and-drop
-├── Real-time updates
-├── Testing with Cypress
-└── Advanced optimizations
+```tsx
+// Good: tie hooks to a final experience
+const upcomingModules = ["State & events", "Effects & data"];
 ```
 
-### Final Application Features
+### 2. Set a Support System Early
 
-By the end of this course, TaskFlow Pro will have:
+**Why:** Beginners progress faster when they know where to look for answers.
 
-**✅ Core Functionality**
-
--  Create, edit, and delete tasks
--  Organize tasks by priority (high, medium, low)
--  Set due dates and track completion
--  Mark tasks as complete/incomplete
-
-**✅ Advanced Features**
-
--  User authentication and profiles
--  Multiple project organization
--  Task filtering and search
--  Responsive design (mobile, tablet, desktop)
--  Dark/light theme support
--  Data persistence with API
-
-**✅ Production Quality**
-
--  Clean, maintainable code
--  Performance optimized
--  Accessibility compliant
--  Comprehensive error handling
--  Professional UI/UX design
-
----
-
-## Learning Approach: Project-Based
-
-This course uses a **project-based learning** methodology, which means:
-
-### How It Works
-
-**1. Learn by Doing**
-
--  Each lesson teaches a concept AND shows you how to apply it
--  No theoretical knowledge without practical application
--  Build real features, not toy examples
-
-**2. Progressive Complexity**
-
--  Start simple, add complexity gradually
--  Each module builds on previous work
--  By the end, you have a complete application
-
-**3. Professional Practices**
-
--  Learn industry-standard patterns
--  Understand common pitfalls and how to avoid them
--  Write production-quality code from day one
-
-**4. Portfolio Project**
-
--  TaskFlow Pro becomes a portfolio piece
--  Deploy it and show it to employers
--  Demonstrate real React skills, not just course completion
-
-### What Makes This Different
-
-**Traditional Approach:**
-
-```
-Learn concept → Simple example → Move on
-Result: Disconnected knowledge, no real project
-```
-
-**Our Approach:**
-
-```
-Learn concept → Apply to TaskFlow Pro → See it in context
-Result: Cohesive knowledge, complete application
+```md
+-  React docs → https://react.dev
+-  MDN JavaScript → https://developer.mozilla.org
+-  Course Q&A → internal forum or Slack
 ```
 
 ---
 
-## Course Structure
+## ❌ Common Mistakes
 
-### 10 Comprehensive Modules
+### 1. Treating Lessons as Standalone
 
-**M0 - Introduction** (3-4 hours) Set up development environment and project
-foundation
+**Problem:** Forgetting the project arc leads to disjointed learning.
 
-**M1 - React Fundamentals** (5-6 hours) Components, JSX, props, and basic
-styling
+```md
+// Bad: jumping around modules without finishing validation steps.
+```
 
-**M2 - State & Event Handlers** (5-6 hours) Interactive components with state
-and events
+**Solution:**
 
-**M3 - Effects & Data Fetching** (6-7 hours) Side effects, API integration, and
-data management
+```md
+1. Finish a lesson.
+2. Run the checklist.
+3. Commit changes tagged with the lesson ID.
+```
 
-**M4 - Routes & Navigation** (4-5 hours) Multi-page applications with React
-Router
+### 2. Skipping Retrospectives
 
-**M5 - Hooks & Performance** (5-6 hours) Custom hooks and optimization
-techniques
+**Problem:** Learners who do not reflect stall when revisiting topics.
 
-**M6 - State Management** (6-7 hours) Context API and global state patterns
+```md
+// Bad: no notes on what worked, what was confusing, or next questions.
+```
 
-**M7 - Forms & Authentication** (5-6 hours) Form handling and user
-authentication
+**Solution:**
 
-**M8 - Deploying** (2-3 hours) Production deployment and CI/CD
-
-**MX - Extended** (8-10 hours) Advanced features and testing
-
-### Total Course Time
-
-⏱️ **40+ hours** of comprehensive content
-
--  Video walkthroughs and explanations
--  Hands-on coding exercises
--  Project implementation tasks
--  Validation and testing
+```md
+-  Jot one win, one question, one idea after each lesson.
+```
 
 ---
 
-## What You'll Need
+## 🔨 Implement in TaskFlow Pro
 
-### Technical Prerequisites
+### Task: Create a Course Notes Document
 
-**Basic JavaScript** (Required)
+1. Create a `notes/` folder at the root of your project.
+2. Add `m0-notes.md` with space for wins, blockers, and TODOs per lesson.
+3. Commit the file with `git commit -m "docs: add m0 notes template"`.
 
--  Variables, functions, arrays, objects
--  ES6+ features (arrow functions, destructuring, etc.)
--  Basic understanding of async/await
+#### Expected Result
 
-**HTML & CSS** (Required)
-
--  HTML elements and structure
--  CSS selectors and properties
--  Basic responsive design concepts
-
-**Command Line** (Helpful)
-
--  Navigate directories
--  Run commands
--  Basic Git usage
-
-### Soft Skills
-
-**Patience and Persistence**
-
--  Learning React takes time and practice
--  Debugging is part of the process
--  Mistakes are learning opportunities
-
-**Curiosity**
-
--  Ask "why" not just "how"
--  Explore documentation
--  Experiment with examples
-
-**Commitment**
-
--  Consistent practice yields best results
--  Complete hands-on exercises
--  Build the project step-by-step
-
----
-
-## What Success Looks Like
-
-### By the End of This Course
-
-**You Will Be Able To:**
-
--  ✅ Build complete React applications from scratch
--  ✅ Understand modern React patterns and best practices
--  ✅ Implement state management effectively
--  ✅ Integrate with APIs and handle async data
--  ✅ Create responsive, accessible user interfaces
--  ✅ Deploy React applications to production
--  ✅ Debug React applications efficiently
--  ✅ Read and understand React documentation
-
-**You Will Have:**
-
--  📦 A portfolio-ready project (TaskFlow Pro)
--  💼 Production-grade code samples
--  🎓 Deep understanding of React ecosystem
--  🚀 Confidence to build your own React apps
--  📚 Foundation for advanced React topics
-
----
-
-## Getting Help
-
-### Throughout This Course
-
-**Documentation**
-
--  React official docs: [react.dev](https://react.dev)
--  MDN Web Docs for JavaScript
--  Course reference materials
-
-**Community**
-
--  Stack Overflow for specific questions
--  React Discord and forums
--  Course discussion forums
-
-**Best Practices**
-
--  Read error messages carefully
--  Use React DevTools for debugging
--  Check the browser console
--  Search for similar issues online
-
----
-
-## Your First Step
-
-### What's Next?
-
-In the next lesson, you'll **set up your development environment**. This
-includes:
-
--  Installing Node.js and npm
--  Setting up VS Code with essential extensions
--  Configuring Git for version control
--  Preparing your system for React development
-
-### Before Moving On
-
-Take a moment to:
-
--  [ ] **Ensure you have time** - This course requires commitment
--  [ ] **Check prerequisites** - Make sure you have basic JavaScript knowledge
--  [ ] **Get excited!** - You're about to build something amazing
--  [ ] **Clear your schedule** - Block out time for focused learning
+You now have a dedicated place to capture insights and questions, ready for
+review during validation.
 
 ---
 
 ## ✅ Validation Checklist
 
-After completing this lesson, verify:
+### Functionality
 
-### **Understanding**
+-  [ ] Notes file exists inside `notes/m0-notes.md`.
+-  [ ] Git commit recorded the new documentation.
 
--  [ ] You understand what React is and why it's valuable
--  [ ] You know what TaskFlow Pro is and what features it will have
--  [ ] You understand the project-based learning approach
--  [ ] You're aware of the time commitment required
+### Code Quality
 
-### **Readiness**
+-  [ ] Commit message follows `<type>: <description>` style.
+-  [ ] Repository runs `npm run lint` without errors.
 
--  [ ] You have basic JavaScript, HTML, and CSS knowledge
--  [ ] You're committed to completing the hands-on exercises
--  [ ] You're ready to install development tools
--  [ ] You're excited to start learning React!
+### Understanding
 
-### **Expectations**
+-  [ ] You can summarise the project scope to a peer.
+-  [ ] You know where to find official React resources.
 
--  [ ] You understand this is a practical, project-based course
--  [ ] You know the course follows a progressive learning path
--  [ ] You're prepared for 40+ hours of content and practice
--  [ ] You're ready to build a production-quality application
+### Project Integration
+
+-  [ ] Notes document includes the module lesson list.
+-  [ ] Next actions for Module 0 are captured.
 
 ---
 
-<div className='bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg my-8'>
-   <h3 className='text-xl font-bold mb-3'>🎉 Welcome to React Development!</h3>
-   <p className='mb-4'>
-      You're taking the first step toward mastering one of the most valuable
-      skills in modern web development. This course will transform you from a
-      React beginner to a confident developer capable of building
-      production-ready applications.
-   </p>
-   <p className='font-medium'>Let's build something amazing together! 🚀</p>
-</div>
-
-<div className='mt-8 flex justify-between items-center'>
+<div className='mt-8 flex justify-between'>
    <a
-      href='/docs/react/m0'
-      className='text-blue-600 hover:text-blue-800 font-medium'
+      href='/docs/react/m0/0_index'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
    >
-      ← Back to M0 Overview
+      ← Module Overview
    </a>
    <a
-      href='/docs/react/m0/setup'
-      className='bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium inline-flex items-center'
+      href='/docs/react/m0/2_setup'
+      className='text-sm font-medium text-primary hover:text-primary/80'
    >
-      Next: Setup and Requirements →
+      Next · Downloads & Setup
    </a>
 </div>

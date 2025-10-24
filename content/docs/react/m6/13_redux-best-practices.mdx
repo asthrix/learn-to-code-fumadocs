@@ -1,0 +1,118 @@
+---
+title: "Redux Best Practices"
+description:
+   "Ship reliable global state with structure, testing, DevTools, and
+   performance guardrails."
+module: "M6"
+lesson: "13"
+difficulty: "advanced"
+duration: "30"
+project_phase: "Global state"
+prerequisites: ["/docs/react/m6/12_redux-custom-components"]
+learning_objectives:
+   - "Enforce slice structure and naming conventions"
+   - "Leverage middleware and DevTools responsibly"
+   - "Monitor performance of selectors and thunks"
+   - "Capture governance policies for future contributors"
+tags: ["redux", "best-practices", "architecture"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Redux Best Practices
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Define conventions for slices, selectors, and thunks.
+-  [ ] Instrument Redux with middleware for analytics and errors.
+-  [ ] Monitor selector performance and memoisation.
+-  [ ] Document governance rules for contributors.
+
+## Structural Guidelines
+
+-  One domain per slice (projects, tasks, preferences).
+-  Co-locate thunks with slices or dedicated `thunks/` folder.
+-  Export actions and selectors from slice entry points.
+
+### File Layout
+
+```
+src/state/
+├── store.ts
+├── projects/
+│   ├── slice.ts
+│   ├── selectors.ts
+│   └── thunks.ts
+└── tasks/
+    ├── slice.ts
+    ├── selectors.ts
+    └── thunks.ts
+```
+
+---
+
+## Middleware & DevTools
+
+-  Use Redux DevTools in development only.
+-  Add logging middleware for debugging, but gate behind env flags.
+-  Emit analytics events (route, filters) from thunks.
+
+```tsx
+const store = configureStore({
+   reducer,
+   middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+         thunk: { extraArgument: { api, analytics } },
+      }).concat(trackErrorsMiddleware),
+   devTools: process.env.NODE_ENV !== "production",
+});
+```
+
+---
+
+## Governance Checklist
+
+-  Require selectors for all shared state reads.
+-  Memoise expensive selectors and measure with performance tooling.
+-  Add tests for reducers + thunks before merging complex features.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='State Governance Doc'>
+      <p>Record expectations in the engineering handbook.</p>
+
+      ```md filename="docs/state-architecture.md"
+      ## Governance
+      - Naming: `domainSlice`, `selectDomainById`
+      - Middleware: analytics + error tracking registered in `store.ts`
+      - Testing: reducers + selectors require unit tests, thunks require integration tests
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Slices follow agreed naming and layout.
+-  [ ] Middleware stack documented and unit tested.
+-  [ ] DevTools disabled in production builds.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m6/12_redux-custom-components'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Redux Custom Components
+   </a>
+   <a
+      href='/docs/react/m6/14_implementation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Implementation
+   </a>
+</div>

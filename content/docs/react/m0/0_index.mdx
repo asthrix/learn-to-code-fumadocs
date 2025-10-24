@@ -1,159 +1,62 @@
 ---
-title: "M0 - Introduction to React"
-description:
-   "Welcome to React Development! Set up your environment and understand the
-   course structure."
+title: "Module 0 · Kickstart"
+description: "Set up your tools and understand what TaskFlow Pro will become."
 module: "M0"
+lesson: "0"
 difficulty: "beginner"
-duration: "60"
-project_phase: "Project setup and environment configuration"
+duration: "30"
+project_phase: "Environment & workflow"
+prerequisites: ["/docs/react/index"]
+learning_objectives:
+   - "Outline the purpose of Module 0"
+   - "List each lesson deliverable"
+   - "Prepare the tools you'll install next"
+tags: ["overview", "setup", "planning"]
 ---
 
-# M0 - Introduction to React Development
+# Module 0 · Kickstart
 
-Welcome to the **React Development** course! You're about to embark on an
-exciting journey to master one of the most popular and powerful frontend
-libraries in the world.
+Module 0 clears the runway. Across twelve compact lessons you will install
+tooling, explore the TaskFlow Pro architecture, and ship the initial scaffold
+that powers every later module.
 
-## 🎯 Module Overview
+### What You Will Ship
 
-In this introductory module, you'll:
+-  Local development workspace with Node.js, npm, VS Code, and Git ready.
+-  A fresh Vite + React project configured with ESLint, Prettier, Tailwind CSS,
+   and opinionated folder structure.
+-  Shared environment variables and scripts that your future self can reuse
+   without guesswork.
 
--  ✅ Set up your development environment
--  ✅ Understand the course structure and learning path
--  ✅ Get familiar with the TaskFlow Pro project
--  ✅ Configure essential tools and extensions
+### Lesson Map
 
-## 📚 Module Lessons
+1. **Welcome** — orient yourself and preview the final app.
+2. **Downloads & Setup** — install core tooling.
+3. **Project Overview** — peek at features and data flows.
+4. **Dependencies** — document the libraries we rely on.
+5. **Linting & Formatting** — lock in consistent code.
+6. **API Overview** — understand the mock backend.
+7. **UI Components** — review the design system you'll build.
+8. **Environment Variables** — separate secrets from code.
+9. **Running the Project** — start dev servers with confidence.
+10.   **Working with the Project** — practice the day-to-day workflow.
+11.   **Implementation** — bootstrap TaskFlow Pro.
+12.   **Validation** — confirm everything works before M1.
 
-### [Welcome to Project React](/docs/react/m0/welcome)
+Keep a notebook or digital doc for lessons learned; you'll reuse the same
+checklist format in later modules.
 
-Get introduced to the course, understand what you'll build, and see the final
-TaskFlow Pro application in action.
-
-### [Downloads and Setup Requirements](/docs/react/m0/setup)
-
-Install Node.js, VS Code, and essential extensions. Set up your development
-environment for success.
-
-### [Project Overview](/docs/react/m0/overview)
-
-Deep dive into the TaskFlow Pro project structure, features, and development
-approach.
-
-### [Dependencies](/docs/react/m0/dependencies)
-
-Understand the key libraries and tools we'll use: React, Vite, Tailwind CSS, and
-more.
-
-### [Linting and Formatting](/docs/react/m0/linting)
-
-Configure ESLint and Prettier for consistent, high-quality code.
-
-### [API Overview](/docs/react/m0/api)
-
-Introduction to the mock API and data structures for TaskFlow Pro.
-
-### [UI Components](/docs/react/m0/components)
-
-Preview the component library and design system we'll build.
-
-### [Environment Variables](/docs/react/m0/environment)
-
-Set up environment variables for different deployment environments.
-
-### [Running the Project](/docs/react/m0/running)
-
-Start the development server and explore the initial project structure.
-
-### [Working with the Project](/docs/react/m0/workflow)
-
-Learn the development workflow, Git practices, and project organization.
-
-### [Implementing Module 0](/docs/react/m0/implementation)
-
-Hands-on: Create the initial TaskFlow Pro shell application.
-
-### [Validation Checklist](/docs/react/m0/validation)
-
-Verify your setup and ensure you're ready for Module 1.
-
-## 🏗️ What You'll Build
-
-In this module, you'll create the foundation for **TaskFlow Pro**, a modern task
-management application that you'll enhance throughout the course.
-
-### Initial Project Features:
-
--  ⚡ **Vite + React** development environment
--  🎨 **Tailwind CSS** for styling
--  📱 **Responsive layout** foundation
--  🔧 **ESLint + Prettier** configuration
--  📂 **Organized project structure**
-
-## 🔧 Prerequisites
-
-Before starting this module, ensure you have:
-
--  **Basic JavaScript knowledge** (variables, functions, arrays, objects)
--  **HTML/CSS fundamentals** (elements, selectors, responsive design)
--  **Command line basics** (navigating directories, running commands)
--  **Curiosity and patience** to learn something amazing!
-
-## ⏱️ Time Commitment
-
--  **Total Module Time:** ~4-6 hours
--  **Individual Lessons:** 20-45 minutes each
--  **Hands-on Practice:** 2-3 hours
--  **Recommended Pace:** 1-2 lessons per day
-
-## 🎯 Learning Objectives
-
-By the end of this module, you will:
-
-1. **Have a fully configured development environment** ready for React
-   development
-2. **Understand the course structure** and know what to expect in each module
-3. **Know the TaskFlow Pro project** inside and out
-4. **Have created the initial project shell** with proper tooling
-5. **Be confident using** the development workflow and tools
-
-## 🚀 Ready to Start?
-
-Let's begin your React journey! Click on the first lesson below to get started.
-
-<div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-8'>
+<div className='mt-8 flex justify-between'>
    <a
-      href='/docs/react/m0/welcome'
-      className='block p-6 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors'
+      href='/docs/react/index'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
    >
-      <div className='flex items-center space-x-3'>
-         <span className='text-2xl'>👋</span>
-         <div>
-            <h3 className='font-bold text-blue-900'>
-               Welcome to Project React
-            </h3>
-            <p className='text-blue-700 text-sm'>Start your React journey</p>
-         </div>
-      </div>
+      ← Course Overview
    </a>
-
    <a
-      href='/docs/react/m0/setup'
-      className='block p-6 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors'
+      href='/docs/react/m0/1_welcome'
+      className='text-sm font-medium text-primary hover:text-primary/80'
    >
-      <div className='flex items-center space-x-3'>
-         <span className='text-2xl'>⚙️</span>
-         <div>
-            <h3 className='font-bold text-green-900'>Setup Requirements</h3>
-            <p className='text-green-700 text-sm'>Configure your environment</p>
-         </div>
-      </div>
+      Next · Welcome
    </a>
 </div>
-
----
-
-**Next Module Preview:** In **M1 - React Fundamentals**, you'll learn JSX,
-create your first components, and build the Header and TaskCard components for
-TaskFlow Pro!

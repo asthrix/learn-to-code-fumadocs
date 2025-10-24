@@ -1,0 +1,108 @@
+---
+title: "Forms in React"
+description:
+   "Review controlled vs uncontrolled inputs and pick the right approach for
+   TaskFlow Pro."
+module: "M7"
+lesson: "2"
+difficulty: "intermediate"
+duration: "25"
+project_phase: "Authentication"
+prerequisites: ["/docs/react/m7/1_introduction-forms"]
+learning_objectives:
+   - "Differentiate controlled and uncontrolled components"
+   - "Evaluate native form behaviours vs React abstractions"
+   - "Plan accessibility features for TaskFlow Pro forms"
+   - "Decide when to introduce React Hook Form"
+tags: ["forms", "react", "accessibility"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Forms in React
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Understand trade-offs between controlled and uncontrolled inputs.
+-  [ ] Know how browser form events interact with React state.
+-  [ ] Apply accessibility patterns (labels, descriptions, errors).
+-  [ ] Choose when to introduce form libraries.
+
+## Controlled vs Uncontrolled
+
+| Pattern      | Pros                              | Cons                              | Use When                    |
+| ------------ | --------------------------------- | --------------------------------- | --------------------------- |
+| Controlled   | Single source of truth, easy sync | More renders, boilerplate         | Complex validation, dynamic |
+| Uncontrolled | Minimal renders, native behaviour | Harder to sync state, manual refs | Simple forms, low logic     |
+
+---
+
+## Accessibility Essentials
+
+-  Associate `<label>` with `htmlFor` attributes.
+-  Provide helper text using `aria-describedby`.
+-  Set `aria-invalid` and `role="alert"` for error messages.
+-  Ensure keyboard focus order matches visual layout.
+
+```tsx
+<label htmlFor='email'>Email</label>
+<input
+   id='email'
+   name='email'
+   type='email'
+   aria-describedby='email-help email-error'
+   aria-invalid={Boolean(errors.email)}
+/>
+<p id='email-help' className='text-sm text-muted-foreground'>Use your work email.</p>
+```
+
+---
+
+## When to Adopt a Form Library
+
+-  Repeated validation logic across forms.
+-  Need for async validation and field arrays.
+-  Want built-in integration with schema validators (Zod, Yup).
+-  Desire for granular input registration (React Hook Form).
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='TaskFlow Pro Decisions'>
+      <p>Document chosen patterns before implementation.</p>
+
+      ```md filename="notes/module-7-forms-auth-plan.md"
+      ## Form Architecture Decisions
+      - Controlled: sign-up (needs dynamic company fields)
+      - Uncontrolled + RHF: login, reset (fast interactions)
+      - Accessibility: label, hint, error IDs standardised
+      - Library: React Hook Form + Zod for schema validation
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Each form flow mapped to controlled/uncontrolled strategy.
+-  [ ] Accessibility requirements documented.
+-  [ ] React Hook Form adoption justified with team.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m7/1_introduction-forms'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Introduction to Forms
+   </a>
+   <a
+      href='/docs/react/m7/3_react-hook-form-basics'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · React Hook Form Basics
+   </a>
+</div>

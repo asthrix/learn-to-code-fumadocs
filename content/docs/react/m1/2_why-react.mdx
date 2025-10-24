@@ -1,793 +1,198 @@
 ---
-title: "Why Choose React?"
+title: "Why React?"
 description:
-   "Deep dive into React's advantages, when to use it, and how it compares to
-   alternatives"
+   "Understand why teams choose React and how its ecosystem supports TaskFlow
+   Pro."
 module: "M1"
 lesson: "2"
 difficulty: "beginner"
-duration: "25"
-project_phase: "React fundamentals"
-prerequisites: ["Introduction to React"]
+duration: "20"
+project_phase: "UI scaffolding"
+prerequisites: ["/docs/react/m1/1_intro-react"]
 learning_objectives:
-   - "Understand React's competitive advantages"
-   - "Know when React is the right choice"
-   - "Learn React's ecosystem and community benefits"
-   - "Make informed technology decisions"
-tags: ["react", "advantages", "comparison", "decision-making"]
+   - "Identify business and technical reasons to adopt React"
+   - "Compare React with alternative frameworks"
+   - "Connect ecosystem tools to course modules"
+   - "Highlight companies succeeding with React"
+tags: ["react", "ecosystem", "decision"]
 ---
 
-# Why Choose React?
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Why React?
 
 ## Learning Objectives
 
 By the end of this lesson, you will:
 
--  [ ] Understand React's key advantages over alternatives
--  [ ] Know when to choose React for a project
--  [ ] Appreciate React's ecosystem and community
--  [ ] Make informed decisions about using React
--  [ ] Understand React's career benefits
+-  [ ] List the benefits React brings to modern web applications.
+-  [ ] Compare React with Vanilla JS and full frameworks like Angular.
+-  [ ] Map ecosystem tools to upcoming TaskFlow Pro modules.
+-  [ ] Share real-world examples of React at scale.
 
 ## Project Context
 
-For TaskFlow Pro, we chose React because it offers the perfect balance of
-performance, developer experience, and ecosystem support. This lesson explains
-why React was the right choice and will help you make similar decisions in your
-projects.
+Choosing React is a strategic decision. You will leverage its flexibility,
+community, and tooling across every feature of TaskFlow Pro.
 
 ---
 
-## React's Key Advantages
+## Business Case
 
-### 1. Component Reusability
+-  **Developer Velocity:** Component reuse speeds up feature delivery.
+-  **Talent Pool:** React is widely taught, easing hiring.
+-  **Community Support:** Thousands of libraries accelerate development.
 
-**Problem:** Duplicating UI code across your application
+### Basic Example
 
-```jsx
-// ❌ Without components: Copy-paste everywhere
-// Page 1
-<div className="card">
-  <h3>Task 1</h3>
-  <button>Edit</button>
-  <button>Delete</button>
-</div>
-
-// Page 2 (same code duplicated)
-<div className="card">
-  <h3>Task 2</h3>
-  <button>Edit</button>
-  <button>Delete</button>
-</div>
-
-// ✅ With React components: Write once, use everywhere
-function TaskCard({ task, onEdit, onDelete }) {
-  return (
-    <div className="card">
-      <h3>{task.title}</h3>
-      <button onClick={onEdit}>Edit</button>
-      <button onClick={onDelete}>Delete</button>
-    </div>
-  );
-}
-
-// Use it anywhere
-<TaskCard task={task1} onEdit={handleEdit} onDelete={handleDelete} />
-<TaskCard task={task2} onEdit={handleEdit} onDelete={handleDelete} />
+```md
+React powers Facebook, Netflix, Shopify, Airbnb, and countless SaaS startups.
 ```
 
-**Benefits:**
+### Practical Example
 
--  ✅ Write once, reuse everywhere
--  ✅ Update in one place, changes everywhere
--  ✅ Easier to maintain and test
--  ✅ Consistent UI across application
+```tsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-### 2. Virtual DOM Performance
+const queryClient = new QueryClient();
 
-**How it Works:**
-
-```
-User Action
-    ↓
-State Change
-    ↓
-Create New Virtual DOM
-    ↓
-Compare with Old Virtual DOM (Diffing)
-    ↓
-Calculate Minimal Changes
-    ↓
-Update Only Changed Real DOM Elements
-    ↓
-Fast, Efficient Update ⚡
-```
-
-**Real Example:**
-
-```jsx
-// You have 1000 tasks
-function TaskList({ tasks }) {
+export function AppProviders({ children }: { children: React.ReactNode }) {
    return (
-      <ul>
-         {tasks.map((task) => (
-            <li key={task.id}>
-               <TaskCard task={task} />
-            </li>
-         ))}
-      </ul>
-   );
-}
-
-// User marks ONE task complete
-// React only updates THAT ONE <li>
-// Doesn't recreate all 1000 tasks!
-
-// Performance comparison:
-// Vanilla JS:   ~50ms (recreate everything)
-// React:        ~5ms (update only changed)  ⚡ 10x faster!
-```
-
-### 3. Declarative Syntax
-
-**Imperative vs Declarative:**
-
-```javascript
-// Imperative (HOW): Tell computer each step
-const list = document.getElementById("task-list");
-const li = document.createElement("li");
-li.textContent = task.title;
-li.className = task.completed ? "completed" : "";
-li.addEventListener("click", () => toggleTask(task.id));
-list.appendChild(li);
-
-// Update later
-const item = document.querySelector(`[data-id="${task.id}"]`);
-item.className = task.completed ? "completed" : "";
-
-// Declarative (WHAT): Describe desired state
-function TaskItem({ task, onToggle }) {
-   return (
-      <li
-         className={task.completed ? "completed" : ""}
-         onClick={() => onToggle(task.id)}
-      >
-         {task.title}
-      </li>
-   );
-}
-// React handles the updates automatically! ✨
-```
-
-### 4. Rich Ecosystem
-
-**React's Ecosystem Size:**
-
-```
-npm packages mentioning "react": 300,000+
-Weekly downloads: 20+ million
-GitHub stars: 220,000+
-Community: Millions of developers
-```
-
-**Popular React Libraries:**
-
-```javascript
-// Routing
-import { BrowserRouter, Route } from "react-router-dom";
-
-// State Management
-import { Provider } from "react-redux";
-import { create } from "zustand";
-
-// UI Components
-import { Button } from "@mui/material";
-import { Alert } from "@chakra-ui/react";
-
-// Forms
-import { useForm } from "react-hook-form";
-import { Formik } from "formik";
-
-// Data Fetching
-import { useQuery } from "@tanstack/react-query";
-import useSWR from "swr";
-
-// Animation
-import { motion } from "framer-motion";
-import { useSpring } from "react-spring";
-
-// Testing
-import { render, screen } from "@testing-library/react";
-
-// Everything you need exists! 🎉
-```
-
-### 5. Strong Community Support
-
-**Getting Help:**
-
-```
-Stack Overflow: 450,000+ React questions
-Reddit r/reactjs: 500,000+ members
-Discord servers: 100,000+ active developers
-GitHub discussions: Thousands of conversations
-YouTube tutorials: Millions of videos
-Online courses: Thousands available
-```
-
-**Response Time Example:**
-
-```javascript
-// Post a React question on Stack Overflow
-// Average first response: 11 minutes ⚡
-// Average solution: 45 minutes
-
-// Compare with newer frameworks:
-// Average first response: 2-3 hours
-// Average solution: 1-2 days
-```
-
-### 6. Corporate Backing
-
-**Meta (Facebook) Investment:**
-
-```
-Full-time React core team: 15+ engineers
-Annual investment: $10+ million
-Used in: Facebook, Instagram, WhatsApp
-Commitment: Long-term support guaranteed
-Updates: Regular, well-tested releases
-```
-
-**Stability:**
-
-```javascript
-// React follows Semantic Versioning
-React 16 (2017) → React 17 (2020) → React 18 (2022)
-
-// Major versions are rare, breaking changes minimal
-// Your code from 2017 likely still works in 2024! ✅
-```
-
----
-
-## When to Choose React
-
-### ✅ React is Perfect For:
-
-**1. Single Page Applications (SPAs)**
-
-```jsx
-// TaskFlow Pro - Perfect use case!
-function App() {
-   return (
-      <Router>
-         <Routes>
-            <Route path='/' element={<Dashboard />} />
-            <Route path='/tasks' element={<TaskList />} />
-            <Route path='/tasks/:id' element={<TaskDetail />} />
-            <Route path='/settings' element={<Settings />} />
-         </Routes>
-      </Router>
-   );
-}
-
-// All pages in one app, no full page reloads
-// Fast, smooth user experience ✨
-```
-
-**2. Interactive UIs**
-
-```jsx
-// Real-time updates, user interactions
-function TaskBoard() {
-   const [tasks, setTasks] = useState([]);
-
-   // Drag and drop
-   const handleDragEnd = (result) => {
-      const reordered = reorder(tasks, result);
-      setTasks(reordered);
-   };
-
-   // Filter updates
-   const [filter, setFilter] = useState("all");
-   const filteredTasks = tasks.filter(
-      (t) => filter === "all" || t.status === filter
-   );
-
-   return (
-      <DragDropContext onDragEnd={handleDragEnd}>
-         <FilterBar value={filter} onChange={setFilter} />
-         <TaskList tasks={filteredTasks} />
-      </DragDropContext>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
    );
 }
 ```
 
-**3. Component-Heavy Applications**
-
-```jsx
-// Lots of reusable UI pieces
-<App>
-   <Header>
-      <Logo />
-      <Navigation>
-         <NavItem />
-         <NavItem />
-      </Navigation>
-      <UserMenu>
-         <Avatar />
-         <Dropdown>
-            <MenuItem />
-            <MenuItem />
-         </Dropdown>
-      </UserMenu>
-   </Header>
-   <Sidebar>
-      <ProjectList />
-      <TagCloud />
-   </Sidebar>
-   <MainContent>
-      <TaskBoard>
-         <TaskCard />
-         <TaskCard />
-      </TaskBoard>
-   </MainContent>
-</App>
-
-// Each component is reusable, testable, maintainable! ✅
-```
-
-**4. Real-Time Applications**
-
-```jsx
-// Live updates, WebSocket connections
-function LiveTaskFeed() {
-   const [tasks, setTasks] = useState([]);
-
-   useEffect(() => {
-      const socket = new WebSocket("wss://api.taskflow.com");
-
-      socket.onmessage = (event) => {
-         const newTask = JSON.parse(event.data);
-         setTasks((prev) => [newTask, ...prev]);
-      };
-
-      return () => socket.close();
-   }, []);
-
-   return (
-      <div>
-         {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
-         ))}
-      </div>
-   );
-}
-// React automatically re-renders with new data! ⚡
-```
-
-**5. Progressive Web Apps (PWAs)**
-
-```jsx
-// TaskFlow Pro can become a PWA
-// Works offline, installable, fast
-
-// service-worker.js + React = PWA ✅
-if ("serviceWorker" in navigator) {
-   navigator.serviceWorker.register("/sw.js");
-}
-
-// React handles the UI
-// Service worker handles offline capability
-// Perfect combination! 🎉
-```
-
-### ⚠️ React May Not Be Ideal For:
-
-**1. Simple Static Sites**
-
-```html
-<!-- If your site is just this, React is overkill -->
-<!DOCTYPE html>
-<html>
-   <body>
-      <h1>Welcome to My Blog</h1>
-      <p>Here are my posts...</p>
-      <footer>© 2024</footer>
-   </body>
-</html>
-
-<!-- Better choice: Plain HTML or SSG like Hugo -->
-```
-
-**2. SEO-Critical Marketing Sites**
-
-```javascript
-// Problem: Client-side rendering
-// Google sees this initially:
-<div id='root'></div>
-
-// Solution: Use Next.js (React framework with SSR)
-// Or: Use a CMS like WordPress for marketing site
-```
-
-**3. Content-Heavy Documentation**
-
-```markdown
-// Better choices for docs: // - Docusaurus (React-based, optimized for docs)
-// - VitePress (Vue-based, super fast) // - Fumadocs (What this course uses!)
-
-// Pure React would work but specialized tools are better
-```
-
-**4. Resource-Constrained Environments**
-
-```javascript
-// React bundle size: ~40KB (gzipped)
-// For very low-bandwidth users, consider:
-// - Preact (3KB alternative)
-// - Vanilla JS
-// - Server-rendered HTML
-```
+React's ecosystem integrates seamlessly, letting you drop in tools like React
+Query in Module 3.
 
 ---
 
 ## React vs Alternatives
 
-### React vs Vue
-
-```javascript
-// React: More flexible, larger ecosystem
-function Counter() {
-  const [count, setCount] = useState(0);
-  return <button onClick={() => setCount(count + 1)}>{count}</button>;
-}
-
-// Vue: More structured, gentler learning curve
-<template>
-  <button @click="count++">{{ count }}</button>
-</template>
-
-<script>
-export default {
-  data() {
-    return { count: 0 }
-  }
-}
-</script>
-```
-
-**Choose React if:**
-
--  ✅ You want maximum flexibility
--  ✅ Largest job market matters
--  ✅ React Native is in your future
--  ✅ You prefer JavaScript over templates
-
-**Choose Vue if:**
-
--  ✅ You prefer templates and structure
--  ✅ Gentler learning curve needed
--  ✅ Smaller, simpler projects
--  ✅ You like all-in-one frameworks
-
-### React vs Angular
-
-```typescript
-// React: Library, minimal
-function TaskList({ tasks }) {
-   return (
-      <ul>
-         {tasks.map((task) => (
-            <li key={task.id}>{task.title}</li>
-         ))}
-      </ul>
-   );
-}
-
-// Angular: Full framework, more boilerplate
-@Component({
-   selector: "task-list",
-   template: `
-      <ul>
-         <li *ngFor="let task of tasks; trackBy: trackByFn">
-            {{ task.title }}
-         </li>
-      </ul>
-   `,
-})
-export class TaskListComponent {
-   @Input() tasks: Task[];
-
-   trackByFn(index: number, task: Task): number {
-      return task.id;
-   }
-}
-```
-
-**Choose React if:**
-
--  ✅ You want flexibility
--  ✅ Prefer gradual learning
--  ✅ Like JavaScript-centric approach
--  ✅ Want lighter framework
-
-**Choose Angular if:**
-
--  ✅ You need enterprise features
--  ✅ TypeScript-first is required
--  ✅ Want opinionated structure
--  ✅ Have large teams
-
-### React vs Svelte
-
-```javascript
-// React: Virtual DOM, runtime
-function Counter() {
-  const [count, setCount] = useState(0);
-  return <button onClick={() => setCount(count + 1)}>{count}</button>;
-}
-
-// Svelte: Compiler, no runtime
-<script>
-  let count = 0;
-</script>
-
-<button on:click={() => count += 1}>
-  {count}
-</button>
-```
-
-**Choose React if:**
-
--  ✅ Mature ecosystem needed
--  ✅ Large community important
--  ✅ More libraries/tools needed
--  ✅ Job market matters
-
-**Choose Svelte if:**
-
--  ✅ Bundle size critical
--  ✅ Learning curve concerns
--  ✅ New project, experimental
--  ✅ Performance is top priority
-
----
-
-## Career Benefits
-
-### Job Market Statistics
-
-```
-React Job Openings (2024):
-LinkedIn:     50,000+ jobs
-Indeed:       45,000+ jobs
-Glassdoor:    40,000+ jobs
-
-Average Salaries (US):
-Junior:       $70,000 - $90,000
-Mid-level:    $90,000 - $130,000
-Senior:       $130,000 - $180,000
-Staff/Principal: $180,000 - $250,000+
-
-Remote Opportunities:
-75% of React jobs offer remote work ✅
-```
-
-### Skills Transferability
-
-```javascript
-// Learning React teaches you:
-
-1. Component thinking     → Useful in all frameworks
-2. State management      → Core programming concept
-3. Functional programming → Modern JavaScript
-4. Virtual DOM concepts  → Performance optimization
-5. Testing strategies    → Quality assurance
-
-// These skills transfer to:
-React Native → Mobile development
-Next.js → Full-stack development
-Gatsby → Static sites
-Electron → Desktop apps
-```
-
-### Industry Demand Trend
-
-```
-Google Trends (2019-2024):
-React:   ████████████████████ 100
-Vue:     ███████████         55
-Angular: ████████            40
-Svelte:  ████                20
-
-React maintains highest interest! 📈
-```
+| Feature        | React                            | Angular                        | Vue                         |
+| -------------- | -------------------------------- | ------------------------------ | --------------------------- |
+| Philosophy     | Library (bring your own tooling) | Framework (batteries included) | Progressive framework       |
+| Learning Curve | Gentle start, depth later        | Steeper upfront                | Between React and Angular   |
+| Ecosystem      | Huge third-party library set     | Official CLI, opinionated      | Balanced third-party + core |
 
 ---
 
 ## ✅ Best Practices
 
-### 1. Start with Create React App or Vite
+### 1. Adopt Tools Gradually
 
-**Why:** Don't reinvent the wheel
+**Why:** React's flexibility lets you add libraries only when needed.
 
-```bash
-# ✅ Good: Use battle-tested setup
-npm create vite@latest my-app -- --template react
+```md
+Module timeline:
 
-# ❌ Bad: Manual configuration from scratch
-# (Unless you're learning Webpack/build tools)
+-  M1: React + Tailwind
+-  M3: Axios + React Query (optional)
+-  M7: React Hook Form
 ```
 
-### 2. Learn React First, Frameworks Later
+### 2. Benchmark Needs Against Ecosystem
 
-**Why:** Understand fundamentals before abstractions
-
-```
-Learning Path:
-1. React basics           ← You are here
-2. Component patterns
-3. State management
-4. React ecosystem
-5. Next.js/Remix          ← After React mastery
-```
-
-### 3. Use the Official Documentation
-
-**Why:** It's excellent!
-
-```
-Resources in order of importance:
-1. React.dev (official docs)     ⭐⭐⭐⭐⭐
-2. React DevTools
-3. This course! 😊
-4. Community tutorials
-5. Stack Overflow
-```
+**Why:** Avoid reinventing the wheel; rely on proven libraries when they reduce
+risk.
 
 ---
 
 ## ❌ Common Mistakes
 
-### 1. Choosing React for Everything
+### 1. Installing Everything Day One
 
-**Problem:** Using React when simpler solutions exist
+**Problem:** Bloated dependencies complicate onboarding.
 
-```jsx
-// ❌ Bad: React for a simple landing page
-function LandingPage() {
-  return (
-    <div>
-      <h1>Welcome</h1>
-      <p>Simple content</p>
-    </div>
-  );
-}
+**Solution:** Add packages when a module requires them and document why.
 
-// ✅ Good: Plain HTML for simple pages
-<!DOCTYPE html>
-<html>
-  <body>
-    <h1>Welcome</h1>
-    <p>Simple content</p>
-  </body>
-</html>
-```
+### 2. Ignoring Browser Support
 
-### 2. Not Learning Vanilla JavaScript First
+**Problem:** New APIs may not work without polyfills.
 
-**Problem:** Jumping to React without JS fundamentals
+**Solution:** Use tools like `@vitejs/plugin-legacy` when supporting older
+browsers.
 
-```javascript
-// You need to understand these FIRST:
-// - Arrays (map, filter, reduce)
-// - Objects
-// - ES6+ (arrow functions, destructuring, spread)
-// - Promises and async/await
-// - DOM basics
+---
 
-// Then React makes sense! Otherwise, confusion! 😵
-```
+## 🔨 Implement in TaskFlow Pro
 
-### 3. Underestimating the Learning Curve
+### Task: Ecosystem Roadmap
 
-**Problem:** Expecting to master React in a week
+1. Update `docs/dependencies.md` with a section titled "When We Introduce It".
+2. For each dependency (React Router, React Hook Form, etc.), note the module
+   where it appears.
+3. Add a short reason (e.g., "Routing" or "Forms").
+4. Commit with `git commit -am "docs: map dependencies to modules"`.
 
-```
-Realistic Timeline:
-Week 1-2:   Basic components, JSX ✅
-Week 3-4:   Props, state, hooks
-Week 5-6:   Advanced patterns
-Week 7-8:   State management
-Month 3-6:  Confidence in real projects
-Year 1+:    Mastery and best practices
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Extend <code>docs/dependencies.md</code> with a module-aware table so every
+         dependency ties back to a TaskFlow Pro milestone. The matrix below keeps the
+         roadmap aligned with the final project scope.
+      </p>
 
-Be patient! React is worth the investment! 💪
-```
+      ```md
+      ## When We Introduce It
+
+      | Package | Introduced In | Why It Matters |
+      | --- | --- | --- |
+      | react-router-dom | Module 4 · Routing | Power dashboard ↔ task board navigation and deep links. |
+      | @tanstack/react-query | Module MX · Extended Capabilities | Handle task fetching, caching, and optimistic updates. |
+      | react-hook-form | Module 7 · Forms & Auth | Manage task create/edit flows with validation. |
+      | zustand | Module 6 · State Management | Provide lightweight global state for preferences. |
+      | tailwindcss-animate | Module 5 · Hooks & Performance | Add micro-interactions to the command palette. |
+      ```
+
+      <p className='mt-3'>Document additional libraries as the backlog evolves, then commit:</p>
+
+      ```bash
+      git add docs/dependencies.md
+      git commit -m "docs: map dependencies to modules"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Future contributors can see which module introduces each library and why.
 
 ---
 
 ## ✅ Validation Checklist
 
-After completing this lesson, you should be able to:
+### Functionality
 
-### **React Advantages**
+-  [ ] Dependency roadmap includes all tools referenced in Module 1–7.
 
--  [ ] List 5 key advantages of React
--  [ ] Explain Virtual DOM benefits
--  [ ] Understand component reusability
--  [ ] Appreciate React's ecosystem
--  [ ] Know React's performance benefits
+### Code Quality
 
-### **Decision Making**
+-  [ ] Reasons are concise and action-oriented.
 
--  [ ] Know when React is the right choice
--  [ ] Understand when React is overkill
--  [ ] Compare React to alternatives
--  [ ] Make informed technology decisions
--  [ ] Consider project requirements
+### Understanding
 
-### **Career & Community**
+-  [ ] You can articulate why React was chosen over alternatives.
 
--  [ ] Understand React's job market value
--  [ ] Appreciate community size and support
--  [ ] Know career growth opportunities
--  [ ] Understand skills transferability
--  [ ] See React's future potential
+### Project Integration
 
-### **Practical Understanding**
-
--  [ ] Know what makes React special
--  [ ] Understand React's philosophy
--  [ ] Can defend React choice to stakeholders
--  [ ] Ready to commit to learning React
--  [ ] Excited about React development!
+-  [ ] Notes reference the roadmap when planning future modules.
 
 ---
 
-<div className='bg-green-50 border border-green-200 rounded-lg p-6 my-8'>
-   <h3 className='text-lg font-semibold text-green-900 mb-3'>
-      ✅ Why TaskFlow Pro Uses React
-   </h3>
-   <p className='text-green-800 mb-3'>
-      For our TaskFlow Pro project, React is perfect because:
-   </p>
-   <ul className='list-disc list-inside text-green-800 space-y-1 ml-4'>
-      <li>
-         <strong>Interactive UI:</strong> Drag-and-drop, real-time updates
-      </li>
-      <li>
-         <strong>Component Reusability:</strong> TaskCard, Modal, Button, etc.
-      </li>
-      <li>
-         <strong>Performance:</strong> Virtual DOM handles 1000s of tasks
-      </li>
-      <li>
-         <strong>Ecosystem:</strong> React Router, state management, UI
-         libraries
-      </li>
-      <li>
-         <strong>Future Growth:</strong> Can become React Native mobile app
-      </li>
-      <li>
-         <strong>Job Skills:</strong> You learn the most in-demand framework
-      </li>
-   </ul>
-</div>
-
-<div className='mt-8 flex justify-between items-center'>
+<div className='mt-8 flex justify-between'>
    <a
-      href='/docs/react/m1/intro-react'
-      className='text-blue-600 hover:text-blue-800 font-medium'
+      href='/docs/react/m1/1_intro-react'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
    >
-      ← Previous: Introduction to React
+      ← Introduction to React
    </a>
    <a
-      href='/docs/react/m1/jsx-overview'
-      className='bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium inline-flex items-center'
+      href='/docs/react/m1/3_jsx-overview'
+      className='text-sm font-medium text-primary hover:text-primary/80'
    >
-      Next: JSX Overview →
+      Next · JSX Overview
    </a>
 </div>

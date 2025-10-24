@@ -1,0 +1,229 @@
+---
+title: "Effects in React"
+description:
+   "Understand when React runs effects and how they relate to renders, commits,
+   and cleanup."
+module: "M3"
+lesson: "2"
+difficulty: "intermediate"
+duration: "25"
+project_phase: "Data integration"
+prerequisites: ["/docs/react/m3/1_introduction-effects"]
+learning_objectives:
+   - "Describe the render → commit → effect timeline"
+   - "Differentiate layout and passive effects"
+   - "Plan effect cleanup to avoid memory leaks"
+   - "Apply effect timing to TaskFlow Pro's dashboard"
+tags: ["effects", "react", "lifecycle"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Effects in React
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Walk through React's render, commit, and effect phases.
+-  [ ] Choose between layout and passive effects for TaskFlow Pro features.
+-  [ ] Determine when cleanup runs and why it matters for network calls.
+-  [ ] Map effect timing to TaskFlow Pro's dashboard workload.
+
+## Project Context
+
+TaskFlow Pro now depends on remote data. Mis-timed effects cause flickers,
+double requests, or warnings about state updates on unmounted components.
+Understanding the effect pipeline ensures your data layer remains predictable.
+
+---
+
+## Effect Timeline
+
+React processes components in three phases:
+
+1. **Render phase:** React calculates the next UI tree. Effects do not run here.
+2. **Commit phase:** React updates the DOM. Layout effects run immediately
+   after.
+3. **Post-commit phase:** Passive effects (`useEffect`) run once the browser
+   paints.
+
+### Basic Example
+
+```tsx
+function Dashboard() {
+   useEffect(() => {
+      console.log("Passive effect after paint");
+   });
+
+   useLayoutEffect(() => {
+      console.log("Layout effect immediately after commit");
+   });
+
+   return <main>TaskFlow Pro</main>;
+}
+```
+
+### Practical Example
+
+```tsx
+useEffect(() => {
+   const subscription = analytics.trackRouteChange("/dashboard");
+   return () => subscription.unsubscribe();
+}, []);
+```
+
+This effect waits for the DOM update, then registers analytics. The cleanup
+unsubscribes when the dashboard unmounts.
+
+---
+
+## Layout vs Passive Effects
+
+-  **Layout Effects (`useLayoutEffect`)** block the browser paint, ideal for
+   reading layout measurements or synchronizing scroll positions.
+-  **Passive Effects (`useEffect`)** run after paint, perfect for data fetching
+   and logging.
+
+TaskFlow Pro primarily uses passive effects: fetching tasks, syncing document
+title, and persisting changes.
+
+---
+
+## Cleanup Timing
+
+Cleanup runs before the next effect execution and when the component unmounts.
+Use it to cancel network requests, remove subscriptions, or reset timers.
+
+```tsx
+useEffect(() => {
+   const controller = new AbortController();
+   fetch("/api/tasks", { signal: controller.signal });
+   return () => controller.abort();
+}, []);
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Effects Pure Relative to Render
+
+**Why:** Effects should only run after React commits UI. Avoid reading mutable
+refs during render to decide whether to run an effect; instead, check inside the
+effect body.
+
+### 2. Centralize Cleanup Logic
+
+**Why:** Shared cleanup utilities (e.g., `createAbortableFetch`) reduce
+duplication and mistakes.
+
+```ts
+export function createAbortableFetch() {
+   const controller = new AbortController();
+   return {
+      signal: controller.signal,
+      abort: () => controller.abort(),
+   };
+}
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Triggering Effects Conditionally Inside Render
+
+**Problem:** Returning early from render to block effects causes inconsistent
+state.
+
+**Solution:** Use guards inside the effect and include dependencies.
+
+### 2. Forgetting Dependency Arrays
+
+**Problem:** Effects re-run on every render without dependencies, flooding APIs.
+
+**Solution:** Supply the dependency array and lint with
+`eslint-plugin-react-hooks`.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Document how effect timing maps to Module 3:
+
+1. Update `notes/module-3-effects-plan.md` with a new section titled "Effect
+   Timing".
+2. For each effect, note whether it should be a layout or passive effect and
+   why.
+3. Record cleanup strategies that depend on the timing (e.g., abort fetch vs.
+   unsubscribe).
+4. Commit with `git commit -am "docs: clarify module 3 effect timing"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Extend the plan with explicit timing notes so future contributors know where each effect runs.
+      </p>
+
+      ```md filename="notes/module-3-effects-plan.md"
+      ## Effect Timing
+      - Initial Task Fetch → passive effect (`useEffect`), abort on cleanup.
+      - Persist Task Mutations → passive effect triggered from handlers, abort on route change.
+      - Document Title Sync → passive effect after stats update; no cleanup needed.
+      - Scroll Restoration (future) → layout effect to measure positions.
+      ```
+
+      ```bash
+      git add notes/module-3-effects-plan.md
+      git commit -m "docs: clarify module 3 effect timing"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Your effects plan now captures when each effect runs and how to clean up,
+reducing surprises during implementation.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Every planned effect has a timing classification.
+-  [ ] Cleanup requirements account for unmounts and reruns.
+
+### Code Quality
+
+-  [ ] Timing notes live alongside the effect inventory.
+-  [ ] You can trace dependencies between state changes and effect triggers.
+
+### Understanding
+
+-  [ ] You can explain the difference between layout and passive effects.
+-  [ ] You understand when cleanup fires relative to unmounts.
+
+### Project Integration
+
+-  [ ] Plan references how timing influences TaskFlow Pro components.
+-  [ ] Future features (scroll restoration, analytics) have placeholders.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m3/1_introduction-effects'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Introduction to Effects
+   </a>
+   <a
+      href='/docs/react/m3/3_use-effect-deep-dive'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · `useEffect` Deep Dive
+   </a>
+</div>

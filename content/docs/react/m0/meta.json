@@ -1,16 +1,19 @@
 {
-   "title": "M0 - Introduction",
+   "title": "M0 · Kickstart",
    "pages": [
       "0_index",
       "1_welcome",
       "2_setup",
       "3_project-overview",
       "4_dependencies",
-      "5_linting",
-      "6_environment",
-      "7_running",
-      "8_implementation",
-      "9_validation"
+      "5_linting-formatting",
+      "6_api-overview",
+      "7_ui-components",
+      "8_environment-variables",
+      "9_running-project",
+      "10_working-with-project",
+      "11_implementation",
+      "12_validation"
    ],
    "defaultOpen": true
 }

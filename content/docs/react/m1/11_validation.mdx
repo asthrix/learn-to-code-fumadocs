@@ -1,0 +1,190 @@
+---
+title: "Module 1 Validation"
+description:
+   "Review Module 1 deliverables and confirm the UI shell meets quality
+   standards."
+module: "M1"
+lesson: "11"
+difficulty: "beginner"
+duration: "20"
+project_phase: "UI scaffolding"
+prerequisites: ["/docs/react/m1/10_implementation"]
+learning_objectives:
+   - "Verify core components meet functional requirements"
+   - "Audit styling and responsiveness"
+   - "Document outstanding tasks before Module 2"
+   - "Celebrate progress and capture learning"
+tags: ["validation", "quality", "checklist"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Module 1 Validation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Confirm Header, Sidebar, and TaskCard behave as intended.
+-  [ ] Validate UI against design tokens and responsive requirements.
+-  [ ] Update documentation, notes, and TODOs.
+-  [ ] Identify skills to reinforce before Module 2.
+
+## Project Context
+
+Quality gates ensure TaskFlow Pro stays production-ready. Completing this
+checklist gives you confidence to move into state and events next.
+
+---
+
+## Validation Categories
+
+### UI & Layout
+
+-  Header displays workspace name, actions, and scales down gracefully.
+-  Sidebar navigation highlights active items and retains spacing.
+-  Task cards show priority, description, and due date.
+
+### Responsiveness
+
+-  Layout adapts to 1280px, 1024px, and 768px widths.
+-  Buttons remain accessible and do not wrap awkwardly.
+
+### Accessibility
+
+-  Interactive elements have accessible names (`aria-label` where needed).
+-  Color contrast meets WCAG AA (check using browser tools).
+
+### Documentation
+
+-  `docs/ui-components.md` reflects final props and styling decisions.
+-  `docs/status/m1.md` summarises outcomes, blockers, and next steps.
+
+---
+
+## ✅ Best Practices
+
+### 1. Run a Manual QA Pass
+
+**Why:** Real clicks catch issues automated checks miss.
+
+```md
+-  Click every CTA (New task, View roadmap)
+-  Keyboard navigate through header and sidebar
+```
+
+### 2. Capture Screenshots
+
+**Why:** Provides visual baseline for future regressions.
+
+```md
+Attach screenshots to status notes or project management tool.
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Skipping Lint Before Validation
+
+**Problem:** Hidden warnings slip into next module.
+
+**Solution:** Run `npm run lint` and resolve all issues.
+
+### 2. Ignoring Accessibility Checks
+
+**Problem:** UI becomes unusable for keyboard or screen reader users.
+
+**Solution:** Run Lighthouse or the browser's accessibility inspector.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Finalise Module 1
+
+1. Run `npm run lint`, `npm run format -- --check`, and `npm run build`.
+2. Test responsiveness using Chrome dev tools device toolbar.
+3. Update `notes/m1-retro.md` with wins, challenges, and questions.
+4. Commit with `git commit -am "chore: complete m1 validation"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Run the quality gates and capture learnings before entering Module 2 so the
+         project stays production-ready.
+      </p>
+
+      ```bash
+      npm run lint
+      npm run format -- --check
+      npm run build
+      ```
+
+      ```md filename="notes/m1-retro.md"
+      # Module 1 Retro
+
+      ## Wins
+      - Header + Sidebar ship responsive UI with Tailwind tokens.
+      - TaskCard leverages shared Badge component.
+
+      ## Challenges
+      - Need clearer strategy for loading states (address in Module 2).
+
+      ## Questions
+      - Should priority badges map to custom icons?
+      ```
+
+      ```bash
+      git status
+      git add .
+      git commit -m "chore: complete m1 validation"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+You have a clean commit history, polished UI, and documentation ready for
+Module 2.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Header actions and navigation links work.
+-  [ ] TaskCard displays accurate content and styling.
+
+### Code Quality
+
+-  [ ] Lint, format, and build commands finish without errors.
+-  [ ] No unused components or sandbox code left in production paths.
+
+### Understanding
+
+-  [ ] You can explain how JSX, props, and Tailwind combined to ship Module 1.
+
+### Project Integration
+
+-  [ ] Notes and status docs updated with lessons learned.
+-  [ ] Open TODOs assigned to future modules.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m1/10_implementation'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Implementing Module 1
+   </a>
+   <a
+      href='/docs/react/m2/0_index'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Module 2 Overview
+   </a>
+</div>

@@ -1,0 +1,94 @@
+---
+title: "Vercel Deployment"
+description:
+   "Connect TaskFlow Pro to Vercel, configure preview environments, and promote
+   to production."
+module: "M8"
+lesson: "2"
+difficulty: "intermediate"
+duration: "30"
+project_phase: "Deployment"
+prerequisites: ["/docs/react/m8/1_production-build"]
+learning_objectives:
+   - "Link GitHub repository to Vercel"
+   - "Configure preview deployments with environment variables"
+   - "Promote a preview build to production"
+   - "Set up deployment notifications"
+tags: ["vercel", "deployment", "ci-cd"]
+---
+
+import { Steps } from "@/components/steps";
+
+# Vercel Deployment
+
+## Project Setup
+
+<Steps>
+   <div title='Create Project'>Import the GitHub repository into Vercel.</div>
+   <div title='Select Framework'>
+      Choose Next.js; Vercel auto-detects build settings.
+   </div>
+   <div title='Configure Env Vars'>Add secrets defined in Lesson 1.</div>
+   <div title='Trigger First Deploy'>
+      Vercel kicks off the initial build automatically.
+   </div>
+</Steps>
+
+---
+
+## Preview Deployments
+
+-  Every PR should generate a preview URL.
+-  Share preview links with QA and product for sign-off.
+-  Enable password protection if sharing outside the org.
+
+```bash
+# Trigger redeploy for a given commit
+vercel --prebuilt --env-file=.env.preview
+```
+
+---
+
+## Production Promotion
+
+```bash
+# Promote the latest preview to production
+vercel promote
+```
+
+-  Verify logs in the Vercel dashboard.
+-  Confirm environment variable overrides for production.
+
+---
+
+## Notifications & Observability
+
+-  Connect Slack or Teams notifications for deployment success/failure.
+-  Enable Vercel Analytics for traffic insights.
+-  Forward logs to the centralized observability stack if available.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] GitHub repository linked to Vercel project.
+-  [ ] Preview deployments automatically build on pull requests.
+-  [ ] Production promotion tested with smoke checks.
+-  [ ] Deployment notifications configured for the team.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m8/1_production-build'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Production Build
+   </a>
+   <a
+      href='/docs/react/m8/3_deployment-best-practices'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Deployment Best Practices
+   </a>
+</div>

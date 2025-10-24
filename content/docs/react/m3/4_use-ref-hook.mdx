@@ -1,0 +1,237 @@
+---
+title: "`useRef` for DOM and Mutable Values"
+description:
+   "Leverage refs to manage DOM access, store mutable values, and coordinate
+   with effects."
+module: "M3"
+lesson: "4"
+difficulty: "intermediate"
+duration: "20"
+project_phase: "Data integration"
+prerequisites: ["/docs/react/m3/3_use-effect-deep-dive"]
+learning_objectives:
+   - "Differentiate between state and refs"
+   - "Use refs to access DOM nodes"
+   - "Track mutable values without triggering renders"
+   - "Prepare scroll restoration for TaskFlow Pro"
+tags: ["useRef", "effects", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# `useRef` for DOM and Mutable Values
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Explain when refs are preferable to state.
+-  [ ] Access DOM nodes imperatively without breaking React's model.
+-  [ ] Store mutable values between renders without causing rerenders.
+-  [ ] Plan scroll restoration for TaskFlow Pro's task list.
+
+## Project Context
+
+Effects often need information that does not belong in state: previous values,
+timers, or DOM measurements. Module 3 uses refs to persist metadata across
+requests and to prepare smooth scroll experiences when data changes.
+
+---
+
+## Refs vs State
+
+-  **State** triggers rerenders when updated.
+-  **Refs** store mutable values that survive rerenders without causing one.
+
+### Basic Example
+
+```tsx
+const renderCount = useRef(0);
+useEffect(() => {
+   renderCount.current += 1;
+});
+```
+
+### Practical Example
+
+```tsx
+const listRef = useRef<HTMLDivElement | null>(null);
+
+useEffect(() => {
+   if (listRef.current) {
+      listRef.current.scrollTop = 0;
+   }
+}, [filters.status]);
+```
+
+---
+
+## Tracking Previous Values
+
+Refs help compare the current and previous state inside effects.
+
+```tsx
+const previousStats = useRef(stats);
+
+useEffect(() => {
+   if (previousStats.current.completed !== stats.completed) {
+      trackCompletion(stats.completed);
+   }
+   previousStats.current = stats;
+}, [stats]);
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Refs Narrow in Scope
+
+**Why:** Using one ref per responsibility prevents accidental coupling across
+effects.
+
+### 2. Initialize Refs Lazily
+
+**Why:** Avoid heavy allocations on initial render by passing a factory function
+when the ref holds complex objects.
+
+```tsx
+const cacheRef = useRef<Map<string, Task[]>>(() => new Map());
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mutating Refs in Render
+
+**Problem:** Changing `ref.current` during render introduces side effects.
+
+**Solution:** Only mutate refs inside effects or callbacks.
+
+### 2. Using Refs Instead of State for UI
+
+**Problem:** The UI does not update when `ref.current` changes.
+
+**Solution:** Reserve refs for non-visual data; keep UI in state.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Set up scroll restoration and previous value tracking:
+
+1. In `src/components/tasks/TaskList.tsx` (create it if needed), attach a `ref`
+   to the scrollable list container.
+2. Use `useEffect` to reset scroll to top when the status filter changes.
+3. Inside `useTasksState`, add a `useRef` that stores the previous stats object
+   so analytics effects can compare changes later.
+4. Commit with `git commit -am "feat: add task list refs"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Combine refs and effects to control UI details without polluting state.
+      </p>
+
+      ```tsx filename="src/components/tasks/TaskList.tsx"
+      import { forwardRef, useEffect, useRef } from "react";
+      import { TaskCard } from "@/components/task/TaskCard";
+
+      type TaskListProps = {
+         tasks: Task[];
+         onToggleStatus: (taskId: string) => void;
+      };
+
+      export const TaskList = forwardRef<HTMLDivElement, TaskListProps>(
+         ({ tasks, onToggleStatus }, forwardedRef) => {
+            const localRef = useRef<HTMLDivElement | null>(null);
+            const combinedRef = forwardedRef ?? localRef;
+
+            useEffect(() => {
+               if (combinedRef && "current" in combinedRef && combinedRef.current) {
+                  combinedRef.current.scrollTop = 0;
+               }
+            }, [tasks.length, combinedRef]);
+
+            return (
+               <div ref={combinedRef as React.MutableRefObject<HTMLDivElement | null>} className='grid gap-3 overflow-y-auto'>
+                  {tasks.map((task) => (
+                     <TaskCard key={task.id} task={task} onToggleStatus={onToggleStatus} />
+                  ))}
+               </div>
+            );
+         }
+      );
+      ```
+
+      ```tsx filename="src/hooks/useTasksState.ts"
+      const previousStatsRef = useRef<Stats | null>(null);
+
+      useEffect(() => {
+         if (!previousStatsRef.current) {
+            previousStatsRef.current = stats;
+            return;
+         }
+
+         if (previousStatsRef.current.completed !== stats.completed) {
+            analytics.trackCompletion(stats.completed);
+         }
+
+         previousStatsRef.current = stats;
+      }, [stats]);
+      ```
+
+      ```bash
+      git add src/components/tasks/TaskList.tsx src/hooks/useTasksState.ts
+      git commit -m "feat: add task list refs"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+TaskFlow Pro now resets scroll positions and tracks previous stats without
+triggering unnecessary rerenders.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Task list scroll resets when filters change.
+-  [ ] Previous stats tracking fires analytics only on changes.
+
+### Code Quality
+
+-  [ ] Refs are mutated inside effects or callbacks only.
+-  [ ] Components forward refs to remain composable.
+
+### Understanding
+
+-  [ ] You can describe when to choose refs over state.
+-  [ ] You know how to access DOM nodes without breaking React.
+
+### Project Integration
+
+-  [ ] Scroll behavior prepares for long task lists.
+-  [ ] Analytics hooks leverage the stored previous stats.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m3/3_use-effect-deep-dive'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← `useEffect` Deep Dive
+   </a>
+   <a
+      href='/docs/react/m3/5_introduction-data-fetching'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Introduction to Data Fetching
+   </a>
+</div>

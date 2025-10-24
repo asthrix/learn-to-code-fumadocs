@@ -1,0 +1,253 @@
+---
+title: "Handling Form Submission"
+description:
+   "Submit the Task Composer reliably with validation, loading states, and
+   optimistic updates."
+module: "M2"
+lesson: "6"
+difficulty: "beginner"
+duration: "25"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react/m2/5_handling-change-events"]
+learning_objectives:
+   - "Handle form submissions without full page reloads"
+   - "Provide optimistic UI feedback"
+   - "Reset form state after successful submission"
+tags: ["events", "forms", "submission"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Handling Form Submission
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Intercept form submissions and prevent full page refreshes.
+-  [ ] Validate draft data before calling the create handler.
+-  [ ] Provide loading feedback and reset drafts on success.
+-  [ ] Wrap Task Composer in a stateful container component.
+
+## Project Context
+
+TaskFlow Pro needs a submission flow that handles optimistic updates while
+waiting for persistence. You'll build a container component that owns draft
+state, validation, and the `onCreateTask` callback provided by the dashboard.
+
+---
+
+## Preventing Default Form Behaviour
+
+Call `event.preventDefault()` to stop browsers from refreshing the page when a
+form is submitted.
+
+```tsx
+function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+   event.preventDefault();
+   // custom logic
+}
+```
+
+---
+
+## Optimistic Updates
+
+Immediately push a new task into state while the eventual API request is in
+flight. Roll back if the request fails.
+
+```tsx
+const optimisticTask = { ...draft, id: crypto.randomUUID() };
+setTasks((previous) => [optimisticTask, ...previous]);
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Validate Before Mutating State
+
+**Why:** Prevents blank or invalid tasks from rendering.
+
+```tsx
+if (!draft.title.trim()) {
+   setErrors({ title: "Title is required" });
+   return;
+}
+```
+
+### 2. Reset Drafts After Success
+
+**Why:** Keeps the composer ready for the next task.
+
+```tsx
+setDraft(DEFAULT_DRAFT);
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting to Handle Async Errors
+
+**Problem:** Failed submissions leave UI in a loading state.
+
+**Solution:** Use `try/catch` and show an inline alert or toast.
+
+### 2. Duplicating ID Generation
+
+**Problem:** Multiple components may generate conflicting IDs.
+
+**Solution:** Centralise ID creation in the submission handler.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Create the Task Composer Container
+
+1. Add `src/components/tasks/TaskComposerContainer.tsx`.
+2. Implement a component that:
+   -  Owns composer draft state (`title`, `summary`, `priority`)
+   -  Validates required fields on submit
+   -  Calls `props.onCreateTask(draft)` returning a promise
+   -  Sets `isSubmitting` while awaiting the promise
+   -  Resets draft and errors on success; retains them on failure
+3. Render the presentational `TaskComposer` component created earlier.
+4. Commit with `git commit -am "feat: add task composer container"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Encapsulate form logic inside a container so the dashboard can provide persistence
+         later without duplicating state management.
+      </p>
+
+      ```tsx filename="src/components/tasks/TaskComposerContainer.tsx"
+      import { useCallback, useState } from 'react';
+      import type { Priority, Task } from '@/types/task';
+      import { TaskComposer } from './TaskComposer';
+
+      type TaskComposerContainerProps = {
+         onCreateTask: (task: {
+            title: string;
+            summary: string;
+            priority: Priority;
+         }) => Promise<Task> | Promise<void>;
+      };
+
+      const DEFAULT_DRAFT = {
+         title: '',
+         summary: '',
+         priority: 'medium' as Priority,
+      };
+
+      export function TaskComposerContainer({ onCreateTask }: TaskComposerContainerProps) {
+         const [draft, setDraft] = useState(DEFAULT_DRAFT);
+         const [errors, setErrors] = useState<Partial<Record<'title' | 'summary', string>>>({});
+         const [isSubmitting, setIsSubmitting] = useState(false);
+
+         const updateDraft = useCallback((update: Partial<typeof draft>) => {
+            setDraft((previous) => ({ ...previous, ...update }));
+            setErrors((previous) => ({ ...previous, ...Object.keys(update).reduce((acc, key) => ({
+               ...acc,
+               [key]: undefined,
+            }), {}) }));
+         }, []);
+
+         const handleCancel = useCallback(() => {
+            setDraft(DEFAULT_DRAFT);
+            setErrors({});
+         }, []);
+
+         const handleSubmit = useCallback(async () => {
+            if (!draft.title.trim()) {
+               setErrors((previous) => ({ ...previous, title: 'Title is required' }));
+               return;
+            }
+
+            setIsSubmitting(true);
+            try {
+               await onCreateTask({
+                  title: draft.title.trim(),
+                  summary: draft.summary.trim(),
+                  priority: draft.priority,
+               });
+               setDraft(DEFAULT_DRAFT);
+               setErrors({});
+            } catch (error) {
+               setErrors((previous) => ({
+                  ...previous,
+                  summary:
+                     error instanceof Error
+                        ? error.message
+                        : 'Unable to create task. Try again.',
+               }));
+            } finally {
+               setIsSubmitting(false);
+            }
+         }, [draft, onCreateTask]);
+
+         return (
+            <TaskComposer
+               draft={draft}
+               errors={errors}
+               isSubmitting={isSubmitting}
+               onDraftChange={updateDraft}
+               onCancel={handleCancel}
+               onSubmit={handleSubmit}
+            />
+         );
+      }
+      ```
+
+      ```bash
+      git add src/components/tasks/TaskComposerContainer.tsx
+      git commit -m "feat: add task composer container"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Your composer now handles validation, loading state, and resetting drafts.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Submission prevents default browser behaviour.
+-  [ ] Successful create resets the draft.
+
+### Code Quality
+
+-  [ ] Validation happen before calling `onCreateTask`.
+-  [ ] Errors clear when fields change.
+
+### Understanding
+
+-  [ ] You can describe optimistic UI benefits.
+
+### Project Integration
+
+-  [ ] Container will connect to Module 2 state hooks for persistence.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m2/5_handling-change-events'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Handling Change Events
+   </a>
+   <a
+      href='/docs/react/m2/7_event-handler-best-practices'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Event Handler Best Practices
+   </a>
+</div>
