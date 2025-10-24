@@ -32,12 +32,12 @@ export function SpotlightCoursesSection({
                </Link>
             </div>
 
-            <div className='mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
+            <div className='mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3'>
                {spotlightCourses.map((course) => (
                   <Link
                      key={course.id}
                      href={`/docs/${course.id}`}
-                     className='group relative flex h-full flex-col rounded-3xl border border-slate-900/10 bg-white p-6 shadow-[0_20px_40px_-25px_rgba(14,165,233,0.3)] transition-transform duration-500 hover:-translate-y-4 hover:-rotate-1 dark:border-white/5 dark:bg-gradient-to-br dark:from-slate-900/70 dark:via-slate-900/40 dark:to-slate-800/30 dark:shadow-[0_20px_40px_-20px_rgba(14,165,233,0.45)] dark:backdrop-blur-xl'
+                     className='group relative flex h-full flex-col rounded-3xl border border-slate-900/10 bg-white p-6 shadow-[0_20px_40px_-25px_rgba(14,165,233,0.3)] transition-transform duration-500 hover:-translate-y-4 hover:-rotate-1 dark:border-white/5 dark:bg-gradient-to-br dark:from-slate-900/90 dark:via-slate-900/95 dark:to-slate-800/90 dark:shadow-[0_20px_40px_-20px_rgba(14,165,233,0.45)] dark:backdrop-blur-xl'
                   >
                      <span className='inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-2xl shadow-inner shadow-slate-900/10 transition group-hover:scale-105 dark:bg-white/10 dark:shadow-white/20'>
                         {course.icon}

@@ -7,7 +7,7 @@ import { courses } from "@/lib/courses";
 export default function HomePage() {
    const spotlightCourses = courses
       .filter((course) => course.featured)
-      .slice(0, 4);
+      .slice(0, 5);
 
    return (
       <main className='relative flex flex-1 flex-col bg-slate-50 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-100'>
