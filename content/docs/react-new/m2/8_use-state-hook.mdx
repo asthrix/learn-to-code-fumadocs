@@ -1,0 +1,270 @@
+---
+title: "The `useState` Hook"
+description:
+   "Build a reusable hook that manages TaskFlow Pro's task list and connected
+   handlers."
+module: "M2"
+lesson: "8"
+difficulty: "beginner"
+duration: "25"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react-new/m2/7_event-handler-best-practices"]
+learning_objectives:
+   - "Use `useState` to store complex data structures"
+   - "Expose handler callbacks alongside state"
+   - "Return derived values from a custom hook"
+tags: ["hooks", "useState", "state"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# The `useState` Hook
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Compose `useState` with derived selectors for tasks.
+-  [ ] Return state, actions, and derived values from a custom hook.
+-  [ ] Guard updates when handlers receive invalid input.
+-  [ ] Create `useTasksState` to power Module 2's dashboard.
+
+## Project Context
+
+`useTasksState` will become the single source of truth for Module 2. It manages
+the task array, filters, and CRUD operations while exposing helper callbacks to
+the UI.
+
+---
+
+## Building a Custom Hook
+
+A custom hook is a function that uses React hooks and returns data and actions.
+
+```tsx
+export function useCounter(initial = 0) {
+   const [count, setCount] = useState(initial);
+   const increment = () => setCount((value) => value + 1);
+   return { count, increment };
+}
+```
+
+---
+
+## Including Derived Values
+
+Return derived metrics so components can display them without recomputing.
+
+```tsx
+const completed = useMemo(() => tasks.filter(isDone).length, [tasks]);
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Freeze Initial Data
+
+**Why:** Avoids mutating the initial array.
+
+```tsx
+const [tasks, setTasks] = useState(() => [...initialTasks]);
+```
+
+### 2. Co-locate Handlers
+
+**Why:** Keeps state transitions and logic together.
+
+```tsx
+const toggleStatus = (taskId: string) => {
+   setTasks((previous) => previous.map(/* ... */));
+};
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Returning New Object References Every Call
+
+**Problem:** Consumers re-render unnecessarily.
+
+**Solution:** Use `useMemo` to memoize the return value if needed.
+
+### 2. Swallowing Errors
+
+**Problem:** Failing to propagate errors leaves the UI stuck.
+
+**Solution:** Throw or return error state for the caller to handle.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Build `useTasksState`
+
+1. Create `src/hooks/useTasksState.ts`.
+2. Accept an optional `initialTasks: Task[]` parameter.
+3. Manage state for tasks and filters:
+   -  `tasks`
+   -  `statusFilter`
+   -  `search`
+4. Return helpers:
+   -  `createTask(draft)` (generates an ID, prepends to list)
+   -  `toggleTaskStatus(taskId, nextStatus)`
+   -  `renameTask(taskId, title)`
+   -  `deleteTask(taskId)`
+   -  `setStatusFilter(status)` and `setSearch(term)`
+   -  Derived values: `filteredTasks`, `stats` (`total`, `completed`,
+      `remaining`)
+5. Commit with `git commit -am "feat: add useTasksState hook"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Centralise task management logic so the dashboard consumes a single hook.
+      </p>
+
+      ```tsx filename="src/hooks/useTasksState.ts"
+      import { useMemo, useState } from 'react';
+      import type { Task } from '@/types/task';
+      import type { TaskStatusFilter } from '@/components/tasks/TaskToolbar';
+
+      type CreateTaskInput = Pick<Task, 'title' | 'summary' | 'priority'>;
+
+      const DEFAULT_FILTER: TaskStatusFilter = 'all';
+
+      export function useTasksState(initialTasks: Task[] = []) {
+         const [tasks, setTasks] = useState<Task[]>(() => [...initialTasks]);
+         const [statusFilter, setStatusFilter] = useState<TaskStatusFilter>(DEFAULT_FILTER);
+         const [search, setSearch] = useState('');
+
+         const createTask = async ({ title, summary, priority }: CreateTaskInput) => {
+            const normalizedTitle = title.trim();
+            if (!normalizedTitle) {
+               throw new Error('Title cannot be empty');
+            }
+
+            const task: Task = {
+               id: crypto.randomUUID(),
+               title: normalizedTitle,
+               summary: summary.trim(),
+               status: 'todo',
+               priority,
+            };
+
+            setTasks((previous) => [task, ...previous]);
+            return task;
+         };
+
+         const toggleTaskStatus = (taskId: string, nextStatus: Task['status']) => {
+            setTasks((previous) =>
+               previous.map((task) =>
+                  task.id === taskId ? { ...task, status: nextStatus } : task,
+               ),
+            );
+         };
+
+         const deleteTask = (taskId: string) => {
+            setTasks((previous) => previous.filter((task) => task.id !== taskId));
+         };
+
+         const renameTask = (taskId: string, title: string) => {
+            const normalized = title.trim();
+            if (!normalized) return;
+
+            setTasks((previous) =>
+               previous.map((task) =>
+                  task.id === taskId ? { ...task, title: normalized } : task,
+               ),
+            );
+         };
+
+         const filteredTasks = useMemo(() => {
+            return tasks.filter((task) => {
+               const matchesStatus =
+                  statusFilter === 'all' ? true : task.status === statusFilter;
+               const matchesSearch = search.trim().length
+                  ? task.title.toLowerCase().includes(search.toLowerCase()) ||
+                    task.summary.toLowerCase().includes(search.toLowerCase())
+                  : true;
+               return matchesStatus && matchesSearch;
+            });
+         }, [tasks, statusFilter, search]);
+
+         const stats = useMemo(() => {
+            const completed = tasks.filter((task) => task.status === 'done').length;
+            return {
+               total: tasks.length,
+               completed,
+               remaining: tasks.length - completed,
+            };
+         }, [tasks]);
+
+         return {
+            tasks,
+            filteredTasks,
+            stats,
+            statusFilter,
+            search,
+            setStatusFilter,
+            setSearch,
+            createTask,
+            toggleTaskStatus,
+            deleteTask,
+            renameTask,
+         };
+      }
+      ```
+
+      ```bash
+      git add src/hooks/useTasksState.ts
+      git commit -m "feat: add useTasksState hook"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+You now have a reusable `useTasksState` hook that exposes state, actions, and
+selectors.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Hook returns filtered tasks and stats based on current filters.
+-  [ ] Create/delete/toggle handlers update the underlying state.
+
+### Code Quality
+
+-  [ ] Derived values are memoized.
+-  [ ] ID generation uses `crypto.randomUUID()`.
+
+### Understanding
+
+-  [ ] You can describe why `useState` initialisers should be lazy for arrays.
+
+### Project Integration
+
+-  [ ] Dashboard will consume the hook during Module 2 implementation.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m2/7_event-handler-best-practices'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Event Handler Best Practices
+   </a>
+   <a
+      href='/docs/react-new/m2/9_controlled-vs-uncontrolled'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Controlled vs Uncontrolled Components
+   </a>
+</div>

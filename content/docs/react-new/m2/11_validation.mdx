@@ -1,0 +1,170 @@
+---
+title: "Module 2 Validation"
+description:
+   "Verify stateful interactions, confirm handlers work, and capture Module 2
+   lessons learned."
+module: "M2"
+lesson: "11"
+difficulty: "beginner"
+duration: "20"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react-new/m2/10_implementation"]
+learning_objectives:
+   - "Validate task creation, filtering, and deletion"
+   - "Run automated checks after stateful changes"
+   - "Document retro notes before Module 3"
+tags: ["validation", "quality", "checklist"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Module 2 Validation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Ensure task CRUD flows operate without errors.
+-  [ ] Validate filters, search, and stats stay in sync.
+-  [ ] Run linting and build checks after interactive changes.
+-  [ ] Document Module 2 retrospective notes.
+
+## Project Context
+
+Module 2 introduced stateful complexity. Validation catches regressions before
+moving to effects and data fetching in Module 3.
+
+---
+
+## Validation Categories
+
+### Interactivity
+
+-  Composer creates tasks, resets drafts, and shows errors for empty titles.
+-  Toolbar filters/sorts tasks and search is case-insensitive.
+-  Toggle, rename, and delete actions work end-to-end.
+
+### UX
+
+-  Inline editor focuses automatically and supports keyboard shortcuts.
+-  Empty states communicate next actions.
+
+### Documentation
+
+-  Notes and playbooks reflect the final implementation.
+
+---
+
+## ✅ Best Practices
+
+### 1. Re-test Each Handler After Refactors
+
+**Why:** State updates are easy to break when adding new features.
+
+### 2. Capture GIFs or Screenshots
+
+**Why:** Visual records help future debugging and stakeholder updates.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Skipping Lint/Type Checks
+
+**Problem:** Runtime issues surface later in Module 3.
+
+### 2. Forgetting Retro Notes
+
+**Problem:** Learnings fade before the next module.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: QA and Retro
+
+1. Run `npm run lint`, `npm run build`, and `npm run format -- --check`.
+2. Manually test task creation, filtering, toggling, renaming, and deletion.
+3. Update `notes/m2-retro.md` with:
+   -  Wins, challenges, and follow-up tasks
+   -  Observations about state/handler patterns
+4. Commit with `git commit -am "chore: complete m2 validation"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Run automated checks and capture learnings before advancing to Module 3.
+      </p>
+
+      ```bash
+      npm run lint
+      npm run format -- --check
+      npm run build
+      ```
+
+      ```md filename="notes/m2-retro.md"
+      # Module 2 Retro
+
+      ## Wins
+      - State visualizer made debugging easier.
+      - `useTasksState` keeps handlers colocated.
+
+      ## Challenges
+      - Need better error messaging for rename failures.
+      - Deletion confirmation flow planned for Module 3.
+
+      ## Follow-ups
+      - Integrate analytics tracking for key events.
+      - Persist tasks to API once backend endpoints exist.
+      ```
+
+      ```bash
+      git add notes/m2-retro.md
+      git commit -m "chore: complete m2 validation"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Module 2 ends with verified interactions and documented improvements for the
+next phase.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Automated commands succeed without errors.
+-  [ ] Manual QA steps pass.
+
+### Code Quality
+
+-  [ ] No unused handlers or stale state remain.
+
+### Understanding
+
+-  [ ] You can highlight the biggest Module 2 learning.
+
+### Project Integration
+
+-  [ ] Retro notes outline follow-up work for Module 3.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m2/10_implementation'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Implementation
+   </a>
+   <a
+      href='/docs/react-new/m3/0_index'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Module 3 Overview
+   </a>
+</div>

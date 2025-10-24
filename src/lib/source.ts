@@ -9,39 +9,56 @@ export const source = loader({
    plugins: [lucideIconsPlugin()],
 });
 
+type SourcePage = InferPageType<typeof source>;
+
+type CoursePageNode = {
+   type: "page";
+   name: string;
+   url: string;
+   external: boolean;
+};
+
+type CourseFolderNode = {
+   type: "folder";
+   name: string;
+   children: CourseTreeNode[];
+};
+
+type CourseTreeNode = CoursePageNode | CourseFolderNode;
+
 // Helper function to create course-specific source with filtered content
 export function getCourseSource(courseId: string) {
    // Get all pages and filter for the specific course
    const allPages = source.getPages();
-   const coursePages = allPages.filter(page => page.slugs[0] === courseId);
-   
+   const coursePages = allPages.filter((page) => page.slugs[0] === courseId);
+
    // Create a hierarchical tree structure that groups pages properly
    const createCourseTree = () => {
-      const tree: any = {
+      const tree: CourseFolderNode = {
          name: courseId,
-         type: 'folder',
-         children: []
+         type: "folder",
+         children: [],
       };
 
       // Group pages by their path structure
-      const groupedPages = new Map<string, any[]>();
-      
-      coursePages.forEach(page => {
+      const groupedPages = new Map<string, SourcePage[]>();
+
+      coursePages.forEach((page) => {
          if (page.slugs.length === 1) {
             // Root course page
             tree.children.push({
-               type: 'page',
-               name: page.data.title || 'Course Overview',
+               type: "page",
+               name: page.data.title || "Course Overview",
                url: page.url,
-               external: false
+               external: false,
             });
          } else if (page.slugs.length === 2) {
             // Direct child pages (intro, m0, m1, etc.)
             tree.children.push({
-               type: 'page',
+               type: "page",
                name: page.data.title || page.slugs[1],
                url: page.url,
-               external: false
+               external: false,
             });
          } else {
             // Nested pages - group by parent folder
@@ -55,15 +72,17 @@ export function getCourseSource(courseId: string) {
 
       // Add grouped nested pages as folders
       groupedPages.forEach((pages, parentSlug) => {
-         const folderNode = {
-            type: 'folder',
+         const folderNode: CourseFolderNode = {
+            type: "folder",
             name: parentSlug.toUpperCase(),
-            children: pages.map((page: any) => ({
-               type: 'page',
-               name: page.data.title || page.slugs[page.slugs.length - 1],
-               url: page.url,
-               external: false
-            }))
+            children: pages.map(
+               (page): CoursePageNode => ({
+                  type: "page",
+                  name: page.data.title || page.slugs[page.slugs.length - 1],
+                  url: page.url,
+                  external: false,
+               })
+            ),
          };
          tree.children.push(folderNode);
       });
@@ -76,7 +95,7 @@ export function getCourseSource(courseId: string) {
    return {
       ...source,
       getPages: () => coursePages,
-      pageTree: courseTree
+      pageTree: courseTree,
    };
 }
 

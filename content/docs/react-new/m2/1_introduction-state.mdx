@@ -1,0 +1,226 @@
+---
+title: "Introduction to State"
+description:
+   "Understand what state means inside TaskFlow Pro and map where it should live
+   before writing code."
+module: "M2"
+lesson: "1"
+difficulty: "beginner"
+duration: "20"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react-new/m2/0_index"]
+learning_objectives:
+   - "Differentiate persistent data from view-only UI state"
+   - "Identify the task interactions that require state in Module 2"
+   - "Outline where TaskFlow Pro should store and update task data"
+tags: ["state", "planning", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Introduction to State
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Explain the difference between application, view, and derived state.
+-  [ ] List the task CRUD interactions coming in this module.
+-  [ ] Decide which components own each piece of state.
+-  [ ] Document how state flows through TaskFlow Pro.
+
+## Project Context
+
+Module 2 turns TaskFlow Pro into an interactive product. Before wiring hooks,
+clarify which components own state, which events update it, and how the UI
+responds to changes.
+
+---
+
+## What Is Application State?
+
+Application state covers data that influences rendering and must persist across
+interactions—tasks, filters, form drafts, and modal visibility.
+
+### Why It Matters for TaskFlow Pro
+
+-  Tasks should persist when navigating between views.
+-  Filters and sorting should update lists immediately.
+-  Draft form values should reset only when users finish submissions.
+
+### Basic Example
+
+```tsx
+const [tasks, setTasks] = useState<Task[]>([]);
+```
+
+### Practical Example
+
+```tsx
+const [filters, setFilters] = useState({
+   status: "all",
+   search: "",
+   priority: "any",
+});
+
+function handleFilterChange<Key extends keyof typeof filters>(
+   key: Key,
+   value: (typeof filters)[Key]
+) {
+   setFilters((previous) => ({ ...previous, [key]: value }));
+}
+```
+
+---
+
+## Building a State Inventory
+
+Map every interaction across the dashboard:
+
+-  **Task composer:** needs form draft, validation errors, submit/loading flags.
+-  **Task list:** needs task array, derived counts, and active selection.
+-  **Inline editing:** needs local state for temporary text before commit.
+
+Capture this inventory in a notes file so you can cross-check while coding.
+
+---
+
+## ✅ Best Practices
+
+### 1. Group Related Values
+
+**Why:** Keeps updates predictable and reduces multiple `setState` calls.
+
+```tsx
+const [composerState, setComposerState] = useState({
+   title: "",
+   description: "",
+   priority: "medium",
+});
+```
+
+### 2. Establish Ownership Early
+
+**Why:** Knowing which component owns state avoids prop-drilling refactors.
+
+```tsx
+// Dashboard manages tasks and passes callbacks to children
+const [tasks, setTasks] = useState<Task[]>(initialTasks);
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Storing Derived Values Directly
+
+**Problem:** Duplicated data gets out of sync.
+
+```tsx
+// Bad: completedTasks duplicates tasks array
+const [completedTasks, setCompletedTasks] = useState(tasks.filter(isDone));
+```
+
+**Solution:** Derive values on render or with memoized selectors.
+
+```tsx
+const completedTasks = useMemo(() => tasks.filter(isDone), [tasks]);
+```
+
+### 2. Letting Local State Leak Globally
+
+**Problem:** Modals and forms update unrelated components.
+
+**Solution:** Keep local state inside the component unless multiple siblings
+need it.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Document the State Plan
+
+1. Create `notes/module-2-state-plan.md`.
+2. List each Module 2 feature (task composer, inline edit, delete confirmation)
+   and note:
+   -  Source of truth
+   -  Components that read/write it
+   -  Events that trigger updates
+3. Highlight questions or follow-ups for future modules.
+4. Commit with `git commit -am "docs: add module 2 state plan"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Capture the state inventory so you can reference it while implementing hooks
+         and handlers.
+      </p>
+
+      ```md
+      # Module 2 State Plan
+
+      ## Task Composer
+      - Source: Dashboard state via `useTasksState` (module target)
+      - Reads: `TaskComposer` for draft values, `TaskList` for rendering
+      - Events: `onDraftChange`, `onSubmit`, `onCancel`
+
+      ## Inline Editing
+      - Source: Local state inside `TaskCard`
+      - Events: `onToggleEditing`, `onSave`, `onCancel`
+
+      ## Delete Confirmation
+      - Source: Dashboard modal state
+      - Events: `onConfirmDelete`, `onDismiss`
+      ```
+
+      <p className='mt-3'>Commit the new notes file when it reflects your scope:</p>
+
+      ```bash
+      git add notes/module-2-state-plan.md
+      git commit -m "docs: add module 2 state plan"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+You now have a high-level plan for which components own state and which events
+update it.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Notes document includes every Module 2 feature.
+
+### Code Quality
+
+-  [ ] Sections clarify ownership, events, and open questions.
+
+### Understanding
+
+-  [ ] You can explain the difference between application and derived state.
+
+### Project Integration
+
+-  [ ] Plan references components created in Module 1.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m2/0_index'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Module Overview
+   </a>
+   <a
+      href='/docs/react-new/m2/2_state-in-react'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · State in React
+   </a>
+</div>
