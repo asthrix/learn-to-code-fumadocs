@@ -1,0 +1,333 @@
+---
+title: "Data Fetching Part 3"
+description:
+   "Add caching, optimistic updates, and retry logic to TaskFlow Pro's data
+   layer."
+module: "M3"
+lesson: "8"
+difficulty: "advanced"
+duration: "35"
+project_phase: "Data integration"
+prerequisites: ["/docs/react/m3/7_data-fetching-part-2"]
+learning_objectives:
+   - "Implement a lightweight cache for tasks"
+   - "Perform optimistic updates for mutations"
+   - "Retry failed requests with backoff"
+   - "Prepare the codebase for TanStack Query integration"
+tags: ["data", "caching", "optimistic"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Data Fetching Part 3
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Cache task queries and reuse them across navigations.
+-  [ ] Perform optimistic updates for task mutations.
+-  [ ] Retry failed mutations with exponential backoff.
+-  [ ] Structure the data layer so adopting TanStack Query later is
+       straightforward.
+
+## Project Context
+
+Without caching, TaskFlow Pro refetches on every navigation. Optimistic updates
+keep the UI snappy even when the API is slow. This lesson introduces a minimal
+cache that mirrors features of TanStack Query while keeping dependencies light.
+
+---
+
+## Caching Strategy
+
+Use a shared cache keyed by query parameters. Store metadata like `updatedAt` to
+support stale-while-revalidate patterns.
+
+### Basic Example
+
+```ts
+const cache = new Map<string, { data: Task[]; updatedAt: number }>();
+```
+
+### Practical Example
+
+```ts
+export function getCachedTasks(key: string) {
+   const entry = cache.get(key);
+   if (!entry) return null;
+   const isFresh = Date.now() - entry.updatedAt < 1000 * 30;
+   return isFresh ? entry.data : null;
+}
+```
+
+---
+
+## Optimistic Updates
+
+Apply changes to local state immediately, then roll back if the server fails.
+
+```ts
+async function handleCreateTask(input: TaskInput) {
+   const optimisticTask = createOptimisticTask(input);
+   setTasks((tasks) => [optimisticTask, ...tasks]);
+
+   try {
+      const persisted = await createTask(input);
+      replaceTask(optimisticTask.id, persisted);
+   } catch (error) {
+      setTasks((tasks) =>
+         tasks.filter((task) => task.id !== optimisticTask.id)
+      );
+      throw error;
+   }
+}
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Use Deterministic Cache Keys
+
+**Why:** Keys like `tasks::status=all&search=` ensure consistent lookups.
+
+```ts
+function createTaskKey(params: { status?: string; search?: string }) {
+   const query = new URLSearchParams(params).toString();
+   return `tasks::${query}`;
+}
+```
+
+### 2. Record Mutation Rollbacks
+
+**Why:** Replaying the previous state prevents data drift when the server
+rejects a request.
+
+```ts
+const rollback = tasksRef.current;
+try {
+   // optimistic update
+} catch (error) {
+   setTasks(rollback);
+}
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Caching Without Expiration
+
+**Problem:** Users never see updated data.
+
+**Solution:** Add TTL (time-to-live) checks or manual invalidation.
+
+### 2. Forgetting to Update Cache After Mutations
+
+**Problem:** Cache returns stale data even after a successful mutation.
+
+**Solution:** Update or invalidate the relevant cache entry after each mutation.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Introduce caching and optimistic updates:
+
+1. Create `src/lib/api/cache.ts` with helper functions: `getTasksFromCache`,
+   `setTasksCache`, `invalidateTasksCache`.
+2. In `useTasksState`, read from the cache before fetching; fall back to the
+   network when data is stale.
+3. Add optimistic updates for create, update, and delete mutations, storing
+   rollback snapshots in refs.
+4. Implement a simple retry helper (`retryWithBackoff`) for mutations that fail
+   due to network errors.
+5. Commit with `git commit -am "feat: add task cache and optimistic updates"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Build a minimal caching layer that keeps TaskFlow Pro responsive while preparing for a future TanStack Query integration.
+      </p>
+
+```ts filename="src/lib/api/cache.ts"
+const CACHE_TTL = 1000 * 30; // 30 seconds
+const cache = new Map<string, { data: Task[]; updatedAt: number }>();
+
+export function getTasksFromCache(key: string) {
+   const entry = cache.get(key);
+   if (!entry) return null;
+   const isFresh = Date.now() - entry.updatedAt < CACHE_TTL;
+   return isFresh ? entry.data : null;
+}
+
+export function setTasksCache(key: string, data: Task[]) {
+   cache.set(key, { data, updatedAt: Date.now() });
+}
+
+export function invalidateTasksCache(key?: string) {
+   if (key) {
+      cache.delete(key);
+      return;
+   }
+   cache.clear();
+}
+```
+
+```ts filename="src/lib/api/retry.ts"
+export async function retryWithBackoff<T>(
+   operation: () => Promise<T>,
+   attempts = 3
+) {
+   let delay = 200;
+
+   for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      try {
+         return await operation();
+      } catch (error) {
+         if (attempt === attempts) throw error;
+         await new Promise((resolve) => setTimeout(resolve, delay));
+         delay *= 2;
+      }
+   }
+
+   throw new Error("Failed after retries");
+}
+```
+
+```tsx filename="src/hooks/useTasksState.ts"
+const cacheKey = useMemo(() => {
+   const params = new URLSearchParams({
+      status: statusFilter === "all" ? "" : statusFilter,
+      search,
+   });
+   return `tasks::${params.toString()}`;
+}, [statusFilter, search]);
+
+useEffect(() => {
+   const cached = getTasksFromCache(cacheKey);
+   if (cached) {
+      setTasks(cached);
+      setIsLoading(false);
+      return;
+   }
+
+   const controller = new AbortController();
+
+   async function loadTasks() {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+         const result = await fetchTasks(
+            {
+               status: statusFilter === "all" ? undefined : statusFilter,
+               search,
+            },
+            { signal: controller.signal }
+         );
+         setTasks(result);
+         setTasksCache(cacheKey, result);
+      } catch (error) {
+         if ((error as Error).name !== "AbortError") {
+            setError((error as Error).message ?? "Unable to load tasks");
+         }
+      } finally {
+         setIsLoading(false);
+      }
+   }
+
+   loadTasks();
+
+   return () => controller.abort();
+}, [cacheKey, statusFilter, search]);
+
+const rollbackRef = useRef<Task[]>([]);
+
+const createTaskMutation = useCallback(
+   async (input: TaskInput) => {
+      rollbackRef.current = tasks;
+      const optimisticTask = createOptimisticTask(input);
+
+      setTasks((previous) => {
+         const next = [optimisticTask, ...previous];
+         setTasksCache(cacheKey, next);
+         return next;
+      });
+
+      try {
+         const persisted = await retryWithBackoff(() => createTask(input));
+         setTasks((prev) => {
+            const next = prev.map((task) =>
+               task.id === optimisticTask.id ? persisted : task
+            );
+            setTasksCache(cacheKey, next);
+            return next;
+         });
+         return persisted;
+      } catch (error) {
+         setTasks(rollbackRef.current);
+         setTasksCache(cacheKey, rollbackRef.current);
+         throw error;
+      }
+   },
+   [tasks, cacheKey]
+);
+```
+
+```bash
+   git add src/lib/api/cache.ts src/lib/api/retry.ts src/hooks/useTasksState.ts
+   git commit -m "feat: add task cache and optimistic updates"
+```
+
+</Accordion>
+</Accordions>
+
+#### Expected Result
+
+TaskFlow Pro now caches task queries, performs optimistic updates, and retries
+transient failures to keep the UI smooth.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Task list shows cached data instantly when revisiting filters.
+-  [ ] Optimistic updates roll back on failure.
+-  [ ] Retry helper eventually surfaces errors after set attempts.
+
+### Code Quality
+
+-  [ ] Cache helpers live in a dedicated module with TTL logic.
+-  [ ] Effects invalidate or update cache entries after mutations.
+
+### Understanding
+
+-  [ ] You can explain why deterministic cache keys matter.
+-  [ ] You can describe how optimistic updates improve UX.
+
+### Project Integration
+
+-  [ ] Cache prepares the project for TanStack Query adoption.
+-  [ ] Retry helper is reusable for future modules (auth, settings).
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m3/7_data-fetching-part-2'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Data Fetching Part 2
+   </a>
+   <a
+      href='/docs/react/m3/9_data-fetching-best-practices'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Data Fetching Best Practices
+   </a>
+</div>
+````

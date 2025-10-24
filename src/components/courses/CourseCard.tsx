@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import {
    Course,
    getCourseProgress,
@@ -17,50 +18,46 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
    const shouldCheckPrerequisites = isPrerequisitesEnabled();
 
    const getStatusBadge = () => {
+      const baseClasses =
+         "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold";
+
       switch (course.status) {
          case "available":
             return (
-               <span className='px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full'>
+               <span
+                  className={`${baseClasses} border-emerald-200/80 bg-emerald-100/70 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-500/20 dark:text-emerald-200`}
+               >
                   Available
                </span>
             );
          case "coming-soon":
             return (
-               <span className='px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full'>
+               <span
+                  className={`${baseClasses} border-amber-200/80 bg-amber-100/70 text-amber-700 dark:border-amber-400/30 dark:bg-amber-500/20 dark:text-amber-200`}
+               >
                   Coming Soon
                </span>
             );
          case "in-development":
             return (
-               <span className='px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full'>
+               <span
+                  className={`${baseClasses} border-sky-200/80 bg-sky-100/70 text-sky-700 dark:border-sky-400/30 dark:bg-sky-500/20 dark:text-sky-200`}
+               >
                   In Development
                </span>
             );
       }
    };
 
-   const getDifficultyColor = () => {
+   const getDifficultyClasses = () => {
       switch (course.difficulty) {
          case "beginner":
-            return "text-green-600 bg-green-50 border-green-200";
+            return "border-emerald-200/60 bg-emerald-50/80 text-emerald-600 dark:border-emerald-400/30 dark:bg-emerald-500/20 dark:text-emerald-200";
          case "intermediate":
-            return "text-yellow-600 bg-yellow-50 border-yellow-200";
+            return "border-amber-200/60 bg-amber-50/80 text-amber-600 dark:border-amber-400/30 dark:bg-amber-500/20 dark:text-amber-200";
          case "advanced":
-            return "text-red-600 bg-red-50 border-red-200";
+            return "border-rose-200/60 bg-rose-50/80 text-rose-600 dark:border-rose-400/30 dark:bg-rose-500/20 dark:text-rose-200";
       }
-   };
-
-   // Use primary/secondary colors instead of colorful gradients
-   const getCardHeaderStyles = () => {
-      return "bg-primary text-primary-foreground";
-   };
-
-   const getProgressBarStyles = () => {
-      return "bg-primary";
-   };
-
-   const getActionButtonStyles = () => {
-      return "bg-primary hover:bg-primary/90 text-primary-foreground";
    };
 
    const isAccessible =
@@ -68,103 +65,88 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
       (!shouldCheckPrerequisites || prerequisiteStatus.met);
 
    return (
-      <div className='bg-card rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-border'>
-         {/* Course Header */}
-         <div
-            className={`h-32 ${getCardHeaderStyles()} p-6 relative overflow-hidden`}
-         >
-            <div className='absolute top-4 right-4'>{getStatusBadge()}</div>
-            <div className='flex items-center space-x-3'>
-               <span className='text-4xl'>{course.icon}</span>
-               <div>
-                  <h3 className='text-xl font-bold'>{course.title}</h3>
-                  <p className='text-sm opacity-90'>
-                     {course.duration} • {course.modules} modules
-                  </p>
-               </div>
-            </div>
-
-            {/* Decorative shapes */}
-            <div className='absolute -bottom-6 -right-6 w-24 h-24 bg-primary-foreground opacity-10 rounded-full'></div>
-            <div className='absolute -top-6 -right-12 w-32 h-32 bg-primary-foreground opacity-5 rounded-full'></div>
+      <div className='group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-900/10 bg-white/90 p-6 shadow-[0_20px_40px_-25px_rgba(14,165,233,0.3)] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_25px_50px_-20px_rgba(14,165,233,0.45)] dark:border-white/10 dark:bg-gradient-to-br dark:from-slate-900/70 dark:via-slate-900/40 dark:to-slate-800/30 dark:shadow-[0_20px_40px_-20px_rgba(14,165,233,0.45)] dark:backdrop-blur-xl'>
+         <div className='flex items-start justify-between gap-4'>
+            <span className='inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-2xl shadow-inner shadow-slate-900/10 transition group-hover:scale-105 dark:bg-white/10 dark:shadow-white/20'>
+               {course.icon}
+            </span>
+            {getStatusBadge()}
          </div>
 
-         {/* Course Content */}
-         <div className='p-6'>
-            <p className='text-muted-foreground mb-4 line-clamp-3'>
+         <div className='mt-6 flex flex-col gap-4'>
+            <div>
+               <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100'>
+                  {course.title}
+               </h3>
+               <p className='mt-1 text-sm text-slate-500 dark:text-slate-300'>
+                  {course.duration} • {course.modules} modules
+               </p>
+            </div>
+
+            <p className='text-sm text-slate-600 dark:text-slate-300'>
                {course.shortDescription}
             </p>
 
-            {/* Difficulty & Prerequisites */}
-            <div className='flex items-center gap-2 mb-4'>
+            <div className='flex flex-wrap items-center gap-2'>
                <span
-                  className={`px-3 py-1 text-xs font-medium rounded-full border ${getDifficultyColor()}`}
+                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-widest ${getDifficultyClasses()}`}
                >
-                  {course.difficulty.charAt(0).toUpperCase() +
-                     course.difficulty.slice(1)}
+                  {course.difficulty}
                </span>
                {shouldCheckPrerequisites && course.prerequisites.length > 0 && (
-                  <span className='text-xs text-muted-foreground'>
+                  <span className='text-xs text-slate-500 dark:text-slate-400'>
                      Requires: {course.prerequisites.join(", ")}
                   </span>
                )}
             </div>
 
-            {/* Progress Bar (if applicable) */}
             {showProgress && progress > 0 && (
-               <div className='mb-4'>
-                  <div className='flex items-center justify-between text-sm text-muted-foreground mb-1'>
+               <div>
+                  <div className='flex items-center justify-between text-xs text-slate-500 dark:text-slate-400'>
                      <span>Progress</span>
                      <span>{progress}%</span>
                   </div>
-                  <div className='w-full bg-secondary rounded-full h-2'>
+                  <div className='mt-2 h-2 w-full rounded-full bg-slate-200/70 dark:bg-slate-800/70'>
                      <div
-                        className={`${getProgressBarStyles()} h-2 rounded-full transition-all duration-300`}
+                        className='h-full rounded-full bg-sky-500 transition-all duration-300 dark:bg-sky-400'
                         style={{ width: `${progress}%` }}
-                     ></div>
+                     />
                   </div>
                </div>
             )}
 
-            {/* Technologies */}
-            <div className='mb-4'>
-               <div className='flex flex-wrap gap-2'>
-                  {course.technologies.slice(0, 3).map((tech, index) => (
-                     <span
-                        key={index}
-                        className='px-2 py-1 text-xs bg-secondary text-secondary-foreground rounded-md'
-                     >
-                        {tech}
-                     </span>
-                  ))}
-                  {course.technologies.length > 3 && (
-                     <span className='px-2 py-1 text-xs bg-secondary text-muted-foreground rounded-md'>
-                        +{course.technologies.length - 3} more
-                     </span>
-                  )}
-               </div>
+            <div className='flex flex-wrap gap-2'>
+               {course.technologies.slice(0, 3).map((tech) => (
+                  <span
+                     key={tech}
+                     className='inline-flex items-center rounded-full border border-slate-900/10 bg-white/60 px-3 py-1 text-xs font-medium text-slate-600 dark:border-white/10 dark:bg-white/10 dark:text-slate-200'
+                  >
+                     {tech}
+                  </span>
+               ))}
+               {course.technologies.length > 3 && (
+                  <span className='inline-flex items-center rounded-full border border-slate-900/10 bg-white/60 px-3 py-1 text-xs font-medium text-slate-500 dark:border-white/10 dark:bg-white/10 dark:text-slate-300'>
+                     +{course.technologies.length - 3} more
+                  </span>
+               )}
             </div>
 
-            {/* Prerequisites Warning (only if prerequisites checking is enabled) */}
             {shouldCheckPrerequisites && !prerequisiteStatus.met && (
-               <div className='mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg'>
-                  <p className='text-sm text-amber-800'>
-                     <span className='font-medium'>Prerequisites needed:</span>{" "}
-                     Complete {prerequisiteStatus.missing.join(", ")} first
-                  </p>
+               <div className='rounded-2xl border border-amber-200/60 bg-amber-50/80 p-3 text-xs text-amber-700 dark:border-amber-400/20 dark:bg-amber-500/15 dark:text-amber-200'>
+                  <span className='font-semibold'>Prerequisites:</span> Complete{" "}
+                  {prerequisiteStatus.missing.join(", ")} first.
                </div>
             )}
 
-            {/* Action Button */}
-            <div className='flex items-center justify-between'>
+            <div className='flex flex-col gap-3 pt-2'>
                {isAccessible ? (
                   <Link
                      href={`/docs/${course.id}`}
-                     className={`flex-1 inline-flex items-center justify-center px-4 py-2 ${getActionButtonStyles()} font-medium rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`}
+                     className='inline-flex items-center justify-center rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/40 transition hover:-translate-y-1 hover:bg-sky-400 focus-visible:ring-2 focus-visible:ring-sky-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-slate-950 dark:focus-visible:ring-offset-slate-950'
                   >
-                     {progress > 0 ? "Continue Learning" : "Start Course"}
+                     {progress > 0 ? "Continue learning" : "Start course"}
                      <svg
-                        className='ml-2 w-4 h-4'
+                        className='ml-2 h-4 w-4'
                         fill='none'
                         stroke='currentColor'
                         viewBox='0 0 24 24'
@@ -180,20 +162,17 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
                ) : (
                   <button
                      disabled
-                     className='flex-1 inline-flex items-center justify-center px-4 py-2 bg-muted text-muted-foreground font-medium rounded-lg cursor-not-allowed'
+                     className='inline-flex items-center justify-center rounded-full border border-slate-900/10 bg-white/70 px-4 py-2 text-sm font-semibold text-slate-500 dark:border-white/10 dark:bg-white/10 dark:text-slate-400'
                   >
                      {course.status === "available"
                         ? shouldCheckPrerequisites
-                           ? "Complete Prerequisites"
-                           : "Course Locked"
-                        : "Coming Soon"}
+                           ? "Complete prerequisites"
+                           : "Course locked"
+                        : "Coming soon"}
                   </button>
                )}
-            </div>
 
-            {/* Course Stats */}
-            <div className='mt-4 pt-4 border-t border-border'>
-               <div className='flex items-center justify-between text-sm text-muted-foreground'>
+               <div className='flex items-center justify-between rounded-2xl border border-slate-900/10 bg-slate-100/70 px-3 py-2 text-xs text-slate-500 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-300'>
                   <span>🎯 {course.project}</span>
                   <span>📚 {course.modules} modules</span>
                </div>

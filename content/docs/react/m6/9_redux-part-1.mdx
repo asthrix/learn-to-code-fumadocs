@@ -1,0 +1,128 @@
+---
+title: "Redux Part 1"
+description:
+   "Set up Redux Toolkit, define the store, and model TaskFlow Pro actions."
+module: "M6"
+lesson: "9"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Global state"
+prerequisites: ["/docs/react/m6/8_zustand-integration"]
+learning_objectives:
+   - "Install Redux Toolkit and configure the store"
+   - "Model domain actions for projects and tasks"
+   - "Integrate the Redux Provider with existing context"
+   - "Verify store wiring with initial selectors"
+tags: ["redux", "redux-toolkit", "state-management"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Redux Part 1
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Configure Redux Toolkit with TypeScript support.
+-  [ ] Create slices for projects and tasks with initial state.
+-  [ ] Register the store in the React tree.
+-  [ ] Expose typed hooks for dispatching actions and reading state.
+
+## Setting Up the Store
+
+```tsx
+import { configureStore } from "@reduxjs/toolkit";
+import { projectsReducer } from "./projectsSlice";
+import { tasksReducer } from "./tasksSlice";
+
+export const store = configureStore({
+   reducer: {
+      projects: projectsReducer,
+      tasks: tasksReducer,
+   },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+```
+
+---
+
+## Typed Hooks
+
+```tsx
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+```
+
+-  Ensures components access strongly typed state slices.
+-  Encourages selectors for derived data (introduced in Part 2).
+
+---
+
+## Wiring the Provider
+
+```tsx
+import { Provider as ReduxProvider } from "react-redux";
+import { store } from "@/state/store";
+
+export function AppProviders({ children }: { children: React.ReactNode }) {
+   return <ReduxProvider store={store}>{children}</ReduxProvider>;
+}
+```
+
+Combine with `PreferencesProvider` and Zustand stores from earlier lessons to
+form a complete provider stack.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Implementation Steps'>
+      <p>Bring Redux Toolkit into TaskFlow Pro.</p>
+
+      ```bash
+      npm install @reduxjs/toolkit react-redux
+      ```
+
+      ```tsx filename="src/state/store.ts"
+      import { configureStore } from "@reduxjs/toolkit";
+      import { projectsReducer } from "@/state/projectsSlice";
+      import { tasksReducer } from "@/state/tasksSlice";
+
+      export const store = configureStore({
+         reducer: {
+            projects: projectsReducer,
+            tasks: tasksReducer,
+         },
+         devTools: process.env.NODE_ENV !== "production",
+      });
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Store composes all planned slices.
+-  [ ] Provider wraps the app without breaking existing routes.
+-  [ ] Typed hooks available across modules.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m6/8_zustand-integration'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Zustand Integration
+   </a>
+   <a
+      href='/docs/react/m6/10_redux-part-2'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Redux Part 2
+   </a>
+</div>

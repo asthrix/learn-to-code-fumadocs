@@ -1,120 +1,120 @@
 ---
-title: React Development Course
+title: "TaskFlow Pro with React"
 description:
-   Build modern, scalable web applications with React. Master components, hooks,
-   state management, and production-ready development practices.
+   "A concise, project-based React curriculum that guides beginners to a
+   production deployment."
+module: "ROOT"
+difficulty: "beginner"
+duration: "40"
+project_phase: "Course overview"
+prerequisites: []
+learning_objectives:
+   - "Understand the TaskFlow Pro project arc"
+   - "Preview each module's deliverables"
+   - "Set expectations for time, tools, and workflow"
+tags: ["react", "course", "overview"]
 ---
 
-# React Development Course
+import { buttonVariants } from "@/components/ui/button";
+import {
+   Collapsible,
+   CollapsibleTrigger,
+   CollapsibleContent,
+} from "@/components/ui/collapsible";
 
-<div className='bg-primary text-primary-foreground p-8 rounded-lg mb-8'>
-   <div className='flex items-center space-x-4 mb-4'>
-      <span className='text-4xl'>⚛️</span>
-      <div>
-         <h2 className='text-2xl font-bold'>React Development</h2>
-         <p className='text-primary-foreground/80'>
-            Create powerful web applications with React
-         </p>
-      </div>
-   </div>
+# TaskFlow Pro with React
 
-   <div className='grid grid-cols-2 md:grid-cols-4 gap-4 text-center'>
-      <div>
-         <div className='text-2xl font-bold'>40 Hours</div>
-         <div className='text-primary-foreground/80 text-sm'>Duration</div>
-      </div>
-      <div>
-         <div className='text-2xl font-bold'>5 Modules</div>
-         <div className='text-primary-foreground/80 text-sm'>
-            Structured Learning
-         </div>
-      </div>
-      <div>
-         <div className='text-2xl font-bold'>Task Manager</div>
-         <div className='text-primary-foreground/80 text-sm'>Final Project</div>
-      </div>
-      <div>
-         <div className='text-2xl font-bold'>Intermediate</div>
-         <div className='text-primary-foreground/80 text-sm'>
-            Difficulty Level
-         </div>
-      </div>
-   </div>
+Welcome to your React journey. This course stays laser-focused on one goal:
+guide you from zero to a deployed, portfolio-ready TaskFlow Pro application
+using practical, bite-sized lessons.
+
+<div className='mt-6 flex flex-wrap gap-4'>
+   <a
+      className={buttonVariants({ variant: "primary" })}
+      href='/docs/react/m0/1_welcome'
+   >
+      Start Module 0
+   </a>
+   <a
+      className={buttonVariants({ variant: "outline" })}
+      href='/docs/react/m0/0_index'
+   >
+      View Module Roadmap
+   </a>
 </div>
 
-## Course Overview
+---
 
-React is the most popular JavaScript library for building user interfaces. In
-this comprehensive course, you'll learn how to build modern, scalable web
-applications from the ground up.
+## Course at a Glance
 
-### What You'll Learn
+| Module | Focus                  | TaskFlow Pro Milestone         |
+| ------ | ---------------------- | ------------------------------ |
+| M0     | Environment & workflow | Project shell + tooling        |
+| M1     | React fundamentals     | Header, Sidebar, TaskCard      |
+| M2     | State & events         | Interactive task CRUD          |
+| M3     | Effects & data         | API-powered lists              |
+| M4     | Routing                | Dashboard, Projects, Settings  |
+| M5     | Hooks & performance    | Custom hooks + optimisations   |
+| M6     | State management       | Global preferences + themes    |
+| M7     | Forms & auth           | Secure onboarding flow         |
+| M8     | Deployment             | Production build + Vercel      |
+| MX     | Extensions             | Drag-and-drop, testing, polish |
 
--  **React Fundamentals**: Components, JSX, and the virtual DOM
--  **State Management**: useState, useEffect, and advanced hooks
--  **Component Architecture**: Building reusable and maintainable components
--  **Routing**: Multi-page applications with React Router
--  **API Integration**: Fetching and managing data from external APIs
--  **Performance**: Optimization techniques and best practices
--  **Testing**: Unit testing with Jest and React Testing Library
+Each lesson aims for a 15–25 minute read paired with a single, concrete task.
+You always ship something that moves TaskFlow Pro forward.
 
-### Prerequisites
+---
 
-Before starting this course, you should have:
+## Workflow Snapshot
 
--  Solid understanding of JavaScript (ES6+)
--  Basic knowledge of HTML and CSS
--  Familiarity with modern development tools (npm, Git)
--  Completed our [JavaScript Course](/docs/javascript) (recommended)
+1. **Learn** a focused concept in plain language.
+2. **See** the idea in a minimal example and a TaskFlow Pro snippet.
+3. **Build** the corresponding feature in the project repository.
+4. **Validate** using the checklist before advancing.
 
-### Course Structure
+We front-load environment setup in M0, build core UI in M1, then layer
+interactivity, data, and advanced architecture.
 
-This course is divided into 5 comprehensive modules:
+---
 
-1. **[React Fundamentals](/docs/react/module1)** - Components, JSX, and Props
-2. **[State and Events](/docs/react/module2)** - Interactive components and
-   state management
-3. **[Advanced Hooks](/docs/react/module3)** - useEffect, custom hooks, and
-   context
-4. **[Routing and Navigation](/docs/react/module4)** - Multi-page applications
-5. **[Final Project](/docs/react/module5)** - Build a complete task management
-   app
+## Course Commitments
 
-### Learning Outcomes
+-  **Time:** 40+ hours end to end; plan on 3 lessons per study session.
+-  **Tech:** Node.js (LTS), npm, VS Code, Git, modern browser.
+-  **Mindset:** Ship iteratively, review checklists, ask questions when stuck.
 
-By the end of this course, you will be able to:
+<Collapsible className='mt-8' defaultOpen={false}>
+   <CollapsibleTrigger className='group inline-flex w-full items-center justify-between rounded-md border px-4 py-2 text-sm font-medium'>
+      Need a deeper dive into our teaching philosophy?
+      <span className='transition-transform group-data-[state=open]:rotate-90'>
+         ➜
+      </span>
+   </CollapsibleTrigger>
+   <CollapsibleContent className='mt-4 space-y-3 rounded-md border bg-muted/40 p-4 text-sm text-muted-foreground'>
+      <p>
+         <strong>Project-first:</strong> Every example ties back to TaskFlow Pro
+         so learners never wonder “when will I use this?”.
+      </p>
+      <p>
+         <strong>Proof over promise:</strong> Each module ends with a validation
+         checklist you can run to prove readiness for the next stage.
+      </p>
+      <p>
+         <strong>Inclusive pacing:</strong> Lessons remain short, but optional
+         collapsible sections (like this one) provide enrichment for curious
+         learners.
+      </p>
+   </CollapsibleContent>
+</Collapsible>
 
--  Build complex, interactive user interfaces with React
--  Manage application state effectively using hooks and context
--  Create reusable components with proper prop handling
--  Implement client-side routing for single-page applications
--  Integrate with REST APIs and handle asynchronous operations
--  Apply React best practices and performance optimizations
--  Test React components and applications
--  Deploy React applications to production
+---
 
-### Final Project: Task Manager App
+## Next Steps
 
-Throughout the course, you'll build a fully-functional task management
-application featuring:
+1. Skim the Module 0 overview to understand the setup journey.
+2. Block out two 45-minute sessions to complete the first three lessons.
+3. Keep the [React docs](https://react.dev) and
+   [Fumadocs UI kit](https://fumadocs.dev/docs/ui/components) handy for
+   reference.
 
--  **User Authentication**: Login and registration system
--  **Task Management**: Create, edit, delete, and organize tasks
--  **Categories**: Organize tasks by custom categories
--  **Filtering & Search**: Find tasks quickly with advanced filtering
--  **Responsive Design**: Works perfectly on desktop and mobile
--  **Real-time Updates**: Live synchronization across devices
-
-## Ready to Start?
-
-Begin your React journey with the [Introduction lesson](/docs/react/intro) or
-jump straight to [Module 1: React Fundamentals](/docs/react/module1).
-
-<div className='bg-secondary/20 p-6 rounded-lg mt-8'>
-   <h3 className='text-lg font-semibold mb-3'>💡 Pro Tip</h3>
-   <p className='text-muted-foreground'>
-      React has a vibrant ecosystem. As you progress through this course, don't
-      hesitate to explore additional libraries and tools that complement React
-      development.
-   </p>
-</div>
+You are six modules away from a production build—let’s get started.

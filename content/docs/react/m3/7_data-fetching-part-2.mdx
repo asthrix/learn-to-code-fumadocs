@@ -1,0 +1,278 @@
+---
+title: "Data Fetching Part 2"
+description:
+   "Use async/await with the API client to implement typed tasks endpoints."
+module: "M3"
+lesson: "7"
+difficulty: "intermediate"
+duration: "30"
+project_phase: "Data integration"
+prerequisites: ["/docs/react/m3/6_data-fetching-part-1"]
+learning_objectives:
+   - "Implement typed API functions for tasks"
+   - "Propagate query parameters for filtering"
+   - "Normalize server payloads into app models"
+   - "Surface errors and loading states through hooks"
+tags: ["data", "async", "api"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Data Fetching Part 2
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Write async functions that wrap the API client.
+-  [ ] Pass query parameters to filter tasks on the server.
+-  [ ] Map DTOs to the app's internal `Task` model.
+-  [ ] Expose errors and loading flags through `useTasksState`.
+
+## Project Context
+
+With `fetchJson` ready, implement task-specific helpers so the dashboard can
+load, create, update, and delete tasks with confidence.
+
+---
+
+## Async/Await with the API Client
+
+Async/await keeps code readable while handling errors via `try/catch`.
+
+### Basic Example
+
+```ts
+const api = createApiClient();
+
+export async function fetchTasksRequest() {
+   return api.get<ApiResponse<TaskDto[]>>("/tasks");
+}
+```
+
+### Practical Example
+
+```ts
+export async function fetchTasks(
+   params: { status?: string; search?: string },
+   signal?: AbortSignal
+) {
+   const query = new URLSearchParams(params).toString();
+   const result = await api.get<ApiResponse<TaskDto[]>>(`/tasks?${query}`, {
+      signal,
+   });
+   return result.data.map(mapDtoToTask);
+}
+```
+
+---
+
+## Mapping DTOs to Domain Models
+
+Keep transport-specific fields out of UI components.
+
+```ts
+function mapDtoToTask(dto: TaskDto): Task {
+   return {
+      id: dto.id,
+      title: dto.title,
+      description: dto.description,
+      status: dto.status,
+      priority: dto.priority,
+      createdAt: new Date(dto.createdAt),
+      updatedAt: new Date(dto.updatedAt),
+   };
+}
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Co-locate DTO Mapping with API Functions
+
+**Why:** Prevents mismatched structures across the app.
+
+### 2. Bubble Errors with Context
+
+**Why:** Hooks can display `error.message` and fallback UI when the server
+responds with `error` details.
+
+```ts
+catch (error) {
+   if (error instanceof ApiError) {
+      throw new Error(error.message ?? "Unable to load tasks");
+   }
+   throw error;
+}
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mixing DTOs and Domain Models
+
+**Problem:** Components rely on string dates or snake_case fields.
+
+**Solution:** Map DTOs immediately and keep types strict.
+
+### 2. Ignoring Query Params
+
+**Problem:** Server always returns all tasks, defeating toolbar filters.
+
+**Solution:** Pass search and status parameters from `useTasksState`.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Build task-specific API helpers:
+
+1. Create `src/lib/api/tasks.ts` with helpers: `fetchTasks`, `createTask`,
+   `updateTask`, `deleteTask`.
+2. Use `createApiClient` and map DTOs to the `Task` model.
+3. Update `useTasksState` to call `fetchTasks` with filters when they change
+   (re-run the effect when `statusFilter` or `search` updates after a debounce).
+4. Surface `isSubmitting` flags for mutations.
+5. Commit with `git commit -am "feat: add task api helpers"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Implement typed helpers that translate between the API contract and the app's domain model.
+      </p>
+
+      ```ts filename="src/lib/api/tasks.ts"
+      import { createApiClient } from "./client";
+      import type { ApiResponse, TaskDto } from "./types";
+      import { ApiError } from "./errors";
+
+      const api = createApiClient();
+
+      function mapDtoToTask(dto: TaskDto): Task {
+         return {
+            id: dto.id,
+            title: dto.title,
+            description: dto.description,
+            status: dto.status,
+            priority: dto.priority,
+            createdAt: new Date(dto.createdAt),
+            updatedAt: new Date(dto.updatedAt),
+         };
+      }
+
+      export async function fetchTasks(
+         params: { status?: string; search?: string } = {},
+         options?: { signal?: AbortSignal }
+      ) {
+         const query = new URLSearchParams(params).toString();
+         const path = query.length ? `/tasks?${query}` : "/tasks";
+         const response = await api.get<ApiResponse<TaskDto[]>>(path, options);
+         return response.data.map(mapDtoToTask);
+      }
+
+      export async function createTask(payload: {
+         title: string;
+         description: string;
+         priority: Task["priority"];
+      }) {
+         const response = await api.post<ApiResponse<TaskDto>>("/tasks", payload);
+         return mapDtoToTask(response.data);
+      }
+
+      export async function updateTask(taskId: string, payload: Partial<TaskDto>) {
+         const response = await api.patch<ApiResponse<TaskDto>>(`/tasks/${taskId}`, payload);
+         return mapDtoToTask(response.data);
+      }
+
+      export async function deleteTask(taskId: string) {
+         await api.delete<ApiResponse<null>>(`/tasks/${taskId}`);
+      }
+      ```
+
+      ```tsx filename="src/hooks/useTasksState.ts"
+      useEffect(() => {
+         const controller = new AbortController();
+
+         async function loadTasks() {
+            setIsLoading(true);
+            setError(null);
+
+            try {
+               const result = await fetchTasks(
+                  { status: statusFilter === "all" ? undefined : statusFilter, search },
+                  { signal: controller.signal }
+               );
+               setTasks(result);
+            } catch (error) {
+               if ((error as Error).name !== "AbortError") {
+                  setError((error as Error).message ?? "Unable to load tasks");
+               }
+            } finally {
+               setIsLoading(false);
+            }
+         }
+
+         const timeout = setTimeout(loadTasks, 150);
+
+         return () => {
+            controller.abort();
+            clearTimeout(timeout);
+         };
+      }, [statusFilter, search]);
+      ```
+
+      ```bash
+      git add src/lib/api/tasks.ts src/hooks/useTasksState.ts
+      git commit -m "feat: add task api helpers"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Task API helpers now return typed data and integrate with `useTasksState`,
+enabling filtered fetches and future mutations.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Fetching honors status and search filters.
+-  [ ] Mutations return mapped tasks without DTO leakage.
+
+### Code Quality
+
+-  [ ] API helpers live in `src/lib/api/tasks.ts` with shared mapping.
+-  [ ] Effects debounce requests and clean up properly.
+
+### Understanding
+
+-  [ ] You can explain why DTO-to-domain mapping matters.
+-  [ ] You can handle API errors gracefully with async/await.
+
+### Project Integration
+
+-  [ ] Hook consumers receive updated data when filters change.
+-  [ ] API helpers prepare for optimistic updates in Part 3.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m3/6_data-fetching-part-1'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Data Fetching Part 1
+   </a>
+   <a
+      href='/docs/react/m3/8_data-fetching-part-3'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Data Fetching Part 3
+   </a>
+</div>

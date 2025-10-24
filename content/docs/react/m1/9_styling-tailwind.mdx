@@ -1,0 +1,277 @@
+---
+title: "Styling & Tailwind"
+description:
+   "Style TaskFlow Pro using Tailwind CSS utilities and custom design tokens."
+module: "M1"
+lesson: "9"
+difficulty: "beginner"
+duration: "30"
+project_phase: "UI scaffolding"
+prerequisites: ["/docs/react/m1/8_introduction-hooks"]
+learning_objectives:
+   - "Apply Tailwind utility classes effectively"
+   - "Create component-level style primitives"
+   - "Use the local design tokens defined in Module 0"
+   - "Leverage Fumadocs UI components in MDX"
+tags: ["tailwind", "styling", "design-system"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Styling & Tailwind
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Style components with Tailwind utility classes.
+-  [ ] Reference custom colors and spacing defined in `tailwind.config`.
+-  [ ] Create reusable class helpers for consistent looks.
+-  [ ] Integrate Fumadocs UI components for documentation snippets.
+
+## Project Context
+
+TaskFlow Pro leans on Tailwind for rapid styling. You already set up tokens in
+Module 0—now you'll apply them to real components.
+
+---
+
+## Tailwind Utilities Recap
+
+-  Compose classes directly in JSX (`className="grid gap-6"`).
+-  Utilities are mobile-first and override in order.
+-  Use `cn` helper (already in `src/lib/cn.ts`) to conditionally merge classes.
+
+### Basic Example
+
+```tsx
+<div className='rounded-lg border border-border bg-card p-6 shadow-sm' />
+```
+
+### Practical Example
+
+```tsx
+import { cn } from "@/lib/cn";
+
+type BadgeProps = {
+   variant?: "default" | "success" | "danger";
+   children: React.ReactNode;
+};
+
+const variantClasses: Record<NonNullable<BadgeProps["variant"]>, string> = {
+   default: "bg-muted text-muted-foreground",
+   success: "bg-emerald-500/10 text-emerald-500",
+   danger: "bg-red-500/10 text-red-500",
+};
+
+export function Badge({ variant = "default", children }: BadgeProps) {
+   return (
+      <span
+         className={cn(
+            "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium",
+            variantClasses[variant]
+         )}
+      >
+         {children}
+      </span>
+   );
+}
+```
+
+---
+
+## Using Local UI Components
+
+You can adopt shared components from `src/components/ui`, such as
+`buttonVariants`.
+
+```tsx
+import { buttonVariants } from "@/components/ui/button";
+
+<a className={buttonVariants({ variant: "primary" })} href='#'>
+   Add Task
+</a>;
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Group Utilities Logically
+
+**Why:** Improves readability.
+
+```tsx
+className =
+   "flex items-center justify-between rounded-lg border bg-card px-4 py-3";
+```
+
+### 2. Extract Patterns into Components
+
+**Why:** Simplifies future design tweaks.
+
+```tsx
+function Card({ children }: { children: React.ReactNode }) {
+   return (
+      <article className='rounded-lg border bg-card p-6 shadow-sm'>
+         {children}
+      </article>
+   );
+}
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mixing Inline Styles with Tailwind
+
+**Problem:** Harder to enforce consistency.
+
+**Solution:** Rely on utilities and extend Tailwind when necessary.
+
+### 2. Forgetting Dark Mode Considerations
+
+**Problem:** Styles unreadable in dark theme.
+
+**Solution:** Use Tailwind color tokens that adapt automatically.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Style Header & Sidebar
+
+1. Update `src/components/layout/Header.tsx` and `Sidebar.tsx` (create if
+   missing).
+2. Apply Tailwind classes using tokens (`bg-card`, `text-muted-foreground`,
+   etc.).
+3. Use `buttonVariants` for primary CTA in the header (e.g., "New Task").
+4. Document the class choices in `docs/ui-components.md` under a "Styling"
+   subsection.
+5. Commit with `git commit -am "feat: style header and sidebar"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Apply Tailwind tokens so the dashboard shell matches our design language while
+         staying ready for Module 2 state work.
+      </p>
+
+      ```tsx filename="src/components/layout/Header.tsx"
+      import { buttonVariants } from '@/components/ui/button';
+
+      export function Header() {
+         return (
+            <header className='border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+               <div className='mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4'>
+                  <div>
+                     <p className='text-xs uppercase tracking-wide text-muted-foreground'>TaskFlow Pro</p>
+                     <h1 className='text-lg font-semibold text-foreground'>Workspace Overview</h1>
+                  </div>
+                  <nav className='flex items-center gap-3'>
+                     <a href='#roadmap' className={buttonVariants({ variant: 'ghost' })}>
+                        View Roadmap
+                     </a>
+                     <button type='button' className={buttonVariants({ variant: 'primary' })}>
+                        New Task
+                     </button>
+                  </nav>
+               </div>
+            </header>
+         );
+      }
+      ```
+
+      ```tsx filename="src/components/layout/Sidebar.tsx"
+      import { Badge } from '@/components/ui/badge';
+
+      const links = [
+         { id: 'dashboard', label: 'Dashboard', href: '#', badge: 'Now' },
+         { id: 'tasks', label: 'Tasks', href: '#', badge: '12' },
+         { id: 'reports', label: 'Reports', href: '#', badge: 'Soon' },
+      ];
+
+      export function Sidebar() {
+         return (
+            <aside className='w-64 shrink-0 rounded-2xl border border-border bg-card p-6 shadow-sm'>
+               <h2 className='text-xs font-semibold uppercase tracking-wide text-muted-foreground'>Navigation</h2>
+               <ul className='mt-4 space-y-1'>
+                  {links.map((link) => (
+                     <li key={link.id}>
+                        <a
+                           href={link.href}
+                           className='flex items-center justify-between rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground'
+                        >
+                           <span className='font-medium'>{link.label}</span>
+                           {link.badge ? (
+                              <Badge variant={link.badge === 'Now' ? 'default' : 'secondary'}>
+                                 {link.badge}
+                              </Badge>
+                           ) : null}
+                        </a>
+                     </li>
+                  ))}
+               </ul>
+            </aside>
+         );
+      }
+      ```
+
+      ```md filename="docs/ui-components.md"
+      #### Styling Tokens
+      - Header uses `bg-background/80` and blur to lift above page content.
+      - Sidebar relies on `bg-card`, `border-border`, and rounded corners for continuity.
+      - CTAs leverage `buttonVariants` so action buttons match the global system.
+      ```
+
+      ```bash
+      git add src/components/layout/Header.tsx src/components/layout/Sidebar.tsx docs/ui-components.md
+      git commit -m "feat: style header and sidebar"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+The app shell now matches the design language established in Module 0.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Header and sidebar render with new styling.
+-  [ ] Buttons use shared variants.
+
+### Code Quality
+
+-  [ ] No inline styles remain unless justified.
+-  [ ] `cn` helper used for conditional classes.
+
+### Understanding
+
+-  [ ] You can explain which utilities control spacing vs color.
+
+### Project Integration
+
+-  [ ] Documentation references Tailwind tokens for future updates.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m1/8_introduction-hooks'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Introduction to Hooks
+   </a>
+   <a
+      href='/docs/react/m1/10_implementation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Implementation
+   </a>
+</div>

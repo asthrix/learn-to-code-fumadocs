@@ -1,0 +1,247 @@
+---
+title: "Implementing Module 2"
+description:
+   "Wire TaskFlow Pro's task composer, inline editing, and filters using state
+   and event handlers."
+module: "M2"
+lesson: "10"
+difficulty: "beginner"
+duration: "60"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react/m2/9_controlled-vs-uncontrolled"]
+learning_objectives:
+   - "Compose Module 2 components inside the dashboard"
+   - "Connect `useTasksState` to UI handlers"
+   - "Support task creation, toggling, editing, and deletion"
+   - "Record state transitions in notes"
+tags: ["implementation", "state", "events"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Implementing Module 2
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Integrate `useTasksState` into the dashboard shell.
+-  [ ] Hook up Task Toolbar, Composer, and Task Cards to shared state.
+-  [ ] Support inline title editing and task deletion.
+-  [ ] Document state decisions for future modules.
+
+## Project Context
+
+Module 2 glues together state, events, and UI. After this lesson TaskFlow Pro
+supports creating, filtering, toggling, renaming, and removing tasks without
+refreshing the page.
+
+---
+
+## Implementation Plan
+
+1. Wrap the dashboard in `useTasksState`.
+2. Render `TaskComposerContainer` for task creation.
+3. Connect `TaskToolbar` to filter handlers.
+4. Render `TaskCard` for each filtered task and support inline editing.
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep State Updates in Hooks
+
+**Why:** UI components stay presentational.
+
+### 2. Co-locate Derived Metrics
+
+**Why:** Stats help Module 3 diagnostics and future dashboards.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting to Sync Filters
+
+**Problem:** Toolbar UI drifts from actual filter values.
+
+**Solution:** Pass the current filter state back into `TaskToolbar` props.
+
+### 2. Dropping Error Handling
+
+**Problem:** Failing submissions leave UI stuck.
+
+**Solution:** Display inline errors from Composer container.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Follow the steps above, then:
+
+1. Update `src/App.tsx` to use `useTasksState` and render Module 2 components.
+2. Add inline title editing and deletion controls to `TaskCard`.
+3. Record decisions in `notes/module-2-state-plan.md` under a new
+   "Implementation" section.
+4. Commit with `git commit -am "feat: implement module 2 state layer"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Assemble the Module 2 components inside the dashboard shell and ensure every
+         handler routes through `useTasksState`.
+      </p>
+
+      ```tsx filename="src/App.tsx"
+      import { DashboardShell } from '@/components/layout/DashboardShell';
+      import { Header } from '@/components/layout/Header';
+      import { Sidebar } from '@/components/layout/Sidebar';
+      import { TaskComposerContainer } from '@/components/tasks/TaskComposerContainer';
+      import { TaskToolbar } from '@/components/tasks/TaskToolbar';
+      import { TaskCard } from '@/components/task/TaskCard';
+      import { InlineTitleEditor } from '@/components/tasks/InlineTitleEditor';
+      import { useTasksState } from '@/hooks/useTasksState';
+      import { useState } from 'react';
+
+      export function App() {
+         const {
+            filteredTasks,
+            stats,
+            statusFilter,
+            setStatusFilter,
+            setSearch,
+            createTask,
+            toggleTaskStatus,
+            renameTask,
+            deleteTask,
+         } = useTasksState();
+
+         const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+
+         const handleRename = (taskId: string, title: string) => {
+            renameTask(taskId, title);
+            setEditingTaskId(null);
+         };
+
+         return (
+            <DashboardShell>
+               <Header />
+               <section className='mt-8 grid gap-6 md:grid-cols-[320px_1fr]'>
+                  <aside className='space-y-4'>
+                     <TaskComposerContainer onCreateTask={createTask} />
+                     <div className='rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground'>
+                        <p className='font-semibold text-foreground'>Progress</p>
+                        <p className='mt-2'>Total tasks: {stats.total}</p>
+                        <p>Completed: {stats.completed}</p>
+                        <p>Remaining: {stats.remaining}</p>
+                     </div>
+                  </aside>
+                  <main className='space-y-4'>
+                     <TaskToolbar
+                        status={statusFilter}
+                        onStatusChange={setStatusFilter}
+                        onSearch={setSearch}
+                     />
+                     <div className='grid gap-3'>
+                        {filteredTasks.length === 0 ? (
+                           <div className='rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground'>
+                              No tasks yet. Use the composer to create your first task.
+                           </div>
+                        ) : (
+                           filteredTasks.map((task) => (
+                              <section key={task.id} className='space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm'>
+                                 <TaskCard task={task} onToggleStatus={toggleTaskStatus} />
+                                 {editingTaskId === task.id ? (
+                                    <InlineTitleEditor
+                                       value={task.title}
+                                       onSave={(value) => handleRename(task.id, value)}
+                                       onCancel={() => setEditingTaskId(null)}
+                                    />
+                                 ) : (
+                                    <div className='flex items-center gap-3 text-xs'>
+                                       <button
+                                          type='button'
+                                          onClick={() => setEditingTaskId(task.id)}
+                                          className='font-medium text-primary hover:text-primary/80'
+                                       >
+                                          Rename
+                                       </button>
+                                       <button
+                                          type='button'
+                                          onClick={() => deleteTask(task.id)}
+                                          className='font-medium text-destructive hover:text-destructive/80'
+                                       >
+                                          Delete
+                                       </button>
+                                    </div>
+                                 )}
+                              </section>
+                           ))
+                        )}
+                     </div>
+                  </main>
+               </section>
+            </DashboardShell>
+         );
+      }
+      ```
+
+      ```md filename="notes/module-2-state-plan.md"
+      ## Implementation Notes
+      - Dashboard uses `useTasksState` to manage tasks and filters.
+      - Composer container handles validation and submits through the hook.
+      - Inline editor managed via local `editingTaskId` state (future Module 3 work).
+      ```
+
+      ```bash
+      git add src/App.tsx notes/module-2-state-plan.md
+      git commit -m "feat: implement module 2 state layer"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+TaskFlow Pro now supports creating, filtering, completing, and preparing inline
+edits for tasks.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Composer adds tasks to the list instantly.
+-  [ ] Toolbar filters and search update the task list.
+-  [ ] Toggle button updates task status.
+
+### Code Quality
+
+-  [ ] State updates flow through `useTasksState`.
+-  [ ] Implementation notes recorded in the plan file.
+
+### Understanding
+
+-  [ ] You can describe how each handler maps to `useTasksState` actions.
+
+### Project Integration
+
+-  [ ] Implementation keeps future modules in mind (rename, API persistence).
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m2/9_controlled-vs-uncontrolled'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Controlled vs Uncontrolled Components
+   </a>
+   <a
+      href='/docs/react/m2/11_validation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Validation
+   </a>
+</div>

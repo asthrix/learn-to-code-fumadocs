@@ -1,0 +1,191 @@
+---
+title: "Implementing Module 5"
+description:
+   "Ship performance upgrades across dashboards, project detail pages, and
+   analytics panels."
+module: "M5"
+lesson: "9"
+difficulty: "advanced"
+duration: "60"
+project_phase: "Performance"
+prerequisites: ["/docs/react/m5/8_component-best-practices"]
+learning_objectives:
+   - "Integrate memoised hooks and component patterns into production screens"
+   - "Virtualise large task lists without breaking UX"
+   - "Lazy load secondary insights while preserving analytics hooks"
+   - "Update documentation to reflect new performance architecture"
+tags: ["implementation", "performance", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Implementing Module 5
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Wire the new hooks and controller/view pairs into TaskFlow Pro pages.
+-  [ ] Virtualise task lists to handle hundreds of items efficiently.
+-  [ ] Lazy load analytics panels tied to deferred filters.
+-  [ ] Capture implementation decisions in engineering docs.
+
+## Project Context
+
+The patterns from Lessons 1–8 are ready to land. This implementation sprint
+ensures they coexist with routing, caching, and analytics introduced in earlier
+modules.
+
+---
+
+## Implementation Plan
+
+1. Replace legacy state in `DashboardView` and `ProjectDetailPage` with custom
+   hooks.
+2. Introduce `react-virtual` (or similar) for long task lists.
+3. Defer heavy analytics calculations to background components.
+4. Update documentation to outline the new architecture for future contributors.
+
+---
+
+## ✅ Best Practices
+
+### 1. Stage Changes Incrementally
+
+Ship hooks and memoised components behind feature flags if the codebase is
+shared.
+
+### 2. Monitor Runtime Metrics
+
+Observe FPS and memory usage in the browser after each change.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Virtualising Without Measuring Height
+
+Ensure the container has a fixed or computed height; otherwise the list
+collapses.
+
+### 2. Forgetting Suspense Boundaries
+
+Lazy loaded panels without suspense fallback will crash renders.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Bring performance work into the main app:
+
+1. Update `src/pages/DashboardView.tsx` and `src/pages/ProjectDetailPage.tsx` to
+   use `TaskListController`, `ProjectCard`, and deferred filters.
+2. Add `react-virtual` (or your preferred library) and wrap task lists with
+   `Virtualizer` components.
+3. Lazy load analytics and reporting panels using `React.lazy` inside suspense
+   boundaries.
+4. Document the final architecture in `docs/performance-architecture.md` (create
+   if needed) and link it from `notes/module-5-performance-plan.md`.
+5. Commit with `git commit -am "feat: implement module 5 performance upgrades"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Apply hooks, memoised components, and virtualisation to core screens.</p>
+
+      ```tsx filename="src/pages/DashboardView.tsx"
+      import { Suspense, lazy } from "react";
+      import { TaskListController } from "@/components/tasks/TaskListController";
+      import { ProjectSidebar } from "@/components/dashboard/ProjectSidebar";
+      import { useDashboardFilters } from "@/hooks/useTaskFilters";
+      import { VirtualTaskList } from "@/components/tasks/VirtualTaskList";
+
+      const TaskInsightsPanel = lazy(() => import("@/components/dashboard/TaskInsightsPanel"));
+
+      export function DashboardView() {
+         const filters = useDashboardFilters();
+         return (
+            <div className='grid gap-6 lg:grid-cols-[260px_1fr]'>
+               <ProjectSidebar {...filters.sidebar} />
+               <section className='space-y-6'>
+                  <VirtualTaskList
+                     tasks={filters.tasks}
+                     renderItem={(task) => <TaskListController projectId={task.projectId} />}
+                  />
+                  <Suspense fallback={<PanelSkeleton title='Insights' />}>
+                     <TaskInsightsPanel tasks={filters.tasks} />
+                  </Suspense>
+               </section>
+            </div>
+         );
+      }
+      ```
+
+      ```md filename="docs/performance-architecture.md"
+      # Performance Architecture
+
+      - Controllers consume hooks and feed memo-friendly views
+      - Virtual task list powered by `react-virtual`
+      - Analytics panels lazy loaded behind suspense
+      - Deferred filters prevent UI jank
+      ```
+
+      ```md filename="notes/module-5-performance-plan.md"
+      ## Documentation
+      - Architecture: `docs/performance-architecture.md`
+      - Owner: Performance guild (Jordan)
+      - Review cadence: Monthly playback with analytics KPIs
+      ```
+
+      ```bash
+      git add src/pages docs/performance-architecture.md notes/module-5-performance-plan.md
+      git commit -m "feat: implement module 5 performance upgrades"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+TaskFlow Pro now renders large datasets smoothly, lazy loads secondary insights,
+and documents the new performance architecture for future contributors.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Virtualised task lists render the correct number of visible rows.
+-  [ ] Deferred filters and memoised components sync with routing state.
+
+### Code Quality
+
+-  [ ] Implementation sticks to controller/view separation.
+-  [ ] Architecture docs explain how hooks and components interact.
+
+### Understanding
+
+-  [ ] You can trace a task filter update through hooks, controllers, and views.
+-  [ ] You can add new analytics panels without blocking initial render.
+
+### Project Integration
+
+-  [ ] Performance plan links to the new documentation.
+-  [ ] Routing analytics still fire after performance changes.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m5/8_component-best-practices'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Component Best Practices
+   </a>
+   <a
+      href='/docs/react/m5/10_validation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Validation
+   </a>
+</div>

@@ -1,0 +1,267 @@
+---
+title: "Data Fetching Part 1"
+description:
+   "Implement a lightweight fetch wrapper that talks to TaskFlow Pro's mock API."
+module: "M3"
+lesson: "6"
+difficulty: "intermediate"
+duration: "30"
+project_phase: "Data integration"
+prerequisites: ["/docs/react/m3/5_introduction-data-fetching"]
+learning_objectives:
+   - "Use the Fetch API with AbortController"
+   - "Normalize responses into a shared shape"
+   - "Handle HTTP errors gracefully"
+   - "Expose a reusable `fetchJson` helper"
+tags: ["data", "fetch", "api"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Data Fetching Part 1
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Send HTTP requests with the browser Fetch API.
+-  [ ] Abort in-flight requests when components unmount.
+-  [ ] Normalize success and error responses.
+-  [ ] Build a `fetchJson` helper for the rest of Module 3.
+
+## Project Context
+
+TaskFlow Pro needs a consistent way to talk to the API. Centralizing fetch logic
+keeps hooks focused on data flow and error messaging rather than low-level HTTP
+plumbing.
+
+---
+
+## The Fetch API
+
+`fetch` returns a promise that resolves to a `Response`. Check `response.ok` to
+determine success and parse JSON.
+
+### Basic Example
+
+```tsx
+async function fetchJson(input: RequestInfo, init?: RequestInit) {
+   const response = await fetch(input, init);
+   if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+   }
+   return response.json();
+}
+```
+
+### Practical Example
+
+```tsx
+const controller = new AbortController();
+fetch("/api/tasks", { signal: controller.signal })
+   .then((response) => response.json())
+   .catch((error) => {
+      if (error.name !== "AbortError") {
+         reportError(error);
+      }
+   });
+```
+
+---
+
+## Handling Errors
+
+Wrap failures in a consistent error object so UIs display meaningful messages.
+
+```ts
+export class ApiError extends Error {
+   constructor(message: string, public status: number, public body?: unknown) {
+      super(message);
+   }
+}
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Pass Default Headers
+
+**Why:** JSON APIs expect `Content-Type` headers and authentication tokens.
+
+```ts
+const defaultHeaders = {
+   "Content-Type": "application/json",
+};
+```
+
+### 2. Support Base URLs
+
+**Why:** Switching between local mocks and production endpoints should be a
+configuration change, not a code rewrite.
+
+```ts
+const API_BASE_URL = process.env.NEXT_PUBLIC_TASKFLOW_API ?? "/api";
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Ignoring Abort Signals
+
+**Problem:** Requests continue after unmount, causing warnings.
+
+**Solution:** Always accept an optional `signal` and pass it to `fetch`.
+
+### 2. Throwing Raw Responses
+
+**Problem:** Components receive unreadable error objects.
+
+**Solution:** Parse JSON, then throw a structured `ApiError`.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Create a reusable fetch helper:
+
+1. Add `src/lib/api/client.ts` with `fetchJson` and `createApiClient` utilities.
+2. Support default headers, base URL, and abort signals.
+3. Export typed helpers for GET and mutation requests.
+4. Write a unit test placeholder or comment indicating tests should verify
+   success and error cases (actual tests land in Module MX).
+5. Commit with `git commit -am "feat: add api client"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Encapsulate fetch so future lessons can focus on data flow rather than HTTP boilerplate.
+      </p>
+
+      ```ts filename="src/lib/api/client.ts"
+      import { ApiError } from "./errors";
+
+      const API_BASE_URL = process.env.NEXT_PUBLIC_TASKFLOW_API ?? "/api";
+
+      type FetchOptions = RequestInit & { signal?: AbortSignal };
+
+      export async function fetchJson<T>(path: string, options: FetchOptions = {}) {
+         const response = await fetch(`${API_BASE_URL}${path}`, {
+            ...options,
+            headers: {
+               "Content-Type": "application/json",
+               ...(options.headers ?? {}),
+            },
+         });
+
+         const contentType = response.headers.get("content-type") ?? "";
+         const isJson = contentType.includes("application/json");
+         const body = isJson ? await response.json() : await response.text();
+
+         if (!response.ok) {
+            throw new ApiError(
+               body?.error?.message ?? "Request failed",
+               response.status,
+               body
+            );
+         }
+
+         return body as T;
+      }
+
+      export function createApiClient() {
+         return {
+            get: <T>(path: string, options?: FetchOptions) => fetchJson<T>(path, options),
+            post: <T>(path: string, body: unknown, options?: FetchOptions) =>
+               fetchJson<T>(path, {
+                  method: "POST",
+                  body: JSON.stringify(body),
+                  ...options,
+               }),
+            patch: <T>(path: string, body: unknown, options?: FetchOptions) =>
+               fetchJson<T>(path, {
+                  method: "PATCH",
+                  body: JSON.stringify(body),
+                  ...options,
+               }),
+            delete: <T>(path: string, options?: FetchOptions) =>
+               fetchJson<T>(path, {
+                  method: "DELETE",
+                  ...options,
+               }),
+         };
+      }
+      ```
+
+      ```ts filename="src/lib/api/errors.ts"
+      export class ApiError extends Error {
+         body?: unknown;
+
+         constructor(message: string, public status: number, body?: unknown) {
+            super(message);
+            this.body = body;
+         }
+      }
+      ```
+
+      ```md filename="notes/module-3-effects-plan.md"
+      ## API Client
+      - `fetchJson(path, options)` → wraps fetch with defaults
+      - `createApiClient()` → returns get/post/patch/delete helpers
+      - Errors → `ApiError` with status and body
+      ```
+
+      ```bash
+      git add src/lib/api/client.ts src/lib/api/errors.ts notes/module-3-effects-plan.md
+      git commit -m "feat: add api client"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+TaskFlow Pro now has a shared HTTP client ready for effects to consume in later
+lessons.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] `fetchJson` throws readable errors when the response is not OK.
+-  [ ] API client methods reuse shared defaults.
+
+### Code Quality
+
+-  [ ] Base URL and headers come from a single location.
+-  [ ] Notes document helper responsibilities.
+
+### Understanding
+
+-  [ ] You can explain how AbortController integrates with fetch.
+-  [ ] You can extend the client with auth headers when needed.
+
+### Project Integration
+
+-  [ ] Future hooks will call `createApiClient()` instead of raw `fetch`.
+-  [ ] Mock API and real API can reuse the same helpers.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m3/5_introduction-data-fetching'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Introduction to Data Fetching
+   </a>
+   <a
+      href='/docs/react/m3/7_data-fetching-part-2'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Data Fetching Part 2
+   </a>
+</div>

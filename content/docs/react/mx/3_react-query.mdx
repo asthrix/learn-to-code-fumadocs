@@ -1,0 +1,131 @@
+---
+title: "Implementing React Query"
+description:
+   "Introduce React Query for TaskFlow Pro to unlock caching, optimistic
+   updates, and background sync."
+module: "MX"
+lesson: "3"
+difficulty: "advanced"
+duration: "35"
+project_phase: "Advanced polish"
+prerequisites: ["/docs/react/mx/2_improving-forms-inputs"]
+learning_objectives:
+   - "Configure React Query provider and devtools"
+   - "Migrate fetch logic to query/mutation hooks"
+   - "Implement optimistic updates and error recovery"
+   - "Prime cache during navigation"
+tags: ["react-query", "state", "data-fetching"]
+---
+
+# Implementing React Query
+
+## Setup
+
+```tsx filename="src/app/layout.tsx"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
+export default function RootLayout({
+   children,
+}: {
+   children: React.ReactNode;
+}) {
+   return (
+      <QueryClientProvider client={queryClient}>
+         {children}
+         <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+   );
+}
+```
+
+-  Enable devtools only in development.
+-  Configure `defaultOptions` to tune retries and stale times.
+
+---
+
+## Query Hooks
+
+```ts filename="src/features/tasks/api.ts"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { http } from "@/lib/http";
+
+export const useTasks = () => {
+   return useQuery({
+      queryKey: ["tasks"],
+      queryFn: async () => (await http.get("/tasks")).data,
+      staleTime: 30_000,
+   });
+};
+
+export const useUpdateTask = () => {
+   const queryClient = useQueryClient();
+   return useMutation({
+      mutationFn: (payload: TaskUpdate) =>
+         http.patch(`/tasks/${payload.id}`, payload),
+      onMutate: async (payload) => {
+         await queryClient.cancelQueries({ queryKey: ["tasks"] });
+         const previous = queryClient.getQueryData<Task[]>(["tasks"]);
+         queryClient.setQueryData<Task[]>(["tasks"], (tasks = []) =>
+            tasks.map((task) =>
+               task.id === payload.id
+                  ? { ...task, ...payload, optimistic: true }
+                  : task
+            )
+         );
+         return { previous };
+      },
+      onError: (_err, _payload, context) => {
+         queryClient.setQueryData(["tasks"], context?.previous);
+      },
+      onSettled: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+   });
+};
+```
+
+---
+
+## Prefetching
+
+```tsx filename="src/app/(app)/layout.tsx"
+const queryClient = useQueryClient();
+
+useEffect(() => {
+   const controller = new AbortController();
+   queryClient.prefetchQuery({
+      queryKey: ["tasks"],
+      queryFn: () => fetchTasks(controller.signal),
+   });
+   return () => controller.abort();
+}, [queryClient]);
+```
+
+-  Prefetch analytics data before navigating to reporting dashboards.
+-  Use `ensureQueryData` to hydrate server-rendered pages.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] React Query provider wraps the application shell.
+-  [ ] Tasks API migrated to query/mutation hooks.
+-  [ ] Optimistic updates revert gracefully on error.
+-  [ ] Prefetch strategy documented in runbook.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/mx/2_improving-forms-inputs'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Improving Forms & Inputs
+   </a>
+   <a
+      href='/docs/react/mx/4_users-profiles'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Implementing Users & Profiles
+   </a>
+</div>

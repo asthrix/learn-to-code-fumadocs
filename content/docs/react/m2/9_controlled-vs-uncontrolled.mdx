@@ -1,0 +1,229 @@
+---
+title: "Controlled vs Uncontrolled Components"
+description:
+   "Choose the right input strategy for inline editing and quick task actions."
+module: "M2"
+lesson: "9"
+difficulty: "beginner"
+duration: "25"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react/m2/8_use-state-hook"]
+learning_objectives:
+   - "Differentiate controlled and uncontrolled inputs"
+   - "Convert uncontrolled components to controlled when state is required"
+   - "Use refs when uncontrolled inputs make sense"
+tags: ["forms", "controlled", "uncontrolled"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Controlled vs Uncontrolled Components
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Explain when to prefer controlled versus uncontrolled inputs.
+-  [ ] Convert inline editors to controlled components for predictability.
+-  [ ] Use refs for small, uncontrolled inputs when performance matters.
+-  [ ] Implement an inline task title editor for TaskFlow Pro.
+
+## Project Context
+
+TaskFlow Pro needs inline editing for titles without losing draft control. The
+dashboard benefits from controlled components when edits must be validated, but
+quick actions (like uploading files) may benefit from uncontrolled inputs.
+
+---
+
+## Controlled Inputs
+
+Controlled components mirror state. They are ideal when you need validation,
+auto-save, or cross-component coordination.
+
+```tsx
+<input value={title} onChange={(event) => setTitle(event.target.value)} />
+```
+
+---
+
+## Uncontrolled Inputs
+
+Uncontrolled components manage their own state. Use refs to read values when
+necessary.
+
+```tsx
+const fileInputRef = useRef<HTMLInputElement>(null);
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Choose Controlled for Critical Data
+
+**Why:** Ensures TaskFlow Pro never loses edits when switching views.
+
+### 2. Use Refs for Lightweight Inputs
+
+**Why:** File uploads or search boxes can remain uncontrolled for performance.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mixing Modes
+
+**Problem:** React warns when a component switches between controlled and
+uncontrolled.
+
+**Solution:** Decide up front and stick with one mode.
+
+### 2. Forgetting to Sync External Changes
+
+**Problem:** Controlled inputs must update when parent state changes.
+
+**Solution:** Pass new values via props and ensure state updates propagate.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+### Task: Add an Inline Title Editor
+
+1. Create `src/components/tasks/InlineTitleEditor.tsx`.
+2. Accept props
+   `{ value: string; onSave(nextValue: string): void; onCancel(): void; }`.
+3. Render:
+   -  Controlled input bound to `value`
+   -  `Save` and `Cancel` buttons
+   -  `Enter` submits, `Escape` cancels using keyboard handlers
+4. Export optional `autoFocus` prop for convenience.
+5. Commit with `git commit -am "feat: add inline title editor"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Provide a controlled editor so TaskCard can switch between display and edit
+         modes without losing the draft.
+      </p>
+
+      ```tsx filename="src/components/tasks/InlineTitleEditor.tsx"
+      import { useCallback, useEffect, useRef, useState } from 'react';
+      import { buttonVariants } from '@/components/ui/button';
+      import { cn } from '@/lib/cn';
+
+      type InlineTitleEditorProps = {
+         value: string;
+         onSave: (value: string) => void;
+         onCancel: () => void;
+         autoFocus?: boolean;
+      };
+
+      export function InlineTitleEditor({ value, onSave, onCancel, autoFocus = true }: InlineTitleEditorProps) {
+         const [draft, setDraft] = useState(value);
+         const inputRef = useRef<HTMLInputElement>(null);
+
+         useEffect(() => {
+            if (autoFocus) inputRef.current?.focus();
+         }, [autoFocus]);
+
+         useEffect(() => {
+            setDraft(value);
+         }, [value]);
+
+         const handleSave = useCallback(() => {
+            const normalized = draft.trim();
+            if (!normalized) {
+               inputRef.current?.focus();
+               return;
+            }
+            onSave(normalized);
+         }, [draft, onSave]);
+
+         const handleKeyDown = useCallback(
+            (event: React.KeyboardEvent<HTMLInputElement>) => {
+               if (event.key === 'Enter') {
+                  event.preventDefault();
+                  handleSave();
+               }
+               if (event.key === 'Escape') {
+                  event.preventDefault();
+                  setDraft(value);
+                  onCancel();
+               }
+            },
+            [handleSave, onCancel, value],
+         );
+
+         return (
+            <div className='flex items-center gap-2'>
+               <input
+                  ref={inputRef}
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className='flex-1 rounded-lg border border-border bg-background px-2 py-1 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
+               />
+               <button type='button' onClick={handleSave} className={buttonVariants({ variant: 'primary' })}>
+                  Save
+               </button>
+               <button type='button' onClick={onCancel} className={cn(buttonVariants({ variant: 'ghost' }), 'text-muted-foreground')}>
+                  Cancel
+               </button>
+            </div>
+         );
+      }
+      ```
+
+      ```bash
+      git add src/components/tasks/InlineTitleEditor.tsx
+      git commit -m "feat: add inline title editor"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Inline title edits now run through a controlled component that respects keyboard
+shortcuts and validation.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] `Enter` saves and `Escape` cancels.
+-  [ ] External value changes reset the draft.
+
+### Code Quality
+
+-  [ ] Controlled input stays in sync with props.
+-  [ ] Handlers memoize where necessary.
+
+### Understanding
+
+-  [ ] You can explain when to use refs for uncontrolled inputs.
+
+### Project Integration
+
+-  [ ] TaskCard can embed the editor in Module 2 implementation.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react/m2/8_use-state-hook'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← The `useState` Hook
+   </a>
+   <a
+      href='/docs/react/m2/10_implementation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Implementation
+   </a>
+</div>

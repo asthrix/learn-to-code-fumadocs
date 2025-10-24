@@ -118,7 +118,7 @@ export const courses: Course[] = [
    },
    {
       id: "react",
-      title: "React Development",
+      title: "Project React",
       description:
          "Build modern, scalable web applications with React. Master components, hooks, state management, and production-ready development practices.",
       shortDescription: "Create powerful web applications with React",
