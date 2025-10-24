@@ -1,4 +1,17 @@
 {
    "title": "M7 · Forms & Authentication",
-   "pages": ["0_index"]
+   "pages": [
+      "0_index",
+      "1_introduction-forms",
+      "2_forms-in-react",
+      "3_react-hook-form-basics",
+      "4_react-hook-form-validation",
+      "5_react-hook-form-dynamic-fields",
+      "6_form-ux-best-practices",
+      "7_introduction-authentication",
+      "8_auth-service-and-context",
+      "9_login-implementation",
+      "10_password-reset-flow",
+      "11_auth-rollout"
+   ]
 }
