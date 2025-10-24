@@ -1,4 +1,10 @@
 {
    "title": "M8 · Deployment",
-   "pages": ["0_index"]
+   "pages": [
+      "0_index",
+      "1_production-build",
+      "2_vercel-deployment",
+      "3_deployment-best-practices",
+      "4_deployment-validation"
+   ]
 }
