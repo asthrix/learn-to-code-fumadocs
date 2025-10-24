@@ -151,139 +151,143 @@ Introduce caching and optimistic updates:
          Build a minimal caching layer that keeps TaskFlow Pro responsive while preparing for a future TanStack Query integration.
       </p>
 
-````ts filename="src/lib/api/cache.ts"
-   const CACHE_TTL = 1000 * 30; // 30 seconds
-   const cache = new Map<string, { data: Task[]; updatedAt: number }>();
+```ts filename="src/lib/api/cache.ts"
+const CACHE_TTL = 1000 * 30; // 30 seconds
+const cache = new Map<string, { data: Task[]; updatedAt: number }>();
 
-   export function getTasksFromCache(key: string) {
-      const entry = cache.get(key);
-      if (!entry) return null;
-      const isFresh = Date.now() - entry.updatedAt < CACHE_TTL;
-      return isFresh ? entry.data : null;
+export function getTasksFromCache(key: string) {
+   const entry = cache.get(key);
+   if (!entry) return null;
+   const isFresh = Date.now() - entry.updatedAt < CACHE_TTL;
+   return isFresh ? entry.data : null;
+}
+
+export function setTasksCache(key: string, data: Task[]) {
+   cache.set(key, { data, updatedAt: Date.now() });
+}
+
+export function invalidateTasksCache(key?: string) {
+   if (key) {
+      cache.delete(key);
+      return;
    }
+   cache.clear();
+}
+```
 
-   export function setTasksCache(key: string, data: Task[]) {
-      cache.set(key, { data, updatedAt: Date.now() });
-   }
+```ts filename="src/lib/api/retry.ts"
+export async function retryWithBackoff<T>(
+   operation: () => Promise<T>,
+   attempts = 3
+) {
+   let delay = 200;
 
-   export function invalidateTasksCache(key?: string) {
-      if (key) {
-         cache.delete(key);
-         return;
+   for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      try {
+         return await operation();
+      } catch (error) {
+         if (attempt === attempts) throw error;
+         await new Promise((resolve) => setTimeout(resolve, delay));
+         delay *= 2;
       }
-      cache.clear();
    }
-   ```
 
-   ```ts filename="src/lib/api/retry.ts"
-   export async function retryWithBackoff<T>(operation: () => Promise<T>, attempts = 3) {
-      let delay = 200;
+   throw new Error("Failed after retries");
+}
+```
 
-      for (let attempt = 1; attempt <= attempts; attempt += 1) {
-         try {
-            return await operation();
-         } catch (error) {
-            if (attempt === attempts) throw error;
-            await new Promise((resolve) => setTimeout(resolve, delay));
-            delay *= 2;
+```tsx filename="src/hooks/useTasksState.ts"
+const cacheKey = useMemo(() => {
+   const params = new URLSearchParams({
+      status: statusFilter === "all" ? "" : statusFilter,
+      search,
+   });
+   return `tasks::${params.toString()}`;
+}, [statusFilter, search]);
+
+useEffect(() => {
+   const cached = getTasksFromCache(cacheKey);
+   if (cached) {
+      setTasks(cached);
+      setIsLoading(false);
+      return;
+   }
+
+   const controller = new AbortController();
+
+   async function loadTasks() {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+         const result = await fetchTasks(
+            {
+               status: statusFilter === "all" ? undefined : statusFilter,
+               search,
+            },
+            { signal: controller.signal }
+         );
+         setTasks(result);
+         setTasksCache(cacheKey, result);
+      } catch (error) {
+         if ((error as Error).name !== "AbortError") {
+            setError((error as Error).message ?? "Unable to load tasks");
          }
-      }
-
-      throw new Error("Failed after retries");
-   }
-   ```
-
-   ```tsx filename="src/hooks/useTasksState.ts"
-   const cacheKey = useMemo(
-      () => {
-         const params = new URLSearchParams({
-            status: statusFilter === "all" ? "" : statusFilter,
-            search,
-         });
-         return `tasks::${params.toString()}`;
-      },
-      [statusFilter, search]
-   );
-
-   useEffect(() => {
-      const cached = getTasksFromCache(cacheKey);
-      if (cached) {
-         setTasks(cached);
+      } finally {
          setIsLoading(false);
-         return;
       }
+   }
 
-      const controller = new AbortController();
+   loadTasks();
 
-     async function loadTasks() {
-         setIsLoading(true);
-         setError(null);
+   return () => controller.abort();
+}, [cacheKey, statusFilter, search]);
 
-         try {
-            const result = await fetchTasks(
-               { status: statusFilter === "all" ? undefined : statusFilter, search },
-               { signal: controller.signal }
+const rollbackRef = useRef<Task[]>([]);
+
+const createTaskMutation = useCallback(
+   async (input: TaskInput) => {
+      rollbackRef.current = tasks;
+      const optimisticTask = createOptimisticTask(input);
+
+      setTasks((previous) => {
+         const next = [optimisticTask, ...previous];
+         setTasksCache(cacheKey, next);
+         return next;
+      });
+
+      try {
+         const persisted = await retryWithBackoff(() => createTask(input));
+         setTasks((prev) => {
+            const next = prev.map((task) =>
+               task.id === optimisticTask.id ? persisted : task
             );
-            setTasks(result);
-            setTasksCache(cacheKey, result);
-         } catch (error) {
-            if ((error as Error).name !== "AbortError") {
-               setError((error as Error).message ?? "Unable to load tasks");
-            }
-         } finally {
-            setIsLoading(false);
-         }
-      }
-
-      loadTasks();
-
-      return () => controller.abort();
-   }, [cacheKey, statusFilter, search]);
-
-   const rollbackRef = useRef<Task[]>([]);
-
-   const createTaskMutation = useCallback(
-      async (input: TaskInput) => {
-         rollbackRef.current = tasks;
-         const optimisticTask = createOptimisticTask(input);
-
-         setTasks((previous) => {
-            const next = [optimisticTask, ...previous];
             setTasksCache(cacheKey, next);
             return next;
          });
+         return persisted;
+      } catch (error) {
+         setTasks(rollbackRef.current);
+         setTasksCache(cacheKey, rollbackRef.current);
+         throw error;
+      }
+   },
+   [tasks, cacheKey]
+);
+```
 
-         try {
-            const persisted = await retryWithBackoff(() => createTask(input));
-            setTasks((prev) => {
-               const next = prev.map((task) =>
-                  task.id === optimisticTask.id ? persisted : task
-               );
-               setTasksCache(cacheKey, next);
-               return next;
-            });
-            return persisted;
-         } catch (error) {
-            setTasks(rollbackRef.current);
-            setTasksCache(cacheKey, rollbackRef.current);
-            throw error;
-         }
-      },
-      [tasks, cacheKey]
-   );
-   ```
-
-   ```bash
+```bash
    git add src/lib/api/cache.ts src/lib/api/retry.ts src/hooks/useTasksState.ts
    git commit -m "feat: add task cache and optimistic updates"
-   ```
+```
 
 </Accordion>
 </Accordions>
 
 #### Expected Result
 
-TaskFlow Pro now caches task queries, performs optimistic updates, and retries transient failures to keep the UI smooth.
+TaskFlow Pro now caches task queries, performs optimistic updates, and retries
+transient failures to keep the UI smooth.
 
 ---
 
@@ -313,17 +317,17 @@ TaskFlow Pro now caches task queries, performs optimistic updates, and retries t
 ---
 
 <div className='mt-8 flex justify-between'>
-<a
-   href='/docs/react-new/m3/7_data-fetching-part-2'
-   className='text-sm font-medium text-muted-foreground hover:text-foreground'
->
-   ← Data Fetching Part 2
-</a>
-<a
-   href='/docs/react-new/m3/9_data-fetching-best-practices'
-   className='text-sm font-medium text-primary hover:text-primary/80'
->
-   Next · Data Fetching Best Practices
-</a>
+   <a
+      href='/docs/react-new/m3/7_data-fetching-part-2'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Data Fetching Part 2
+   </a>
+   <a
+      href='/docs/react-new/m3/9_data-fetching-best-practices'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Data Fetching Best Practices
+   </a>
 </div>
 ````
