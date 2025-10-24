@@ -1,0 +1,202 @@
+---
+title: "Component Best Practices"
+description:
+   "Optimise render paths with memoisation, suspense, and predictable prop flow."
+module: "M5"
+lesson: "8"
+difficulty: "advanced"
+duration: "30"
+project_phase: "Performance"
+prerequisites: ["/docs/react-new/m5/7_custom-components-patterns"]
+learning_objectives:
+   - "Audit components for avoidable renders"
+   - "Apply `React.memo`, lazy loading, and suspense at the right layer"
+   - "Stabilise callbacks and derived values between renders"
+   - "Document performance guardrails for new UI work"
+tags: ["react", "performance", "best-practices"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Component Best Practices
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Profile expensive component trees before refactoring.
+-  [ ] Wrap steady components in `React.memo` with stable props.
+-  [ ] Defer secondary UI with `React.lazy` and suspense fallbacks.
+-  [ ] Capture patterns in a reusable performance checklist.
+
+## Project Context
+
+Controllers and hooks are now solid—next up is ensuring components use those
+APIs efficiently so TaskFlow Pro stays responsive as datasets grow.
+
+---
+
+## Audit Before You Optimise
+
+1. Record a React DevTools profiler trace for dashboard interactions.
+2. Note components with long render durations or frequent commits.
+3. Confirm whether props actually change or if renders stem from parent churn.
+
+---
+
+## Tactical Improvements
+
+### Memoise Pure Components
+
+```tsx
+const TaskAvatars = memo(function TaskAvatars({ tasks }: { tasks: Task[] }) {
+   return (
+      <div className='flex -space-x-2'>
+         {tasks.slice(0, 5).map((task) => (
+            <Avatar key={task.id} task={task} />
+         ))}
+      </div>
+   );
+}, areTasksEqual);
+```
+
+-  Provide custom equality when props are arrays or objects.
+
+### Lazy Load Secondary Panels
+
+```tsx
+const TaskInsightsPanel = lazy(() => import("./TaskInsightsPanel"));
+```
+
+-  Wrap in `<Suspense fallback={<Skeleton />}>` to smooth loading.
+
+### Defer Expensive Filters
+
+Use `useDeferredValue` when typeahead filters re-render large lists.
+
+```tsx
+const deferredQuery = useDeferredValue(searchQuery);
+const visibleTasks = useMemo(
+   () => filterTasks(tasks, deferredQuery),
+   [tasks, deferredQuery]
+);
+```
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Lock in performance guardrails:
+
+1. Wrap `ProjectSidebar` and `TaskAvatars` with `React.memo` and prop equality
+   helpers.
+2. Lazy load the analytics panel
+   (`src/components/dashboard/TaskInsightsPanel.tsx`) behind suspense.
+3. Introduce `useDeferredValue` in `TaskFiltersBar` for the search input.
+4. Add a "Component Performance Checklist" to
+   `notes/module-5-performance-plan.md`.
+5. Commit with `git commit -am "perf: tighten component render paths"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Reduce unnecessary renders and shift secondary work off the critical path.</p>
+
+      ```tsx filename="src/components/dashboard/ProjectSidebar.tsx"
+      import { memo } from "react";
+
+      function ProjectSidebarComponent({ projects, activeId }: ProjectSidebarProps) {
+         return (
+            <aside className='space-y-2'>
+               {projects.map((project) => (
+                  <SidebarItem key={project.id} project={project} active={project.id === activeId} />
+               ))}
+            </aside>
+         );
+      }
+
+      export const ProjectSidebar = memo(
+         ProjectSidebarComponent,
+         (prev, next) => prev.activeId === next.activeId && prev.projects === next.projects
+      );
+      ```
+
+      ```tsx filename="src/components/dashboard/index.tsx"
+      import { Suspense, lazy, useDeferredValue } from "react";
+      import { TaskListController } from "@/components/tasks/TaskListController";
+
+      const TaskInsightsPanel = lazy(() => import("./TaskInsightsPanel"));
+
+      export function DashboardView({ searchQuery, tasks }: DashboardViewProps) {
+         const deferredQuery = useDeferredValue(searchQuery);
+         return (
+            <div className='grid gap-6 lg:grid-cols-[2fr_1fr]'>
+               <TaskListController projectId={null} query={deferredQuery} tasks={tasks} />
+               <Suspense fallback={<PanelSkeleton title='Insights' />}>
+                  <TaskInsightsPanel tasks={tasks} />
+               </Suspense>
+            </div>
+         );
+      }
+      ```
+
+      ```md filename="notes/module-5-performance-plan.md"
+      ## Component Performance Checklist
+      - Profile with React DevTools before optimising
+      - Apply `React.memo` when props are stable
+      - Lazy load analytics/insights panels behind suspense
+      - Defer typeahead filtering with `useDeferredValue`
+      ```
+
+      ```bash
+      git add src/components/dashboard notes/module-5-performance-plan.md
+      git commit -m "perf: tighten component render paths"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Critical dashboard and sidebar components update only when data changes, while
+secondary insights load on demand without blocking navigation.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Profiling shows fewer wasted renders on dashboards.
+-  [ ] Lazy-loaded panels display with suspense fallback.
+
+### Code Quality
+
+-  [ ] Memo wrappers use appropriate equality checks.
+-  [ ] Deferred values prevent choppy typing in filters.
+
+### Understanding
+
+-  [ ] You can justify each optimisation with profiler data.
+-  [ ] You know when to avoid premature memoisation.
+
+### Project Integration
+
+-  [ ] Performance plan documents the new checklist.
+-  [ ] Future components adopt the same guardrails.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m5/7_custom-components-patterns'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Custom Components Patterns
+   </a>
+   <a
+      href='/docs/react-new/m5/9_implementation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Implementation
+   </a>
+</div>
