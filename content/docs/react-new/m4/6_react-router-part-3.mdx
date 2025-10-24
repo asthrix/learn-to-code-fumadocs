@@ -1,0 +1,301 @@
+---
+title: "React Router Part 3"
+description:
+   "Implement nested routes, URL params, lazy loading, and loaders for TaskFlow
+   Pro."
+module: "M4"
+lesson: "6"
+difficulty: "advanced"
+duration: "35"
+project_phase: "Navigation"
+prerequisites: ["/docs/react-new/m4/5_react-router-part-2"]
+learning_objectives:
+   - "Create nested routes for projects and settings"
+   - "Read URL params with `useParams`"
+   - "Lazy load secondary pages to improve performance"
+   - "Use route loaders or prefetching to warm caches"
+tags: ["react-router", "nested-routes", "performance"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# React Router Part 3
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Nest routes under `ProjectsLayout` and `SettingsLayout`.
+-  [ ] Access path parameters via `useParams`.
+-  [ ] Lazy load project detail and settings routes.
+-  [ ] Prefetch task data when navigating between views.
+
+## Project Context
+
+Projects and settings contain sub-pages. Nested routes keep code organized,
+while lazy loading and prefetching maintain performance as the app grows.
+
+---
+
+## Nested Routes & Params
+
+Wrap related routes with a shared layout that renders an `Outlet`.
+
+### Basic Example
+
+```tsx
+<Route path='projects' element={<ProjectsLayout />}>
+   <Route index element={<ProjectsPage />} />
+   <Route path=':projectId' element={<ProjectDetailPage />} />
+</Route>
+```
+
+### Reading Params
+
+```tsx
+const { projectId } = useParams<{ projectId: string }>();
+```
+
+---
+
+## Lazy Loading
+
+React Router v6 supports lazy routes via `lazy()`.
+
+```tsx
+const ProjectDetailPage = lazy(() => import("@/pages/ProjectDetailPage"));
+```
+
+Wrap the route tree with `<Suspense>` to display skeletons.
+
+---
+
+## Prefetching with Loaders / Effects
+
+Even without React Router data APIs, you can prefetch data on hover.
+
+```tsx
+function handleHover(projectId: string) {
+   queryClient.prefetchQuery(["project", projectId], () =>
+      fetchProject(projectId)
+   );
+}
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Params Type-Safe
+
+**Why:** Casting once inside the layout avoids repetition.
+
+```tsx
+const { projectId = "" } = useParams<{ projectId: string }>();
+```
+
+### 2. Provide Suspense Fallbacks
+
+**Why:** Lazy routes should show skeletons instead of blank screens.
+
+```tsx
+<Suspense fallback={<ProjectSkeleton />}>
+   <Outlet />
+</Suspense>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting `index` Routes
+
+**Problem:** Navigating to `/projects` shows nothing.
+
+**Solution:** Include an `index` route for default content.
+
+### 2. Accessing Params Outside Router Context
+
+**Problem:** Calling `useParams` in components not rendered by a route raises
+errors.
+
+**Solution:** Ensure parameter usage lives under the relevant route tree.
+
+---
+
+## 🔨 Implement in TaskFlow Pro
+
+Add nested routes and lazy loading:
+
+1. Create `ProjectsLayout` rendering side navigation (project list) and an
+   `Outlet` for details.
+2. Split the router tree so `/projects/:projectId` lazy loads
+   `ProjectDetailPage`.
+3. Use `Suspense` fallback components (`ProjectSkeleton`, `SettingsSkeleton`).
+4. Prefetch project data when hovering project links (stubbing fetch for now).
+5. Commit with `git commit -am "feat: add nested project routes"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>Organize Project and Settings routes with nested layouts and lazy loading.</p>
+
+      ```tsx filename="src/router/AppRouter.tsx"
+      import { lazy, Suspense } from "react";
+
+      const ProjectsLayout = lazy(() => import("@/router/ProjectsLayout"));
+      const ProjectDetailPage = lazy(() => import("@/pages/ProjectDetailPage"));
+      const SettingsLayout = lazy(() => import("@/router/SettingsLayout"));
+      const SettingsProfilePage = lazy(() => import("@/pages/SettingsProfilePage"));
+      const SettingsNotificationsPage = lazy(() => import("@/pages/SettingsNotificationsPage"));
+
+      export function AppRouter() {
+         return (
+            <BrowserRouter>
+               <Suspense fallback={<AppSkeleton />}>
+                  <Routes>
+                     <Route element={<AppLayout />}>
+                        <Route index element={<Navigate to='/dashboard' replace />} />
+                        <Route path='dashboard' element={<DashboardPage />} />
+                        <Route
+                           path='projects'
+                           element={
+                              <Suspense fallback={<ProjectSkeleton />}>
+                                 <ProjectsLayout />
+                              </Suspense>
+                           }
+                        >
+                           <Route index element={<ProjectsPage />} />
+                           <Route
+                              path=':projectId'
+                              element={
+                                 <Suspense fallback={<ProjectSkeleton detail />}>
+                                    <ProjectDetailPage />
+                                 </Suspense>
+                              }
+                           />
+                        </Route>
+                        <Route
+                           path='settings'
+                           element={
+                              <Suspense fallback={<SettingsSkeleton />}>
+                                 <SettingsLayout />
+                              </Suspense>
+                           }
+                        >
+                           <Route index element={<Navigate to='profile' replace />} />
+                           <Route path='profile' element={<SettingsProfilePage />} />
+                           <Route path='notifications' element={<SettingsNotificationsPage />} />
+                        </Route>
+                     </Route>
+                     <Route path='*' element={<NotFoundPage />} />
+                  </Routes>
+               </Suspense>
+            </BrowserRouter>
+         );
+      }
+      ```
+
+      ```tsx filename="src/router/ProjectsLayout.tsx"
+      import { Outlet, useParams } from "react-router-dom";
+      import { ProjectSidebar } from "@/components/projects/ProjectSidebar";
+      import { Suspense } from "react";
+
+      export default function ProjectsLayout() {
+         const { projectId } = useParams<{ projectId?: string }>();
+
+         return (
+            <section className='grid gap-6 lg:grid-cols-[260px_1fr]'>
+               <ProjectSidebar activeProjectId={projectId ?? null} />
+               <Suspense fallback={<ProjectSkeleton detail />}>
+                  <Outlet />
+               </Suspense>
+            </section>
+         );
+      }
+      ```
+
+      ```tsx filename="src/components/projects/ProjectSidebar.tsx"
+      import { NavLink } from "react-router-dom";
+      import { routes } from "@/router/routes";
+      import { useProjects } from "@/hooks/useProjects";
+
+      export function ProjectSidebar({ activeProjectId }: { activeProjectId: string | null }) {
+         const { projects, prefetchProject } = useProjects();
+
+         return (
+            <aside className='space-y-2'>
+               {projects.map((project) => (
+                  <NavLink
+                     key={project.id}
+                     to={routes.project(project.id)}
+                     onMouseEnter={() => prefetchProject(project.id)}
+                     className={({ isActive }) =>
+                        cn(
+                           "flex items-center justify-between rounded-lg px-3 py-2 text-sm",
+                           isActive ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                        )
+                     }
+                  >
+                     <span>{project.name}</span>
+                     {project.id === activeProjectId ? <Badge>Viewing</Badge> : null}
+                  </NavLink>
+               ))}
+            </aside>
+         );
+      }
+      ```
+
+      ```bash
+      git add src/router/AppRouter.tsx src/router/ProjectsLayout.tsx src/router/SettingsLayout.tsx
+      git commit -m "feat: add nested project routes"
+      ```
+
+   </Accordion>
+</Accordions>
+
+#### Expected Result
+
+Projects and settings routes now support nested pages, lazy loading, and
+prefetching for smoother navigation.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Navigating to `/projects/:projectId` renders the detail view.
+-  [ ] Settings tabs have their own URLs (`/settings/profile`).
+-  [ ] Lazy loaded routes show skeletons while loading.
+
+### Code Quality
+
+-  [ ] Nested layouts isolate sidebar logic from page content.
+-  [ ] Suspense boundaries wrap each lazy-loaded segment.
+
+### Understanding
+
+-  [ ] You can explain when to use `Outlet` vs `Suspense`.
+-  [ ] You know how to access params safely.
+
+### Project Integration
+
+-  [ ] Prefetch hooks rely on existing caching utilities from Module 3.
+-  [ ] 404 route catches undefined URLs for better UX.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m4/5_react-router-part-2'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← React Router Part 2
+   </a>
+   <a
+      href='/docs/react-new/m4/7_routing-best-practices'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Routing Best Practices
+   </a>
+</div>
