@@ -1,0 +1,106 @@
+---
+title: "Introduction to State Management"
+description:
+   "Define why TaskFlow Pro needs shared state and how this module evolves the
+   architecture."
+module: "M6"
+lesson: "1"
+difficulty: "beginner"
+duration: "20"
+project_phase: "Global state"
+prerequisites: ["/docs/react-new/m5/10_validation"]
+learning_objectives:
+   - "Identify symptoms that indicate the need for shared state"
+   - "Compare local, shared, and server state responsibilities"
+   - "Draft a rollout plan for TaskFlow Pro state management"
+   - "Set expectations for Redux and Context usage"
+tags: ["state-management", "planning", "react"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Introduction to State Management
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Spot features that suffer from prop drilling or duplicated state.
+-  [ ] Classify state by ownership (local vs shared vs server).
+-  [ ] Outline a migration plan for TaskFlow Pro.
+-  [ ] Understand how Redux complements Context.
+
+## Project Context
+
+TaskFlow Pro now has performance guardrails. Next, you must centralise global
+state (projects, tasks, user preferences) to keep features consistent across
+modules. Module 6 lays the foundation.
+
+---
+
+## Why Shared State Matters
+
+-  Multiple routes edit the same project data; local state causes drift.
+-  Performance optimisations rely on memoised selectors.
+-  Collaboration features (notifications, assignments) need a single source of
+   truth.
+
+### State Categories
+
+| Type   | Examples                       | Ownership        |
+| ------ | ------------------------------ | ---------------- |
+| Local  | Modal open state, form inputs  | Component        |
+| Shared | Active project, sidebar filter | Module/Feature   |
+| Server | Task records, audit logs       | Backend services |
+
+---
+
+## Drafting the Rollout
+
+1. Audit existing state usage (components, hooks, route loaders).
+2. Decide which domains use Context vs Redux.
+3. List data contracts between UI and async APIs.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='State Rollout Template'>
+      <p>Use this template to plan the global state migration.</p>
+
+      ```md filename="notes/module-6-state-plan.md"
+      ## State Audit
+      - Shared: activeProjectId (dashboard, project detail)
+      - Preferences: theme, density
+      - Async: projects, tasks, activity feed
+
+      ## Rollout
+      - Context: preferences, feature toggles
+      - Redux: projects/tasks data, async queues
+      - Milestones: Week 1 audit, Week 2 Context, Week 3 Redux store
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Stakeholders agree on the state ownership plan.
+-  [ ] Critical flows relying on local state are documented.
+-  [ ] Success metrics captured (fewer prop chains, reduced re-renders).
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m5/10_validation'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Validating Module 5
+   </a>
+   <a
+      href='/docs/react-new/m6/2_state-management-in-react'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · State Management in React
+   </a>
+</div>

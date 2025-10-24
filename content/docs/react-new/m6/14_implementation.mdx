@@ -1,0 +1,101 @@
+---
+title: "Implementing Module 6"
+description:
+   "Wire Context, Zustand, and Redux into TaskFlow Pro, migrate state, and
+   introduce async workflows."
+module: "M6"
+lesson: "14"
+difficulty: "advanced"
+duration: "65"
+project_phase: "Global state"
+prerequisites: ["/docs/react-new/m6/13_redux-best-practices"]
+learning_objectives:
+   - "Integrate Context, Zustand stores, and Redux providers across the app"
+   - "Migrate project/task data to Redux slices while moving preferences to
+     Zustand"
+   - "Implement async fetching with thunks and optimistic updates"
+   - "Document architecture changes for future contributors"
+tags: ["implementation", "redux", "zustand", "context"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Implementing Module 6
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Replace prop-drilled state with shared selectors and hooks.
+-  [ ] Sync TaskFlow Pro data via Redux Toolkit thunks.
+-  [ ] Compose Zustand stores for preferences and UI-specific state.
+-  [ ] Update documentation describing the new global state model.
+
+## Implementation Plan
+
+1. Create `AppProviders` that layer `PreferencesProvider`, Zustand stores, and
+   the Redux provider.
+2. Configure Redux store with project/task slices and typed hooks.
+3. Migrate dashboard + project detail routes to consume selectors and Zustand
+   hooks.
+4. Add async thunks for fetching/creating tasks while keeping optimistic
+   updates.
+5. Persist preference state with Zustand middleware for seamless UX.
+6. Update documentation (`docs/state-architecture.md`,
+   `notes/module-6-state-plan.md`).
+
+---
+
+## Migration Tips
+
+-  Move one route at a time (Dashboard → Project Detail → Settings) and verify
+   both stores.
+-  Keep local UI state (modal open) local; elevate only shared concerns.
+-  Use feature flags if collaborating with other teams to control rollouts.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Task Checklist'>
+      <p>Track completion as you roll out the new architecture.</p>
+
+      ```md filename="notes/module-6-state-plan.md"
+      ## Implementation Tasks
+      - [ ] Providers composed in `src/app/providers.tsx`
+      - [ ] Dashboard uses Redux selectors + Zustand preferences store
+      - [ ] Project detail page dispatches `syncProjectTasks`
+      - [ ] Settings panel reads `usePreferencesStore`
+      - [ ] Docs updated: `docs/state-architecture.md`
+      ```
+
+      ```bash
+      git add src/state src/context docs/state-architecture.md notes/module-6-state-plan.md
+      git commit -m "feat: implement module 6 global state"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] All major routes use shared state stores (Zustand + Redux) appropriately.
+-  [ ] Async thunks succeed and roll back gracefully on failure.
+-  [ ] Preference state persists across reloads via Zustand middleware.
+-  [ ] Documentation reflects the final architecture.
+
+---
+
+<div className='mt-8 flex justify-between'>
+   <a
+      href='/docs/react-new/m6/13_redux-best-practices'
+      className='text-sm font-medium text-muted-foreground hover:text-foreground'
+   >
+      ← Redux Best Practices
+   </a>
+   <a
+      href='/docs/react-new/m6/15_validation'
+      className='text-sm font-medium text-primary hover:text-primary/80'
+   >
+      Next · Validation
+   </a>
+</div>
