@@ -15,6 +15,8 @@ learning_objectives:
 tags: ["jsx", "iteration", "conditional-rendering"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # JSX Iteration & Conditional Rendering
 
 ## Learning Objectives
@@ -150,6 +152,113 @@ const hasOverdueTasks = tasks.some((task) => task.dueDate < today);
 4. Import and render `Agenda` in the dashboard section of `App.tsx` (placeholder
    for now).
 5. Commit with `git commit -am "feat: add dashboard agenda"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Ship a production-leaning Agenda component so the dashboard showcases TaskFlow
+         Pro's upcoming work.
+      </p>
+
+      ```tsx filename="src/components/dashboard/Agenda.tsx"
+      import type { FC } from 'react';
+      import type { Task } from '@/types/task';
+      import { cn } from '@/lib/cn';
+
+      type AgendaProps = {
+         tasks: Task[];
+         isLoading: boolean;
+         error?: Error | null;
+      };
+
+      const getUpcomingTasks = (tasks: Task[]) =>
+         [...tasks]
+            .filter((task) => task.dueDate)
+            .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
+            .slice(0, 5);
+
+      export const Agenda: FC<AgendaProps> = ({ tasks, isLoading, error }) => {
+         if (isLoading) {
+            return (
+               <div className='space-y-3'>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                     <div
+                        key={`agenda-skeleton-${index}`}
+                        className='h-14 animate-pulse rounded-lg bg-muted'
+                     />
+                  ))}
+               </div>
+            );
+         }
+
+         if (error) {
+            return (
+               <p className='rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive'>
+                  Could not load the agenda. {error.message}
+               </p>
+            );
+         }
+
+         const upcoming = getUpcomingTasks(tasks);
+
+         if (upcoming.length === 0) {
+            return (
+               <div className='rounded-lg border border-dashed p-6 text-sm text-muted-foreground'>
+                  No upcoming tasks. Celebrate the clear runway or add a new priority task.
+               </div>
+            );
+         }
+
+         return (
+            <ol className='space-y-3'>
+               {upcoming.map((task) => (
+                  <li
+                     key={task.id}
+                     className={cn(
+                        'rounded-lg border bg-card p-4 transition hover:border-primary/50 hover:shadow-sm',
+                        task.priority === 'high' && 'border-primary'
+                     )}
+                  >
+                     <div className='flex items-center justify-between gap-3'>
+                        <span className='font-medium text-foreground'>{task.title}</span>
+                        <time className='text-xs uppercase tracking-wide text-muted-foreground'>
+                           Due {new Date(task.dueDate!).toLocaleDateString()}
+                        </time>
+                     </div>
+                     <p className='mt-2 text-sm text-muted-foreground'>{task.summary}</p>
+                  </li>
+               ))}
+            </ol>
+         );
+      };
+      ```
+
+      ```tsx filename="src/App.tsx"
+      import { Agenda } from '@/components/dashboard/Agenda';
+      import { demoTasks } from '@/data/demo-tasks';
+
+      export function App() {
+         return (
+            <DashboardShell>
+               {/* existing header + sidebar */}
+               <section className='space-y-4'>
+                  <h2 className='text-base font-semibold text-foreground'>Upcoming tasks</h2>
+                  <Agenda tasks={demoTasks} isLoading={false} />
+               </section>
+            </DashboardShell>
+         );
+      }
+      ```
+
+      <p className='mt-3'>Commit once the agenda reflects loading, error, empty, and populated states:</p>
+
+      ```bash
+      git add src/components/dashboard/Agenda.tsx src/App.tsx
+      git commit -m "feat: add dashboard agenda"
+      ```
+
+   </Accordion>
+</Accordions>
 
 #### Expected Result
 

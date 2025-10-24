@@ -59,6 +59,9 @@ type DashboardShellProps = {
    sidebar: React.ReactNode;
    header: React.ReactNode;
    children: React.ReactNode;
+---
+
+import { Accordions, Accordion } from '@/components/accordion';
 };
 
 export function DashboardShell({
@@ -145,6 +148,64 @@ src/components/
 4. Update `src/components/layout/DashboardShell.tsx` using the practical example
    above (create directories if needed).
 5. Commit with `git commit -am "feat: add dashboard shell"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Document the dashboard hierarchy and scaffold a reusable shell so every Module 1
+         component stays aligned with the TaskFlow Pro UI milestone.
+      </p>
+
+      ```md filename="docs/ui-component-tree.md"
+      # Dashboard Component Tree
+
+      - <DashboardShell>
+        - <Header /> — displays workspace switcher, quick actions, and user menu
+        - <div class='flex'>
+          - <Sidebar /> — navigation + filter controls
+          - <main>
+            - <TaskOverview /> — summary metrics
+            - <Agenda /> — upcoming tasks (Module 1 Lesson 4)
+            - <TaskGrid /> — priority cards (Module 2+)
+      ```
+
+      ```tsx filename="src/components/layout/DashboardShell.tsx"
+      import type { PropsWithChildren } from 'react';
+      import { Sidebar } from '@/components/layout/Sidebar';
+      import { Header } from '@/components/layout/Header';
+
+      export function DashboardShell({ children }: PropsWithChildren) {
+         return (
+            <div className='min-h-screen bg-muted/20 text-foreground'>
+               <Header />
+               <div className='mx-auto flex w-full max-w-6xl gap-6 px-6 py-8'>
+                  <Sidebar />
+                  <main className='flex-1 space-y-6'>{children}</main>
+               </div>
+            </div>
+         );
+      }
+      ```
+
+      ```tsx filename="src/App.tsx"
+      import { DashboardShell } from '@/components/layout/DashboardShell';
+
+      export function App() {
+         return (
+            <DashboardShell>
+               {/* Dashboard content continues here */}
+            </DashboardShell>
+         );
+      }
+      ```
+
+      ```bash
+      git add docs/ui-component-tree.md src/components/layout/DashboardShell.tsx src/App.tsx
+      git commit -m "feat: add dashboard shell"
+      ```
+
+   </Accordion>
+</Accordions>
 
 #### Expected Result
 

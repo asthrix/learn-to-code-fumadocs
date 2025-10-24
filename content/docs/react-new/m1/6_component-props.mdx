@@ -15,6 +15,8 @@ learning_objectives:
 tags: ["props", "typescript", "components"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Component Props
 
 ## Learning Objectives
@@ -142,6 +144,66 @@ props.task.status = "done";
 3. Add prop documentation to `docs/ui-components.md` for Header, Sidebar,
    TaskCard.
 4. Commit with `git commit -am "refactor: consolidate task types"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Centralise task-related types and document prop contracts so every Module 1
+         component pulls from a single source of truth.
+      </p>
+
+      ```ts filename="src/types/task.ts"
+      export type Priority = 'low' | 'medium' | 'high';
+
+      export type Task = {
+         id: string;
+         title: string;
+         summary: string;
+         status: 'todo' | 'in-progress' | 'done';
+         priority: Priority;
+         dueDate?: string;
+      };
+
+      export type Project = {
+         id: string;
+         name: string;
+         description: string;
+         taskCount: number;
+         active?: boolean;
+      };
+      ```
+
+      ```tsx filename="src/components/tasks/TaskCard.tsx"
+      import type { Task } from '@/types/task';
+
+      type TaskCardProps = {
+         task: Task;
+         onStatusChange?: (taskId: Task['id'], nextStatus: Task['status']) => void;
+      };
+      ```
+
+      ```md filename="docs/ui-components.md"
+      ### Header Props
+      - `title: string`
+      - `user: User`
+      - `onCreateTask(): void`
+
+      ### Sidebar Props
+      - `sections: Array<{ id: string; label: string; href: string; badge?: string }>`
+      - `onNavigate(id: string): void`
+
+      ### TaskCard Props
+      - `task: Task`
+      - `onStatusChange?: (taskId: string, status: Task['status']) => void`
+      ```
+
+      ```bash
+      git add src/types/task.ts src/components/tasks/TaskCard.tsx docs/ui-components.md
+      git commit -m "refactor: consolidate task types"
+      ```
+
+   </Accordion>
+</Accordions>
 
 #### Expected Result
 

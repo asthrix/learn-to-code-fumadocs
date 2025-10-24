@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["validation", "quality", "checklist"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Module 1 Validation
 
 ## Learning Objectives
@@ -105,6 +107,42 @@ Attach screenshots to status notes or project management tool.
 2. Test responsiveness using Chrome dev tools device toolbar.
 3. Update `notes/m1-retro.md` with wins, challenges, and questions.
 4. Commit with `git commit -am "chore: complete m1 validation"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>
+         Run the quality gates and capture learnings before entering Module 2 so the
+         project stays production-ready.
+      </p>
+
+      ```bash
+      npm run lint
+      npm run format -- --check
+      npm run build
+      ```
+
+      ```md filename="notes/m1-retro.md"
+      # Module 1 Retro
+
+      ## Wins
+      - Header + Sidebar ship responsive UI with Tailwind tokens.
+      - TaskCard leverages shared Badge component.
+
+      ## Challenges
+      - Need clearer strategy for loading states (address in Module 2).
+
+      ## Questions
+      - Should priority badges map to custom icons?
+      ```
+
+      ```bash
+      git status
+      git add .
+      git commit -m "chore: complete m1 validation"
+      ```
+
+   </Accordion>
+</Accordions>
 
 #### Expected Result
 

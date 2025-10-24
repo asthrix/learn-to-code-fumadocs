@@ -92,7 +92,8 @@ Keep these files open while writing:
 6. **✅ Best Practices:** At least two items with rationale and good code.
 7. **❌ Common Mistakes:** At least two items showing bad code + fix.
 8. **🔨 Implement in TaskFlow Pro:** Clear steps with code to integrate into the
-   project.
+   project, plus an accompanying `<Accordions>` solution block showing a
+   realistic implementation snippet.
 9. **✅ Validation Checklist:** 8–12 checks grouped under Functionality, Code
    Quality, Understanding, Project Integration.
 10.   **Navigation:** Update `meta.json` and bottom links (`Previous` / `Next`).
@@ -172,10 +173,11 @@ import {
 
 ### Local UI Components (`src/components/ui`)
 
-| Component       | How to Import in MDX                                                                                 | Typical Use                                    |
-| --------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Button variants | `import { buttonVariants } from '@/components/ui/button';`                                           | Style links or CTA buttons with project theme. |
-| Collapsible     | `import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';` | Hide advanced notes or optional challenges.    |
+| Component       | How to Import in MDX                                                                                 | Typical Use                                      |
+| --------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Button variants | `import { buttonVariants } from '@/components/ui/button';`                                           | Style links or CTA buttons with project theme.   |
+| Collapsible     | `import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';` | Hide advanced notes or optional challenges.      |
+| Accordions      | `import { Accordions, Accordion } from '@/components/accordion';`                                    | Provide task solutions and deep dives on demand. |
 
 Usage tips:
 
@@ -194,6 +196,8 @@ Usage tips:
    content).
 -  Keep component usage purposeful—ask "Does this improve clarity for a
    beginner?"
+-  Pair every implementation task with an `<Accordions>` solution so learners
+   can verify progress without derailing the main narrative.
 
 ---
 
