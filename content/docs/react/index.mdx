@@ -15,7 +15,8 @@ learning_objectives:
 tags: ["react", "course", "overview"]
 ---
 
-import { buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
    Collapsible,
    CollapsibleTrigger,
@@ -29,18 +30,14 @@ guide you from zero to a deployed, portfolio-ready TaskFlow Pro application
 using practical, bite-sized lessons.
 
 <div className='mt-6 flex flex-wrap gap-4'>
-   <a
-      className={buttonVariants({ variant: "primary" })}
-      href='/docs/react/m0/1_welcome'
-   >
-      Start Module 0
-   </a>
-   <a
-      className={buttonVariants({ variant: "outline" })}
-      href='/docs/react/m0/0_index'
-   >
-      View Module Roadmap
-   </a>
+   <Link href='/docs/react/m0/1_welcome'>
+      <Button>Start Module 0</Button>
+   </Link>
+   <Link href='/docs/react/m0/0_index'>
+      <Button variant='outline' className='hover:text-secondary'>
+         View Module Roadmap
+      </Button>
+   </Link>
 </div>
 
 ---
