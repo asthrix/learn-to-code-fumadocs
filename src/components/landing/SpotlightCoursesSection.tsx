@@ -36,7 +36,7 @@ export function SpotlightCoursesSection({
                {spotlightCourses.map((course) => (
                   <Link
                      key={course.id}
-                     href={`/${course.id}`}
+                     href={`/courses/${course.id}`}
                      className='group relative flex h-full flex-col rounded-3xl border border-border bg-card p-6 shadow-[0_20px_40px_-25px_hsl(var(--color-primary)/0.3)] transition-transform duration-500 hover:-translate-y-4 hover:-rotate-1'
                   >
                      <span className='inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary/25 text-2xl shadow-[inset_0_1px_2px_hsl(var(--color-primary)/0.15)] transition group-hover:scale-105'>

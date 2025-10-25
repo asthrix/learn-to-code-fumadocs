@@ -25,7 +25,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
          case "available":
             return (
                <span
-                  className={`${baseClasses} border-primary/40 bg-primary/15 text-primary`}
+                  className={`${baseClasses} border-emerald-600/40 bg-emerald-600/15 text-emerald-600`}
                >
                   Available
                </span>
@@ -33,7 +33,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
          case "coming-soon":
             return (
                <span
-                  className={`${baseClasses} border-secondary/40 bg-secondary/20 text-secondary-foreground`}
+                  className={`${baseClasses} border-indigo-500/40 bg-indigo-500/20 text-indigo-500`}
                >
                   Coming Soon
                </span>
@@ -41,7 +41,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
          case "in-development":
             return (
                <span
-                  className={`${baseClasses} border-accent/40 bg-accent/20 text-accent-foreground`}
+                  className={`${baseClasses} border-red-300/40 bg-red-300/20 text-red-300`}
                >
                   In Development
                </span>
@@ -52,11 +52,11 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
    const getDifficultyClasses = () => {
       switch (course.difficulty) {
          case "beginner":
-            return "border-primary/40 bg-primary/15 text-primary";
+            return "border-sky-600/40 bg-sky-600/15 text-sky-600";
          case "intermediate":
-            return "border-secondary/40 bg-secondary/15 text-secondary-foreground";
+            return "border-secondary/40 bg-secondary/15 text-secondary/70";
          case "advanced":
-            return "border-accent/40 bg-accent/15 text-accent-foreground";
+            return "border-orange-400/40 bg-orange-400/15 text-orange-400";
       }
    };
 
