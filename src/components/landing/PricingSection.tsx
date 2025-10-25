@@ -85,8 +85,8 @@ export function PricingSection() {
             </div>
 
             <p className='mt-10 text-center text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400'>
-               Need a custom enterprise rollout? Drop us a line and we'll tailor
-               onboarding for your team.
+               Need a custom enterprise rollout? Drop us a line and we&apos;ll
+               tailor onboarding for your team.
             </p>
          </div>
       </section>

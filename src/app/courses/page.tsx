@@ -1,4 +1,3 @@
-import { CourseHeroSection2 } from "@/components/courses/CourseHeroSection2";
 import { CourseComparisonSection } from "@/components/courses/CourseComparisonSection";
 import { CourseFaqSection } from "@/components/courses/CourseFaqSection";
 import { LearningPathSection } from "@/components/courses/LearningPathSection";
