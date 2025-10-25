@@ -1,0 +1,632 @@
+[
+  {
+    "slug": "m0",
+    "title": "M0 · Kickstart",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "Module 0 · Kickstart",
+        "duration": "30"
+      },
+      {
+        "page": "1_welcome",
+        "title": "Welcome to Project React",
+        "duration": "20"
+      },
+      {
+        "page": "2_setup",
+        "title": "Downloads & Setup Requirements",
+        "duration": "30"
+      },
+      {
+        "page": "3_project-overview",
+        "title": "Project Overview",
+        "duration": "20"
+      },
+      {
+        "page": "4_dependencies",
+        "title": "Dependencies",
+        "duration": "25"
+      },
+      {
+        "page": "5_linting-formatting",
+        "title": "Linting & Formatting",
+        "duration": "25"
+      },
+      {
+        "page": "6_api-overview",
+        "title": "API Overview",
+        "duration": "20"
+      },
+      {
+        "page": "7_ui-components",
+        "title": "UI Components",
+        "duration": "20"
+      },
+      {
+        "page": "8_environment-variables",
+        "title": "Environment Variables",
+        "duration": "15"
+      },
+      {
+        "page": "9_running-project",
+        "title": "Running the Project",
+        "duration": "15"
+      },
+      {
+        "page": "10_working-with-project",
+        "title": "Working with the Project",
+        "duration": "20"
+      },
+      {
+        "page": "11_implementation",
+        "title": "Implementing Module 0",
+        "duration": "45"
+      },
+      {
+        "page": "12_validation",
+        "title": "Module 0 Validation",
+        "duration": "15"
+      }
+    ]
+  },
+  {
+    "slug": "m1",
+    "title": "M1 · React Fundamentals",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "React Fundamentals",
+        "duration": "60"
+      },
+      {
+        "page": "1_intro-react",
+        "title": "Introduction to React",
+        "duration": "20"
+      },
+      {
+        "page": "2_why-react",
+        "title": "Why React?",
+        "duration": "20"
+      },
+      {
+        "page": "3_jsx-overview",
+        "title": "JSX Overview",
+        "duration": "25"
+      },
+      {
+        "page": "4_jsx-iteration",
+        "title": "JSX Iteration & Conditional Rendering",
+        "duration": "25"
+      },
+      {
+        "page": "5_components",
+        "title": "Components",
+        "duration": "25"
+      },
+      {
+        "page": "6_component-props",
+        "title": "Component Props",
+        "duration": "25"
+      },
+      {
+        "page": "7_component-lifecycle",
+        "title": "Component Lifecycle",
+        "duration": "20"
+      },
+      {
+        "page": "8_introduction-hooks",
+        "title": "Introduction to Hooks",
+        "duration": "25"
+      },
+      {
+        "page": "9_styling-tailwind",
+        "title": "Styling & Tailwind",
+        "duration": "30"
+      },
+      {
+        "page": "10_implementation",
+        "title": "Implementing Module 1",
+        "duration": "60"
+      },
+      {
+        "page": "11_validation",
+        "title": "Module 1 Validation",
+        "duration": "20"
+      }
+    ]
+  },
+  {
+    "slug": "m2",
+    "title": "M2 · State & Events",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "Module 2 · State & Events",
+        "duration": "70"
+      },
+      {
+        "page": "1_introduction-state",
+        "title": "Introduction to State",
+        "duration": "20"
+      },
+      {
+        "page": "2_state-in-react",
+        "title": "State in React",
+        "duration": "25"
+      },
+      {
+        "page": "3_event-handlers",
+        "title": "Event Handlers",
+        "duration": "25"
+      },
+      {
+        "page": "4_handling-click-events",
+        "title": "Handling Click Events",
+        "duration": "25"
+      },
+      {
+        "page": "5_handling-change-events",
+        "title": "Handling Change Events",
+        "duration": "25"
+      },
+      {
+        "page": "6_handling-form-submission",
+        "title": "Handling Form Submission",
+        "duration": "25"
+      },
+      {
+        "page": "7_event-handler-best-practices",
+        "title": "Event Handler Best Practices",
+        "duration": "20"
+      },
+      {
+        "page": "8_use-state-hook",
+        "title": "The `useState` Hook",
+        "duration": "25"
+      },
+      {
+        "page": "9_controlled-vs-uncontrolled",
+        "title": "Controlled vs Uncontrolled Components",
+        "duration": "25"
+      },
+      {
+        "page": "10_implementation",
+        "title": "Implementing Module 2",
+        "duration": "60"
+      },
+      {
+        "page": "11_validation",
+        "title": "Module 2 Validation",
+        "duration": "20"
+      }
+    ]
+  },
+  {
+    "slug": "m3",
+    "title": "M3 · Effects & Data",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "Module 3 · Effects & Data",
+        "duration": "80"
+      },
+      {
+        "page": "1_introduction-effects",
+        "title": "Introduction to Effects",
+        "duration": "25"
+      },
+      {
+        "page": "2_effects-in-react",
+        "title": "Effects in React",
+        "duration": "25"
+      },
+      {
+        "page": "3_use-effect-deep-dive",
+        "title": "`useEffect` Deep Dive",
+        "duration": "30"
+      },
+      {
+        "page": "4_use-ref-hook",
+        "title": "`useRef` for DOM and Mutable Values",
+        "duration": "20"
+      },
+      {
+        "page": "5_introduction-data-fetching",
+        "title": "Introduction to Data Fetching",
+        "duration": "25"
+      },
+      {
+        "page": "6_data-fetching-part-1",
+        "title": "Data Fetching Part 1",
+        "duration": "30"
+      },
+      {
+        "page": "7_data-fetching-part-2",
+        "title": "Data Fetching Part 2",
+        "duration": "30"
+      },
+      {
+        "page": "8_data-fetching-part-3",
+        "title": "Data Fetching Part 3",
+        "duration": "35"
+      },
+      {
+        "page": "9_data-fetching-best-practices",
+        "title": "Data Fetching Best Practices",
+        "duration": "25"
+      },
+      {
+        "page": "10_implementation",
+        "title": "Implementing Module 3",
+        "duration": "60"
+      },
+      {
+        "page": "11_validation",
+        "title": "Module 3 Validation",
+        "duration": "20"
+      }
+    ]
+  },
+  {
+    "slug": "m4",
+    "title": "M4 · Routes & Navigation",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "Module 4 · Routes & Navigation",
+        "duration": "60"
+      },
+      {
+        "page": "1_introduction-navigation",
+        "title": "Introduction to Navigation",
+        "duration": "20"
+      },
+      {
+        "page": "2_client-vs-server-routing",
+        "title": "Client vs Server Routing",
+        "duration": "20"
+      },
+      {
+        "page": "3_routing-in-react",
+        "title": "Routing in React",
+        "duration": "25"
+      },
+      {
+        "page": "4_react-router-part-1",
+        "title": "React Router Part 1",
+        "duration": "30"
+      },
+      {
+        "page": "5_react-router-part-2",
+        "title": "React Router Part 2",
+        "duration": "30"
+      },
+      {
+        "page": "6_react-router-part-3",
+        "title": "React Router Part 3",
+        "duration": "35"
+      },
+      {
+        "page": "7_routing-best-practices",
+        "title": "Routing Best Practices",
+        "duration": "25"
+      },
+      {
+        "page": "8_implementation",
+        "title": "Implementing Module 4",
+        "duration": "60"
+      },
+      {
+        "page": "9_validation",
+        "title": "Validating Module 4",
+        "duration": "25"
+      }
+    ]
+  },
+  {
+    "slug": "m5",
+    "title": "M5 · Hooks & Performance",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "Module 5 · Hooks & Performance",
+        "duration": "70"
+      },
+      {
+        "page": "1_introduction-performance",
+        "title": "Introduction to Performance",
+        "duration": "20"
+      },
+      {
+        "page": "2_performance-in-react",
+        "title": "Performance in React",
+        "duration": "25"
+      },
+      {
+        "page": "3_use-memo",
+        "title": "`useMemo`",
+        "duration": "25"
+      },
+      {
+        "page": "4_use-callback",
+        "title": "`useCallback`",
+        "duration": "25"
+      },
+      {
+        "page": "5_custom-hooks",
+        "title": "Custom Hooks",
+        "duration": "30"
+      },
+      {
+        "page": "6_custom-hooks-best-practices",
+        "title": "Custom Hooks Best Practices",
+        "duration": "25"
+      },
+      {
+        "page": "7_custom-components-patterns",
+        "title": "Custom Components Patterns",
+        "duration": "35"
+      },
+      {
+        "page": "8_component-best-practices",
+        "title": "Component Best Practices",
+        "duration": "30"
+      },
+      {
+        "page": "9_implementation",
+        "title": "Implementing Module 5",
+        "duration": "60"
+      },
+      {
+        "page": "10_validation",
+        "title": "Validating Module 5",
+        "duration": "30"
+      }
+    ]
+  },
+  {
+    "slug": "m6",
+    "title": "M6 · State Management",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "Module 6 · State Management",
+        "duration": "80"
+      },
+      {
+        "page": "1_introduction-state-management",
+        "title": "Introduction to State Management",
+        "duration": "20"
+      },
+      {
+        "page": "2_state-management-in-react",
+        "title": "State Management in React",
+        "duration": "25"
+      },
+      {
+        "page": "3_prop-drilling",
+        "title": "Prop Drilling",
+        "duration": "25"
+      },
+      {
+        "page": "4_use-context",
+        "title": "`useContext`",
+        "duration": "30"
+      },
+      {
+        "page": "5_zustand-introduction",
+        "title": "Zustand Introduction",
+        "duration": "25"
+      },
+      {
+        "page": "6_zustand-selectors",
+        "title": "Zustand Selectors",
+        "duration": "30"
+      },
+      {
+        "page": "7_zustand-async",
+        "title": "Zustand Async Flows",
+        "duration": "35"
+      },
+      {
+        "page": "8_zustand-integration",
+        "title": "Zustand Integration",
+        "duration": "35"
+      },
+      {
+        "page": "9_redux-part-1",
+        "title": "Redux Part 1",
+        "duration": "35"
+      },
+      {
+        "page": "10_redux-part-2",
+        "title": "Redux Part 2",
+        "duration": "40"
+      },
+      {
+        "page": "11_redux-part-3",
+        "title": "Redux Part 3",
+        "duration": "40"
+      },
+      {
+        "page": "12_redux-custom-components",
+        "title": "Redux Custom Components",
+        "duration": "35"
+      },
+      {
+        "page": "13_redux-best-practices",
+        "title": "Redux Best Practices",
+        "duration": "30"
+      },
+      {
+        "page": "14_implementation",
+        "title": "Implementing Module 6",
+        "duration": "65"
+      },
+      {
+        "page": "15_validation",
+        "title": "Validating Module 6",
+        "duration": "30"
+      }
+    ]
+  },
+  {
+    "slug": "m7",
+    "title": "M7 · Forms & Authentication",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "Module 7 · Forms & Authentication",
+        "duration": "80"
+      },
+      {
+        "page": "1_introduction-forms",
+        "title": "Introduction to Forms",
+        "duration": "20"
+      },
+      {
+        "page": "2_forms-in-react",
+        "title": "Forms in React",
+        "duration": "25"
+      },
+      {
+        "page": "3_react-hook-form-basics",
+        "title": "React Hook Form Basics",
+        "duration": "30"
+      },
+      {
+        "page": "4_react-hook-form-validation",
+        "title": "React Hook Form Validation",
+        "duration": "35"
+      },
+      {
+        "page": "5_react-hook-form-dynamic-fields",
+        "title": "React Hook Form Dynamic Fields",
+        "duration": "35"
+      },
+      {
+        "page": "6_form-ux-best-practices",
+        "title": "Form UX Best Practices",
+        "duration": "25"
+      },
+      {
+        "page": "7_introduction-authentication",
+        "title": "Authentication Foundations",
+        "duration": "20"
+      },
+      {
+        "page": "8_auth-service-and-context",
+        "title": "Auth Service & Context",
+        "duration": "40"
+      },
+      {
+        "page": "9_login-implementation",
+        "title": "Login Implementation",
+        "duration": "40"
+      },
+      {
+        "page": "10_password-reset-flow",
+        "title": "Password Reset Flow",
+        "duration": "35"
+      },
+      {
+        "page": "11_auth-rollout",
+        "title": "Auth Rollout & Validation",
+        "duration": "45"
+      }
+    ]
+  },
+  {
+    "slug": "m8",
+    "title": "M8 · Deployment",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "Module 8 · Deployment",
+        "duration": "40"
+      },
+      {
+        "page": "1_production-build",
+        "title": "Production Build",
+        "duration": "25"
+      },
+      {
+        "page": "2_vercel-deployment",
+        "title": "Vercel Deployment",
+        "duration": "30"
+      },
+      {
+        "page": "3_deployment-best-practices",
+        "title": "Deployment Best Practices",
+        "duration": "30"
+      },
+      {
+        "page": "4_deployment-validation",
+        "title": "Deployment Validation",
+        "duration": "25"
+      }
+    ]
+  },
+  {
+    "slug": "mx",
+    "title": "MX · Extended",
+    "lessons": [
+      {
+        "page": "0_index",
+        "title": "Module X · Extended",
+        "duration": "90"
+      },
+      {
+        "page": "1_introduction",
+        "title": "Introduction to Extended Enhancements",
+        "duration": "20"
+      },
+      {
+        "page": "2_improving-forms-inputs",
+        "title": "Improving Forms & Inputs",
+        "duration": "30"
+      },
+      {
+        "page": "3_react-query",
+        "title": "Implementing React Query",
+        "duration": "35"
+      },
+      {
+        "page": "4_users-profiles",
+        "title": "Implementing Users & Profiles",
+        "duration": "35"
+      },
+      {
+        "page": "5_listing-creation",
+        "title": "Implementing Listing Creation",
+        "duration": "35"
+      },
+      {
+        "page": "6_reviews",
+        "title": "Implementing Reviews",
+        "duration": "30"
+      },
+      {
+        "page": "7_cypress-testing",
+        "title": "Testing with Cypress",
+        "duration": "30"
+      },
+      {
+        "page": "8_react-19-note",
+        "title": "Note on React 19",
+        "duration": "20"
+      },
+      {
+        "page": "9_conclusion",
+        "title": "Conclusion",
+        "duration": "15"
+      },
+      {
+        "page": "10_validation-checklist",
+        "title": "Validation Checklist",
+        "duration": "15"
+      }
+    ]
+  }
+]
