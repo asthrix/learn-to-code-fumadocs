@@ -15,7 +15,10 @@ export default function ReactCoursePage() {
          <CourseDetailHeroSection hero={hero} />
          <CourseDifferentiatorsSection differentiators={differentiators} />
          <CourseTechnologySection technology={technology} />
-         <CourseModulesSection modules={modules} />
+         <CourseModulesSection
+            modules={modules}
+            courseSlug={reactCourseDetail.slug}
+         />
          <CoursePricingSection pricing={pricing} />
          <CourseTestimonialsSection testimonials={testimonials} />
       </main>

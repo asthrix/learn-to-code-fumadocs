@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { type KeyboardEvent, useMemo, useState } from "react";
 import { Folder as FolderIcon, FolderOpen } from "lucide-react";
 
@@ -10,9 +11,13 @@ import { cn } from "@/lib/cn";
 
 interface CourseModulesSectionProps {
    modules: CourseModule[];
+   courseSlug: string;
 }
 
-export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
+export function CourseModulesSection({
+   modules,
+   courseSlug,
+}: CourseModulesSectionProps) {
    const [activeIndex, setActiveIndex] = useState(0);
 
    const summaries = useMemo(
@@ -110,8 +115,14 @@ export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
                         <Steps>
                            <div className='space-y-2'>
                               {activeModule.lessons.map(
-                                 (lesson, lessonIndex) => (
-                                    <Step key={lesson.title}>
+                                 (lesson, lessonIndex) => {
+                                    const inferredHref =
+                                       lesson.href ??
+                                       (lesson.id
+                                          ? `/docs/${courseSlug}/${lesson.id}`
+                                          : undefined);
+
+                                    const content = (
                                        <div className='flex items-start justify-between gap-6 rounded-2xl border border-border bg-card/80 p-4 shadow-sm transition hover:border-primary/40 hover:shadow-[0_12px_35px_-20px_hsl(var(--color-primary)/0.45)]'>
                                           <div>
                                              <p className='text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground'>
@@ -128,8 +139,23 @@ export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
                                              {lesson.duration}
                                           </span>
                                        </div>
-                                    </Step>
-                                 )
+                                    );
+
+                                    return (
+                                       <Step key={lesson.title}>
+                                          {inferredHref ? (
+                                             <Link
+                                                href={inferredHref}
+                                                className='block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+                                             >
+                                                {content}
+                                             </Link>
+                                          ) : (
+                                             content
+                                          )}
+                                       </Step>
+                                    );
+                                 }
                               )}
                            </div>
                         </Steps>
