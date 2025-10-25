@@ -1,6 +1,29 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
+import { Accordions, Accordion } from "@/components/accordion";
+
+const ctaHighlights = [
+   {
+      id: "cta-path-start",
+      title: "Where should I begin?",
+      content:
+         "Kick off with the HTML track if you are brand new to front-end work. Already comfortable with markup? Jump straight into the React pathway and follow the guided checklists.",
+   },
+   {
+      id: "cta-what-you-ship",
+      title: "What will I ship?",
+      content:
+         "Every module advances a feature of TaskFlow Pro—from foundational layouts to full-stack workflows. Expect tangible progress and a production-ready deployment by the end.",
+   },
+   {
+      id: "cta-support",
+      title: "How do I stay unblocked?",
+      content:
+         "Each lesson includes validation checklists, and the built-in Fumadocs navigation keeps you oriented. Bring questions to the community channel when you need a nudge.",
+   },
+];
+
 export function FinalCtaSection() {
    return (
       <section className='relative px-6 pb-28'>
@@ -29,6 +52,18 @@ export function FinalCtaSection() {
                   <ArrowUpRight className='h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1' />
                </Link>
             </div>
+            <Accordions
+               type='single'
+               className='mt-10 text-left border border-border bg-card/90'
+            >
+               {ctaHighlights.map((item) => (
+                  <Accordion key={item.id} title={item.title} id={item.id}>
+                     <p className='text-sm leading-relaxed text-muted-foreground'>
+                        {item.content}
+                     </p>
+                  </Accordion>
+               ))}
+            </Accordions>
             <p className='mt-6 text-xs uppercase tracking-[0.3em] text-muted-foreground'>
                No fluff. Only shipping.
             </p>
