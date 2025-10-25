@@ -1,7 +1,8 @@
-import "@/app/global.css";
+import "./global.css";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const appUrl =
    process.env.NEXT_PUBLIC_APP_URL ??
@@ -23,7 +24,10 @@ export default function Layout({ children }: LayoutProps<"/">) {
    return (
       <html lang='en' className={inter.className} suppressHydrationWarning>
          <body className='flex flex-col min-h-screen'>
-            <RootProvider>{children}</RootProvider>
+            <RootProvider>
+               <ScrollToTop />
+               {children}
+            </RootProvider>
          </body>
       </html>
    );

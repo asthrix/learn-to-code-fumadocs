@@ -42,13 +42,12 @@ export default function CourseNotFound() {
    const displayName = matchedCourse?.title ?? toTitleCase(fallbackSlug);
 
    return (
-      <main className='relative flex flex-1 flex-col bg-slate-50 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-100'>
+      <main className='relative overflow-hidden flex  flex-col bg-slate-50 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-100'>
+         <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.16),_transparent_58%)]' />
+         <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,_transparent,_hsl(var(--color-primary)/0.08)_30%,_transparent_70%)]' />
+         <div className='pointer-events-none absolute -left-32 top-24 h-72 w-72 rounded-full bg-primary/25 blur-[120px]' />
+         <div className='pointer-events-none absolute -right-40 bottom-10 h-80 w-80 rounded-full bg-secondary/25 blur-[140px]' />
          <section className='relative overflow-hidden'>
-            <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.16),_transparent_58%)]' />
-            <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,_transparent,_hsl(var(--color-primary)/0.08)_30%,_transparent_70%)]' />
-            <div className='pointer-events-none absolute -left-32 top-24 h-72 w-72 rounded-full bg-primary/25 blur-[120px]' />
-            <div className='pointer-events-none absolute -right-40 bottom-10 h-80 w-80 rounded-full bg-secondary/25 blur-[140px]' />
-
             <div className='relative mx-auto max-w-4xl px-6 pb-24 pt-28 text-center lg:px-8 lg:pt-36'>
                <span className='inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.32em] text-primary-foreground shadow-[0_20px_45px_-32px_hsl(var(--color-primary)/0.55)]'>
                   <Sparkles className='h-4 w-4' />
