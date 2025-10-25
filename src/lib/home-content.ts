@@ -12,6 +12,17 @@ export interface StatHighlight {
    value: string;
 }
 
+export interface PricingPlan {
+   name: string;
+   price: string;
+   cadence: string;
+   description: string;
+   features: string[];
+   ctaLabel: string;
+   ctaHref: string;
+   highlighted?: boolean;
+}
+
 export const featureHighlights: FeatureHighlight[] = [
    {
       title: "Production-ready projects",
@@ -38,4 +49,52 @@ export const statHighlights: StatHighlight[] = [
    { label: "Real-world components", value: "120" },
    { label: "Average time to deploy", value: "6 wks" },
    { label: "Community builders", value: "8k+" },
+];
+
+export const pricingPlans: PricingPlan[] = [
+   {
+      name: "Starter",
+      price: "₹0",
+      cadence: "per month",
+      description:
+         "Perfect if you're getting your bearings with HTML, CSS, and JavaScript fundamentals.",
+      features: [
+         "Access to HTML and CSS foundations",
+         "Weekly office hours with mentors",
+         "Downloadable exercise solutions",
+      ],
+      ctaLabel: "Start for free",
+      ctaHref: "/docs/html",
+   },
+   {
+      name: "Pro Builder",
+      price: "₹3,999",
+      cadence: "per month",
+      description:
+         "Ship React and Next.js builds with code reviews, deployment checklists, and async support.",
+      features: [
+         "Full access to all current courses",
+         "Automated project feedback within 48 hours",
+         "Production deployment playbooks and CI templates",
+         "Private Discord pods for accountability",
+      ],
+      ctaLabel: "Upgrade to Pro",
+      ctaHref: "/docs/react-new",
+      highlighted: true,
+   },
+   {
+      name: "Team Studio",
+      price: "₹9,999",
+      cadence: "per month",
+      description:
+         "Designed for teams rolling out modern frontend standards and onboarding new engineers rapidly.",
+      features: [
+         "Five seats with shared progress dashboard",
+         "Custom onboarding workshops and retros",
+         "Integration guides for analytics and observability",
+         "Quarterly curriculum updates and roadmap access",
+      ],
+      ctaLabel: "Talk to us",
+      ctaHref: "mailto:hello@learnfrontend.dev",
+   },
 ];
