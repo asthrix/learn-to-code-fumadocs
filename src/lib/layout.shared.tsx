@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 
 /**
@@ -12,12 +14,12 @@ export function baseOptions(): BaseLayoutProps {
       nav: {
          title: (
             <span className='inline-flex items-center gap-2 font-semibold text-foreground'>
-               <img
+               <Image
                   src='/logo.png'
                   alt='Learn To Code logo'
                   width={28}
                   height={28}
-                  loading='lazy'
+                  priority
                />
                Learn To Code
             </span>
