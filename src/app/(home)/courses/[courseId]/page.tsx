@@ -14,14 +14,13 @@ const formatCourseName = (slug: string) => {
       .join(" ");
 };
 
-interface CourseDetailPageProps {
-   params: { courseId: string };
-}
-
 export async function generateMetadata({
    params,
-}: CourseDetailPageProps): Promise<Metadata> {
-   const course = getCourseById(params.courseId);
+}: {
+   params: Promise<{ courseId: string }>;
+}): Promise<Metadata> {
+   const { courseId } = await params;
+   const course = getCourseById(courseId);
 
    if (course?.id === "react") {
       return {
@@ -30,7 +29,7 @@ export async function generateMetadata({
       };
    }
 
-   const displayName = course?.title ?? formatCourseName(params.courseId);
+   const displayName = course?.title ?? formatCourseName(courseId);
 
    return {
       title: `${displayName} course coming soon | Learn to Code`,
@@ -38,8 +37,13 @@ export async function generateMetadata({
    };
 }
 
-export default function CourseDetailPage({ params }: CourseDetailPageProps) {
-   const course = getCourseById(params.courseId);
+export default async function CourseDetailPage({
+   params,
+}: {
+   params: Promise<{ courseId: string }>;
+}) {
+   const { courseId } = await params;
+   const course = getCourseById(courseId);
 
    if (!course) {
       notFound();

@@ -68,7 +68,7 @@ export const pricingPlans: PricingPlan[] = [
    },
    {
       name: "Pro Builder",
-      price: "₹3,999",
+      price: "₹24,999",
       cadence: "per month",
       description:
          "Ship React and Next.js builds with code reviews, deployment checklists, and async support.",
@@ -84,7 +84,7 @@ export const pricingPlans: PricingPlan[] = [
    },
    {
       name: "Team Studio",
-      price: "₹9,999",
+      price: "₹39,999",
       cadence: "per month",
       description:
          "Designed for teams rolling out modern frontend standards and onboarding new engineers rapidly.",
