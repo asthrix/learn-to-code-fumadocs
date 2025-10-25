@@ -1,0 +1,16 @@
+{
+   "title": "M5 · Advanced HTML5 & Production Polish",
+   "pages": [
+      "0_index",
+      "1_metadata-strategy",
+      "2_social-previews",
+      "3_structured-data",
+      "4_custom-data-attributes",
+      "5_web-manifest",
+      "6_performance-audits",
+      "7_accessibility-seo-runbook",
+      "8_implementation",
+      "9_validation"
+   ],
+   "defaultOpen": false
+}

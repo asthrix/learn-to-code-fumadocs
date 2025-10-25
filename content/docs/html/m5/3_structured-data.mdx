@@ -1,0 +1,122 @@
+---
+title: "Structured Data"
+description:
+   "Add JSON-LD schemas for Person, Organization, and featured case studies."
+module: "M5"
+lesson: "3"
+difficulty: "advanced"
+duration: "40"
+project_phase: "Launch"
+prerequisites: ["/docs/html/m5/2_social-previews"]
+learning_objectives:
+   - "Author JSON-LD blocks for key Portfolio Pulse entities"
+   - "Embed structured data safely within HTML"
+   - "Validate rich results and document governance"
+tags: ["structured-data", "json-ld", "seo"]
+---
+
+# Structured Data
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Generate JSON-LD for Avery (Person), Portfolio Pulse (WebSite), and
+       highlighted case studies (CreativeWork).
+-  [ ] Embed structured data without breaking caching or templating.
+-  [ ] Record update cadence and validation steps.
+
+## Why It Matters
+
+Structured data improves search visibility, eligibility for rich results, and
+feeds knowledge panels. It also documents relationships between Avery, clients,
+and work.
+
+---
+
+## JSON-LD Example
+
+```html
+<script type="application/ld+json">
+   {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Avery Rivera",
+      "url": "https://avery.dev",
+      "jobTitle": "Principal Product Designer",
+      "image": "https://avery.dev/images/avery-rivera.jpg",
+      "sameAs": [
+         "https://www.linkedin.com/in/avery",
+         "https://dribbble.com/avery",
+         "https://github.com/avery"
+      ],
+      "worksFor": {
+         "@type": "Organization",
+         "name": "Rivera Studio"
+      }
+   }
+</script>
+```
+
+Add separate script blocks for `WebSite` and `CreativeWork` case studies.
+
+---
+
+## Documentation
+
+Create `docs/structured-data.md` capturing:
+
+-  Entities covered and their JSON-LD blocks
+-  Source of each field (data inventory, social profiles)
+-  Refresh cadence (e.g., quarterly check for new case studies)
+-  Validation steps using Google Rich Results Test and Schema.org validator
+
+---
+
+## ✅ Best Practices
+
+### 1. Use Absolute URLs
+
+**Why:** Schema parsers expect fully qualified links.
+
+### 2. Keep Data DRY
+
+**Why:** Duplicate unsynced data rots quickly.
+
+Reference existing docs (data sources, media inventory) to populate fields.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Embedding HTML in JSON-LD
+
+**Problem:** Invalid JSON leads to parser errors.
+
+### 2. Forgetting to Escape Quotes
+
+**Problem:** Breaks the `<script>` block when templating.
+
+**Fix:** Use JSON formatters or template helpers when available.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Author Person, WebSite, and at least one CreativeWork JSON-LD script.
+2. Insert scripts near the end of `<head>` or before closing `<body>` per
+   tooling constraints.
+3. Document snippets and sources in `docs/structured-data.md`.
+4. Capture validation results in `docs/validation-log.md` with links to Rich
+   Results tests.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] JSON-LD passes Google Rich Results Test with zero errors.
+-  [ ] Structured data documentation updated with fields and cadence.
+-  [ ] Scripts use absolute URLs and reference current data.
+-  [ ] Stakeholder approval recorded for public client mentions.
+
+---

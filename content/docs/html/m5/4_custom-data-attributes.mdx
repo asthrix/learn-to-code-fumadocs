@@ -1,0 +1,125 @@
+---
+title: "Custom Data Attributes"
+description:
+   "Design `data-*` attributes for analytics, personalization, and future
+   automation."
+module: "M5"
+lesson: "4"
+difficulty: "advanced"
+duration: "35"
+project_phase: "Launch"
+prerequisites: ["/docs/html/m5/3_structured-data"]
+learning_objectives:
+   - "Plan consistent naming for custom data attributes"
+   - "Instrument key interactions for analytics"
+   - "Document governance for future JavaScript integrations"
+tags: ["data-attributes", "analytics", "instrumentation"]
+---
+
+# Custom Data Attributes
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Define a naming scheme for Portfolio Pulse `data-*` attributes.
+-  [ ] Add attributes that power analytics, personalization, or automation.
+-  [ ] Document ownership and change management for each attribute.
+
+## Why It Matters
+
+Custom data attributes bridge static HTML and future interactivity. Planning
+them now prevents inconsistent tagging later and supports no-code analytics
+integrations.
+
+---
+
+## Naming Convention
+
+Establish rules in `docs/state-architecture.md`:
+
+-  Prefix with namespace: `data-cta`, `data-metric`, `data-track`.
+-  Use kebab-case values (`data-cta="credibility-contact"`).
+-  Avoid embedding PII; use IDs referencing documentation.
+
+---
+
+## Instrumentation Example
+
+```html
+<a
+   href="/case-studies/fintech-onboarding.html"
+   data-cta="gallery-case-study"
+   data-track="click"
+   data-metric-id="highlight-001"
+>
+   Read the case study
+</a>
+```
+
+Log `data-metric-id` reference in `docs/data-sources.md` so analytics teams can
+map it to the correct metric.
+
+---
+
+## Governance Checklist
+
+Add a table to `docs/state-architecture.md`:
+
+| Attribute        | Purpose                      | Owner       | Notes                        |
+| ---------------- | ---------------------------- | ----------- | ---------------------------- |
+| `data-cta`       | Funnel tracking              | Marketing   | Keep values short            |
+| `data-metric-id` | Link UI to metrics inventory | You         | References `data-sources.md` |
+| `data-component` | Identify UI modules          | Engineering | Optional for A/B tests       |
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Values Stable
+
+**Why:** Analytics dashboards rely on consistent identifiers.
+
+### 2. Document Lifecycle
+
+**Why:** Teams need to know how to add or remove attributes.
+
+Include process steps in `docs/metadata-playbook.md` or a dedicated governance
+section.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Embedding Secrets
+
+**Problem:** Sensitive tokens leak into HTML.
+
+**Fix:** Store IDs, not keys or PII.
+
+### 2. Over-Instrumentation
+
+**Problem:** Too many tags overwhelm analytics.
+
+**Fix:** Prioritize primary CTAs and high-value interactions.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Draft naming conventions and governance notes in
+   `docs/state-architecture.md`.
+2. Tag primary CTAs, metrics, and testimonials with `data-*` attributes.
+3. Update `docs/data-sources.md` mapping metric IDs to visible content.
+4. Record pending analytics integrations in `notes/module-5-plan.md`.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Data attribute naming scheme documented and approved.
+-  [ ] High-value interactions tagged consistently.
+-  [ ] Documentation links metrics to UI elements.
+-  [ ] Retro log captures open analytics questions.
+
+---

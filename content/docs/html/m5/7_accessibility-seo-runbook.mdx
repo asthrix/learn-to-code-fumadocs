@@ -1,0 +1,115 @@
+---
+title: "Accessibility & SEO Runbook"
+description:
+   "Consolidate audit flows, remediation templates, and governance for ongoing
+   quality."
+module: "M5"
+lesson: "7"
+difficulty: "advanced"
+duration: "40"
+project_phase: "Launch"
+prerequisites: ["/docs/html/m5/6_performance-audits"]
+learning_objectives:
+   - "Create a repeatable accessibility and SEO runbook"
+   - "Define remediation workflows and owners"
+   - "Update documentation and retro logs"
+tags: ["accessibility", "seo", "runbook"]
+---
+
+# Accessibility & SEO Runbook
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Document an accessibility and SEO audit playbook.
+-  [ ] Establish remediation workflows with SLAs and owners.
+-  [ ] Align stakeholders on ongoing governance post-launch.
+
+## Why It Matters
+
+Launch is not the finish line. A runbook ensures Portfolio Pulse keeps evolving
+without backsliding on accessibility or discoverability.
+
+---
+
+## Runbook Structure
+
+Create `docs/accessibility-seo-runbook.md` with sections:
+
+1. **Audit Cadence** — quarterly full checks, monthly spot checks.
+2. **Tools** — axe DevTools, Lighthouse, WAVE, Screaming Frog, Ahrefs.
+3. **Checklists** — WCAG 2.2 AA, heading structure, landmark usage, meta tags.
+4. **Escalation** — how to log issues (Jira/Linear/GitHub) with severity levels.
+5. **Sign-off** — required approvals for launch or major updates.
+
+---
+
+## Issue Template
+
+Document a template in the runbook:
+
+```
+### Issue Summary
+- Impacted page(s):
+- Severity (blocker/major/minor):
+- Evidence (screenshots/URLs):
+
+### Remediation Plan
+- Owner:
+- Target fix date:
+- Validation steps:
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Pair Technical & Content Audits
+
+**Why:** Metadata, headings, and copy all influence SEO and accessibility.
+
+### 2. Track SLAs
+
+**Why:** Ensures high-impact issues get priority treatment.
+
+Log SLAs in `notes/module-5-plan.md` for team visibility.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Treating Accessibility as One-Time
+
+**Problem:** Regressions creep in with new content.
+
+**Fix:** Schedule recurring audits tied to release calendar.
+
+### 2. Ignoring Internationalization
+
+**Problem:** Future localization adds complexity.
+
+**Fix:** Add placeholder guidance for localization checks even if not yet
+implemented.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Draft the runbook and store it at `docs/accessibility-seo-runbook.md`.
+2. Update `docs/accessibility-manifesto.md` with links to the new runbook and
+   audit cadence.
+3. Log remediation workflow summary in `docs/state-architecture.md` for future
+   developers.
+4. Capture open questions in `notes/module-5-plan.md` and assign owners.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Runbook created with cadence, tools, checklists, and escalation process.
+-  [ ] Accessibility manifesto references the runbook.
+-  [ ] Owners and SLAs documented for remediation workflow.
+-  [ ] Retro log updated with governance notes.
+
+---
