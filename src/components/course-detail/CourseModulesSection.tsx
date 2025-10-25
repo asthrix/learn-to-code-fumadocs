@@ -68,13 +68,13 @@ export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
       <section className='relative px-6 pb-20'>
          <div className='mx-auto max-w-6xl'>
             <div className='text-center'>
-               <p className='inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/80 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-slate-600 dark:border-white/10 dark:bg-white/10 dark:text-slate-300'>
+               <p className='inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-primary dark:border-primary/25 dark:bg-primary/15 dark:text-primary-foreground'>
                   Modules & lessons
                </p>
-               <h2 className='mt-6 text-3xl font-semibold text-slate-900 dark:text-slate-100 sm:text-4xl'>
+               <h2 className='mt-6 text-3xl font-semibold text-foreground sm:text-4xl'>
                   Navigate your build sprint-by-sprint
                </h2>
-               <p className='mt-4 text-sm text-slate-600 dark:text-slate-300'>
+               <p className='mt-4 text-sm text-muted-foreground'>
                   Switch between modules to inspect the lesson flow, time
                   commitment, and repository touchpoints without losing context.
                </p>
@@ -82,48 +82,48 @@ export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
 
             <div className='mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]'>
                <div className='space-y-6'>
-                  <div className='rounded-3xl border border-slate-900/10 bg-white/95 p-6 shadow-[0_25px_55px_-35px_rgba(14,116,144,0.45)] dark:border-white/10 dark:bg-slate-900/60 dark:shadow-[0_25px_55px_-28px_rgba(14,116,144,0.6)]'>
-                     <div className='flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400'>
-                        <span className='rounded-full border border-slate-900/10 bg-white/70 px-3 py-1 dark:border-white/10 dark:bg-white/10'>
+                  <div className='rounded-3xl border border-border bg-card p-6 shadow-[0_25px_55px_-35px_hsl(var(--color-primary)/0.4)]'>
+                     <div className='flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground'>
+                        <span className='rounded-full border border-border/60 bg-primary/10 px-3 py-1 text-foreground'>
                            Sprint {String(clampedIndex + 1).padStart(2, "0")}
                         </span>
-                        <span className='rounded-full border border-slate-900/10 bg-white/70 px-3 py-1 dark:border-white/10 dark:bg-white/10'>
+                        <span className='rounded-full border border-border/60 bg-secondary/10 px-3 py-1 text-foreground'>
                            {activeSummary.lessonsCount} lessons
                         </span>
-                        <span className='rounded-full border border-slate-900/10 bg-white/70 px-3 py-1 dark:border-white/10 dark:bg-white/10'>
+                        <span className='rounded-full border border-border/60 bg-accent/20 px-3 py-1 text-foreground'>
                            {activeTimeLabel}
                         </span>
                      </div>
-                     <h3 className='mt-5 text-2xl font-semibold text-slate-900 dark:text-slate-100'>
+                     <h3 className='mt-5 text-2xl font-semibold text-foreground'>
                         {activeModule.title}
                      </h3>
-                     <p className='mt-3 max-w-3xl text-sm text-slate-600 dark:text-slate-300'>
+                     <p className='mt-3 max-w-3xl text-sm text-muted-foreground'>
                         {activeModule.description}
                      </p>
                   </div>
 
-                  <div className='rounded-3xl border border-slate-900/10 bg-white/95 p-6 dark:border-white/10 dark:bg-slate-900/60'>
-                     <p className='text-xs font-medium uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400'>
+                  <div className='rounded-3xl border border-border bg-card p-6'>
+                     <p className='text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground'>
                         Lesson cadence
                      </p>
                      <div className='mt-5 space-y-4'>
                         <Steps>
                            {activeModule.lessons.map((lesson, lessonIndex) => (
                               <Step key={lesson.title}>
-                                 <div className='flex items-start justify-between gap-6 rounded-2xl border border-slate-900/10 bg-white/90 p-4 shadow-sm transition hover:border-sky-500/40 hover:shadow-[0_12px_35px_-20px_rgba(14,165,233,0.45)] dark:border-white/15 dark:bg-slate-900/70'>
+                                 <div className='flex items-start justify-between gap-6 rounded-2xl border border-border bg-card/80 p-4 shadow-sm transition hover:border-primary/40 hover:shadow-[0_12px_35px_-20px_hsl(var(--color-primary)/0.45)]'>
                                     <div>
-                                       <p className='text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400'>
+                                       <p className='text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground'>
                                           Lesson{" "}
                                           {String(lessonIndex + 1).padStart(
                                              2,
                                              "0"
                                           )}
                                        </p>
-                                       <p className='mt-1 text-sm font-medium text-slate-900 dark:text-slate-100'>
+                                       <p className='mt-1 text-sm font-medium text-foreground'>
                                           {lesson.title}
                                        </p>
                                     </div>
-                                    <span className='shrink-0 rounded-full border border-slate-900/10 bg-slate-900/5 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-slate-600 dark:border-white/10 dark:bg-white/10 dark:text-slate-200'>
+                                    <span className='shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-primary'>
                                        {lesson.duration}
                                     </span>
                                  </div>
@@ -135,11 +135,11 @@ export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
                </div>
 
                <div className='space-y-6'>
-                  <div className='rounded-3xl border border-slate-900/10 bg-white/95 p-6 dark:border-white/10 dark:bg-slate-900/60'>
-                     <p className='text-xs font-medium uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400'>
+                  <div className='rounded-3xl border border-border bg-card p-6'>
+                     <p className='text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground'>
                         Modules
                      </p>
-                     <p className='mt-3 text-sm text-slate-600 dark:text-slate-300'>
+                     <p className='mt-3 text-sm text-muted-foreground'>
                         Browse every sprint artifact in one place. Tap a module
                         to update the sprint overview, then drill into its
                         lesson commits without losing sight of the larger
@@ -171,17 +171,17 @@ export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
                                        className={cn(
                                           "cursor-pointer select-none px-3 py-2 font-medium transition",
                                           isActive
-                                             ? "bg-sky-500/10 text-sky-700 shadow-[0_18px_35px_-28px_rgba(14,165,233,0.45)] dark:bg-sky-400/10 dark:text-sky-200"
-                                             : "text-slate-600 hover:bg-slate-900/5 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
+                                             ? "bg-primary/15 text-primary shadow-[0_18px_35px_-28px_hsl(var(--color-primary)/0.45)]"
+                                             : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
                                        )}
                                     />
                                     {/* {isActive && (
-                                       <div className='ms-5 mb-3 mt-2 space-y-1 border-l border-slate-900/10 pl-3 dark:border-white/10'>
+                                       <div className='ms-5 mb-3 mt-2 space-y-1 border-l border-border pl-3'>
                                           {module.lessons.map((lesson) => (
                                              <File
                                                 key={lesson.title}
                                                 name={`${lesson.title} · ${lesson.duration}`}
-                                                className='bg-transparent px-2 py-1 text-sm text-slate-600 hover:bg-slate-900/5 dark:text-slate-300 dark:hover:bg-white/10'
+                                                className='bg-transparent px-2 py-1 text-sm text-muted-foreground hover:bg-muted/40 hover:text-foreground'
                                              />
                                           ))}
                                        </div>

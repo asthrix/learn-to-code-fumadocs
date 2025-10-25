@@ -79,7 +79,7 @@ export const pricingPlans: PricingPlan[] = [
          "Private Discord pods for accountability",
       ],
       ctaLabel: "Upgrade to Pro",
-      ctaHref: "/docs/react-new",
+      ctaHref: "/docs/react",
       highlighted: true,
    },
    {

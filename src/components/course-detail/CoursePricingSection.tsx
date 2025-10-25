@@ -10,16 +10,16 @@ interface CoursePricingSectionProps {
 export function CoursePricingSection({ pricing }: CoursePricingSectionProps) {
    return (
       <section className='relative px-6 pb-28'>
-         <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.12),_transparent_60%)] dark:bg-[radial-gradient(circle_at_top,_rgba(30,64,175,0.22),_transparent_55%)]' />
+         <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.14),_transparent_60%)]' />
          <div className='relative mx-auto max-w-6xl'>
             <div className='text-center'>
-               <p className='inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/80 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-slate-600 dark:border-white/10 dark:bg-white/10 dark:text-slate-300'>
+               <p className='inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground'>
                   Pricing in INR
                </p>
-               <h2 className='mt-6 text-3xl font-semibold text-slate-900 dark:text-slate-100 sm:text-4xl'>
+               <h2 className='mt-6 text-3xl font-semibold text-foreground sm:text-4xl'>
                   Pick the engagement style that fits your sprint velocity
                </h2>
-               <p className='mt-4 text-sm text-slate-600 dark:text-slate-300'>
+               <p className='mt-4 text-sm text-muted-foreground'>
                   All plans include TaskFlow Pro source code, updates, and
                   lifetime access to refreshed lessons.
                </p>
@@ -29,44 +29,42 @@ export function CoursePricingSection({ pricing }: CoursePricingSectionProps) {
                {pricing.map((tier) => (
                   <div
                      key={tier.name}
-                     className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-900/10 bg-white/90 p-6 shadow-[0_30px_70px_-35px_rgba(37,99,235,0.35)] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-40px_rgba(37,99,235,0.4)] dark:border-white/10 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800 dark:shadow-[0_30px_70px_-35px_rgba(37,99,235,0.55)] ${
-                        tier.highlighted
-                           ? "ring-2 ring-orange-400/70 dark:ring-orange-300/70"
-                           : ""
+                     className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card/95 p-6 shadow-[0_30px_70px_-35px_hsl(var(--color-primary)/0.34)] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_40px_85px_-42px_hsl(var(--color-primary)/0.45)] ${
+                        tier.highlighted ? "ring-2 ring-secondary/60" : ""
                      }`}
                   >
                      {tier.highlighted && (
-                        <span className='absolute left-6 top-6 inline-flex items-center rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-orange-600 dark:bg-orange-400/10 dark:text-orange-200'>
+                        <span className='absolute left-6 top-6 inline-flex items-center rounded-full bg-secondary/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-secondary-foreground'>
                            Recommended
                         </span>
                      )}
 
                      <div className='mt-8 flex flex-col gap-4'>
                         <div>
-                           <h3 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>
+                           <h3 className='text-xl font-semibold text-foreground'>
                               {tier.name}
                            </h3>
-                           <p className='mt-2 text-sm text-slate-600 dark:text-slate-300'>
+                           <p className='mt-2 text-sm text-muted-foreground'>
                               {tier.description}
                            </p>
                         </div>
 
-                        <div className='flex items-baseline gap-2 text-slate-900 dark:text-slate-100'>
+                        <div className='flex items-baseline gap-2 text-foreground'>
                            <span className='text-3xl font-semibold sm:text-4xl'>
                               {tier.price}
                            </span>
-                           <span className='text-xs font-medium uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400'>
+                           <span className='text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground'>
                               {tier.cadence}
                            </span>
                         </div>
 
-                        <ul className='space-y-3 text-sm text-slate-600 dark:text-slate-300'>
+                        <ul className='space-y-3 text-sm text-muted-foreground'>
                            {tier.features.map((feature) => (
                               <li
                                  key={feature}
                                  className='flex items-start gap-3'
                               >
-                                 <CheckCircle2 className='mt-0.5 h-4 w-4 text-emerald-500 dark:text-emerald-300' />
+                                 <CheckCircle2 className='mt-0.5 h-4 w-4 text-primary' />
                                  <span>{feature}</span>
                               </li>
                            ))}
@@ -76,8 +74,8 @@ export function CoursePricingSection({ pricing }: CoursePricingSectionProps) {
                            href={tier.ctaHref}
                            className={`mt-6 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 ${
                               tier.highlighted
-                                 ? "group bg-orange-300 text-slate-950 shadow-lg shadow-orange-500/40 hover:-translate-y-1 hover:bg-orange-400 focus-visible:ring-orange-500/60 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950"
-                                 : "group border border-slate-900/20 bg-white/80 text-slate-900 hover:-translate-y-1 hover:border-slate-900/40 hover:bg-white focus-visible:ring-slate-200/70 focus-visible:ring-offset-white dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/20 dark:focus-visible:ring-white/50 dark:focus-visible:ring-offset-slate-950"
+                                 ? "group bg-secondary text-secondary-foreground shadow-[0_18px_45px_-25px_hsl(var(--color-secondary)/0.55)] hover:-translate-y-1 hover:bg-secondary/90 focus-visible:ring-secondary/60 focus-visible:ring-offset-background"
+                                 : "group border border-border bg-card text-foreground hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/10 hover:text-primary focus-visible:ring-primary/40 focus-visible:ring-offset-background"
                            }`}
                         >
                            {tier.ctaLabel}

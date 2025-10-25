@@ -12,11 +12,11 @@ export const reactCourseDetail: CourseDetailContent = {
          "Ship TaskFlow Pro end-to-end while learning state management, routing, data fetching, and performance hardening techniques used by high-growth teams.",
       primaryCta: {
          label: "Start the React track",
-         href: "/docs/react-new",
+         href: "/docs/react",
       },
       secondaryCta: {
          label: "View project blueprint",
-         href: "/docs/react-new/m0",
+         href: "/docs/react/m0",
       },
       metrics: [
          { label: "Total modules", value: "10" },
