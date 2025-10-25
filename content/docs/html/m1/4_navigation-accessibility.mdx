@@ -1,0 +1,204 @@
+---
+title: "Accessible Navigation Systems"
+description:
+   "Refine Portfolio Pulse navigation with keyboard support, ARIA labelling, and
+   focus management."
+module: "M1"
+lesson: "4"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/3_header-strategy"]
+learning_objectives:
+   - "Audit navigation for keyboard and screen reader usability"
+   - "Implement skip links, current page states, and aria-controls"
+   - "Create a focus trap pattern for mobile menus if required"
+   - "Document navigation accessibility requirements"
+tags: ["navigation", "accessibility", "keyboard"]
+---
+
+# Accessible Navigation Systems
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Ensure navigation works flawlessly with keyboard-only interaction.
+-  [ ] Provide accessible names, states, and instructions for menus.
+-  [ ] Manage focus when mobile menus open and close.
+-  [ ] Capture navigation accessibility requirements in documentation.
+
+## Project Context
+
+Navigation determines how quickly visitors reach the information they need. For
+Portfolio Pulse, any friction risks losing a recruiter or client. Accessible
+navigation is also a legal requirement in many regions, so investing time now
+saves potential remediation later.
+
+---
+
+## Keyboard-First Audit
+
+### Tab Order
+
+Ensure tab order moves from skip link to navigation to primary call-to-action.
+Use `tabindex="-1"` only for custom focus targets (like main content anchor).
+
+### Current Page State
+
+If you plan to expand Portfolio Pulse into multiple pages, use
+`aria-current="page"` or `aria-current="section"` to indicate state.
+
+### Basic Example
+
+```html
+<nav aria-label="Primary navigation">
+   <ul>
+      <li><a href="#highlights" aria-current="section">Work</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#testimonials">Proof</a></li>
+      <li><a href="#contact">Contact</a></li>
+   </ul>
+</nav>
+```
+
+### Practical Example
+
+```html
+<details class="nav-mobile" data-menu>
+   <summary
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="mobile-nav-list"
+   >
+      Menu
+   </summary>
+   <nav id="mobile-nav-list" aria-label="Mobile navigation">
+      <ul>
+         <li><a href="#highlights" aria-current="section">Work</a></li>
+         <li><a href="#services">Services</a></li>
+         <li><a href="#testimonials">Proof</a></li>
+         <li><a href="#contact">Contact</a></li>
+      </ul>
+   </nav>
+</details>
+<script type="module">
+   const menu = document.querySelector("[data-menu]");
+   const summary = menu?.querySelector("summary");
+   summary?.addEventListener("click", () => {
+      const expanded = summary.getAttribute("aria-expanded") === "true";
+      summary.setAttribute("aria-expanded", String(!expanded));
+   });
+</script>
+```
+
+> If you prefer to avoid JavaScript, ensure your CSS respects the open state of
+> `<details>` so focus remains inside until the menu closes.
+
+---
+
+## ✅ Best Practices
+
+### 1. Provide Visible Focus Styles
+
+**Why:** Users must see where they are when tabbing through navigation.
+
+```css
+.site-header a:focus {
+   outline: 3px solid var(--accent);
+   outline-offset: 4px;
+}
+```
+
+### 2. Keep Skip Links First in DOM Order
+
+**Why:** Placing skip links first ensures they are the first tab stop and
+immediately accessible.
+
+```html
+<a class="skip-link" href="#main-content">Skip to main content</a>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Hiding Navigation with `display: none`
+
+**Problem:** `display: none` removes elements from the accessibility tree.
+
+```css
+.nav-mobile ul {
+   display: none;
+}
+```
+
+**Solution:**
+
+```css
+.nav-mobile[open] ul {
+   display: block;
+}
+```
+
+### 2. Forgetting to Update `aria-expanded`
+
+**Problem:** Screen readers rely on `aria-expanded` to know menu state.
+
+```html
+<!-- Bad: static aria-expanded attribute -->
+<summary aria-expanded="false">Menu</summary>
+```
+
+**Solution:**
+
+```js
+summary.setAttribute("aria-expanded", String(!expanded));
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Audit and Enhance Navigation Accessibility
+
+1. Test navigation using only the keyboard; note any fails in
+   `notes/retro-log.md`.
+2. Add `aria-current` to the navigation link that best represents the current
+   section.
+3. Update mobile menu toggles to reflect `aria-expanded` state (with minimal JS
+   if necessary) and plan CSS fallback.
+4. Document accessibility requirements in `docs/accessibility.md` under a new
+   "Navigation" section.
+5. Commit with `git commit -am "feat: harden navigation accessibility"`.
+
+#### Expected Result
+
+Navigation works smoothly for keyboard and screen reader users, and
+documentation captures the requirements for future styling.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Tab order matches the documented focus path.
+-  [ ] `aria-expanded` updates when the mobile menu opens/closes.
+
+### Code Quality
+
+-  [ ] Navigation anchors include `aria-current` where appropriate.
+-  [ ] Skip link is the first focusable element in the DOM.
+
+### Understanding
+
+-  [ ] You can describe how focus behaves when the mobile menu opens.
+-  [ ] You know why `display: none` is avoided during menu toggling.
+
+### Project Integration
+
+-  [ ] Accessibility manifesto references navigation behaviors.
+-  [ ] Retro log captures audit results and any remaining gaps.
+
+---

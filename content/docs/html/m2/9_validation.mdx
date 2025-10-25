@@ -1,0 +1,173 @@
+---
+title: "Module 2 Validation"
+description:
+   "Audit your form implementation for accessibility, usability, and resilience."
+module: "M2"
+lesson: "9"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Lead capture"
+prerequisites: ["/docs/html/m2/8_implementation"]
+learning_objectives:
+   - "Test the full form experience across browsers and devices"
+   - "Log accessibility and usability findings"
+   - "Verify documentation and analytics updates"
+   - "Prepare Module 2 retro notes"
+tags: ["validation", "testing", "accessibility"]
+---
+
+# Module 2 Validation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Validate the contact form across desktop and mobile.
+-  [ ] Confirm accessibility expectations (labels, hints, errors).
+-  [ ] Document findings in validation logs and retro notes.
+-  [ ] Ensure analytics and consent tracking are ready for launch.
+
+## Why This Matters
+
+Lead capture is one of the most sensitive flows in your site. Any friction or
+accessibility gap can cost you opportunities. A thorough validation round
+protects the experience before the next module.
+
+---
+
+## Validation Process
+
+### 1. Manual Checks
+
+-  Navigate the form using only the keyboard.
+-  Test the `tab` order, ensuring skip link lands at the form.
+-  Trigger each validation state and confirm the correct message appears.
+
+### 2. Accessibility Audits
+
+-  Run Lighthouse (accessibility category) in Chrome; expect 95+ score.
+-  Use axe DevTools or tota11y to verify label relationships and error handling.
+-  Confirm ARIA attributes (`aria-describedby`, `role="status"`) function as
+   expected.
+
+### 3. Browser & Device
+
+-  Desktop: Chrome, Firefox, Safari.
+-  Mobile: iOS Safari, Android Chrome (responsive mode acceptable if devices
+   unavailable).
+
+### 4. Documentation Updates
+
+-  `docs/form-strategy.md`: Record any copy or flow adjustments.
+-  `docs/state-architecture.md`: Document how you reset error states on success.
+-  `notes/module-2-retro.md` (create if absent): Capture what worked, pain
+   points, and next steps.
+
+### 5. Analytics & Consent Checks
+
+-  Confirm placeholder data layer events exist for submissions.
+-  Ensure consent checkbox states are passed through `FormData`.
+
+---
+
+## ✅ Best Practices
+
+### 1. Test Real Inputs
+
+**Why:** Sample data exposes formatting issues and context-specific problems.
+
+```text
+Budget: 4,500
+Message: Launching a redesign in Q3, need UX audit + roadmap.
+```
+
+### 2. Break Things on Purpose
+
+**Why:** Validating resilience ensures graceful failure states.
+
+```text
+- Disable JavaScript and submit (should still post)
+- Turn off network mid-submit (status message should fail gracefully)
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Only Testing Happy Paths
+
+**Problem:** Edge cases slip into production.
+
+```text
+Never triggers error state for required checkbox.
+```
+
+**Fix:**
+
+-  Attempt submission with consent unchecked.
+-  Confirm inline error appears and focus moves to the checkbox.
+
+### 2. Skipping Documentation
+
+**Problem:** Team cannot trace decisions.
+
+```text
+No entry in validation log; future audits restart from scratch.
+```
+
+**Fix:**
+
+-  Record checklist results in `docs/validation-log.md`.
+-  Note bug tickets or follow-up tasks.
+
+---
+
+## 🔍 Audit Scenario: Portfolio Pulse
+
+### Validate the Contact Form Flow
+
+1. Use Chrome and Safari to test submissions with valid and invalid inputs.
+2. Navigate using keyboard only; verify focus order and visual indicators.
+3. Run Lighthouse → Accessibility report → record score in
+   `docs/validation-log.md`.
+4. Update `notes/module-2-retro.md` with highlights and risks.
+5. Create tickets for any issues you cannot resolve immediately.
+
+#### Expected Result
+
+You have documented evidence of the form’s quality and a clear plan for
+follow-up work.
+
+---
+
+## ✅ Validation Checklist
+
+### Accessibility
+
+-  [ ] Lighthouse accessibility score ≥ 95.
+-  [ ] Screen reader announces errors and success messages.
+
+### Functionality
+
+-  [ ] Required fields prevent submission until resolved.
+-  [ ] Consent states persist in submitted data.
+
+### Documentation
+
+-  [ ] Validation log updated with Module 2 findings.
+-  [ ] Retro notes captured with action items.
+
+### Analytics & Consent
+
+-  [ ] Analytics instrumentation documented or stubbed.
+-  [ ] Consent policy reference confirmed in UI copy.
+
+---
+
+## Next Steps
+
+-  Review Module 2 retro notes to identify improvements for upcoming modules.
+-  Prepare for Module 3 by outlining how HTML structure supports dynamic
+   content.
+
+---

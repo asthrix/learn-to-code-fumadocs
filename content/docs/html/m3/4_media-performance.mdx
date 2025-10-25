@@ -1,0 +1,143 @@
+---
+title: "Media Performance Guardrails"
+description:
+   "Keep imagery, video, and embeds fast with budgets, lazy loading, and modern
+   formats."
+module: "M3"
+lesson: "4"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Showcase"
+prerequisites: ["/docs/html/m3/3_art-direction-picture"]
+learning_objectives:
+   - "Set and enforce media performance budgets"
+   - "Apply lazy loading, fetchpriority, and decoding strategically"
+   - "Plan monitoring for regressions"
+tags: ["performance", "media", "budgets"]
+---
+
+# Media Performance Guardrails
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Define performance budgets for imagery, video, and embeds.
+-  [ ] Implement loading strategies that protect Core Web Vitals.
+-  [ ] Document monitoring steps to catch future regressions.
+
+## Why It Matters
+
+Great visuals fail if they tank page load. Performance guardrails keep Portfolio
+Pulse fast even as media footprint grows.
+
+---
+
+## Establish Budgets
+
+Create a matrix in `docs/performance-budgets.md`:
+
+| Asset Type            | Max Size | Notes                  |
+| --------------------- | -------- | ---------------------- |
+| Hero image            | 220 KB   | Preloaded, eager load  |
+| Gallery thumbs        | 90 KB    | Lazy loaded            |
+| Embedded video poster | 120 KB   | Provide fallback image |
+
+Use Lighthouse and WebPageTest to validate budgets after each iteration.
+
+---
+
+## Loading Strategies
+
+### 1. `loading` and `decoding`
+
+-  Use `loading="lazy"` for below-the-fold images.
+-  Default to `decoding="async"` to avoid blocking main thread.
+
+### 2. `fetchpriority`
+
+Highlight the single most critical image:
+
+```html
+<img
+   src="/images/showcase/hero-1280.jpg"
+   width="1280"
+   height="853"
+   alt="Hero shot of Portfolio Pulse case study"
+   fetchpriority="high"
+   loading="eager"
+/>
+```
+
+### 3. Lazy Load Embeds
+
+Wrap iframes in placeholders and only load once the user interacts.
+
+```html
+<div class="video-embed" data-embed>
+   <button type="button" data-embed-trigger>Play client testimonial</button>
+</div>
+```
+
+Enhance with JavaScript to swap in the iframe on demand.
+
+---
+
+## ✅ Best Practices
+
+### 1. Ship Poster Images for Video
+
+**Why:** Provides meaningful content before playback.
+
+```html
+<video
+   controls
+   preload="metadata"
+   poster="/images/showcase/testimonial-poster.jpg"
+>
+   ...
+</video>
+```
+
+### 2. Evaluate Third-Party Impact
+
+**Why:** External scripts can bypass your budgets.
+
+Run `npm run analyze:bundle` or similar tooling if available to measure
+third-party weight.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Lazy Loading Above-the-Fold Media
+
+**Problem:** Delays Largest Contentful Paint (LCP).
+
+**Fix:** Eager-load hero imagery and primary headlines.
+
+### 2. Forgetting to Monitor
+
+**Problem:** Regressions creep in as media changes.
+
+**Fix:** Record baseline metrics and revisit after each deployment.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Create or update `docs/performance-budgets.md` with Module 3 limits.
+2. Add lazy loading to gallery thumbnails while keeping hero imagery eager.
+3. Replace auto-loading video iframes with user-triggered placeholders.
+4. Capture before/after Lighthouse scores in `docs/validation-log.md`.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Budgets documented and communicated to collaborators.
+-  [ ] Lazy loading applied only to below-the-fold assets.
+-  [ ] Video and embed placeholders reduce initial payload.
+-  [ ] Monitoring plan recorded for future regressions.
+
+---

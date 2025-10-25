@@ -1,0 +1,175 @@
+---
+title: "Module 1 Implementation"
+description:
+   "Assemble the full semantic layout with landmarks, sections, asides, and
+   footer."
+module: "M1"
+lesson: "8"
+difficulty: "beginner"
+duration: "45"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/7_footer-cta"]
+learning_objectives:
+   - "Integrate all Module 1 components into index.html"
+   - "Verify headings, landmarks, and navigation are coherent"
+   - "Log outstanding dependencies for copy or assets"
+   - "Prepare a baseline commit marking Module 1 completion"
+tags: ["implementation", "layout", "portfolio"]
+---
+
+# Module 1 Implementation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Combine header, navigation, main sections, asides, and footer into a
+       cohesive layout.
+-  [ ] Confirm semantic integrity using validation tooling.
+-  [ ] Record outstanding content or tooling requirements.
+-  [ ] Publish a clean commit representing Module 1 state.
+
+## Project Context
+
+Module 1 delivers a layout that mirrors how production teams ship HTML. You now
+have a collection of sections ready for styling, interaction, and richer
+content. Treat this as the semantic baseline before layering CSS and JS.
+
+---
+
+## Assembly Checklist
+
+### Review Structure
+
+Ensure `index.html` uses one `<header>`, one `<main>`, optional `<aside>`
+elements, and one `<footer>`. Confirm anchor targets exist.
+
+### Validate Headings
+
+Run through the document outline: `h1` → `h2` → `h3` without skipping levels.
+Tools like the HTML5 Outliner help.
+
+### Basic Example
+
+```html
+<header role="banner">...</header>
+<main id="main-content" tabindex="-1">
+   <section id="hero">...</section>
+   <section id="highlights">...</section>
+   <aside aria-label="Credentials">...</aside>
+   <section id="services">...</section>
+   <section id="testimonials">...</section>
+   <section id="contact">...</section>
+</main>
+<footer role="contentinfo">...</footer>
+```
+
+### Practical Example
+
+```
+// Combine all snippets from lessons 3-7 into index.html.
+```
+
+Rather than rewriting, ensure you pasted or assembled each section exactly once
+and removed placeholder comments.
+
+---
+
+## ✅ Best Practices
+
+### 1. Run Automated Outline Checks
+
+**Why:** Tools like the Firefox Accessibility Inspector reveal heading orders
+and landmark usage instantly.
+
+```bash
+# Using html-validate with heading rule
+npx html-validate --config .htmlvalidate.json index.html
+```
+
+### 2. Snapshot the DOM
+
+**Why:** Saving a DOM snapshot (via browser devtools) provides a reference for
+future modules and ensures nothing accidentally changes.
+
+```md
+notes/dom-snapshots/module-1.md
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Leaving TODO Comments Untracked
+
+**Problem:** Comments with `TODO` but no tracking leads to forgotten work.
+
+```html
+<!-- TODO: add new testimonial -->
+```
+
+**Solution:**
+
+```md
+notes/retro-log.md → Add backlog item referencing the section.
+```
+
+### 2. Forgetting to Update Accessibility Docs
+
+**Problem:** Structural changes without documentation break alignment.
+
+```md
+// Bad: accessibility manifesto still mentions old nav structure.
+```
+
+**Solution:**
+
+```md
+Update docs/accessibility.md with the latest structural context.
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Finalize Module 1 Layout
+
+1. Ensure `index.html` includes the header, navigation, hero, highlights,
+   services, testimonials, aside, contact, and footer from previous lessons.
+2. Run `npx html-validate index.html` or the W3C validator to confirm zero
+   errors.
+3. Capture a DOM snapshot (or copy outline results) in
+   `notes/validation/module-1.md`.
+4. Commit with `git commit -am "feat: deliver module 1 semantic layout"`.
+
+#### Expected Result
+
+Portfolio Pulse now presents a complete semantic layout that is ready for Module
+2's form enhancements.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Navigation anchors scroll to valid section IDs.
+-  [ ] Mobile menu toggles and skip link still work after assembly.
+
+### Code Quality
+
+-  [ ] Document outline shows proper heading sequence.
+-  [ ] Asides contain supplemental content only.
+
+### Understanding
+
+-  [ ] You can explain how each section maps to user needs.
+-  [ ] You know which sections require CSS or JS in future modules.
+
+### Project Integration
+
+-  [ ] Validation notes saved to `notes/validation/module-1.md`.
+-  [ ] Documentation (layout plan, accessibility manifesto) reflect current
+       state.
+
+---

@@ -1,0 +1,146 @@
+---
+title: "Art Direction with <picture>"
+description:
+   "Use the <picture> element to tailor imagery per context and support modern
+   formats."
+module: "M3"
+lesson: "3"
+difficulty: "intermediate"
+duration: "40"
+project_phase: "Showcase"
+prerequisites: ["/docs/html/m3/2_responsive-images"]
+learning_objectives:
+   - "Decide when to use <picture> vs. <img>"
+   - "Serve format-specific sources like AVIF and WebP"
+   - "Support art-directed crops that reinforce the story"
+tags: ["images", "picture", "art-direction"]
+---
+
+# Art Direction with `<picture>`
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Serve modern formats with graceful fallbacks.
+-  [ ] Swap crops or compositions per breakpoint to reinforce storytelling.
+-  [ ] Maintain accessible markup when using `<picture>`.
+
+## Why It Matters
+
+Case studies look different on a phone than on a desktop. `<picture>` lets you
+tailor imagery to each context without sacrificing performance or accessibility.
+
+---
+
+## When to Reach for `<picture>`
+
+-  Art direction: mobile needs tighter crop vs. desktop panorama.
+-  Format switching: deliver AVIF or WebP while falling back to JPEG.
+-  Density-specific logos or icons.
+
+### Example
+
+```html
+<picture>
+   <source
+      type="image/avif"
+      srcset="
+         /images/showcase/sketching-640.avif   640w,
+         /images/showcase/sketching-1280.avif 1280w
+      "
+      sizes="(min-width: 960px) 45vw, 90vw"
+   />
+   <source
+      type="image/webp"
+      srcset="
+         /images/showcase/sketching-640.webp   640w,
+         /images/showcase/sketching-1280.webp 1280w
+      "
+      sizes="(min-width: 960px) 45vw, 90vw"
+   />
+   <img
+      src="/images/showcase/sketching-1280.jpg"
+      srcset="
+         /images/showcase/sketching-640.jpg   640w,
+         /images/showcase/sketching-1280.jpg 1280w
+      "
+      sizes="(min-width: 960px) 45vw, 90vw"
+      width="1280"
+      height="853"
+      alt="Sketching interface ideas alongside sticky notes during a design sprint"
+   />
+</picture>
+```
+
+> 💡 The `<img>` element provides the fallback alt text and dimensions.
+> `<source>` elements should not include `alt` attributes.
+
+---
+
+## Art-Directed Crops
+
+Plan composition per breakpoint:
+
+| Breakpoint | Goal                               | Crop                |
+| ---------- | ---------------------------------- | ------------------- |
+| Mobile     | Highlight user interaction         | Tight crop on hands |
+| Tablet     | Balance context and detail         | Medium crop         |
+| Desktop    | Showcase collaborative environment | Wide crop           |
+
+Export dedicated assets and document in `docs/media-inventory.md` under
+`art_direction` notes.
+
+---
+
+## ✅ Best Practices
+
+### 1. Prioritize Format Sources
+
+**Why:** Browsers choose the first compatible `<source>`.
+
+Order from most efficient (AVIF) to least (JPEG) so modern browsers pick the
+best option.
+
+### 2. Keep `sizes` Consistent
+
+**Why:** Mismatched `sizes` across `<source>` elements causes inconsistent
+choices.
+
+Ensure every `<source>` and the `<img>` share identical `sizes` values.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting Fallback Formats
+
+**Problem:** Older browsers fail to display the image.
+
+**Fix:** Always include an `<img>` fallback even if you use AVIF/WebP.
+
+### 2. Overusing `<picture>`
+
+**Problem:** Adds complexity when a single responsive `<img>` would suffice.
+
+**Fix:** Reserve `<picture>` for meaningful art direction or format switching.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Identify one hero image that benefits from art-directed crops.
+2. Export AVIF, WebP, and JPEG versions for each crop.
+3. Update the case study hero markup to use `<picture>`.
+4. Record browser support notes and fallbacks in `docs/validation-log.md`.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] `<picture>` markup renders correctly across target browsers.
+-  [ ] Alt text, dimensions, and `sizes` remain accurate.
+-  [ ] Performance budgets still pass after adding new sources.
+-  [ ] Documentation updated with art direction rationale and asset variants.
+
+---

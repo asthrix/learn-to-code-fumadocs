@@ -1,0 +1,132 @@
+---
+title: "Gallery Blueprint"
+description:
+   "Design the markup architecture for Portfolio Pulse's media showcase."
+module: "M3"
+lesson: "7"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Showcase"
+prerequisites: ["/docs/html/m3/6_video-audio-embeds"]
+learning_objectives:
+   - "Structure gallery markup with sections, figures, and captions"
+   - "Plan metadata for automation and analytics"
+   - "Coordinate copy, media, and CTAs for each case study"
+tags: ["gallery", "architecture", "planning"]
+---
+
+# Gallery Blueprint
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Map the gallery structure using semantic HTML.
+-  [ ] Decide how many showcase items and which metadata each requires.
+-  [ ] Align copy, media, and CTAs to guide prospective clients.
+
+## Why It Matters
+
+A blueprint prevents ad-hoc gallery markup that confuses users and search
+engines. Structure the story before writing code to keep implementation
+deliberate.
+
+---
+
+## Gallery Architecture
+
+```
+<section id="showcase" aria-labelledby="showcase-title">
+   <div class="section-intro">...</div>
+   <ol class="case-study-gallery">
+      <li>
+         <article>
+            <header>...</header>
+            <figure>...</figure>
+            <footer>...</footer>
+         </article>
+      </li>
+      ...
+   </ol>
+</section>
+```
+
+### Key Elements
+
+-  `<section>` with heading and introduction copy.
+-  Ordered list `<ol>` to express deliberate sequence.
+-  `<article>` per case study to support independent sharing.
+-  `<figure>` and `<figcaption>` for primary visuals.
+-  `<footer>` with CTA link to detailed case study.
+
+Document this structure in `docs/layout.shared.md` under a new "Showcase
+gallery" section.
+
+---
+
+## Metadata Requirements
+
+Create a YAML block per case study in `docs/media-inventory.md`:
+
+```
+- slug: fintech-onboarding
+  title: "Fintech Onboarding Redesign"
+  outcome: "Increased completion rate by 32%"
+  asset: "/images/showcase/fintech-onboarding-1280.jpg"
+  alt: "Avery presenting improved onboarding screens"
+  cta: "/case-studies/fintech-onboarding.html"
+```
+
+Include analytics tags (`data-cta="fintech-gallery"`) to connect with Module 5
+instrumentation.
+
+---
+
+## ✅ Best Practices
+
+### 1. Maintain Hierarchy Consistency
+
+**Why:** Reusable structures make CMS integration easier later.
+
+### 2. Plan for Empty States
+
+**Why:** The gallery should still render gracefully with fewer case studies.
+
+Add copy for when only one story is available.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Nesting Headings Out of Order
+
+**Problem:** Jumping from `h2` to `h4` harms accessibility.
+
+**Fix:** Ensure each article uses an `h3` heading, with nested `h4` only when
+needed.
+
+### 2. Mixing Structural and Presentational Classes
+
+**Problem:** Layout classes leak into content templates.
+
+**Fix:** Keep markup semantic; leave grid/flex styling for CSS.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Sketch the gallery structure and copy in `notes/module-3-plan.md`.
+2. Update `docs/layout.shared.md` with HTML outline and rationale.
+3. Define analytics data attributes in your blueprint (e.g., `data-cta`).
+4. Secure sign-off on the gallery narrative before coding.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Blueprint documented with semantic hierarchy and element choices.
+-  [ ] Metadata defined for each gallery item.
+-  [ ] Empty states considered and documented.
+-  [ ] Stakeholder approval recorded in retro or notes.
+
+---

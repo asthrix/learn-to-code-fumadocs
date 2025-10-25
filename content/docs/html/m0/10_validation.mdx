@@ -1,0 +1,175 @@
+---
+title: "Module 0 Validation"
+description:
+   "Audit the Portfolio Pulse foundation and capture your backlog before
+   advancing."
+module: "M0"
+lesson: "10"
+difficulty: "beginner"
+duration: "25"
+project_phase: "Foundation blueprint"
+prerequisites: ["/docs/html/m0/9_implementation"]
+learning_objectives:
+   - "Run accessibility and HTML validation tools"
+   - "Record findings with severity and owners"
+   - "Update project documentation with decisions"
+   - "Plan priorities for Module 1"
+tags: ["validation", "quality", "checklist"]
+---
+
+# Module 0 Validation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Complete an audit of the Module 0 deliverables.
+-  [ ] Document issues, risks, and follow-ups with clear severity levels.
+-  [ ] Update briefing documents so stakeholders know the current state.
+-  [ ] Define priorities for Module 1 work.
+
+## Project Context
+
+Validation converts work-in-progress into trusted deliverables. Before moving to
+Module 1, confirm the foundation is strong. A clear backlog prevents surprises
+and makes collaboration smoother once designers or developers join you.
+
+---
+
+## Audit Workflow
+
+### Automated Checks
+
+Run:
+
+-  W3C HTML validator for structural accuracy
+-  axe DevTools or Lighthouse for accessibility signals
+-  Link checker to ensure anchors and external links work
+
+### Manual Review
+
+Read the page with styles disabled, navigate using keyboard only, and test
+screen reader announcements of headings and landmarks.
+
+### Basic Example
+
+```bash
+# Using html-validate for quick feedback
+npm exec html-validate index.html
+```
+
+### Practical Example
+
+```md
+## Validation Findings · Module 0
+
+-  ✅ HTML validator: Passed (0 errors, 2 warnings about missing OG image)
+-  ⚠️ axe DevTools: Warning about low contrast skip link (defer to Module 1
+   styling)
+-  ✅ Keyboard navigation: Skip link, navigation, and buttons reachable
+-  ❌ Content: Placeholder testimonials need real quotes (blocker before launch)
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Categorize Issues by Severity
+
+**Why:** Severity levels (blocker, high, medium, low) help you prioritize fixes
+in Module 1.
+
+```md
+-  Blocker: Missing contact form content
+-  High: Placeholder testimonial copy
+-  Medium: OG image placeholder
+```
+
+### 2. Share Validation Notes in Source Control
+
+**Why:** Keeping validation logs alongside code creates visibility and documents
+improvements over time.
+
+```txt
+notes/validation/module-0.md
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Treating Validation as a One-Time Task
+
+**Problem:** Waiting until the end of the course to validate multiplies
+technical debt.
+
+```md
+// Bad: no validation logs until the final module.
+```
+
+**Solution:**
+
+```md
+-  Run audits after every module.
+-  Update the backlog immediately.
+```
+
+### 2. Ignoring Warnings
+
+**Problem:** Warnings (like missing alt text) become blockers once you add
+media.
+
+```md
+// Bad: "Will fix later" without creating a ticket.
+```
+
+**Solution:**
+
+```md
+-  Create backlog entries with owners and deadlines.
+-  Reference them in the next module plan.
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Log Validation Results
+
+1. Create `notes/validation/module-0.md` summarizing automated and manual
+   checks.
+2. Record severity, owner, and due date for each follow-up item.
+3. Update `docs/project-brief.md` with any scope changes discovered during
+   validation.
+4. Commit with `git commit -am "docs: record module 0 validation"`.
+
+#### Expected Result
+
+You have a transparent record of Module 0 quality checks and a backlog that
+informs Module 1 priorities.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Validation log includes outcomes from at least two automated tools.
+-  [ ] Manual keyboard test recorded success or remediation steps.
+
+### Code Quality
+
+-  [ ] Issues are categorized by severity and assigned owners.
+-  [ ] Backlog entries reference relevant sections or file paths.
+
+### Understanding
+
+-  [ ] You can articulate why each open issue matters.
+-  [ ] You know which items must be solved before Module 1 implementation.
+
+### Project Integration
+
+-  [ ] Project brief and notes reference validation findings.
+-  [ ] Commit history reflects the validation log addition.
+
+---

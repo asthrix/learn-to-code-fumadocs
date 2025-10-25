@@ -1,0 +1,192 @@
+---
+title: "Module 0 Implementation"
+description:
+   "Assemble the Portfolio Pulse base page with hero, highlights, navigation,
+   and metadata."
+module: "M0"
+lesson: "9"
+difficulty: "beginner"
+duration: "45"
+project_phase: "Foundation blueprint"
+prerequisites: ["/docs/html/m0/8_bootstrap-workspace"]
+learning_objectives:
+   - "Combine Module 0 learnings into a cohesive page"
+   - "Confirm notes, briefs, and manifests all reference the same structure"
+   - "Run validation tools against the static HTML"
+   - "Prepare a baseline commit before Module 1"
+tags: ["implementation", "html", "portfolio"]
+---
+
+# Module 0 Implementation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Produce a working Portfolio Pulse homepage skeleton.
+-  [ ] Verify metadata, navigation, and semantic sections render correctly.
+-  [ ] Capture TODOs for content refinements in upcoming modules.
+-  [ ] Record validation results from automated tooling.
+
+## Project Context
+
+Module 0 culminates in a cohesive HTML document that reflects the strategy and
+accessibility work completed so far. This baseline powers future modules, making
+enhancements additive rather than disruptive.
+
+---
+
+## Build the Page
+
+### Assemble Sections
+
+Ensure the hero, highlights, services placeholder, testimonials, and contact
+anchor exist—even if content is still draft. Consistent IDs ensure in-page
+navigation works.
+
+### Validate Structure
+
+Run the W3C validator or a local HTML linter to catch mistakes before styling
+begins.
+
+### Basic Example
+
+```html
+<main id="main-content" tabindex="-1">
+   <section id="hero">...</section>
+   <section id="highlights">...</section>
+   <section id="services">...</section>
+   <section id="testimonials">...</section>
+   <section id="contact">...</section>
+</main>
+```
+
+### Practical Example
+
+```html
+<body>
+   <a class="skip-link" href="#main-content">Skip to main content</a>
+   <header role="banner">...</header>
+   <main id="main-content" tabindex="-1">
+      <section id="hero" aria-labelledby="hero-heading">...</section>
+      <section id="highlights" aria-label="Featured case studies">...</section>
+      <section id="services" aria-labelledby="services-title">...</section>
+      <section id="testimonials" aria-labelledby="testimonials-title">
+         ...
+      </section>
+      <section id="contact" aria-labelledby="contact-title">...</section>
+   </main>
+   <footer role="contentinfo">...</footer>
+</body>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Sections Modular
+
+**Why:** Treat each section as a module so you can convert them into includes or
+components later.
+
+```html
+<section id="services" data-section="services">
+   <h2 id="services-title">Ways we can work together</h2>
+   <p>...</p>
+</section>
+```
+
+### 2. Capture Outstanding Tasks Inline
+
+**Why:** Comments or data attributes help future modules know where to inject
+content or styling.
+
+```html
+<section id="testimonials">
+   <!-- TODO: Replace placeholder quote after client approval -->
+   <blockquote>...</blockquote>
+</section>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mixing Presentation with Structure
+
+**Problem:** Adding inline styles or layout tables at this stage distracts from
+semantic focus.
+
+```html
+<!-- Bad: inline styles controlling layout -->
+<section style="display:flex"></section>
+```
+
+**Solution:**
+
+```html
+<section id="services">...</section>
+```
+
+### 2. Forgetting to Update Navigation After Adding Sections
+
+**Problem:** New sections without corresponding navigation links break the
+experience.
+
+```html
+<!-- Bad: navigation lacks link to testimonials -->
+<li><a href="#highlights">Work</a></li>
+<li><a href="#contact">Contact</a></li>
+```
+
+**Solution:**
+
+```html
+<li><a href="#testimonials">Proof</a></li>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Finalize the Baseline Page
+
+1. Ensure the body structure matches the practical example with all five
+   sections present.
+2. Populate each section with draft content that aligns with your project brief.
+3. Run the W3C validator (`https://validator.w3.org/nu/`) or
+   `npm exec html-validate index.html` if you use a linter.
+4. Document validator results and fixes in `notes/retro-log.md`.
+5. Commit with `git commit -am "feat: complete module 0 baseline"`.
+
+#### Expected Result
+
+You have a cohesive HTML page ready for semantic deep dives and layout work in
+Module 1.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] All navigation links scroll to matching section IDs.
+-  [ ] Validator reports zero errors (warnings documented).
+
+### Code Quality
+
+-  [ ] Each section contains a single heading and supporting copy.
+-  [ ] TODO comments include context and owners if applicable.
+
+### Understanding
+
+-  [ ] You can explain the purpose of each section and how it maps to the brief.
+-  [ ] You know which sections require new content or user research before
+       launch.
+
+### Project Integration
+
+-  [ ] Retro log captures validator results and next actions.
+-  [ ] Baseline commit is tagged or noted for future comparisons.
+
+---

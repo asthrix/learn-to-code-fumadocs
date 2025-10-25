@@ -1,0 +1,272 @@
+---
+title: "Main Content Architecture"
+description:
+   "Compose hero, highlights, services, and testimonials with clear semantics
+   and reusable patterns."
+module: "M1"
+lesson: "5"
+difficulty: "beginner"
+duration: "40"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/4_navigation-accessibility"]
+learning_objectives:
+   - "Structure primary sections using semantic elements"
+   - "Apply nested headings and subheadings for clarity"
+   - "Design reusable case study and service blocks"
+   - "Maintain accessibility through meaningful grouping"
+tags: ["main", "sections", "architecture"]
+---
+
+# Main Content Architecture
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Build the main content sections with clear semantic structure.
+-  [ ] Use nested headings to guide readers and assistive technologies.
+-  [ ] Create reusable case study and service templates.
+-  [ ] Maintain accessibility across hero, highlights, services, and
+       testimonials.
+
+## Project Context
+
+Portfolio Pulse must tell a compelling story. The main body orchestrates that
+narrative, balancing impact stats, process explanations, and social proof. Solid
+semantics make it easy to restyle later without rewriting markup.
+
+---
+
+## Section Patterns
+
+### Hero Section
+
+Focus on value proposition, proof point, and call-to-action. Use `<section>` +
+`<header>` for clarity.
+
+### Highlights / Case Studies
+
+Group each case study inside `<article>` elements. Provide headings, metrics,
+and links to deeper content.
+
+### Services Overview
+
+Use an ordered structure to outline how you work. `<section>` with `<ol>` or
+`<ul>` shows process steps.
+
+### Testimonials
+
+Wrap quotes in `<blockquote>` with `<cite>` or structured `<footer>`.
+
+### Basic Example
+
+```html
+<section id="highlights" aria-labelledby="highlights-heading">
+   <h2 id="highlights-heading">Flagship Case Studies</h2>
+   <article>
+      <h3>LumenAI Activation</h3>
+      <p>Increased product activation by 27%.</p>
+   </article>
+</section>
+```
+
+### Practical Example
+
+```html
+<main id="main-content" tabindex="-1">
+   <section id="hero" aria-labelledby="hero-heading">
+      <header>
+         <p class="eyebrow">Product Designer & Frontend Engineer</p>
+         <h1 id="hero-heading">Designing measurable customer journeys.</h1>
+      </header>
+      <p class="hero-lede">
+         I help SaaS teams ship experiments that grow revenue.
+      </p>
+      <ul class="hero-metrics">
+         <li>
+            <strong>27%</strong>
+            <span>Activation lift at LumenAI</span>
+         </li>
+         <li>
+            <strong>12 weeks</strong>
+            <span>Average discovery-to-launch timeline</span>
+         </li>
+      </ul>
+      <a class="btn-primary" href="#contact">Book a strategy call</a>
+   </section>
+
+   <section id="highlights" aria-labelledby="highlights-heading">
+      <header>
+         <h2 id="highlights-heading">Flagship Case Studies</h2>
+         <p class="section-subtitle">
+            Each engagement pairs measurable outcomes with accessible
+            experiences.
+         </p>
+      </header>
+      <div class="case-study-grid">
+         <article class="case-card" aria-labelledby="case-lumen">
+            <h3 id="case-lumen">LumenAI Activation</h3>
+            <p class="metric"><strong>+27%</strong> activation in 8 weeks</p>
+            <p>
+               Redesigned onboarding with guided tours and progressive
+               profiling.
+            </p>
+            <a class="link-inline" href="/case-studies/lumen-ai.html"
+               >Read the full story</a
+            >
+         </article>
+         <article class="case-card" aria-labelledby="case-harbor">
+            <h3 id="case-harbor">HarborCRM Adoption</h3>
+            <p class="metric"><strong>3.2x</strong> daily active teams</p>
+            <p>
+               Built an insight dashboard with contextual tooltips and
+               short-form tutorials.
+            </p>
+         </article>
+      </div>
+   </section>
+
+   <section id="services" aria-labelledby="services-title">
+      <h2 id="services-title">Ways We Can Work Together</h2>
+      <ol class="service-steps">
+         <li>
+            <h3>Discovery Sprint</h3>
+            <p>
+               Audit current journeys, define target metrics, and align
+               stakeholders.
+            </p>
+         </li>
+         <li>
+            <h3>Design & Prototype</h3>
+            <p>
+               Translate insights into interactive prototypes and validation
+               scripts.
+            </p>
+         </li>
+         <li>
+            <h3>Launch & Iterate</h3>
+            <p>Pair with engineering to ship and monitor experiments.</p>
+         </li>
+      </ol>
+   </section>
+
+   <section id="testimonials" aria-labelledby="testimonials-title">
+      <h2 id="testimonials-title">Client Proof</h2>
+      <article class="testimonial" aria-label="Testimonial from LumenAI">
+         <blockquote>
+            "Avery ship prototypes in days, not weeks. We saw measurable lifts
+            in activation and retention."
+         </blockquote>
+         <footer>
+            <p><strong>Jordan Reyes</strong>, VP Product · LumenAI</p>
+         </footer>
+      </article>
+   </section>
+</main>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Use Lists for Metrics and Processes
+
+**Why:** Lists communicate structure to assistive tech and adapt well to
+responsive layouts.
+
+```html
+<ul class="hero-metrics">
+   <li><strong>15%</strong><span>Churn reduction</span></li>
+</ul>
+```
+
+### 2. Wrap Case Studies in `<article>`
+
+**Why:** Articles represent standalone entries that can syndicate elsewhere.
+
+```html
+<article class="case-card" aria-labelledby="case-lumen">...</article>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Nesting Headings Out of Sequence
+
+**Problem:** Jumping from `<h2>` to `<h4>` inside case studies breaks hierarchy.
+
+```html
+<h2>Flagship Case Studies</h2>
+<h4>LumenAI Activation</h4>
+```
+
+**Solution:**
+
+```html
+<h2>Flagship Case Studies</h2>
+<h3>LumenAI Activation</h3>
+```
+
+### 2. Mixing Presentational Markup
+
+**Problem:** Using tables or layout-specific `<div>` wrappers only for styling.
+
+```html
+<table class="case-grid">
+   ...
+</table>
+```
+
+**Solution:**
+
+```html
+<div class="case-study-grid">...</div>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Build Main Sections
+
+1. Replace placeholder content in `index.html` with the practical example
+   structure, customizing copy for your personas.
+2. Ensure each section has a heading, supporting copy, and call-to-action or
+   link where appropriate.
+3. Add ARIA labels or IDs where necessary to clarify context (e.g.,
+   `aria-labelledby`).
+4. Log outstanding content needs (new case study, testimonial approval) in
+   `notes/retro-log.md`.
+5. Commit with `git commit -am "feat: compose main content architecture"`.
+
+#### Expected Result
+
+The primary narrative of Portfolio Pulse is now expressed with clean semantics,
+ready for styling and interactivity.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Each section is reachable via navigation anchors.
+-  [ ] Articles and lists render without console errors.
+
+### Code Quality
+
+-  [ ] Headings maintain sequential order within sections.
+-  [ ] Articles use descriptive `aria-labelledby` or headings.
+
+### Understanding
+
+-  [ ] You can map each section to a persona need from the project brief.
+-  [ ] You know which content pieces require stakeholder approval.
+
+### Project Integration
+
+-  [ ] Retro log lists outstanding content and owners.
+-  [ ] Layout plan is updated with section details and IDs.
+
+---

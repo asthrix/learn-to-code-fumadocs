@@ -1,0 +1,195 @@
+---
+title: "Text Semantics & Readability"
+description:
+   "Structure headings, paragraphs, and inline semantics that carry Portfolio
+   Pulse's story."
+module: "M0"
+lesson: "4"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Foundation blueprint"
+prerequisites: ["/docs/html/m0/3_document-anatomy"]
+learning_objectives:
+   - "Apply heading hierarchy correctly"
+   - "Use semantic inline elements for emphasis and clarity"
+   - "Map copy from the brief into structured sections"
+   - "Prepare content scaffolding for future styling"
+tags: ["semantics", "content", "headings"]
+---
+
+# Text Semantics & Readability
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Use headings `<h1>` through `<h6>` to communicate structure.
+-  [ ] Apply inline semantics (`<strong>`, `<em>`, `<abbr>`, `<time>`) to add
+       meaning.
+-  [ ] Translate narrative arcs into section headings and paragraphs.
+-  [ ] Prepare content placeholders for the hero and highlights sections.
+
+## Project Context
+
+Portfolio Pulse persuades through words before visuals. Strong semantic markup
+makes the story scannable, exposes meaning to screen readers, and gives search
+engines context. Setting this foundation now means you only tweak content later
+instead of rewriting markup under pressure.
+
+---
+
+## Heading Hierarchy in Practice
+
+### Establish a Single `<h1>`
+
+Your `<h1>` communicates the primary topic of the page. Use `<h2>` for major
+sections (About, Projects) and `<h3>` or `<h4>` for nested subsections
+(Individual projects, highlights).
+
+### Inline Semantics
+
+Use `<em>` for emphasis (changes meaning if removed) and `<strong>` for
+importance. `<abbr>` clarifies acronyms, `<time>` anchors dates, and `<mark>`
+can highlight new additions.
+
+### Basic Example
+
+```html
+<main>
+   <h1>Portfolio Pulse · Avery Stone</h1>
+   <p>
+      <strong>Product designer</strong> focused on <em>measurable outcomes</em>.
+   </p>
+</main>
+```
+
+### Practical Example
+
+```html
+<section id="hero" aria-labelledby="hero-heading">
+   <p class="eyebrow">Product Designer & Frontend Engineer</p>
+   <h1 id="hero-heading">Designing measurable customer journeys.</h1>
+   <p>
+      I partner with product teams to ship experiments that increase
+      <abbr title="Monthly Recurring Revenue">MRR</abbr>, boost retention, and
+      create delightful support experiences.
+   </p>
+   <p>
+      <time datetime="2024-11">Latest Case Study:</time> Rebuilt the onboarding
+      flow at LumenAI, improving activation by <strong>27%</strong>.
+   </p>
+</section>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Write Copy Outside of the Browser First
+
+**Why:** Refining text in a notes file avoids accidental style bias and keeps
+you focused on meaning.
+
+```md
+## Hero Talking Points
+
+-  Role + differentiator
+-  Proof point with metric
+-  Invitation to connect
+```
+
+### 2. Keep Paragraphs Short and Intentional
+
+**Why:** Short paragraphs improve readability and align with responsive layouts.
+
+```html
+<p>
+   I lead discovery workshops, translate insights into prototypes, and work with
+   engineering to ship polished experiences.
+</p>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Skipping Heading Levels
+
+**Problem:** Jumping from `<h1>` to `<h4>` breaks document outline logic and
+confuses screen reader navigation.
+
+```html
+<!-- Bad: h1 followed by h4 -->
+<h1>Portfolio Pulse</h1>
+<h4>Latest Projects</h4>
+```
+
+**Solution:**
+
+```html
+<h1>Portfolio Pulse</h1>
+<h2>Latest Projects</h2>
+<h3>LumenAI Activation</h3>
+```
+
+### 2. Using `<b>` and `<i>` for Meaningful Emphasis
+
+**Problem:** `<b>` and `<i>` are presentational without conveying meaning to
+assistive tech.
+
+```html
+<!-- Bad: purely visual emphasis -->
+<p><i>Product designer</i> building experiences that grow businesses.</p>
+```
+
+**Solution:**
+
+```html
+<p><em>Product designer</em> building experiences that grow businesses.</p>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Draft Hero and Highlights Copy
+
+1. Update `portfolio-pulse/index.html` by adding the hero section markup from
+   the practical example.
+2. Create a `section` with `id="highlights"` and scaffold three `<article>`
+   elements with `<h3>` headings and placeholder paragraphs for case studies.
+3. Use semantic inline elements (`<strong>`, `<time>`, `<abbr>`) to annotate
+   metrics and timelines.
+4. Record any copy placeholders in `notes/orientation.md` for future refinement.
+5. Commit with `git commit -am "feat: add hero and highlights semantics"`.
+
+#### Expected Result
+
+Your homepage now communicates the core story using semantic HTML, ready for
+more detailed content and styling.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Page renders the hero heading and highlights section without errors.
+-  [ ] Each case study `<article>` contains a heading and supporting text.
+
+### Code Quality
+
+-  [ ] Heading levels increase sequentially (no skipped levels).
+-  [ ] Inline semantics are used for meaning, not just styling.
+
+### Understanding
+
+-  [ ] You can explain when to use `<strong>` vs `<em>`.
+-  [ ] You can articulate how the content map ties back to the project brief.
+
+### Project Integration
+
+-  [ ] Notes capture any metrics or client names that need confirmation.
+-  [ ] Copy aligns with the personas defined in the project brief.
+
+---

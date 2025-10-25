@@ -1,0 +1,202 @@
+---
+title: "Navigation Patterns with Lists & Anchors"
+description:
+   "Build accessible navigation and learn how anchors support Portfolio Pulse's
+   information architecture."
+module: "M0"
+lesson: "5"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Foundation blueprint"
+prerequisites: ["/docs/html/m0/4_text-semantics"]
+learning_objectives:
+   - "Construct navigation using semantic lists"
+   - "Configure skip links and in-page anchors"
+   - "Plan URL fragments for key sections"
+   - "Ensure keyboard and screen reader accessibility"
+tags: ["navigation", "anchors", "accessibility"]
+---
+
+# Navigation Patterns with Lists & Anchors
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Create a navigation menu with `<nav>` and an unordered list.
+-  [ ] Configure skip links and in-page anchors targeting hero, projects, and
+       contact sections.
+-  [ ] Reserve accessible names for links and buttons.
+-  [ ] Document the information architecture for future modules.
+
+## Project Context
+
+Portfolio Pulse relies on clear navigation so visitors and assistive
+technologies can reach key sections fast. Navigation decisions now dictate
+anchor IDs, skip link targets, and the overall rhythm of the page. These
+patterns also influence how CSS handles layout later.
+
+---
+
+## Anchors and Lists Working Together
+
+### Use `<nav>` Around Primary Navigation
+
+Wrap your main navigation in a `<nav aria-label="Primary">` to provide an
+accessible name. Inside, use `<ul>` and `<li>` to list anchor links.
+
+### Skip Links Improve Usability
+
+Provide a visually hidden skip link at the top of the page. It appears when
+focused, letting keyboard users jump straight to main content.
+
+### Basic Example
+
+```html
+<nav aria-label="Primary">
+   <ul>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#contact">Contact</a></li>
+   </ul>
+</nav>
+```
+
+### Practical Example
+
+```html
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header" role="banner">
+   <nav aria-label="Primary navigation">
+      <ul class="nav-list">
+         <li><a href="#highlights">Work</a></li>
+         <li><a href="#services">Services</a></li>
+         <li><a href="#testimonials">Proof</a></li>
+         <li><a href="#contact">Contact</a></li>
+      </ul>
+   </nav>
+   <a class="btn-secondary" href="/portfolio-pulse/Avery-Stone-Resume.pdf"
+      >Download resume</a
+   >
+</header>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Use Meaningful Link Text
+
+**Why:** Links like "Click here" provide no context when read aloud or scanned.
+
+```html
+<a href="#contact">Book a discovery call</a>
+```
+
+### 2. Balance In-Page Anchors and Separate Pages
+
+**Why:** Too many anchors can overwhelm; choose anchors for scannable sections
+and reserve new pages for deep dives.
+
+```md
+-  In-page anchor: `#highlights`
+-  Separate page: `/case-studies/lumen-ai`
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting `aria-label` When Text is Ambiguous
+
+**Problem:** A navigation with only icons leaves screen reader users lost.
+
+```html
+<!-- Bad: icon-only navigation -->
+<nav>
+   <ul>
+      <li>
+         <a href="#highlights"><span class="icon icon-star"></span></a>
+      </li>
+   </ul>
+</nav>
+```
+
+**Solution:**
+
+```html
+<nav aria-label="Primary navigation">
+   <ul>
+      <li>
+         <a href="#highlights">
+            <span class="icon icon-star" aria-hidden="true"></span>
+            <span class="sr-only">Work</span>
+         </a>
+      </li>
+   </ul>
+</nav>
+```
+
+### 2. Nesting Anchors Improperly
+
+**Problem:** Wrapping a `<a>` within another `<a>` is invalid and harms
+accessibility.
+
+```html
+<!-- Bad: nested anchors -->
+<a href="#projects">
+   <a href="#services">See work</a>
+</a>
+```
+
+**Solution:**
+
+```html
+<a href="#projects">See work</a>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Add Navigation & Skip Links
+
+1. Update the `<header>` in `index.html` with the practical navigation markup.
+2. Ensure each anchor points to an existing or planned section ID (highlights,
+   services, testimonials, contact).
+3. Insert a skip link before the header and style it later with a
+   `visually-hidden` utility.
+4. Document the information architecture in `docs/project-brief.md` under a new
+   "Navigation" section.
+5. Commit with `git commit -am "feat: add portfolio navigation anchors"`.
+
+#### Expected Result
+
+Visitors can move between key sections using both keyboard and pointer, and your
+anchors line up with the site map defined earlier.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Skip link is focusable and jumps to `#main-content`.
+-  [ ] Navigation anchors point to valid IDs on the page.
+
+### Code Quality
+
+-  [ ] Navigation uses an unordered list inside `<nav>`.
+-  [ ] Links use descriptive text without duplication.
+
+### Understanding
+
+-  [ ] You can explain when to create new pages vs in-page anchors.
+-  [ ] You know how `aria-label` complements visible text.
+
+### Project Integration
+
+-  [ ] Information architecture is reflected in the project brief.
+-  [ ] Anchor IDs match the section plan for future modules.
+
+---

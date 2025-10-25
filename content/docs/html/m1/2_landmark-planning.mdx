@@ -1,0 +1,208 @@
+---
+title: "Planning Landmarks & Page Regions"
+description:
+   "Map Portfolio Pulse sections to landmarks that support accessibility, SEO,
+   and collaboration."
+module: "M1"
+lesson: "2"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/1_semantic-layout-intro"]
+learning_objectives:
+   - "Assign landmarks to portfolio sections"
+   - "Choose when to use `<section>`, `<article>`, `<aside>`, and `<div>`"
+   - "Design skip link and focus order across landmarks"
+   - "Prepare a region inventory for collaboration"
+tags: ["landmarks", "accessibility", "layout"]
+---
+
+# Planning Landmarks & Page Regions
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Assign each major section of Portfolio Pulse to the correct landmark.
+-  [ ] Determine when to use `<section>`, `<article>`, `<aside>`, or `<div>`.
+-  [ ] Document focus order and skip link targets across the page.
+-  [ ] Create a region inventory that guides designers and developers.
+
+## Project Context
+
+Landmarks shape the mental model of your site. When you intentionally assign
+them, you help screen reader users jump to relevant sections, ensure search
+engines understand context, and make collaboration easier because everyone
+references the same region names.
+
+---
+
+## Landmark Assignments
+
+### Header & Navigation
+
+Use `<header role="banner">` for the top region, containing logo, navigation,
+and call-to-action. If the navigation is complex, consider a secondary
+`<nav aria-label="Secondary">` inside the footer.
+
+### Main
+
+`<main>` should contain the primary narrative: hero, highlights, services,
+testimonials, contact. Only one `main` per page.
+
+### Aside
+
+Use `<aside>` for supplemental content such as credentials, press logos, or
+quick stats. The content should be related but not central to the main
+narrative.
+
+### Footer
+
+`<footer>` provides supporting navigation, legal links, and final calls to
+action.
+
+### Basic Example
+
+```html
+<body>
+   <header role="banner">...</header>
+   <main>
+      <section>...</section>
+      <aside aria-label="Quick facts">...</aside>
+   </main>
+   <footer role="contentinfo">...</footer>
+</body>
+```
+
+### Practical Example
+
+```html
+<header class="site-header" role="banner">
+   <div class="brand">Portfolio Pulse</div>
+   <nav aria-label="Primary navigation">...</nav>
+</header>
+<main id="main-content" tabindex="-1">
+   <section id="hero" aria-labelledby="hero-heading">...</section>
+   <section id="projects" aria-labelledby="projects-heading">...</section>
+   <section id="services" aria-labelledby="services-title">...</section>
+   <aside aria-label="Credentials">
+      <h2>Credentials</h2>
+      <p>Certified UX Leader · 8+ years shipping products</p>
+   </aside>
+   <section id="contact" aria-labelledby="contact-title">...</section>
+</main>
+<footer class="site-footer" role="contentinfo">...</footer>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Name Asides for Context
+
+**Why:** Adding `aria-label` clarifies how supplemental content relates to the
+main narrative.
+
+```html
+<aside aria-label="Testimonials sidebar">...</aside>
+```
+
+### 2. Document Focus Order
+
+**Why:** Knowing where focus moves allows you to test keyboard navigation and
+plan interactive elements.
+
+```md
+Focus order:
+
+1. Skip link
+2. Primary navigation items
+3. Hero call-to-action
+4. Case study cards
+5. Contact form
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Using `<aside>` for Core Content
+
+**Problem:** If content is critical (services, case studies), it belongs in
+`<section>` inside `<main>`.
+
+```html
+<!-- Bad: entire services section inside aside -->
+<aside>
+   <h2>Services</h2>
+   ...
+</aside>
+```
+
+**Solution:**
+
+```html
+<section id="services">...</section>
+```
+
+### 2. Duplicating Landmarks
+
+**Problem:** Multiple `<footer>` elements confuse assistive technologies.
+
+```html
+<footer>Primary footer</footer>
+<footer>Secondary info</footer>
+```
+
+**Solution:**
+
+```html
+<footer>
+   <section aria-label="Secondary info">...</section>
+</footer>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Build the Region Inventory
+
+1. Update `docs/layout-plan.md` with a table mapping sections to landmarks,
+   headings, IDs, and notes.
+2. Annotate `index.html` with comments describing the purpose of each region
+   (helpful for collaborators).
+3. Ensure `aside` usage fits the supplemental criteria; move critical content
+   into `<section>` if needed.
+4. Commit with `git commit -am "docs: finalize landmark inventory"`.
+
+#### Expected Result
+
+Your team can glance at the layout plan and know exactly how the page is
+structured and how focus should move.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Each landmark appears once and wraps the correct content.
+-  [ ] `aside` regions contain supplemental—not primary—content.
+
+### Code Quality
+
+-  [ ] Comments in `index.html` reflect the latest region inventory.
+-  [ ] Layout plan table includes headings, IDs, and responsibilities.
+
+### Understanding
+
+-  [ ] You can justify why each section uses its selected HTML element.
+-  [ ] You know how focus should move through the page.
+
+### Project Integration
+
+-  [ ] Region inventory is linked from the project brief.
+-  [ ] Notes include any open dependencies for supplemental content.
+
+---

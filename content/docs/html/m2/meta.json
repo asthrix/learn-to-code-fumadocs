@@ -1,0 +1,16 @@
+{
+   "title": "M2 · Forms & Lead Capture",
+   "pages": [
+      "0_index",
+      "1_forms-introduction",
+      "2_labels-association",
+      "3_input-types",
+      "4_validation-strategies",
+      "5_accessible-feedback",
+      "6_contact-form-blueprint",
+      "7_form-enhancements",
+      "8_implementation",
+      "9_validation"
+   ],
+   "defaultOpen": false
+}

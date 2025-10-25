@@ -1,0 +1,238 @@
+---
+title: "Footer Calls to Action"
+description:
+   "Design a footer that closes the loop with contact options, secondary
+   navigation, and trust builders."
+module: "M1"
+lesson: "7"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/6_supporting-asides"]
+learning_objectives:
+   - "Structure footer content with navigation and contact details"
+   - "Present legal and policy information accessibly"
+   - "Add a secondary call-to-action and newsletter or RSS options"
+   - "Plan global footer reuse across future pages"
+tags: ["footer", "cta", "structure"]
+---
+
+# Footer Calls to Action
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Build a footer that provides navigation, contact, and trust information.
+-  [ ] Present legal and policy links accessibly.
+-  [ ] Offer a secondary call-to-action or newsletter sign-up.
+-  [ ] Plan how the footer scales to multi-page portfolios.
+
+## Project Context
+
+The footer is your final chance to convert. It should reiterate how to reach
+you, surface key resources, and communicate trust signals (location,
+availability, legal details). A thoughtful footer also encourages visitors to
+explore more content.
+
+---
+
+## Footer Composition
+
+### Contact Information
+
+Include email, location, and preferred contact method. Use `<address>` for
+physical location and contact details.
+
+### Secondary Navigation
+
+Provide links to resume, case studies, articles, or social profiles.
+
+### Legal & Policies
+
+Include privacy policy, accessibility statement, and copyright.
+
+### Basic Example
+
+```html
+<footer role="contentinfo">
+   <address>Avery Stone · hello@averystone.design · Remote (UTC-5)</address>
+   <nav aria-label="Footer navigation">
+      <ul>
+         <li><a href="#highlights">Work</a></li>
+         <li><a href="#services">Services</a></li>
+      </ul>
+   </nav>
+</footer>
+```
+
+### Practical Example
+
+```html
+<footer class="site-footer" role="contentinfo">
+   <section class="footer-cta" aria-labelledby="footer-cta-title">
+      <h2 id="footer-cta-title">Ready to build the next win?</h2>
+      <p>
+         Email
+         <a href="mailto:hello@averystone.design">hello@averystone.design</a> or
+         schedule a call.
+      </p>
+      <a
+         class="btn-primary"
+         href="https://cal.com/avery-stone/intro"
+         target="_blank"
+         rel="noopener"
+      >
+         Book a 30-minute intro
+      </a>
+   </section>
+   <section class="footer-grid">
+      <div>
+         <h3>Contact</h3>
+         <address>
+            Avery Stone<br />
+            Remote · UTC-5<br />
+            <a href="mailto:hello@averystone.design">hello@averystone.design</a>
+         </address>
+      </div>
+      <nav aria-label="Footer navigation">
+         <h3>Explore</h3>
+         <ul>
+            <li><a href="/case-studies/index.html">Case studies</a></li>
+            <li><a href="/resume.pdf">Resume</a></li>
+            <li><a href="/writing/index.html">Insights</a></li>
+         </ul>
+      </nav>
+      <div>
+         <h3>Stay in the loop</h3>
+         <form action="https://example.com/newsletter" method="post">
+            <label for="newsletter-email">Email</label>
+            <input id="newsletter-email" name="email" type="email" required />
+            <button type="submit">Subscribe</button>
+         </form>
+      </div>
+   </section>
+   <section class="footer-meta" aria-label="Legal">
+      <small
+         >&copy; <time datetime="2025">2025</time> Avery Stone. All rights
+         reserved.</small
+      >
+      <ul class="legal-links">
+         <li><a href="/legal/privacy.html">Privacy</a></li>
+         <li><a href="/legal/accessibility.html">Accessibility</a></li>
+      </ul>
+   </section>
+</footer>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Use `<address>` for Contact Information
+
+**Why:** `<address>` communicates contact details semantically to browsers and
+assistive tech.
+
+```html
+<address>
+   Avery Stone · Remote · <a href="mailto:hello@averystone.design">Email</a>
+</address>
+```
+
+### 2. Group Legal Links with `<small>` or `<ul>`
+
+**Why:** Grouping legal details clarifies their purpose and improves
+readability.
+
+```html
+<section aria-label="Legal">
+   <small>&copy; 2025 Avery Stone</small>
+   <ul>
+      <li><a href="/legal/privacy.html">Privacy</a></li>
+   </ul>
+</section>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Duplicating Navigation Without Context
+
+**Problem:** Footer navigation needs its own `aria-label` to distinguish it from
+primary nav.
+
+```html
+<nav>
+   <ul>
+      <li><a href="#highlights">Work</a></li>
+   </ul>
+</nav>
+```
+
+**Solution:**
+
+```html
+<nav aria-label="Footer navigation">...</nav>
+```
+
+### 2. Omitting Form Labels
+
+**Problem:** Newsletter forms without labels are inaccessible.
+
+```html
+<input type="email" placeholder="Email" />
+```
+
+**Solution:**
+
+```html
+<label for="newsletter-email">Email</label>
+<input id="newsletter-email" type="email" />
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Build the Footer
+
+1. Replace the footer in `index.html` with the practical example, customizing
+   contact details and links.
+2. Ensure all links have descriptive text and the newsletter form includes
+   accessible labels.
+3. Document future footer partial reuse plans in `docs/layout-plan.md`.
+4. Commit with `git commit -am "feat: craft footer calls to action"`.
+
+#### Expected Result
+
+Your footer now reinforces the call to action, provides essential information,
+and prepares you for scaling to multiple pages.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Email links open the default mail client.
+-  [ ] Newsletter form fields have associated labels and required attributes.
+
+### Code Quality
+
+-  [ ] Footer navigation has a unique `aria-label`.
+-  [ ] Legal links and copyright data use semantic elements.
+
+### Understanding
+
+-  [ ] You can justify what content lives in the footer vs header.
+-  [ ] You know which footer items should become shared partials.
+
+### Project Integration
+
+-  [ ] Layout plan documents reuse strategy for the footer.
+-  [ ] Retro log lists upcoming tasks (privacy policy copy, newsletter
+       integration).
+
+---

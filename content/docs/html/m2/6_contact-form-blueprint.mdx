@@ -1,0 +1,202 @@
+---
+title: "Contact Form Blueprint"
+description:
+   "Assemble the complete field list, consent flows, and submission handling
+   plan for Portfolio Pulse."
+module: "M2"
+lesson: "6"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Lead capture"
+prerequisites: ["/docs/html/m2/5_accessible-feedback"]
+learning_objectives:
+   - "Define the final field set for the contact form"
+   - "Design consent checkboxes and privacy disclosures"
+   - "Plan submission handling (email, API, CRM)"
+   - "Create a blueprint diagram or table"
+tags: ["forms", "blueprint", "planning"]
+---
+
+# Contact Form Blueprint
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Finalize the form field inventory and groupings.
+-  [ ] Define consent and privacy disclosures compliant with regulations.
+-  [ ] Decide how submissions will be processed and stored.
+-  [ ] Create a blueprint table that guides implementation.
+
+## Project Context
+
+Before writing the full markup, commit to the exact form you will ship. This
+blueprint becomes the contract for stakeholders and informs future automation or
+backend work.
+
+---
+
+## Field Inventory
+
+### Core Groups
+
+1. **Contact Details:** Name, email, optional phone.
+2. **Project Context:** Project type, timeline, budget range.
+3. **Message:** Freeform text area.
+4. **Consent:** Marketing opt-in, privacy acknowledgement.
+
+### Consent & Privacy
+
+Include explicit consent for marketing communications and link to privacy
+policies. For EU visitors, note GDPR compliance.
+
+### Basic Example
+
+```md
+| Field             | Type     | Required | Notes                    |
+| ----------------- | -------- | -------- | ------------------------ |
+| name              | text     | yes      | Autocomplete name        |
+| email             | email    | yes      | Primary contact          |
+| project-type      | select   | yes      | Options defined in brief |
+| message           | textarea | yes      | Minimum 50 characters    |
+| marketing-consent | checkbox | no       | Default unchecked        |
+```
+
+### Practical Example
+
+```md
+# Contact Form Blueprint
+
+## Field Groups
+
+1. Contact details
+   -  Name (text, required)
+   -  Work email (email, required)
+   -  Phone (tel, optional)
+2. Project context
+   -  Engagement type (select, required)
+   -  Estimated budget (number, optional)
+   -  Target launch (date, optional)
+3. Message
+   -  Project summary (textarea, required, min 50 chars)
+4. Consent
+   -  Privacy acknowledgment (checkbox, required)
+   -  Marketing opt-in (checkbox, optional)
+
+## Submission Handling
+
+-  Primary channel: Send email via serverless function (Resend or AWS SES)
+-  CRM: Zapier integration to Airtable leads table
+-  Auto-response: Send templated email acknowledging receipt
+
+## Analytics Hooks
+
+-  Trigger `form_submit` event on successful send
+-  Trigger `form_error` with error codes for debugging
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Consent Checkboxes Separate
+
+**Why:** Privacy acknowledgment and marketing consent serve different legal
+purposes.
+
+```html
+<label>
+   <input type="checkbox" name="privacy" required />
+   I agree to the privacy policy.
+</label>
+<label>
+   <input type="checkbox" name="marketing-consent" />
+   Send me occasional updates.
+</label>
+```
+
+### 2. Provide Links to Privacy Policy Next to Consent
+
+**Why:** Users should access policies when making a decision.
+
+```html
+<a href="/legal/privacy.html" target="_blank" rel="noopener">Privacy policy</a>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Combining Consent into a Single Checkbox
+
+**Problem:** Blending legal acknowledgment and marketing opt-in leads to
+compliance issues.
+
+```html
+<input type="checkbox" required /> I agree to privacy and marketing.
+```
+
+**Solution:**
+
+```html
+<input type="checkbox" name="privacy" required /> I agree to privacy policy.
+<input type="checkbox" name="marketing-consent" /> Send updates.
+```
+
+### 2. Ignoring Backend Constraints
+
+**Problem:** Collecting data that backend systems cannot store results in lost
+submissions.
+
+```md
+// Bad: capturing budget as text when CRM expects numeric value.
+```
+
+**Solution:**
+
+```md
+-  Field: Budget
+-  Type: Number (stored as integer in CRM)
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Document the Blueprint
+
+1. Update `docs/form-strategy.md` with a table like the practical example.
+2. Note submission handling plan (email service, CRM, auto-response).
+3. Capture consent language referencing the privacy policy.
+4. Commit with `git commit -am "docs: finalize contact form blueprint"`.
+
+#### Expected Result
+
+You have a clear, approved specification that developers and stakeholders can
+rely on when implementing the form.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Blueprint includes all fields with type and requirement status.
+-  [ ] Submission handling plan defines primary and fallback channels.
+
+### Code Quality
+
+-  [ ] Consent language references actual policy URLs.
+-  [ ] Analytics events listed with trigger points.
+
+### Understanding
+
+-  [ ] You can explain why each field exists and how data is stored.
+-  [ ] You know the compliance implications of consent checkboxes.
+
+### Project Integration
+
+-  [ ] Accessibility manifesto references consent and privacy handling.
+-  [ ] Retro log notes any dependencies on backend work.
+
+---

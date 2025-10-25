@@ -1,0 +1,16 @@
+{
+   "title": "M1 · Semantic Layout & Landmarks",
+   "pages": [
+      "0_index",
+      "1_semantic-layout-intro",
+      "2_landmark-planning",
+      "3_header-strategy",
+      "4_navigation-accessibility",
+      "5_main-content-architecture",
+      "6_supporting-asides",
+      "7_footer-cta",
+      "8_implementation",
+      "9_validation"
+   ],
+   "defaultOpen": false
+}

@@ -1,0 +1,126 @@
+---
+title: "Media Strategy Introduction"
+description:
+   "Define the story your media must tell and the guardrails that keep it fast."
+module: "M3"
+lesson: "1"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Showcase"
+prerequisites: ["/docs/html/m3/0_index"]
+learning_objectives:
+   - "Audit existing visuals and identify storytelling gaps"
+   - "Establish media principles for accessibility and performance"
+   - "Plan documentation updates for media governance"
+tags: ["strategy", "planning", "media"]
+---
+
+# Media Strategy Introduction
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Inventory the visuals that support Avery's story.
+-  [ ] Define media guardrails for performance, licensing, and consent.
+-  [ ] Outline documentation updates for future collaborators.
+
+## Why It Matters
+
+Images and embeds often carry most of a portfolio's emotional weight—but they
+are also hotspots for performance regressions and accessibility gaps. A
+strategy-first approach ensures every asset earns its place and respects users'
+constraints.
+
+---
+
+## Portfolio Pulse Media Audit
+
+### 1. Collect Source Material
+
+-  Case study cover images
+-  Workshop photographs
+-  Logo treatments or UI mockups
+-  Video testimonials or talks
+
+Log attribution, usage rights, and original dimensions in
+`docs/media-inventory.md`.
+
+### 2. Assign Story Beats
+
+Match each asset to the narrative arc:
+
+-  Discovery → showcase research deliverables
+-  Design → highlight UI explorations
+-  Impact → present before/after snapshots or metrics graphics
+
+Document the pairing in `notes/module-3-plan.md` with context on why each asset
+matters.
+
+### 3. Define Success Criteria
+
+| Goal                            | Metric                      | Owner |
+| ------------------------------- | --------------------------- | ----- |
+| Keep hero gallery under 1.2MB   | Lighthouse Performance ≥ 90 | Avery |
+| Provide accessible descriptions | Alt text log updated        | You   |
+| Respect third-party privacy     | Embeds gated until consent  | Team  |
+
+---
+
+## ✅ Best Practices
+
+### 1. Start with Copy
+
+**Why:** Narrative clarity leads to better visual decisions.
+
+Draft a short paragraph describing the story each asset should communicate
+before cropping or compressing.
+
+### 2. Treat Media Like Structured Data
+
+**Why:** Consistent metadata enables automation later.
+
+```
+- asset: concept-workshop.jpg
+  focus: discovery
+  alt: "Avery leading a sticky-note workshop during discovery sprint"
+  license: "CC BY-NC"
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Choosing Assets Before Setting Budgets
+
+**Problem:** High-res exports balloon page weight.
+
+**Fix:** Define max file sizes per asset type before exporting.
+
+### 2. Ignoring Legal & Privacy Constraints
+
+**Problem:** Embedding third-party content without consent banners.
+
+**Fix:** Flag any embed that sets cookies and plan for privacy-gate UI.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Create `docs/media-inventory.md` if it does not exist and log current assets.
+2. Update `docs/accessibility-manifesto.md` with media-specific guidelines (alt
+   text quality, caption timelines).
+3. Add a TODO in `notes/module-3-plan.md` to revisit analytics once media is
+   implemented.
+4. Share the strategy outline with stakeholders for async review.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Media inventory created with source, license, and intended story beat.
+-  [ ] Performance and accessibility goals documented.
+-  [ ] Stakeholders acknowledge media plan or provide feedback.
+-  [ ] Retro log updated with strategy risks for Module 3.
+
+---

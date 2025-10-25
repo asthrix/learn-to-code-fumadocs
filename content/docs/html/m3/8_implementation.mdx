@@ -1,0 +1,188 @@
+---
+title: "Module 3 Implementation"
+description:
+   "Build the responsive media showcase with accessible figures, embeds, and
+   CTAs."
+module: "M3"
+lesson: "8"
+difficulty: "intermediate"
+duration: "45"
+project_phase: "Showcase"
+prerequisites: ["/docs/html/m3/7_gallery-blueprint"]
+learning_objectives:
+   - "Assemble the showcase gallery markup"
+   - "Integrate responsive images and optional media embeds"
+   - "Connect analytics and documentation updates"
+tags: ["implementation", "gallery", "media"]
+---
+
+# Module 3 Implementation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Build the full Portfolio Pulse showcase section.
+-  [ ] Apply responsive image patterns and media accessibility.
+-  [ ] Update documentation and analytics hooks for stakeholders.
+
+## Project Context
+
+The gallery is where prospects evaluate Avery's impact. Your implementation must
+balance storytelling with performance and inclusivity.
+
+---
+
+## Assembly Steps
+
+### 1. Section Scaffold
+
+```html
+<section id="showcase" aria-labelledby="showcase-title">
+   <header>
+      <h2 id="showcase-title">Case studies that sparked measurable change</h2>
+      <p>
+         Explore a curated selection of recent projects and the outcomes they
+         delivered.
+      </p>
+   </header>
+   <ol class="case-study-gallery">
+      <!-- case studies -->
+   </ol>
+</section>
+```
+
+### 2. Case Study Article
+
+```html
+<li>
+   <article class="case-study" aria-labelledby="case-study-fintech">
+      <header>
+         <h3 id="case-study-fintech">Fintech Onboarding Redesign</h3>
+         <p class="case-study-outcome">
+            Completion rate improved by 32% within 6 weeks.
+         </p>
+      </header>
+      <figure class="case-study-figure">
+         <picture>
+            <source
+               type="image/avif"
+               srcset="
+                  /images/showcase/fintech-640.avif   640w,
+                  /images/showcase/fintech-1280.avif 1280w
+               "
+               sizes="(min-width: 960px) 45vw, 90vw"
+            />
+            <source
+               type="image/webp"
+               srcset="
+                  /images/showcase/fintech-640.webp   640w,
+                  /images/showcase/fintech-1280.webp 1280w
+               "
+               sizes="(min-width: 960px) 45vw, 90vw"
+            />
+            <img
+               src="/images/showcase/fintech-1280.jpg"
+               srcset="
+                  /images/showcase/fintech-640.jpg   640w,
+                  /images/showcase/fintech-1280.jpg 1280w
+               "
+               sizes="(min-width: 960px) 45vw, 90vw"
+               width="1280"
+               height="853"
+               alt="Avery guiding fintech stakeholders through the streamlined onboarding flow"
+               loading="lazy"
+               decoding="async"
+            />
+         </picture>
+         <figcaption>
+            We simplified identity verification and set clear expectations,
+            reducing drop-off at step two by 47%.
+         </figcaption>
+      </figure>
+      <footer>
+         <a
+            href="/case-studies/fintech-onboarding.html"
+            data-cta="fintech-gallery"
+            >Read the case study</a
+         >
+      </footer>
+   </article>
+</li>
+```
+
+Replicate the `<li>` structure for each case study, customizing IDs, alt text,
+captions, and analytics attributes.
+
+### 3. Optional Embedded Media
+
+Add a testimonial video to one case study using the consent gate pattern from
+Lesson 6. Place it after the figure or within the footer as supporting evidence.
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Lists Ordered When Sequence Matters
+
+**Why:** Signals progression to assistive tech and search engines.
+
+### 2. Group Headings With Outcomes
+
+**Why:** Reinforces value proposition immediately under each `h3`.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting `aria-labelledby`
+
+**Problem:** Screen readers cannot tie the article to its heading.
+
+**Fix:** Use `aria-labelledby` referencing the internal `h3`.
+
+### 2. Mixing Grid Divs Into Markup
+
+**Problem:** Structure becomes brittle when styling changes.
+
+**Fix:** Keep classes purposeful; handle layout in CSS.
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+1. Update the `#showcase` section in `index.html` with the scaffold and case
+   studies.
+2. Ensure each figure uses responsive image markup and documented alt text.
+3. Add consent-gated embed if you have rich media; otherwise, include a pull
+   quote.
+4. Record analytics attributes and new sections in `docs/state-architecture.md`
+   and `docs/media-inventory.md`.
+5. Commit with `git commit -am "feat: build portfolio showcase gallery"` once
+   complete.
+
+#### Expected Result
+
+Prospects can explore Avery's strongest engagements through a responsive,
+accessible gallery backed by documentation.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Gallery renders correctly across breakpoints.
+-  [ ] Optional media embeds respect consent gating.
+
+### Accessibility
+
+-  [ ] Headings follow logical hierarchy (`h2`, `h3`).
+-  [ ] Figures and captions provide meaningful context.
+
+### Documentation
+
+-  [ ] Inventory updated with asset usage, links, and analytics IDs.
+-  [ ] Retro log notes implementation decisions.
+
+---

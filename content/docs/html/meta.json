@@ -2,5 +2,5 @@
    "title": "HTML Fundamentals",
    "root": true,
    "description": "Learn the foundation of web development with HTML",
-   "pages": ["index"]
+   "pages": ["index", "m0", "m1", "m2", "m3", "m4", "m5"]
 }

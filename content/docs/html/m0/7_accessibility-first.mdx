@@ -1,0 +1,188 @@
+---
+title: "Accessibility-First HTML Mindset"
+description:
+   "Adopt inclusive defaults for landmarks, focus order, and assistive
+   technology support."
+module: "M0"
+lesson: "7"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Foundation blueprint"
+prerequisites: ["/docs/html/m0/6_metadata-basics"]
+learning_objectives:
+   - "Explain the POUR accessibility principles"
+   - "Configure landmarks, skip links, and focus order"
+   - "Annotate content for screen readers with ARIA when needed"
+   - "Document accessibility goals and testing cadence"
+tags: ["accessibility", "semantics", "a11y"]
+---
+
+# Accessibility-First HTML Mindset
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Summarize the POUR (Perceivable, Operable, Understandable, Robust)
+       principles.
+-  [ ] Ensure landmarks, headings, and focus order support keyboard users.
+-  [ ] Apply ARIA attributes only when native semantics fall short.
+-  [ ] Document an accessibility test plan for Portfolio Pulse.
+
+## Project Context
+
+Accessibility is not an add-on; it must inform every decision. Portfolio Pulse
+should feel welcoming to every visitor. Aligning to accessibility best practices
+from the start prevents painful refactors and signals professionalism to hiring
+teams.
+
+---
+
+## Core Principles
+
+### POUR Framework
+
+-  **Perceivable:** Content must be presented in ways users can perceive (text
+   alternatives, structured headings).
+-  **Operable:** Interfaces must support keyboard navigation and predictable
+   focus.
+-  **Understandable:** Content should be clear and consistent with helpful
+   feedback.
+-  **Robust:** Markup should work with assistive technologies today and in the
+   future.
+
+### Landmarks & Focus
+
+Ensure the tab order follows visual order and that skip links land on focusable
+elements. Use native HTML roles before reaching for ARIA.
+
+### Basic Example
+
+```html
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header role="banner">...</header>
+<main id="main-content" tabindex="-1">...</main>
+<footer role="contentinfo">...</footer>
+```
+
+### Practical Example
+
+```html
+<section id="testimonials" aria-labelledby="testimonials-title">
+   <h2 id="testimonials-title">Client Proof</h2>
+   <article class="testimonial" aria-label="testimonial from LumenAI">
+      <blockquote>
+         "Avery audited our onboarding and shipped improvements in two weeks.
+         Accessibility wins alone reduced support tickets by 35%."
+      </blockquote>
+      <footer>
+         <p>
+            <strong>Jordan Reyes</strong>
+            <span class="role">VP Product, LumenAI</span>
+         </p>
+      </footer>
+   </article>
+</section>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Use Native Elements First
+
+**Why:** Native semantics carry built-in accessibility support. Only add ARIA
+when the native element cannot express intent.
+
+```html
+<button type="button">View case study</button>
+<!-- Not a div with role="button" -->
+```
+
+### 2. Keep Focus Styles Visible
+
+**Why:** Removing outlines without providing alternatives traps keyboard users.
+
+```html
+:focus { outline: 3px solid var(--color-accent); outline-offset: 4px; }
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Using ARIA Labels Everywhere
+
+**Problem:** Overusing ARIA increases cognitive load and can introduce
+conflicts.
+
+```html
+<!-- Bad: redundant aria-label when text already descriptive -->
+<a aria-label="View the contact section" href="#contact">Contact</a>
+```
+
+**Solution:**
+
+```html
+<a href="#contact">Contact</a>
+```
+
+### 2. Forgetting to Make Skip Link Targets Focusable
+
+**Problem:** Skip links land on non-focusable elements and fail to move focus.
+
+```html
+<!-- Bad: main has no tabindex so focus does not move -->
+<main id="main-content">...</main>
+```
+
+**Solution:**
+
+```html
+<main id="main-content" tabindex="-1">...</main>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Write the Accessibility Manifesto
+
+1. Create `docs/accessibility.md` capturing accessibility goals, personas, and
+   tools (axe DevTools, Lighthouse, VoiceOver/NVDA).
+2. Audit `index.html` to confirm landmarks, skip links, and focus management
+   follow the practical example.
+3. Add TODOs for future enhancements (ARIA live regions, reduced motion
+   preferences) in the manifesto.
+4. Commit with `git commit -am "docs: define accessibility manifesto"`.
+
+#### Expected Result
+
+You now have a living document that guides accessibility decisions and ensures
+Portfolio Pulse aligns with inclusive standards.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Skip link moves focus to `main` and is visible on focus.
+-  [ ] Landmarks cover the entire page without duplication.
+
+### Code Quality
+
+-  [ ] No unnecessary ARIA attributes appear in `index.html`.
+-  [ ] Accessibility manifesto references tooling and cadence.
+
+### Understanding
+
+-  [ ] You can explain the POUR framework.
+-  [ ] You know when to add `tabindex="-1"` to custom focus targets.
+
+### Project Integration
+
+-  [ ] Accessibility goals are linked in orientation notes.
+-  [ ] Manifesto includes checkpoints for future modules.
+
+---
