@@ -2,6 +2,7 @@ import { BlueprintSection } from "@/components/landing/BlueprintSection";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
 import { ModernHeroSection } from "@/components/landing/ModernHeroSection";
 import { SpotlightCoursesSection } from "@/components/landing/SpotlightCoursesSection";
+import { PricingSection } from "@/components/landing/PricingSection";
 import { courses } from "@/lib/courses";
 
 export default function HomePage() {
@@ -14,6 +15,7 @@ export default function HomePage() {
          <ModernHeroSection />
          <SpotlightCoursesSection spotlightCourses={spotlightCourses} />
          <BlueprintSection />
+         <PricingSection />
          <FinalCtaSection />
       </main>
    );

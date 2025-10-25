@@ -19,13 +19,13 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
 
    const getStatusBadge = () => {
       const baseClasses =
-         "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold";
+         "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-widest";
 
       switch (course.status) {
          case "available":
             return (
                <span
-                  className={`${baseClasses} border-emerald-200/80 bg-emerald-100/70 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-500/20 dark:text-emerald-200`}
+                  className={`${baseClasses} border-emerald-600/40 bg-emerald-600/15 text-emerald-600`}
                >
                   Available
                </span>
@@ -33,7 +33,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
          case "coming-soon":
             return (
                <span
-                  className={`${baseClasses} border-amber-200/80 bg-amber-100/70 text-amber-700 dark:border-amber-400/30 dark:bg-amber-500/20 dark:text-amber-200`}
+                  className={`${baseClasses} border-indigo-500/40 bg-indigo-500/20 text-indigo-500`}
                >
                   Coming Soon
                </span>
@@ -41,7 +41,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
          case "in-development":
             return (
                <span
-                  className={`${baseClasses} border-sky-200/80 bg-sky-100/70 text-sky-700 dark:border-sky-400/30 dark:bg-sky-500/20 dark:text-sky-200`}
+                  className={`${baseClasses} border-red-300/40 bg-red-300/20 text-red-300`}
                >
                   In Development
                </span>
@@ -52,11 +52,11 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
    const getDifficultyClasses = () => {
       switch (course.difficulty) {
          case "beginner":
-            return "border-emerald-200/60 bg-emerald-50/80 text-emerald-600 dark:border-emerald-400/30 dark:bg-emerald-500/20 dark:text-emerald-200";
+            return "border-sky-600/40 bg-sky-600/15 text-sky-600";
          case "intermediate":
-            return "border-amber-200/60 bg-amber-50/80 text-amber-600 dark:border-amber-400/30 dark:bg-amber-500/20 dark:text-amber-200";
+            return "border-secondary/40 bg-secondary/15 text-secondary/70";
          case "advanced":
-            return "border-rose-200/60 bg-rose-50/80 text-rose-600 dark:border-rose-400/30 dark:bg-rose-500/20 dark:text-rose-200";
+            return "border-orange-400/40 bg-orange-400/15 text-orange-400";
       }
    };
 
@@ -65,9 +65,9 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
       (!shouldCheckPrerequisites || prerequisiteStatus.met);
 
    return (
-      <div className='group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-900/10 bg-white/90 p-6 shadow-[0_20px_40px_-25px_rgba(14,165,233,0.3)] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_25px_50px_-20px_rgba(14,165,233,0.45)] dark:border-white/10 dark:bg-gradient-to-br dark:from-slate-900/70 dark:via-slate-900/40 dark:to-slate-800/30 dark:shadow-[0_20px_40px_-20px_rgba(14,165,233,0.45)] dark:backdrop-blur-xl'>
+      <div className='group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card/95 p-6 shadow-[0_20px_40px_-25px_hsl(var(--color-primary)/0.25)] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_25px_50px_-20px_hsl(var(--color-primary)/0.4)]'>
          <div className='flex items-start justify-between gap-4'>
-            <span className='inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-2xl shadow-inner shadow-slate-900/10 transition group-hover:scale-105 dark:bg-white/10 dark:shadow-white/20'>
+            <span className='inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/25 text-2xl shadow-[inset_0_1px_2px_hsl(var(--color-primary)/0.15)] transition group-hover:scale-105'>
                {course.icon}
             </span>
             {getStatusBadge()}
@@ -75,15 +75,15 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
 
          <div className='mt-6 flex flex-col gap-4'>
             <div>
-               <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100'>
+               <h3 className='text-lg font-semibold text-foreground'>
                   {course.title}
                </h3>
-               <p className='mt-1 text-sm text-slate-500 dark:text-slate-300'>
+               <p className='mt-1 text-sm text-muted-foreground'>
                   {course.duration} • {course.modules} modules
                </p>
             </div>
 
-            <p className='text-sm text-slate-600 dark:text-slate-300'>
+            <p className='text-sm text-muted-foreground'>
                {course.shortDescription}
             </p>
 
@@ -94,7 +94,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
                   {course.difficulty}
                </span>
                {shouldCheckPrerequisites && course.prerequisites.length > 0 && (
-                  <span className='text-xs text-slate-500 dark:text-slate-400'>
+                  <span className='text-xs text-muted-foreground'>
                      Requires: {course.prerequisites.join(", ")}
                   </span>
                )}
@@ -102,13 +102,13 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
 
             {showProgress && progress > 0 && (
                <div>
-                  <div className='flex items-center justify-between text-xs text-slate-500 dark:text-slate-400'>
+                  <div className='flex items-center justify-between text-xs text-muted-foreground'>
                      <span>Progress</span>
                      <span>{progress}%</span>
                   </div>
-                  <div className='mt-2 h-2 w-full rounded-full bg-slate-200/70 dark:bg-slate-800/70'>
+                  <div className='mt-2 h-2 w-full rounded-full bg-muted/60'>
                      <div
-                        className='h-full rounded-full bg-sky-500 transition-all duration-300 dark:bg-sky-400'
+                        className='h-full rounded-full bg-primary transition-all duration-300'
                         style={{ width: `${progress}%` }}
                      />
                   </div>
@@ -119,20 +119,20 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
                {course.technologies.slice(0, 3).map((tech) => (
                   <span
                      key={tech}
-                     className='inline-flex items-center rounded-full border border-slate-900/10 bg-white/60 px-3 py-1 text-xs font-medium text-slate-600 dark:border-white/10 dark:bg-white/10 dark:text-slate-200'
+                     className='inline-flex items-center rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium text-muted-foreground'
                   >
                      {tech}
                   </span>
                ))}
                {course.technologies.length > 3 && (
-                  <span className='inline-flex items-center rounded-full border border-slate-900/10 bg-white/60 px-3 py-1 text-xs font-medium text-slate-500 dark:border-white/10 dark:bg-white/10 dark:text-slate-300'>
+                  <span className='inline-flex items-center rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium text-muted-foreground'>
                      +{course.technologies.length - 3} more
                   </span>
                )}
             </div>
 
             {shouldCheckPrerequisites && !prerequisiteStatus.met && (
-               <div className='rounded-2xl border border-amber-200/60 bg-amber-50/80 p-3 text-xs text-amber-700 dark:border-amber-400/20 dark:bg-amber-500/15 dark:text-amber-200'>
+               <div className='rounded-2xl border border-destructive/40 bg-destructive/15 p-3 text-xs text-destructive'>
                   <span className='font-semibold'>Prerequisites:</span> Complete{" "}
                   {prerequisiteStatus.missing.join(", ")} first.
                </div>
@@ -142,7 +142,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
                {isAccessible ? (
                   <Link
                      href={`/docs/${course.id}`}
-                     className='inline-flex items-center justify-center rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/40 transition hover:-translate-y-1 hover:bg-sky-400 focus-visible:ring-2 focus-visible:ring-sky-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-slate-950 dark:focus-visible:ring-offset-slate-950'
+                     className='inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[0_15px_35px_-15px_hsl(var(--color-primary)/0.6)] transition hover:-translate-y-1 hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background'
                   >
                      {progress > 0 ? "Continue learning" : "Start course"}
                      <svg
@@ -162,7 +162,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
                ) : (
                   <button
                      disabled
-                     className='inline-flex items-center justify-center rounded-full border border-slate-900/10 bg-white/70 px-4 py-2 text-sm font-semibold text-slate-500 dark:border-white/10 dark:bg-white/10 dark:text-slate-400'
+                     className='inline-flex items-center justify-center rounded-full border border-border bg-muted/40 px-4 py-2 text-sm font-semibold text-muted-foreground'
                   >
                      {course.status === "available"
                         ? shouldCheckPrerequisites
@@ -172,7 +172,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
                   </button>
                )}
 
-               <div className='flex items-center justify-between rounded-2xl border border-slate-900/10 bg-slate-100/70 px-3 py-2 text-xs text-slate-500 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-300'>
+               <div className='flex items-center justify-between rounded-2xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground'>
                   <span>🎯 {course.project}</span>
                   <span>📚 {course.modules} modules</span>
                </div>
