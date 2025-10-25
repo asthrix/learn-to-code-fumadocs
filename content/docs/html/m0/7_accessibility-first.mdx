@@ -171,53 +171,58 @@ Portfolio Pulse aligns with inclusive standards.
          Reference manifesto content and landmark adjustments to align your page
          with an accessibility-first posture.
       </p>
-      <pre>
-         <code className="language-md">
-{`# Accessibility Manifesto
+      ```md filename="docs/accessibility.md"
+      # Accessibility Manifesto
 
-## Why it matters
+      ## Why it matters
 
--  Deliver equitable access to hiring managers, recruiters, and peers.
--  Reduce friction for visitors who rely on assistive tech or keyboard-only
-   navigation.
+      -  Deliver equitable access to hiring managers, recruiters, and peers.
+      -  Reduce friction for visitors who rely on assistive tech or keyboard-only navigation.
 
-## Personas & scenarios
+      ## Personas & scenarios
 
--  Jordan (screen reader user) reviewing case studies for a partner role.
--  Maya (keyboard-only) comparing service offerings quickly.
+      -  Jordan (screen reader user) reviewing case studies for a partner role.
+      -  Maya (keyboard-only) comparing service offerings quickly.
 
-## Principles
+      ## Principles
 
--  Follow POUR guidelines across every module.
--  Prefer native HTML elements; add ARIA only when semantics require.
--  Preserve visible focus and respect reduced motion preferences.
+      -  Follow POUR guidelines across every module.
+      -  Prefer native HTML elements; add ARIA only when semantics require.
+      -  Preserve visible focus and respect reduced motion preferences.
 
-## Tooling cadence
+      ## Tooling cadence
 
--  axe DevTools quick pass every sprint.
--  Lighthouse accessibility audit before launches.
--  VoiceOver/NVDA spot checks on hero, navigation, testimonials sections.
+      -  axe DevTools quick pass every sprint.
+      -  Lighthouse accessibility audit before launches.
+      -  VoiceOver/NVDA spot checks on hero, navigation, testimonials sections.
 
-## Upcoming enhancements
+      ## Upcoming enhancements
 
--  Add aria-live summaries to form submission messages (Module 4).
--  Provide reduced motion toggles for animations (Module 6).
--  Document color contrast tokens in design system handoff.
-   `} </code> </pre> <p> Ensure `index.html` landmarks and focus management reflect these decisions: </p> <pre> <code className="language-html"> {`<a class="skip-link" href="#main-content">Skip
-   to main content</a>
-   <header role="banner">...</header>
-<main id="main-content" tabindex="-1">...</main>
-<section id="testimonials" aria-labelledby="testimonials-title">
-  <h2 id="testimonials-title">Client Proof</h2>
-  <article class="testimonial" aria-label="Testimonial from LumenAI">...</article>
-</section>
-<footer role="contentinfo">...</footer>`}
-         </code>
-      </pre>
+      -  Add aria-live summaries to form submission messages (Module 4).
+      -  Provide reduced motion toggles for animations (Module 6).
+      -  Document color contrast tokens in design system handoff.
+      ```
+
+      <p>
+         Ensure `index.html` landmarks and focus management reflect these
+         decisions:
+      </p>
+
+      ```html filename="index.html"
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <header role="banner">...</header>
+      <main id="main-content" tabindex="-1">...</main>
+      <section id="testimonials" aria-labelledby="testimonials-title">
+         <h2 id="testimonials-title">Client Proof</h2>
+         <article class="testimonial" aria-label="Testimonial from LumenAI">...</article>
+      </section>
+      <footer role="contentinfo">...</footer>
+      ```
       <p>
          Link the manifesto from `notes/orientation.md` so it stays visible to
          future collaborators as development accelerates.
       </p>
+
    </Accordion>
 </Accordions>
 

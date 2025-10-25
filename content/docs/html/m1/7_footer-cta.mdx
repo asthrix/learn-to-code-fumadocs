@@ -220,89 +220,83 @@ and prepares you for scaling to multiple pages.
              Wire up the footer using this pattern, then note reuse strategy in your
              layout plan.
          </p>
-         <pre>
-             <code className="language-html">
-{`<footer class="site-footer" role="contentinfo">
-   <section class="footer-cta" aria-labelledby="footer-cta-title">
-      <h2 id="footer-cta-title">Ready to build the next win?</h2>
-      <p>
-         Email <a href="mailto:hello@averystone.design">hello@averystone.design</a>
-         or schedule time directly.
-      </p>
-      <a
-         class="btn-primary"
-         href="https://cal.com/avery-stone/intro"
-         target="_blank"
-         rel="noopener"
-      >
-         Book a 30-minute intro
-      </a>
-   </section>
+         ```html filename="index.html"
+         <footer class="site-footer" role="contentinfo">
+            <section class="footer-cta" aria-labelledby="footer-cta-title">
+               <h2 id="footer-cta-title">Ready to build the next win?</h2>
+               <p>
+                  Email <a href="mailto:hello@averystone.design">hello@averystone.design</a>
+                  or schedule time directly.
+               </p>
+               <a
+                  class="btn-primary"
+                  href="https://cal.com/avery-stone/intro"
+                  target="_blank"
+                  rel="noopener"
+               >
+                  Book a 30-minute intro
+               </a>
+            </section>
 
-{" "}
+            <section class="footer-grid">
+               <div>
+                  <h3>Contact</h3>
+                  <address>
+                     Avery Stone
+                     <br />
+                     Remote · UTC-5
+                     <br />
+                     <a href="mailto:hello@averystone.design">hello@averystone.design</a>
+                  </address>
+               </div>
+               <nav aria-label="Footer navigation">
+                  <h3>Explore</h3>
+                  <ul>
+                     <li>
+                        <a href="/case-studies/index.html">Case studies</a>
+                     </li>
+                     <li>
+                        <a href="/resume.pdf">Resume</a>
+                     </li>
+                     <li>
+                        <a href="/writing/index.html">Insights</a>
+                     </li>
+                  </ul>
+               </nav>
+               <div>
+                  <h3>Stay in the loop</h3>
+                  <form action="https://example.com/newsletter" method="post">
+                     <label for="newsletter-email">Email</label>
+                     <input id="newsletter-email" name="email" type="email" required />
+                     <button type="submit">Subscribe</button>
+                  </form>
+               </div>
+            </section>
 
-<section class='footer-grid'>
-   <div>
-      <h3>Contact</h3>
-      <address>
-         Avery Stone
-         <br />
-         Remote · UTC-5
-         <br />
-         <a href='mailto:hello@averystone.design'>hello@averystone.design</a>
-      </address>
-   </div>
-   <nav aria-label='Footer navigation'>
-      <h3>Explore</h3>
-      <ul>
-         <li>
-            <a href='/case-studies/index.html'>Case studies</a>
-         </li>
-         <li>
-            <a href='/resume.pdf'>Resume</a>
-         </li>
-         <li>
-            <a href='/writing/index.html'>Insights</a>
-         </li>
-      </ul>
-   </nav>
-   <div>
-      <h3>Stay in the loop</h3>
-      <form action='https://example.com/newsletter' method='post'>
-         <label for='newsletter-email'>Email</label>
-         <input id='newsletter-email' name='email' type='email' required />
-         <button type='submit'>Subscribe</button>
-      </form>
-   </div>
-</section>
-
-   <section class="footer-meta" aria-label="Legal">
-      <small>&copy; <time datetime="2025">2025</time> Avery Stone. All rights reserved.</small>
-      <ul class="legal-links">
-         <li><a href="/legal/privacy.html">Privacy</a></li>
-         <li><a href="/legal/accessibility.html">Accessibility</a></li>
-      </ul>
-   </section>
-</footer>`}
-             </code>
-         </pre>
+            <section class="footer-meta" aria-label="Legal">
+               <small>&copy; <time datetime="2025">2025</time> Avery Stone. All rights reserved.</small>
+               <ul class="legal-links">
+                  <li><a href="/legal/privacy.html">Privacy</a></li>
+                  <li><a href="/legal/accessibility.html">Accessibility</a></li>
+               </ul>
+            </section>
+         </footer>
+         ```
          <p>
              Update `docs/layout-plan.md` so the footer strategy is easy to reuse:
          </p>
-         <pre>
-             <code className="language-md">
-{`### Footer Notes
-- Convert footer into partial once multiple pages ship (Module 3).
-- Newsletter form posts to ConvertKit; add honeypot field during Module 4.
-- Legal links reference shared /legal/ pages created in Module 2.
-`}
-             </code>
-         </pre>
+         ```md filename="docs/layout-plan.md"
+         ### Footer Notes
+         - Convert footer into partial once multiple pages ship (Module 3).
+         - Newsletter form posts to ConvertKit; add honeypot field during Module 4.
+         - Legal links reference shared /legal/ pages created in Module 2.
+         ```
          <p>
              Record upcoming policy copy tasks in `notes/retro-log.md` to avoid
              losing track before deployment.
          </p>
     </Accordion>
+
 </Accordions>
 
 ---

@@ -195,78 +195,70 @@ keyboard-friendly and screen-reader-ready.
              Use this header markup as a starting point, then document responsive
              considerations in the layout plan.
          </p>
-         <pre>
-             <code className="language-html">
-{`<header class="site-header" role="banner">
-   <div class="brand">
-      <a href="#top" aria-label="Portfolio Pulse">
-         <span aria-hidden="true" class="brand-mark">PP</span>
-         <span class="sr-only">Portfolio Pulse</span>
-      </a>
-   </div>
+         ```html filename="index.html"
+         <header class="site-header" role="banner">
+            <div class="brand">
+               <a href="#top" aria-label="Portfolio Pulse">
+                  <span aria-hidden="true" class="brand-mark">PP</span>
+                  <span class="sr-only">Portfolio Pulse</span>
+               </a>
+            </div>
 
-{" "}
+            <nav aria-label="Primary navigation" class="nav-desktop">
+               <ul>
+                  <li>
+                     <a href="#highlights">Work</a>
+                  </li>
+                  <li>
+                     <a href="#services">Services</a>
+                  </li>
+                  <li>
+                     <a href="#testimonials">Proof</a>
+                  </li>
+                  <li>
+                     <a href="#contact">Contact</a>
+                  </li>
+               </ul>
+            </nav>
 
-<nav aria-label='Primary navigation' class='nav-desktop'>
-   <ul>
-      <li>
-         <a href='#highlights'>Work</a>
-      </li>
-      <li>
-         <a href='#services'>Services</a>
-      </li>
-      <li>
-         <a href='#testimonials'>Proof</a>
-      </li>
-      <li>
-         <a href='#contact'>Contact</a>
-      </li>
-   </ul>
-</nav>
+            <details class="nav-mobile">
+               <summary aria-haspopup="listbox" aria-controls="mobile-nav-list">
+                  Menu
+               </summary>
+               <nav aria-label="Mobile navigation">
+                  <ul id="mobile-nav-list">
+                     <li>
+                        <a href="#highlights">Work</a>
+                     </li>
+                     <li>
+                        <a href="#services">Services</a>
+                     </li>
+                     <li>
+                        <a href="#testimonials">Proof</a>
+                     </li>
+                     <li>
+                        <a href="#contact">Contact</a>
+                     </li>
+                  </ul>
+               </nav>
+            </details>
 
-{" "}
-
-<details class='nav-mobile'>
-   <summary aria-haspopup='listbox' aria-controls='mobile-nav-list'>
-      Menu
-   </summary>
-   <nav aria-label='Mobile navigation'>
-      <ul id='mobile-nav-list'>
-         <li>
-            <a href='#highlights'>Work</a>
-         </li>
-         <li>
-            <a href='#services'>Services</a>
-         </li>
-         <li>
-            <a href='#testimonials'>Proof</a>
-         </li>
-         <li>
-            <a href='#contact'>Contact</a>
-         </li>
-      </ul>
-   </nav>
-</details>
-
-   <a class="btn-primary" href="#contact">Book a discovery call</a>
-</header>`}
-             </code>
-         </pre>
+            <a class="btn-primary" href="#contact">Book a discovery call</a>
+         </header>
+         ```
          <p>
              Record responsive guidance in `docs/layout-plan.md` so future styling
              work has clear direction:
          </p>
-         <pre>
-             <code className="language-md">
-{`### Header Responsive Notes
-- Desktop: nav-desktop visible, nav-mobile hidden
-- Mobile: nav-desktop hidden, nav-mobile expands full width
-- Summary focus state: outline 3px accent, offset 4px
-- TODO: replace duplicate nav lists with partial include once templating added
-`}
-             </code>
-         </pre>
+         ```md filename="docs/layout-plan.md"
+         ### Header Responsive Notes
+         - Desktop: nav-desktop visible, nav-mobile hidden
+         - Mobile: nav-desktop hidden, nav-mobile expands full width
+         - Summary focus state: outline 3px accent, offset 4px
+         - TODO: replace duplicate nav lists with partial include once templating added
+         ```
     </Accordion>
+
 </Accordions>
 
 ---

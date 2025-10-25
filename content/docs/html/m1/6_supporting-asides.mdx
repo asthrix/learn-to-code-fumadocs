@@ -195,85 +195,79 @@ credibility without interrupting the main narrative.
              Implement a credentials aside similar to this example, then log missing
              resources for follow-up.
          </p>
-         <pre>
-             <code className="language-html">
-{`<aside class="sidebar" aria-labelledby="sidebar-credentials">
-   <h2 id="sidebar-credentials">Credentials & Press</h2>
+         ```html filename="index.html"
+         <aside class="sidebar" aria-labelledby="sidebar-credentials">
+            <h2 id="sidebar-credentials">Credentials & Press</h2>
 
-{" "}
+            <section aria-labelledby="quick-stats">
+               <h3 id="quick-stats">Quick stats</h3>
+               <dl class="stat-list">
+                  <div>
+                     <dt>Experience</dt>
+                     <dd>
+                        <time datetime="2015">10 years shipping products</time>
+                     </dd>
+                  </div>
+                  <div>
+                     <dt>Launched products</dt>
+                     <dd>24 end-to-end engagements</dd>
+                  </div>
+                  <div>
+                     <dt>Avg. uplift</dt>
+                     <dd>
+                        <strong>18%</strong> retention improvement
+                     </dd>
+                  </div>
+               </dl>
+            </section>
 
-<section aria-labelledby='quick-stats'>
-   <h3 id='quick-stats'>Quick stats</h3>
-   <dl class='stat-list'>
-      <div>
-         <dt>Experience</dt>
-         <dd>
-            <time datetime='2015'>10 years shipping products</time>
-         </dd>
-      </div>
-      <div>
-         <dt>Launched products</dt>
-         <dd>24 end-to-end engagements</dd>
-      </div>
-      <div>
-         <dt>Avg. uplift</dt>
-         <dd>
-            <strong>18%</strong> retention improvement
-         </dd>
-      </div>
-   </dl>
-</section>
+            <section aria-labelledby="press-highlights">
+               <h3 id="press-highlights">Press highlights</h3>
+               <ul class="press-list">
+                  <li>
+                     <a
+                        href="https://example.com/product-weekly"
+                        target="_blank"
+                        rel="noopener"
+                     >
+                        Product Weekly · Designing with accessible defaults
+                     </a>
+                  </li>
+                  <li>
+                     <a
+                        href="https://example.com/design-ops-radio"
+                        target="_blank"
+                        rel="noopener"
+                     >
+                        Design Ops Radio · From prototypes to production
+                     </a>
+                  </li>
+               </ul>
+            </section>
 
-{" "}
-
-<section aria-labelledby='press-highlights'>
-   <h3 id='press-highlights'>Press highlights</h3>
-   <ul class='press-list'>
-      <li>
-         <a
-            href='https://example.com/product-weekly'
-            target='_blank'
-            rel='noopener'
-         >
-            Product Weekly · Designing with accessible defaults
-         </a>
-      </li>
-      <li>
-         <a
-            href='https://example.com/design-ops-radio'
-            target='_blank'
-            rel='noopener'
-         >
-            Design Ops Radio · From prototypes to production
-         </a>
-      </li>
-   </ul>
-</section>
-
-   <section aria-labelledby="availability-title">
-      <h3 id="availability-title">Availability</h3>
-      <p>Accepting new collaborations starting <time datetime="2024-07">July 2024</time>.</p>
-   </section>
-</aside>`}
-             </code>
-         </pre>
+            <section aria-labelledby="availability-title">
+               <h3 id="availability-title">Availability</h3>
+               <p>
+                  Accepting new collaborations starting <time datetime="2024-07">July 2024</time>.
+               </p>
+            </section>
+         </aside>
+         ```
          <p>
              Track outstanding assets in `notes/retro-log.md`:
          </p>
-         <pre>
-             <code className="language-md">
-{`### Aside Follow-ups
-- Replace placeholder press URLs with real links once approved (Owner: Avery)
-- Confirm availability date with calendar (Owner: Avery)
-- Gather updated stat for average uplift from analytics (Owner: Jordan)
-`}
-             </code>
-         </pre>
+         ```md filename="notes/retro-log.md"
+         ### Aside Follow-ups
+         - Replace placeholder press URLs with real links once approved (Owner: Avery)
+         - Confirm availability date with calendar (Owner: Avery)
+         - Gather updated stat for average uplift from analytics (Owner: Jordan)
+         ```
          <p>
              Update the layout plan to note that the aside should stack below the
              highlights section on narrow viewports.
          </p>
     </Accordion>
+
 </Accordions>
 
 ---

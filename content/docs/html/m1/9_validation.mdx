@@ -10,11 +10,11 @@ duration: "25"
 project_phase: "Semantic layout"
 prerequisites: ["/docs/html/m1/8_implementation"]
 learning_objectives:
-   - "Evaluate landmarks and headings for compliance"
-   - "Document layout review outcomes and remaining work"
-   - "Confirm navigation, skip links, and mobile menus meet standards"
-   - "Prioritize backlog items for Module 2"
-tags: ["validation", "quality", "layout"]
+   - "Run complementary automated and manual audits"
+   - "Document findings with severity, owners, and deadlines"
+   - "Update reference docs with validation outcomes"
+   - "Plan Module 2 priorities based on backlog items"
+tags: ["validation", "quality", "checklist"]
 ---
 
 import { Accordions, Accordion } from "@/components/accordion";
@@ -25,34 +25,27 @@ import { Accordions, Accordion } from "@/components/accordion";
 
 By the end of this lesson, you will:
 
--  [ ] Audit the Module 1 layout using automated and manual techniques.
--  [ ] Capture findings with severity ratings.
--  [ ] Confirm navigation and layout behaviors meet accessibility requirements.
--  [ ] Define next steps for Module 2.
+-  [ ] Update `notes/validation/module-1.md` with automated and manual results.
+-  [ ] Categorize findings by severity and assign clear owners.
+-  [ ] Cross-reference validation outcomes in the project brief and layout plan.
+-  [ ] Prioritize follow-up work for Module 2 based on the backlog.
 
 ## Project Context
 
-Validation ensures your semantic layout is production-worthy. Before moving to
-forms, confirm the core narrative is structurally sound. This step also
-reassures stakeholders that the project stays aligned with standards.
+Module 1 delivered a complete semantic layout. Before moving forward, confirm
+that the structure holds up under validation. Pair automated tooling with manual
+reviews so you can capture accessibility gaps, structural drift, or missing
+content while momentum is high.
 
 ---
 
-## Audit Focus Areas
-
-### Automated Tools
-
--  axe DevTools for landmark, heading, and ARIA issues
--  HTML5 Outliner or browser accessibility tree for heading structure
--  Link checker to ensure all anchors resolve
-
-### Manual Checks
+## Manual Checks
 
 -  Keyboard navigation through header, sections, and footer
 -  Screen reader review of landmarks (VoiceOver, NVDA)
 -  Visual scan for duplicate links or inconsistent copy
 
-### Basic Example
+## Basic Example
 
 ```md
 ## Module 1 Validation Notes
@@ -62,7 +55,7 @@ reassures stakeholders that the project stays aligned with standards.
 -  ✅ Links: All anchors resolved to sections
 ```
 
-### Practical Example
+## Practical Example
 
 ```md
 # Module 1 · Validation Summary
@@ -106,40 +99,42 @@ contextual problems.
 ```md
 -  Issue: Placeholder testimonial
 -  Owner: Avery
--  Due: Module 3 Implementation
+-  Due: Module 3
 ```
 
 ---
 
 ## ❌ Common Mistakes
 
-### 1. Closing Validation Without Sharing Notes
+### 1. Skipping Documentation Updates
 
-**Problem:** Team members remain unaware of outstanding work.
+**Problem:** Validation loses value when results stay in private notes.
 
 ```md
-// Bad: Notes stored locally, not committed.
+<!-- Bad: validation results not saved to repo -->
 ```
 
 **Solution:**
 
 ```md
-Commit validation notes to `notes/validation/module-1.md` and reference them in
-project brief.
+-  Commit notes/validation/module-1.md with findings.
+-  Reference the log from docs/project-brief.md.
 ```
 
-### 2. Ignoring Minor Accessibility Warnings
+### 2. Logging Issues Without Severity
 
-**Problem:** Warnings compound when you add interactions later.
+**Problem:** If backlog items lack severity, it becomes unclear what to tackle
+first.
 
 ```md
-// Bad: Leaving duplicate link text unresolved.
+-  Placeholder testimonial copy needs update.
 ```
 
 **Solution:**
 
 ```md
-Address warnings immediately or raise a backlog item with a due date.
+-  Severity: High — Replace placeholder testimonial copy (Owner: Avery,
+   Module 3)
 ```
 
 ---
@@ -166,9 +161,9 @@ follow-up tasks.
          Populate `notes/validation/module-1.md` with a structured log similar to
          this example.
       </p>
-      <pre>
-         <code className="language-md">
-{`# Module 1 · Validation Summary
+
+```md filename="notes/validation/module-1.md"
+# Module 1 · Validation Summary
 
 _Date:_ 2024-05-15 · _Owner:_ Avery Stone
 
@@ -202,9 +197,14 @@ _Date:_ 2024-05-15 · _Owner:_ Avery Stone
 -  Footer CTA stays email-based; scheduling tool link optional for launch.
 -  Accessibility doc updated with navigation requirements.
 -  Layout plan references aside stacking rules for breakpoints.
-   `} </code> </pre> <p> Link this validation summary from `notes/orientation.md`
-   so future collaborators can spot the latest audit at a glance. </p>
-      </Accordion>
+```
+
+      <p>
+         Link this validation summary from `notes/orientation.md` so future
+         collaborators can spot the latest audit at a glance.
+      </p>
+
+   </Accordion>
 </Accordions>
 
 ---

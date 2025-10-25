@@ -192,81 +192,81 @@ makes onboarding straightforward.
          Create the workspace scaffold and supporting docs similar to the outline
          below.
       </p>
-      <pre>
-         <code className="language-txt">
-{`portfolio-pulse/
-├── README.md
-├── docs/
-│   ├── project-brief.md
-│   ├── accessibility.md
-│   └── measurement.md
-├── notes/
-│   ├── orientation.md
-│   └── retro-log.md
-├── public/
-│   ├── fonts/
-│   ├── images/
-│   └── icons/
-├── src/
-│   ├── includes/
-│   │   ├── services.html
-│   │   └── testimonials.html
-│   └── partials/
-│       ├── head.html
-│       ├── header.html
-│       └── footer.html
-└── index.html`}
-         </code>
-      </pre>
+      ```txt filename="structure.txt"
+      portfolio-pulse/
+      ├── README.md
+      ├── docs/
+      │   ├── project-brief.md
+      │   ├── accessibility.md
+      │   └── measurement.md
+      ├── notes/
+      │   ├── orientation.md
+      │   └── retro-log.md
+      ├── public/
+      │   ├── fonts/
+      │   ├── images/
+      │   └── icons/
+      ├── src/
+      │   ├── includes/
+      │   │   ├── services.html
+      │   │   └── testimonials.html
+      │   └── partials/
+      │       ├── head.html
+      │       ├── header.html
+      │       └── footer.html
+      └── index.html
+      ```
       <p>
          Split key markup into partials so reuse stays simple until tooling is
          introduced.
       </p>
-      <pre>
-         <code className="language-html">
-{`<!-- src/partials/head.html -->
-<head>
-  <!-- metadata from Lesson 6 -->
-</head>
+      ```html filename="src/partials"
+      <!-- src/partials/head.html -->
+      <head>
+         <!-- metadata from Lesson 6 -->
+      </head>
 
-<!-- src/partials/header.html -->
-<header role="banner">
-  <!-- navigation from Lesson 5 -->
-</header>
+      <!-- src/partials/header.html -->
+      <header role="banner">
+         <!-- navigation from Lesson 5 -->
+      </header>
 
-<!-- src/partials/footer.html -->
-
-<footer role="contentinfo">
-   <p>© 2024 Avery Stone · Portfolio Pulse</p>
-</footer>`}
-         </code>
-      </pre>
+      <!-- src/partials/footer.html -->
+      <footer role="contentinfo">
+         <p>© 2024 Avery Stone · Portfolio Pulse</p>
+      </footer>
+      ```
       <p>
          Capture repository expectations in `README.md` so future modules inherit
          a shared workflow:
       </p>
-      <pre>
-         <code className="language-md">
-{`# Portfolio Pulse
+      ```md filename="README.md"
+      # Portfolio Pulse
 
-## Setup
+      ## Setup
 
--  Clone the repo and open
--  Serve locally with
+      -  Clone the repo and open
+      -  Serve locally with
 
-## Branching
+      ## Branching
 
--  main: production-ready
--  feature/\*: new work
--  chore/\*: maintenance
+      -  main: production-ready
+      -  feature/*: new work
+      -  chore/*: maintenance
 
-## Deployment TODOs
+      ## Deployment TODOs
 
--  Automate static hosting via Netlify
--  Add scheduled Lighthouse checks
-   `} </code> </pre> <p> Log the structure in `notes/orientation.md` so
-   collaborators know where to add assets or documentation. </p> </Accordion>
-   </Accordions>
+      -  Automate static hosting via Netlify
+      -  Add scheduled Lighthouse checks
+      ```
+
+      <p>
+         Log the structure in `notes/orientation.md` so collaborators know where
+         to add assets or documentation.
+      </p>
+
+   </Accordion>
+</Accordions>
 
 ---
 

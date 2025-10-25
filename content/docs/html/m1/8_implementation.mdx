@@ -41,58 +41,55 @@ content. Treat this as the semantic baseline before layering CSS and JS.
 
 ## Assembly Checklist
 
-### Review Structure
-
-Ensure `index.html` uses one `<header>`, one `<main>`, optional `<aside>`
-elements, and one `<footer>`. Confirm anchor targets exist.
-
-### Validate Headings
-
-Run through the document outline: `h1` → `h2` → `h3` without skipping levels.
-Tools like the HTML5 Outliner help.
-
-### Basic Example
-
-```html
-<header role="banner">...</header>
-<main id="main-content" tabindex="-1">
-   <section id="hero">...</section>
-   <section id="highlights">...</section>
-   <aside aria-label="Credentials">...</aside>
-   <section id="services">...</section>
-   <section id="testimonials">...</section>
-   <section id="contact">...</section>
-</main>
-<footer role="contentinfo">...</footer>
+```html filename="index.html"
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      ...
+   </head>
+   <body>
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <header class="site-header" role="banner">
+         <!-- Header from Lesson 3 -->
+         ...
+      </header>
+      <main id="main-content" tabindex="-1">
+         <!-- Hero, Highlights, Services from Lesson 5 -->
+         ...
+         <!-- Aside from Lesson 6 -->
+         <aside aria-labelledby="sidebar-credentials">...</aside>
+         <!-- Testimonials + Contact -->
+         ...
+      </main>
+      <footer class="site-footer" role="contentinfo">
+         <!-- Footer CTA + legal from Lesson 7 -->
+         ...
+      </footer>
+      <script type="module" src="/scripts/menu.js"></script>
+   </body>
+</html>
 ```
 
-### Practical Example
+Combine all snippets from lessons 3-7 into `index.html`.
 
+```md filename="notes/validation/module-1.md"
+# Module 1 Validation
+
+## Automated
+
+-  npx html-validate index.html → Pass (0 errors, 0 warnings)
+-  Firefox Accessibility → Headings: h1 → h2 (5) → h3 (4)
+
+## Manual
+
+-  Keyboard traversal retains expected order (skip link → nav → hero CTA)
+-  Mobile menu aria-expanded toggles correctly
+
+## Follow-ups
+
+-  Replace hero metric copy with latest data (Owner: Avery, Due: Module 2)
+-  Style skip link and details summary focus rings (Owner: Avery, Due: Module 2)
 ```
-// Combine all snippets from lessons 3-7 into index.html.
-```
-
-Rather than rewriting, ensure you pasted or assembled each section exactly once
-and removed placeholder comments.
-
----
-
-## ✅ Best Practices
-
-### 1. Run Automated Outline Checks
-
-**Why:** Tools like the Firefox Accessibility Inspector reveal heading orders
-and landmark usage instantly.
-
-```bash
-# Using html-validate with heading rule
-npx html-validate --config .htmlvalidate.json index.html
-```
-
-### 2. Snapshot the DOM
-
-**Why:** Saving a DOM snapshot (via browser devtools) provides a reference for
-future modules and ensures nothing accidentally changes.
 
 ```md
 notes/dom-snapshots/module-1.md
@@ -157,40 +154,37 @@ Portfolio Pulse now presents a complete semantic layout that is ready for Module
          The snippet below shows the assembled `index.html` structure after
          completing Module 1. Use it to double-check ordering and IDs.
       </p>
-      <pre>
-         <code className="language-html">
-{`<!DOCTYPE html>
+```html filename="index.html"
+<!DOCTYPE html>
 <html lang="en">
-  <head>...</head>
-  <body>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
-    <header class="site-header" role="banner">
-      <!-- Header from Lesson 3 -->
-      ...
-    </header>
-    <main id="main-content" tabindex="-1">
-      <!-- Hero, Highlights, Services from Lesson 5 -->
-      ...
-      <!-- Aside from Lesson 6 -->
-      <aside aria-labelledby="sidebar-credentials">...</aside>
-      <!-- Testimonials + Contact -->
-      ...
-    </main>
-    <footer class="site-footer" role="contentinfo">
-      <!-- Footer CTA + legal from Lesson 7 -->
-      ...
-    </footer>
-    <script type="module" src="/scripts/menu.js"></script>
-  </body>
-</html>`}
-         </code>
-      </pre>
+   <head>...</head>
+   <body>
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <header class="site-header" role="banner">
+         <!-- Header from Lesson 3 -->
+         ...
+      </header>
+      <main id="main-content" tabindex="-1">
+         <!-- Hero, Highlights, Services from Lesson 5 -->
+         ...
+         <!-- Aside from Lesson 6 -->
+         <aside aria-labelledby="sidebar-credentials">...</aside>
+         <!-- Testimonials + Contact -->
+         ...
+      </main>
+      <footer class="site-footer" role="contentinfo">
+         <!-- Footer CTA + legal from Lesson 7 -->
+         ...
+      </footer>
+      <script type="module" src="/scripts/menu.js"></script>
+   </body>
+</html>
+```
       <p>
          Record validator output in `notes/validation/module-1.md`:
       </p>
-      <pre>
-         <code className="language-md">
-{`# Module 1 Validation
+```md filename="notes/validation/module-1.md"
+# Module 1 Validation
 
 ## Automated
 
@@ -206,8 +200,13 @@ Portfolio Pulse now presents a complete semantic layout that is ready for Module
 
 -  Replace hero metric copy with latest data (Owner: Avery, Due: Module 2)
 -  Style skip link and details summary focus rings (Owner: Avery, Due: Module 2)
-   `} </code> </pre> <p> Tag the commit (`git tag module-1-baseline`) for quick
-   comparisons once future modules introduce layout or interaction changes. </p>
+
+```
+
+      <p>
+         Tag the commit (`git tag module-1-baseline`) for quick comparisons once
+         future modules introduce layout or interaction changes.
+      </p>
       </Accordion>
 </Accordions>
 
@@ -237,3 +236,4 @@ Portfolio Pulse now presents a complete semantic layout that is ready for Module
        state.
 
 ---
+```
