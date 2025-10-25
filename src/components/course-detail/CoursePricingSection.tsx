@@ -29,19 +29,19 @@ export function CoursePricingSection({ pricing }: CoursePricingSectionProps) {
                {pricing.map((tier) => (
                   <div
                      key={tier.name}
-                     className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-900/10 bg-white/90 p-6 shadow-[0_30px_70px_-35px_rgba(37,99,235,0.35)] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-40px_rgba(37,99,235,0.4)] dark:border-white/10 dark:bg-gradient-to-br dark:from-slate-900/70 dark:via-slate-900/45 dark:to-slate-800/35 dark:shadow-[0_30px_70px_-35px_rgba(37,99,235,0.55)] ${
+                     className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-900/10 bg-white/90 p-6 shadow-[0_30px_70px_-35px_rgba(37,99,235,0.35)] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-40px_rgba(37,99,235,0.4)] dark:border-white/10 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800 dark:shadow-[0_30px_70px_-35px_rgba(37,99,235,0.55)] ${
                         tier.highlighted
-                           ? "ring-2 ring-sky-400/70 dark:ring-sky-300/70"
+                           ? "ring-2 ring-orange-400/70 dark:ring-orange-300/70"
                            : ""
                      }`}
                   >
                      {tier.highlighted && (
-                        <span className='absolute left-6 top-6 inline-flex items-center rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-sky-600 dark:bg-sky-400/10 dark:text-sky-200'>
+                        <span className='absolute left-6 top-6 inline-flex items-center rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-orange-600 dark:bg-orange-400/10 dark:text-orange-200'>
                            Recommended
                         </span>
                      )}
 
-                     <div className='mt-4 flex flex-col gap-4'>
+                     <div className='mt-8 flex flex-col gap-4'>
                         <div>
                            <h3 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>
                               {tier.name}
@@ -76,7 +76,7 @@ export function CoursePricingSection({ pricing }: CoursePricingSectionProps) {
                            href={tier.ctaHref}
                            className={`mt-6 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 ${
                               tier.highlighted
-                                 ? "group bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/40 hover:-translate-y-1 hover:bg-sky-400 focus-visible:ring-sky-500/60 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950"
+                                 ? "group bg-orange-300 text-slate-950 shadow-lg shadow-orange-500/40 hover:-translate-y-1 hover:bg-orange-400 focus-visible:ring-orange-500/60 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950"
                                  : "group border border-slate-900/20 bg-white/80 text-slate-900 hover:-translate-y-1 hover:border-slate-900/40 hover:bg-white focus-visible:ring-slate-200/70 focus-visible:ring-offset-white dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/20 dark:focus-visible:ring-white/50 dark:focus-visible:ring-offset-slate-950"
                            }`}
                         >
