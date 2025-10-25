@@ -13,7 +13,7 @@ export function CoursePricingSection({ pricing }: CoursePricingSectionProps) {
          <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.14),_transparent_60%)]' />
          <div className='relative mx-auto max-w-6xl'>
             <div className='text-center'>
-               <p className='inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground'>
+               <p className='inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-secondary'>
                   Pricing in INR
                </p>
                <h2 className='mt-6 text-3xl font-semibold text-foreground sm:text-4xl'>
@@ -30,11 +30,13 @@ export function CoursePricingSection({ pricing }: CoursePricingSectionProps) {
                   <div
                      key={tier.name}
                      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card/95 p-6 shadow-[0_30px_70px_-35px_hsl(var(--color-primary)/0.34)] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_40px_85px_-42px_hsl(var(--color-primary)/0.45)] ${
-                        tier.highlighted ? "ring-2 ring-secondary/60" : ""
+                        tier.highlighted
+                           ? "border-1 border-secondary/70 hover:border-secondary/90 "
+                           : "hover:border-secondary/80"
                      }`}
                   >
                      {tier.highlighted && (
-                        <span className='absolute left-6 top-6 inline-flex items-center rounded-full bg-secondary/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-secondary-foreground'>
+                        <span className='absolute left-6 top-6 inline-flex items-center rounded-full bg-secondary/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-secondary'>
                            Recommended
                         </span>
                      )}
@@ -75,7 +77,7 @@ export function CoursePricingSection({ pricing }: CoursePricingSectionProps) {
                            className={`mt-6 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition focus-visible:ring-2 focus-visible:ring-offset-2 ${
                               tier.highlighted
                                  ? "group bg-secondary text-secondary-foreground shadow-[0_18px_45px_-25px_hsl(var(--color-secondary)/0.55)] hover:-translate-y-1 hover:bg-secondary/90 focus-visible:ring-secondary/60 focus-visible:ring-offset-background"
-                                 : "group border border-border bg-card text-foreground hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/10 hover:text-primary focus-visible:ring-primary/40 focus-visible:ring-offset-background"
+                                 : "group border border-border bg-card text-foreground hover:-translate-y-1 hover:border-secondary/40 hover:bg-secondary/10 hover:text-secondary focus-visible:ring-secondary/40 focus-visible:ring-offset-background"
                            }`}
                         >
                            {tier.ctaLabel}

@@ -28,7 +28,7 @@ export function CourseDetailHeroSection({
                <h1 className='mt-8 text-4xl font-semibold leading-tight text-foreground sm:text-5xl lg:text-6xl'>
                   {hero.title}{" "}
                   <span className='relative inline-flex items-center'>
-                     <span className='absolute inset-y-0 left-0 right-0 rounded-full bg-primary/30 blur-lg dark:bg-primary/35' />
+                     <span className='absolute inset-y-0 left-0 right-0 rounded-full' />
                      <span className='relative bg-gradient-to-r from-primary via-primary/80 to-secondary bg-clip-text text-transparent drop-shadow-[0_0_22px_hsl(var(--color-primary)/0.45)]'>
                         {hero.highlight}
                      </span>
@@ -62,13 +62,13 @@ export function CourseDetailHeroSection({
                   {hero.metrics.map((metric) => (
                      <div
                         key={metric.label}
-                        className='group relative overflow-hidden rounded-2xl border border-border bg-card/90 p-5 text-center shadow-[0_25px_55px_-40px_hsl(var(--color-primary)/0.4)] transition duration-300 hover:-translate-y-2 hover:border-primary/45 hover:shadow-[0_35px_75px_-45px_hsl(var(--color-primary)/0.55)]'
+                        className='group relative overflow-hidden rounded-2xl border border-border bg-card/90 p-5 text-center shadow-[0_25px_55px_-40px_hsl(var(--color-primary)/0.4)] transition duration-300 hover:-translate-y-2 hover:border-secondary/45 hover:shadow-[0_35px_75px_-45px_hsl(var(--color-primary)/0.55)]'
                      >
                         <span className='pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100 dark:from-primary/20' />
-                        <dt className='text-[10px] font-semibold uppercase tracking-[0.38em] text-muted-foreground transition-colors duration-300 group-hover:text-primary'>
+                        <dt className='text-[10px] font-semibold uppercase tracking-[0.38em] text-muted-foreground transition-colors duration-300 group-hover:text-secondary    '>
                            {metric.label}
                         </dt>
-                        <dd className='mt-3 text-3xl font-semibold text-foreground transition-colors duration-300 group-hover:text-primary'>
+                        <dd className='mt-3 text-3xl font-semibold text-foreground transition-colors duration-300 group-hover:text-secondary'>
                            {metric.value}
                         </dd>
                      </div>

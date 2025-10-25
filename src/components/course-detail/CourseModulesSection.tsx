@@ -87,7 +87,7 @@ export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
                         <span className='rounded-full border border-border/60 bg-primary/10 px-3 py-1 text-foreground'>
                            Sprint {String(clampedIndex + 1).padStart(2, "0")}
                         </span>
-                        <span className='rounded-full border border-border/60 bg-secondary/10 px-3 py-1 text-foreground'>
+                        <span className='rounded-full border border-border/60 bg-secondary/10 px-3 py-1 text-secondary'>
                            {activeSummary.lessonsCount} lessons
                         </span>
                         <span className='rounded-full border border-border/60 bg-accent/20 px-3 py-1 text-foreground'>
@@ -108,27 +108,30 @@ export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
                      </p>
                      <div className='mt-5 space-y-4'>
                         <Steps>
-                           {activeModule.lessons.map((lesson, lessonIndex) => (
-                              <Step key={lesson.title}>
-                                 <div className='flex items-start justify-between gap-6 rounded-2xl border border-border bg-card/80 p-4 shadow-sm transition hover:border-primary/40 hover:shadow-[0_12px_35px_-20px_hsl(var(--color-primary)/0.45)]'>
-                                    <div>
-                                       <p className='text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground'>
-                                          Lesson{" "}
-                                          {String(lessonIndex + 1).padStart(
-                                             2,
-                                             "0"
-                                          )}
-                                       </p>
-                                       <p className='mt-1 text-sm font-medium text-foreground'>
-                                          {lesson.title}
-                                       </p>
-                                    </div>
-                                    <span className='shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-primary'>
-                                       {lesson.duration}
-                                    </span>
-                                 </div>
-                              </Step>
-                           ))}
+                           <div className='space-y-2'>
+                              {activeModule.lessons.map(
+                                 (lesson, lessonIndex) => (
+                                    <Step key={lesson.title}>
+                                       <div className='flex items-start justify-between gap-6 rounded-2xl border border-border bg-card/80 p-4 shadow-sm transition hover:border-primary/40 hover:shadow-[0_12px_35px_-20px_hsl(var(--color-primary)/0.45)]'>
+                                          <div>
+                                             <p className='text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground'>
+                                                Lesson{" "}
+                                                {String(
+                                                   lessonIndex + 1
+                                                ).padStart(2, "0")}
+                                             </p>
+                                             <p className='mt-1 text-sm font-medium text-foreground'>
+                                                {lesson.title}
+                                             </p>
+                                          </div>
+                                          <span className='shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-secondary/80'>
+                                             {lesson.duration}
+                                          </span>
+                                       </div>
+                                    </Step>
+                                 )
+                              )}
+                           </div>
                         </Steps>
                      </div>
                   </div>
@@ -171,8 +174,8 @@ export function CourseModulesSection({ modules }: CourseModulesSectionProps) {
                                        className={cn(
                                           "cursor-pointer select-none px-3 py-2 font-medium transition",
                                           isActive
-                                             ? "bg-primary/15 text-primary shadow-[0_18px_35px_-28px_hsl(var(--color-primary)/0.45)]"
-                                             : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+                                             ? "bg-primary/15 text-secondary/80 shadow-[0_18px_35px_-28px_hsl(var(--color-primary)/0.45)] hover:text-secondary"
+                                             : "text-muted-foreground hover:bg-muted/40 hover:text-secondary"
                                        )}
                                     />
                                     {/* {isActive && (

@@ -16,8 +16,8 @@ export default function ReactCoursePage() {
          <CourseDifferentiatorsSection differentiators={differentiators} />
          <CourseTechnologySection technology={technology} />
          <CourseModulesSection modules={modules} />
-         <CourseTestimonialsSection testimonials={testimonials} />
          <CoursePricingSection pricing={pricing} />
+         <CourseTestimonialsSection testimonials={testimonials} />
       </main>
    );
 }

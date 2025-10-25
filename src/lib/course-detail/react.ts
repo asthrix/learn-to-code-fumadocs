@@ -314,7 +314,7 @@ export const reactCourseDetail: CourseDetailContent = {
    pricing: [
       {
          name: "Solo Builder",
-         price: "₹4,499",
+         price: "₹6,999",
          cadence: "one-time",
          description:
             "Full access to the React track, assessments, and deployment templates for individual learners.",
@@ -329,7 +329,7 @@ export const reactCourseDetail: CourseDetailContent = {
       },
       {
          name: "Mentored Sprint",
-         price: "₹7,999",
+         price: "₹11,999",
          cadence: "one-time",
          description:
             "Get async mentor feedback, portfolio polish sessions, and interview prep guidance.",
@@ -344,7 +344,7 @@ export const reactCourseDetail: CourseDetailContent = {
       },
       {
          name: "Team Pod",
-         price: "₹22,500",
+         price: "₹33,499",
          cadence: "per team",
          description:
             "Ideal for 4-6 engineers adopting React best practices with shared scorecards and rollout plan.",
