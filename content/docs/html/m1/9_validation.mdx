@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["validation", "quality", "layout"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Module 1 Validation
 
 ## Learning Objectives
@@ -155,6 +157,55 @@ Address warnings immediately or raise a backlog item with a due date.
 
 You have a clear record of Module 1 quality checks and a prioritized list of
 follow-up tasks.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Populate `notes/validation/module-1.md` with a structured log similar to
+         this example.
+      </p>
+      <pre>
+         <code className="language-md">
+{`# Module 1 · Validation Summary
+
+_Date:_ 2024-05-15 · _Owner:_ Avery Stone
+
+## Automated Checks
+
+-  HTML Validator (nu): 0 errors · 0 warnings
+-  axe DevTools: 1 warning (duplicate "Book a call" link) — resolved by adding
+   descriptive text "Book a discovery call"
+-  Link Checker: Pass (all anchors resolve)
+
+## Manual Review
+
+-  Keyboard traversal: Pass · Skip link visible, menu summary focusable, Escape
+   closes menu
+-  Screen reader (VoiceOver): Landmarks announced in order; aside labeled
+   "Credentials & Press"
+-  Print preview: Sections appear in expected sequence; aside stacks below
+   highlights
+
+## Backlog Items
+
+| Severity | Item                                         | Owner  | Target Module |
+| -------- | -------------------------------------------- | ------ | ------------- |
+| High     | Replace placeholder testimonial quote        | Avery  | Module 2      |
+| Medium   | Consolidate duplicate nav lists into partial | Avery  | Module 3      |
+| Medium   | Style skip link + menu focus states          | Avery  | Module 2      |
+| Low      | Add newsletter privacy copy                  | Jordan | Module 3      |
+
+## Decisions & Notes
+
+-  Footer CTA stays email-based; scheduling tool link optional for launch.
+-  Accessibility doc updated with navigation requirements.
+-  Layout plan references aside stacking rules for breakpoints.
+   `} </code> </pre> <p> Link this validation summary from `notes/orientation.md`
+   so future collaborators can spot the latest audit at a glance. </p>
+      </Accordion>
+</Accordions>
 
 ---
 

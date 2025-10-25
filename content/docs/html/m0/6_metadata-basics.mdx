@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["seo", "metadata", "head"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Metadata & SEO Foundations
 
 ## Learning Objectives
@@ -176,6 +178,70 @@ preview.
 
 Your site now presents consistent metadata across search results and social
 platforms, and you have a clear plan for assets.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Use this reference implementation to wire the `<head>` metadata, while
+         keeping project notes aligned with future asset work.
+      </p>
+      <pre>
+         <code className="language-html">
+{`<head>
+  <meta charset='utf-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <title>Portfolio Pulse · Avery Stone</title>
+  <meta
+    name='description'
+    content='Avery Stone showcases product design work that grows revenue and improves customer journeys.'
+  />
+  <meta name='robots' content='index, follow' />
+  <link rel='canonical' href='https://portfolio-pulse.example.com' />
+
+{" "}
+<meta property='og:type' content='website' />
+<meta property='og:title' content='Portfolio Pulse · Avery Stone' />
+<meta
+   property='og:description'
+   content='Product designer and frontend engineer delivering measurable product outcomes.'
+/>
+<meta property='og:url' content='https://portfolio-pulse.example.com' />
+<meta
+   property='og:image'
+   content='https://portfolio-pulse.example.com/og-card.jpg'
+/>
+<meta name='twitter:card' content='summary_large_image' />
+<meta name='twitter:creator' content='@averystone' />
+
+  <link rel='icon' href='/favicon.ico' sizes='any' />
+  <link rel='icon' href='/icon.svg' type='image/svg+xml' />
+  <link rel='apple-touch-icon' href='/apple-touch-icon.png' />
+  <link rel='manifest' href='/site.webmanifest' />
+</head>`}
+         </code>
+      </pre>
+      <p>
+         Track outstanding assets and analytics planning for quick follow-up:
+      </p>
+      <pre>
+         <code className="language-md">
+{`### Measurement
+
+-  Primary analytics: Plausible (collect page views, outbound clicks)
+-  Privacy note: Update privacy policy once tracking installed
+-  TODO: confirm team handles consent banner for EU visitors
+
+### Metadata assets
+
+-  og-card.jpg · 1200x630 · design mock queued for next sprint
+-  apple-touch-icon.png · 180x180 · export from Figma brand kit
+-  favicon.ico · multi-size export from glyph set `} </code> </pre> <p> Once
+   metadata is committed, test using the Meta Sharing Debugger and Twitter Card
+   Validator to ensure previews render as expected. </p>
+      </Accordion>
+</Accordions>
 
 ---
 

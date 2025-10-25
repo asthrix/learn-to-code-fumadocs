@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["validation", "quality", "checklist"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Module 0 Validation
 
 ## Learning Objectives
@@ -147,6 +149,58 @@ media.
 
 You have a transparent record of Module 0 quality checks and a backlog that
 informs Module 1 priorities.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Capture validation output and backlog items similar to the example
+         below. Update names, owners, and due dates to match your context.
+      </p>
+      <pre>
+         <code className="language-md">
+{`# Module 0 Validation Log
+
+_Date:_ 2024-05-12 _Owner:_ Avery Stone
+
+## Automated Checks
+
+-  ✅ W3C HTML validator (https://validator.w3.org/nu/) — 0 errors, 1 warning
+   for missing twitter:image asset
+-  ⚠️ axe DevTools (Chrome) — Low contrast on skip link (defer fix to Module 1
+   styling)
+
+## Manual Review
+
+-  Keyboard traversal: Pass · Skip link focuses main, navigation order matches
+   layout
+-  Screen reader (VoiceOver): Landmarks announced in order, testimonials article
+   labeled correctly
+-  Visual inspection without CSS: Content hierarchy clear, placeholders marked
+
+## Findings & Backlog
+
+| Severity | Item                                          | Owner | Due                |
+| -------- | --------------------------------------------- | ----- | ------------------ |
+| Blocker  | Replace placeholder testimonial quote         | Avery | Module 1, Lesson 3 |
+| High     | Export twitter:image asset for metadata       | Avery | Module 2, Lesson 4 |
+| Medium   | Style skip link focus state for contrast      | Avery | Module 1, Lesson 2 |
+| Low      | Add README deploy command once hosting chosen | Avery | Module 3           |
+
+## Decisions
+
+-  Keep navigation labels as-is; revisit wording during copy polish.
+-  No analytics scripts until privacy policy drafted (tracked in project brief).
+
+## Next Steps
+
+-  Update docs/project-brief.md “Measurement” section with twitter:image todo.
+-  Notify collaborators of pending testimonial copy request.
+   `} </code> </pre> <p> Reference this log from `docs/project-brief.md` so
+   stakeholders can see validation status without digging into notes. </p>
+      </Accordion>
+</Accordions>
 
 ---
 

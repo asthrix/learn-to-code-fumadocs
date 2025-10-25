@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["navigation", "accessibility", "keyboard"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Accessible Navigation Systems
 
 ## Learning Objectives
@@ -176,6 +178,77 @@ summary.setAttribute("aria-expanded", String(!expanded));
 
 Navigation works smoothly for keyboard and screen reader users, and
 documentation captures the requirements for future styling.
+
+---
+
+<Accordions className="mt-6">
+    <Accordion title="Solution Walkthrough">
+         <p>
+             Combine markup, minimal JavaScript, and documentation updates using the
+             following pattern.
+         </p>
+         <pre>
+             <code className="language-html">
+{`<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="site-header" role="banner">
+   <nav aria-label="Primary navigation" class="nav-desktop">
+      <ul>
+         <li><a href="#highlights" aria-current="section">Work</a></li>
+         <li><a href="#services">Services</a></li>
+         <li><a href="#testimonials">Proof</a></li>
+         <li><a href="#contact">Contact</a></li>
+      </ul>
+   </nav>
+
+   <details class="nav-mobile" data-menu>
+      <summary
+         aria-haspopup="listbox"
+         aria-expanded="false"
+         aria-controls="mobile-nav-list"
+      >
+         Menu
+      </summary>
+      <nav id="mobile-nav-list" aria-label="Mobile navigation">
+         <ul>
+            <li><a href="#highlights" aria-current="section">Work</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#testimonials">Proof</a></li>
+            <li><a href="#contact">Contact</a></li>
+         </ul>
+      </nav>
+   </details>
+</header>
+
+<script type="module">
+   const menu = document.querySelector('[data-menu]');
+   const summary = menu?.querySelector('summary');
+
+   summary?.addEventListener('click', () => {
+      const expanded = summary.getAttribute('aria-expanded') === 'true';
+      summary.setAttribute('aria-expanded', String(!expanded));
+   });
+   summary?.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && summary.getAttribute('aria-expanded') === 'true') {
+         summary.click();
+         summary.focus();
+      }
+   });
+</script>`}
+
+`} </code> </pre> <p>Reinforce expectations in `docs/accessibility.md`:</p> <pre> <code className="language-md"> {`###
+Navigation
+
+-  Skip link must remain first focusable element.
+-  aria-current="section" set on nav item that matches viewport section.
+-  Mobile menu toggles aria-expanded on open/close; Escape closes menu and
+   returns focus.
+-  Skip link, menu summary, and CTA retain visible focus styles (3px outline).
+-  Avoid display:none on nav lists; use [open] state styling instead.
+   `} </code> </pre> <p> Log remaining gaps in `notes/retro-log.md` so Module 1
+   CSS can style the skip link and mobile menu state effectively. </p>
+   </Accordion>
+   </Accordions>
 
 ---
 

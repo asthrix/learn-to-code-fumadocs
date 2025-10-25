@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["semantics", "content", "headings"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Text Semantics & Readability
 
 ## Learning Objectives
@@ -167,6 +169,68 @@ assistive tech.
 
 Your homepage now communicates the core story using semantic HTML, ready for
 more detailed content and styling.
+
+---
+
+<Accordions className="mt-6">
+    <Accordion title="Solution Walkthrough">
+         <p>
+             Below is an example hero and highlights section that wires together the
+             semantic patterns from this lesson. Update your copy to fit your own
+             story, but keep the hierarchy and inline meaning intact.
+         </p>
+         <pre>
+             <code className="language-html">
+{`<main>
+   <section id="hero" aria-labelledby="hero-heading">
+      <p class="eyebrow">Product Designer & Frontend Engineer</p>
+      <h1 id="hero-heading">Crafting measurable customer journeys.</h1>
+      <p>
+         I help teams translate research into shipped outcomes that boost
+         <abbr title="Monthly Recurring Revenue">MRR</abbr>, shorten onboarding,
+         and deliver cohesive support experiences.
+      </p>
+      <p>
+         <time datetime="2024-10">Latest Project:</time> Redesigned the LumenAI
+         dashboard, increasing activation by <strong>27%</strong>.
+      </p>
+   </section>
+
+   <section id="highlights" aria-labelledby="highlights-heading">
+      <h2 id="highlights-heading">Highlights</h2>
+      <article>
+         <h3>LumenAI Activation</h3>
+         <p>
+            Led a cross-functional sprint to rebuild onboarding flows, resulting in
+            a <strong>27% activation lift</strong> and faster time-to-value.
+         </p>
+      </article>
+      <article>
+         <h3>Northwind Insights</h3>
+         <p>
+            Partnered with data science to prototype dashboards that reduced churn
+            among <abbr title="Small and Medium-sized Businesses">SMB</abbr>
+            customers.
+         </p>
+      </article>
+      <article>
+         <h3>Pulse Support 2.0</h3>
+         <p>
+            Designed a support playbook and handoff system adopted by the team in
+            <time datetime="2023-06">June 2023</time>, boosting satisfaction scores.
+         </p>
+      </article>
+   </section>
+</main>`}
+             </code>
+         </pre>
+         <p>
+             In `notes/orientation.md`, capture placeholders like metrics or client
+             names that you still need to confirm so you can revisit them during copy
+             polish.
+         </p>
+    </Accordion>
+</Accordions>
 
 ---
 

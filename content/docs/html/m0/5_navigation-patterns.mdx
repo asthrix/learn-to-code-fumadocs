@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["navigation", "anchors", "accessibility"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Navigation Patterns with Lists & Anchors
 
 ## Learning Objectives
@@ -174,6 +176,51 @@ accessibility.
 
 Visitors can move between key sections using both keyboard and pointer, and your
 anchors line up with the site map defined earlier.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Here is a baseline implementation that delivers the skip link, primary
+         navigation, and project brief update. Adjust link text and destinations
+         to reflect your own sections, but keep the structural elements.
+      </p>
+      <pre>
+         <code className="language-html">
+{`<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header" role="banner">
+  <nav aria-label="Primary navigation">
+    <ul class="nav-list">
+      <li><a href="#highlights">Highlights</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#testimonials">Proof</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+  <a class="btn-secondary" href="/assets/Avery-Stone-Resume.pdf">
+    Download resume
+  </a>
+</header>`}
+         </code>
+      </pre>
+      <p>
+         In `docs/project-brief.md`, add a concise navigation map so every anchor
+         has a documented destination:
+      </p>
+      <pre>
+         <code className="language-md">
+{`### Navigation
+
+-  Skip link: #main-content (lands on <main>)
+-  Highlights: #highlights (case study overview)
+-  Services: #services (what I offer)
+-  Proof: #testimonials (client quotes)
+-  Contact: #contact (cta + direct outreach)
+   `} </code> </pre> <p> After wiring the anchors, tab through the page to confirm the skip link appears and lands on the `<main>`
+   element so keyboard users can bypass repeated navigation. </p>
+      </Accordion>
+</Accordions>
 
 ---
 

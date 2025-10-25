@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["semantics", "layout", "planning"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Semantic Layout Strategy
 
 ## Learning Objectives
@@ -180,6 +182,61 @@ document structure.
 
 You now have a living document that keeps markup aligned with the narrative and
 aids collaborators who join mid-project.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Draft `docs/layout-plan.md` with a structure similar to this example.
+         Customize names, owners, and notes to your project context.
+      </p>
+      <pre>
+         <code className="language-md">
+{`# Portfolio Pulse · Layout Plan
+
+## Landmarks Overview
+
+-  Header (role="banner") · Navigation + resume CTA
+-  Main (id="main-content") · Hero, Highlights, Services, Testimonials, Contact
+-  Aside (Quick credentials) · Optional context near hero
+-  Footer (role="contentinfo") · Contact details, social, legal links
+
+## Section Outline
+
+1. Hero (h1 · id="hero-heading")
+2. Highlights (h2 · id="highlights-heading")
+3. Services (h2 · id="services-title")
+4. Testimonials (h2 · id="testimonials-title")
+5. Contact (h2 · id="contact-title")
+
+## Wireframe Sketch
+
+[Header] Logo | Nav | Resume CTA [Main] Hero intro + CTA Case study cards
+Services summary Testimonials quote Contact CTA (email + booking) [Footer] Quick
+links | Social | Legal
+
+## Anchor Map
+
+-  #highlights · highlights cards
+-  #services · services summary
+-  #testimonials · client proof
+-  #contact · booking details
+
+## Dependencies
+
+-  Testimonials copy (Owner: Jordan · Due: Module 1, Lesson 7)
+-  Service bullet proofing (Owner: Avery · Due: Module 1, Lesson 5)
+-  Contact CTA (Owner: Avery · Due: Module 1, Lesson 7)
+
+## Notes
+
+-  Keep aside optional for quick credential highlights.
+-  Update layout plan once case studies expand beyond three.
+   `} </code> </pre> <p> Link this file from `docs/project-brief.md` so the
+   layout strategy stays aligned with business goals. </p>
+      </Accordion>
+</Accordions>
 
 ---
 

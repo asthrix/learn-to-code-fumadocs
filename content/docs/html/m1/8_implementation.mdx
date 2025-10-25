@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["implementation", "layout", "portfolio"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Module 1 Implementation
 
 ## Learning Objectives
@@ -146,6 +148,68 @@ Update docs/accessibility.md with the latest structural context.
 
 Portfolio Pulse now presents a complete semantic layout that is ready for Module
 2's form enhancements.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         The snippet below shows the assembled `index.html` structure after
+         completing Module 1. Use it to double-check ordering and IDs.
+      </p>
+      <pre>
+         <code className="language-html">
+{`<!DOCTYPE html>
+<html lang="en">
+  <head>...</head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="site-header" role="banner">
+      <!-- Header from Lesson 3 -->
+      ...
+    </header>
+    <main id="main-content" tabindex="-1">
+      <!-- Hero, Highlights, Services from Lesson 5 -->
+      ...
+      <!-- Aside from Lesson 6 -->
+      <aside aria-labelledby="sidebar-credentials">...</aside>
+      <!-- Testimonials + Contact -->
+      ...
+    </main>
+    <footer class="site-footer" role="contentinfo">
+      <!-- Footer CTA + legal from Lesson 7 -->
+      ...
+    </footer>
+    <script type="module" src="/scripts/menu.js"></script>
+  </body>
+</html>`}
+         </code>
+      </pre>
+      <p>
+         Record validator output in `notes/validation/module-1.md`:
+      </p>
+      <pre>
+         <code className="language-md">
+{`# Module 1 Validation
+
+## Automated
+
+-  npx html-validate index.html → Pass (0 errors, 0 warnings)
+-  Firefox Accessibility → Headings: h1 → h2 (5) → h3 (4)
+
+## Manual
+
+-  Keyboard traversal retains expected order (skip link → nav → hero CTA)
+-  Mobile menu aria-expanded toggles correctly
+
+## Follow-ups
+
+-  Replace hero metric copy with latest data (Owner: Avery, Due: Module 2)
+-  Style skip link and details summary focus rings (Owner: Avery, Due: Module 2)
+   `} </code> </pre> <p> Tag the commit (`git tag module-1-baseline`) for quick
+   comparisons once future modules introduce layout or interaction changes. </p>
+      </Accordion>
+</Accordions>
 
 ---
 

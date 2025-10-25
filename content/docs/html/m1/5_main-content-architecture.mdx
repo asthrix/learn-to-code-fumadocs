@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["main", "sections", "architecture"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Main Content Architecture
 
 ## Learning Objectives
@@ -244,6 +246,136 @@ responsive layouts.
 
 The primary narrative of Portfolio Pulse is now expressed with clean semantics,
 ready for styling and interactivity.
+
+---
+
+<Accordions className="mt-6">
+    <Accordion title="Solution Walkthrough">
+         <p>
+             Build out the hero, highlights, services, and testimonials using this
+             semantic structure as a reference.
+         </p>
+         <pre>
+             <code className="language-html">
+{`<main id="main-content" tabindex="-1">
+   <section id="hero" aria-labelledby="hero-heading">
+      <header>
+         <p class="eyebrow">Product Designer & Frontend Engineer</p>
+         <h1 id="hero-heading">Designing measurable customer journeys.</h1>
+      </header>
+      <p class="hero-lede">
+         I help SaaS teams ship experiments that grow revenue while centering accessibility.
+      </p>
+      <ul class="hero-metrics">
+         <li>
+            <strong>27%</strong>
+            <span>Activation lift at LumenAI</span>
+         </li>
+         <li>
+            <strong>12 weeks</strong>
+            <span>Average discovery-to-launch timeline</span>
+         </li>
+      </ul>
+      <a class="btn-primary" href="#contact">Book a strategy call</a>
+   </section>
+
+{" "}
+
+<section id='highlights' aria-labelledby='highlights-heading'>
+   <header>
+      <h2 id='highlights-heading'>Flagship Case Studies</h2>
+      <p class='section-subtitle'>
+         Each engagement pairs measurable outcomes with inclusive experiences.
+      </p>
+   </header>
+   <div class='case-study-grid'>
+      <article class='case-card' aria-labelledby='case-lumen'>
+         <h3 id='case-lumen'>LumenAI Activation</h3>
+         <p class='metric'>
+            <strong>+27%</strong> activation in eight weeks
+         </p>
+         <p>
+            Redesigned onboarding with guided tours and progressive profiling.
+         </p>
+         <a class='link-inline' href='/case-studies/lumen-ai.html'>
+            Read the full story
+         </a>
+      </article>
+      <article class='case-card' aria-labelledby='case-harbor'>
+         <h3 id='case-harbor'>HarborCRM Adoption</h3>
+         <p class='metric'>
+            <strong>3.2×</strong> daily active teams
+         </p>
+         <p>Built insight dashboards with contextual tooltips and tutorials.</p>
+      </article>
+      <article class='case-card' aria-labelledby='case-aurora'>
+         <h3 id='case-aurora'>Aurora Support Uplift</h3>
+         <p class='metric'>
+            <strong>35%</strong> ticket deflection
+         </p>
+         <p>
+            Launched knowledge base experiments that improved self-serve
+            success.
+         </p>
+      </article>
+   </div>
+</section>
+
+{" "}
+
+<section id='services' aria-labelledby='services-title'>
+   <h2 id='services-title'>Ways We Can Work Together</h2>
+   <ol class='service-steps'>
+      <li>
+         <h3>Discovery Sprint</h3>
+         <p>
+            Audit current journeys, define target metrics, and align
+            stakeholders.
+         </p>
+      </li>
+      <li>
+         <h3>Design & Prototype</h3>
+         <p>
+            Translate insights into interactive prototypes and validation
+            scripts.
+         </p>
+      </li>
+      <li>
+         <h3>Launch & Iterate</h3>
+         <p>Pair with engineering to ship and monitor experiments.</p>
+      </li>
+   </ol>
+</section>
+
+   <section id="testimonials" aria-labelledby="testimonials-title">
+      <h2 id="testimonials-title">Client Proof</h2>
+      <article class="testimonial" aria-label="Testimonial from LumenAI">
+         <blockquote>
+            “Avery ships prototypes in days, not weeks. Accessibility wins alone reduced support tickets by 35%."
+         </blockquote>
+         <footer>
+            <p><strong>Jordan Reyes</strong>, VP Product · LumenAI</p>
+         </footer>
+      </article>
+   </section>
+</main>`}
+             </code>
+         </pre>
+         <p>
+             Track outstanding content requests in `notes/retro-log.md` to close
+             gaps:
+         </p>
+         <pre>
+             <code className="language-md">
+{`## Module 1 · Lesson 5 follow-ups
+- Case study copy: HarborCRM metrics verification (Owner: Avery, Due: 2024-05-20)
+- Testimonial: Request quote approval from Jordan (Owner: Avery, Due: 2024-05-18)
+- CTA: Confirm calendar tool link before Module 2 implementation
+`}
+             </code>
+         </pre>
+    </Accordion>
+</Accordions>
 
 ---
 

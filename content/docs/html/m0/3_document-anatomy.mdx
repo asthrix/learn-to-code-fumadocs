@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["html", "structure", "metadata"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # HTML Document Anatomy
 
 ## Learning Objectives
@@ -189,6 +191,44 @@ a single primary region per page.
 
 You now have a production-ready HTML skeleton that will host every component of
 Portfolio Pulse.
+
+---
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>The example below satisfies the task requirements and mirrors the practical example.</p>
+
+      ```html filename="portfolio-pulse/index.html"
+      <!DOCTYPE html>
+      <html lang="en">
+         <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta
+               name="description"
+               content="Portfolio Pulse showcases Avery Rivera's product design work and measurable outcomes."
+            />
+            <link rel="canonical" href="https://portfolio-pulse.local" />
+            <link rel="preload" href="/fonts/figtree-v7-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+            <title>Portfolio Pulse · Avery Rivera</title>
+         </head>
+         <body>
+            <a class="skip-link" href="#main-content">Skip to main content</a>
+            <header id="top" class="site-header" role="banner">
+               <!-- Hero, navigation, and intro content will be added in Module 1 -->
+            </header>
+            <main id="main-content" tabindex="-1" role="main">
+               <!-- Case studies, highlights, and contact sections land here -->
+            </main>
+            <footer class="site-footer" role="contentinfo">
+               <!-- Footer CTA and legal links ship in Module 1 + Module 5 -->
+            </footer>
+         </body>
+      </html>
+      ```
+
+   </Accordion>
+</Accordions>
 
 ---
 

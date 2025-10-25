@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["implementation", "html", "portfolio"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Module 0 Implementation
 
 ## Learning Objectives
@@ -163,6 +165,138 @@ experience.
 
 You have a cohesive HTML page ready for semantic deep dives and layout work in
 Module 1.
+
+---
+
+<Accordions className="mt-6">
+    <Accordion title="Solution Walkthrough">
+         <p>
+             Here is a representative baseline page that ties all Module 0 elements
+             together. Adapt text to your own narrative, but keep the structure and
+             IDs consistent with previous tasks.
+         </p>
+         <pre>
+             <code className="language-html">
+{`<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Portfolio Pulse · Avery Stone</title>
+      <meta
+         name="description"
+         content="Avery Stone helps product teams design and ship measurable experiences."
+      />
+      <meta name="robots" content="index, follow" />
+      <link rel="canonical" href="https://portfolio-pulse.example.com" />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="Portfolio Pulse · Avery Stone" />
+      <meta
+         property="og:description"
+         content="Product designer and frontend engineer delivering measurable product outcomes."
+      />
+      <meta property="og:url" content="https://portfolio-pulse.example.com" />
+      <meta
+         property="og:image"
+         content="https://portfolio-pulse.example.com/og-card.jpg"
+      />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:creator" content="@averystone" />
+      <link rel="icon" href="/favicon.ico" sizes="any" />
+      <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      <link rel="manifest" href="/site.webmanifest" />
+   </head>
+   <body>
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+      <header role="banner">
+         <nav aria-label="Primary navigation">
+            <ul class="nav-list">
+               <li><a href="#highlights">Highlights</a></li>
+               <li><a href="#services">Services</a></li>
+               <li><a href="#testimonials">Proof</a></li>
+               <li><a href="#contact">Contact</a></li>
+            </ul>
+         </nav>
+      </header>
+      <main id="main-content" tabindex="-1">
+         <section id="hero" aria-labelledby="hero-heading">
+            <p class="eyebrow">Product Designer & Frontend Engineer</p>
+            <h1 id="hero-heading">Designing measurable customer journeys.</h1>
+            <p>
+               I partner with growth-minded teams to design experiments that increase
+               adoption and retention while centering accessibility.
+            </p>
+            <p>
+               <time datetime="2024-10">Latest Case Study:</time> Rebuilt the
+               LumenAI onboarding flow, improving activation by
+               <strong>27%</strong>.
+            </p>
+         </section>
+
+         <section id="highlights" aria-label="Featured case studies">
+            <h2>Highlights</h2>
+            <article>
+               <h3>LumenAI Activation</h3>
+               <p>Increased activation by 27% with journey mapping and prototyping.</p>
+            </article>
+            <article>
+               <h3>Northwind Insights</h3>
+               <p>Reduced churn for SMB customers through data storytelling.</p>
+            </article>
+            <article>
+               <h3>Pulse Support 2.0</h3>
+               <p>Rolled out a support playbook with measurable CSAT improvements.</p>
+            </article>
+         </section>
+
+         <section id="services" aria-labelledby="services-title">
+            <h2 id="services-title">Services</h2>
+            <p>Product discovery, UX/UI design, design systems, and launch support.</p>
+            <!-- TODO: Replace placeholder bullets with quantified offers -->
+         </section>
+
+         <section id="testimonials" aria-labelledby="testimonials-title">
+            <h2 id="testimonials-title">Client Proof</h2>
+            <article aria-label="Testimonial from LumenAI">
+               <blockquote>
+                  “Avery audited our onboarding and shipped improvements in two weeks.
+                  Accessibility wins alone reduced support tickets by 35%.”
+               </blockquote>
+               <footer>
+                  <p><strong>Jordan Reyes</strong>, VP Product at LumenAI</p>
+               </footer>
+            </article>
+         </section>
+
+         <section id="contact" aria-labelledby="contact-title">
+            <h2 id="contact-title">Let’s Collaborate</h2>
+            <p>Email <a href="mailto:avery@portfoliopulse.com">avery@portfoliopulse.com</a>
+            to book a discovery call.</p>
+         </section>
+      </main>
+      <footer role="contentinfo">
+         <p>© 2024 Avery Stone · Portfolio Pulse</p>
+      </footer>
+
+   </body>
+</html>`}
+             </code>
+         </pre>
+         <p>
+             Document validator findings in `notes/retro-log.md` for quick follow-up:
+         </p>
+         <pre>
+             <code className="language-md">
+{`## 2024-05-12 · Module 0 Baseline
+- Tool: W3C validator (nu) · Result: 0 errors, 1 warning (missing twitter:image)
+- Action: Add twitter:image once asset exported in Module 2
+- Next: Confirm skip link styling in CSS module
+`}
+             </code>
+         </pre>
+    </Accordion>
+</Accordions>
 
 ---
 

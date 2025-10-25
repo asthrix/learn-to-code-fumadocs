@@ -17,6 +17,8 @@ learning_objectives:
 tags: ["landmarks", "accessibility", "layout"]
 ---
 
+import { Accordions, Accordion } from "@/components/accordion";
+
 # Planning Landmarks & Page Regions
 
 ## Learning Objectives
@@ -180,6 +182,78 @@ Focus order:
 
 Your team can glance at the layout plan and know exactly how the page is
 structured and how focus should move.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Expand `docs/layout-plan.md` with a region inventory similar to the
+         example below, then mirror the annotations inside `index.html`.
+      </p>
+      <pre>
+         <code className="language-md">
+{`## Region Inventory
+
+| Landmark             | Section ID   | Heading               | Purpose                         | Notes                             |
+| -------------------- | ------------ | --------------------- | ------------------------------- | --------------------------------- |
+| header (banner)      | —            | —                     | Primary navigation + resume CTA | Resume link opens PDF             |
+| main                 | hero         | h1#hero-heading       | Introduce Avery and core value  | Include proof metric              |
+| main                 | highlights   | h2#highlights-heading | Showcase top case studies       | Cards link to detail pages        |
+| main                 | services     | h2#services-title     | Summarize offerings             | Reference pricing doc             |
+| main                 | testimonials | h2#testimonials-title | Social proof quotes             | Replace placeholder in Module 1.7 |
+| main                 | contact      | h2#contact-title      | Invite outreach                 | Add form in Module 3              |
+| aside                | credentials  | h2 (visually hidden)  | Supplemental credibility stats  | Optional for larger viewports     |
+| footer (contentinfo) | —            | —                     | Secondary nav + legal           | Include social icons              |
+
+### Focus Order
+
+1. Skip link → #main-content
+2. Primary navigation (Work, Services, Proof, Contact)
+3. Hero CTA button
+4. Case study cards (left to right)
+5. Services links
+6. Testimonials blockquote
+7. Contact email + button
+8. Footer links
+   `} </code> </pre> <p>Annotate the HTML so collaborators see intent inline:</p> <pre> <code className="language-html"> {`<header role="banner">
+      <!-- Primary navigation + resume CTA -->
+
+   ...
+   </header>
+   <main id="main-content" tabindex="-1">
+      <!-- Hero: Introduces Avery + headline metric -->
+      <section id="hero" aria-labelledby="hero-heading">...</section>
+
+      <!-- Highlights: Featured case studies mapped to anchor #highlights -->
+
+   {" "}
+   <section id='highlights' aria-labelledby='highlights-heading'>
+      ...
+   </section>
+
+      <!-- Services: Core offers, referenced in project brief measurement section -->
+
+   {" "}
+   <section id='services' aria-labelledby='services-title'>
+      ...
+   </section>
+
+      <!-- Aside: Supplemental credentials visible on desktops -->
+
+   {" "}
+   <aside aria-label='Quick credentials'>...</aside>
+
+      <!-- Contact: Primary CTA before footer -->
+      <section id="contact" aria-labelledby="contact-title">...</section>
+   </main>
+   <footer role="contentinfo">
+      <!-- Secondary nav + legal copy -->
+   </footer>`}
+            </code>
+         </pre>
+         </Accordion>
+      </Accordions>
 
 ---
 
