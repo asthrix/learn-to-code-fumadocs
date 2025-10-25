@@ -1,0 +1,136 @@
+---
+title: "Structured Highlights"
+description:
+   "Design outcome cards using `<section>`, `<data>`, `<meter>`, and supporting
+   semantics."
+module: "M4"
+lesson: "6"
+difficulty: "intermediate"
+duration: "40"
+project_phase: "Credibility"
+prerequisites: ["/docs/html/m4/5_testimonials-social-proof"]
+learning_objectives:
+   - "Use semantic elements to emphasize key outcomes"
+   - "Choose between `<data>`, `<meter>`, and `<progress>`"
+   - "Document analytics hooks and accessibility requirements"
+tags: ["data", "highlight", "semantics"]
+---
+
+# Structured Highlights
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Build outcome cards that combine metrics, copy, and actions.
+-  [ ] Select the right semantic element for quantitative data.
+-  [ ] Document analytics and accessibility guidelines for highlight components.
+
+## Why It Matters
+
+Highlight cards surface marquee results quickly. Semantic foundations make them
+understandable to assistive tech, search engines, and future automation.
+
+---
+
+## Highlight Card Pattern
+
+```html
+<section class="highlight" aria-labelledby="highlight-retention">
+   <header>
+      <h3 id="highlight-retention">Retention stabilized in 90 days</h3>
+      <p>Client: FluxHealth · Engagement: Service Design Sprint</p>
+   </header>
+   <p class="stat">
+      <data value="0.18">18%</data> churn reduction after rollout
+   </p>
+   <p class="supporting">
+      Introduced onboarding checkpoints and guidance flows.
+   </p>
+   <footer>
+      <a href="/case-studies/fluxhealth.html" data-cta="highlight-retention">
+         Read the playbook
+      </a>
+   </footer>
+</section>
+```
+
+### When to Use `<meter>`
+
+```html
+<meter
+   min="0"
+   max="100"
+   value="92"
+   optimum="95"
+   aria-describedby="metric-satisfaction"
+>
+   92%
+</meter>
+<p id="metric-satisfaction">Stakeholder satisfaction post engagement.</p>
+```
+
+Use `<meter>` for bounded values with target ranges (satisfaction, uptime).
+
+---
+
+## Accessibility Notes
+
+-  Provide textual interpretation of the metric (`<data>` text) near the
+   element.
+-  Associate `<meter>` or `<progress>` with descriptive copy via
+   `aria-describedby`.
+-  Maintain focus order so buttons and links remain discoverable.
+
+Document component APIs and analytics data attributes in
+`docs/state-architecture.md`.
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Sections Self-Contained
+
+**Why:** Each highlight should stand alone when shared or rearranged.
+
+### 2. Balance Quantitative and Qualitative Copy
+
+**Why:** Metrics need short narratives to feel credible.
+
+Provide 1–2 sentences describing how the result was achieved.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Using `<div>`-Only Cards
+
+**Problem:** Loses semantic meaning.
+
+**Fix:** Wrap each card in `<section>` or `<article>` with headings.
+
+### 2. Forgetting Machine-Readable Values
+
+**Problem:** Informational cards become dead ends for automation.
+
+**Fix:** Use `<data>` or `data-*` attributes to store raw values.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Draft three highlight cards representing top outcomes.
+2. Choose whether each card needs `<data>` or `<meter>` based on metric type.
+3. Update `docs/state-architecture.md` with data attributes and event tracking.
+4. Log content dependencies in `docs/data-sources.md`.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Each highlight includes heading, metric, supporting copy, and CTA.
+-  [ ] Metrics use appropriate semantic elements (data/meter/progress).
+-  [ ] Documentation updated with tracking and data references.
+-  [ ] Keyboard navigation confirmed for focusable elements.
+
+---

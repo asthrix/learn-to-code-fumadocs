@@ -1,0 +1,139 @@
+---
+title: "Module 4 Validation"
+description:
+   "Audit data accuracy, accessibility, and documentation before moving to
+   Module 5."
+module: "M4"
+lesson: "9"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Credibility"
+prerequisites: ["/docs/html/m4/8_implementation"]
+learning_objectives:
+   - "Verify data accuracy and consent"
+   - "Run accessibility and performance audits on the credibility section"
+   - "Capture retro notes and update governance docs"
+tags: ["validation", "testing", "data"]
+---
+
+# Module 4 Validation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Confirm metrics, testimonials, and milestones are accurate and approved.
+-  [ ] Validate accessibility and responsive behavior across devices.
+-  [ ] Update documentation and retro notes for ongoing governance.
+
+## Why It Matters
+
+Data credibility erodes quickly if numbers are wrong or contexts missing. A
+rigorous validation step protects trust before you move into Module 5's advanced
+polish.
+
+---
+
+## Validation Workflow
+
+### 1. Data Accuracy
+
+-  Reconcile metrics against `docs/data-sources.md`; confirm latest values.
+-  Verify testimonial consent dates in `docs/testimonial-consent.md`.
+-  Check timeline entries against `notes/module-4-plan.md` and retro logs.
+
+### 2. Accessibility Audits
+
+-  Run Lighthouse Accessibility (target ≥ 95).
+-  Use axe DevTools to inspect table headers, timeline order, and testimonial
+   structure.
+-  Navigate section with keyboard and screen reader, ensuring logical focus
+   order and announcements.
+
+### 3. Responsive & Performance
+
+-  Test on desktop (Chrome, Firefox, Safari) and mobile (iOS Safari, Android
+   Chrome).
+-  Throttle network to `Fast 3G` to observe lazy loading or heavy assets.
+-  Record Largest Contentful Paint (LCP) impact in `docs/validation-log.md`.
+
+### 4. Documentation
+
+-  Update `docs/layout.shared.md` and `docs/state-architecture.md` with final
+   implementation notes.
+-  Capture Module 4 retro insights in `notes/module-4-retro.md` (create if
+   needed).
+
+---
+
+## ✅ Best Practices
+
+### 1. Cross-Check Copy and Data
+
+**Why:** Minor typos can undermine trust.
+
+Pair with Avery to confirm the story matches the data.
+
+### 2. Set Review Reminders
+
+**Why:** Data stales quickly.
+
+Document next review dates in `docs/data-sources.md` under `refresh_cadence`.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Ignoring Fallback Copy
+
+**Problem:** Optional sections collapse awkwardly if data removed.
+
+**Fix:** Test with testimonials or metrics temporarily removed.
+
+### 2. Skipping Device Testing
+
+**Problem:** Tables overflow or timeline becomes unreadable.
+
+**Fix:** Test on small screens and ensure horizontal scroll has focus styles.
+
+---
+
+## 🔍 Portfolio Pulse Audit Scenario
+
+1. Execute accessibility, performance, and data checks outlined above.
+2. Annotate screenshots of Lighthouse results for future reference.
+3. Record outstanding actions or missing approvals in the retro log.
+4. Open tickets for work that must carry into Module 5.
+
+#### Expected Result
+
+You have confidence that the credibility section is accurate, accessible, and
+documented, clearing the path for Module 5's production polish.
+
+---
+
+## ✅ Validation Checklist
+
+### Data Integrity
+
+-  [ ] Metrics match source docs and include refresh dates.
+-  [ ] Testimonials have valid consent records.
+
+### Accessibility & Performance
+
+-  [ ] Table headers, timeline, and testimonials pass automated checks.
+-  [ ] LCP impact measured and within acceptable range.
+
+### Documentation & Retro
+
+-  [ ] Layout, state, and data docs updated.
+-  [ ] Retro notes capture wins, risks, and follow-ups.
+
+---
+
+## Next Steps
+
+-  Review retro findings to prioritize Module 5 tasks focused on advanced HTML5
+   features and production polish.
+
+---

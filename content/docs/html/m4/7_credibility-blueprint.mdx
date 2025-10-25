@@ -1,0 +1,127 @@
+---
+title: "Credibility Blueprint"
+description:
+   "Map the full credibility section architecture before coding the final
+   markup."
+module: "M4"
+lesson: "7"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Credibility"
+prerequisites: ["/docs/html/m4/6_structured-highlights"]
+learning_objectives:
+   - "Draft the HTML outline for the credibility section"
+   - "Plan data bindings, analytics, and documentation touchpoints"
+   - "Secure stakeholder approval before implementation"
+tags: ["blueprint", "architecture", "planning"]
+---
+
+# Credibility Blueprint
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Document the structure of the credibility section.
+-  [ ] Align metrics, timeline, testimonials, and highlights into a cohesive
+       flow.
+-  [ ] Capture dependencies and analytics hooks for implementation.
+
+## Why It Matters
+
+A blueprint keeps implementation focused. It prevents scope creep and ensures
+all stakeholders agree on the order, copy, and interactions before you touch the
+codebase.
+
+---
+
+## HTML Outline
+
+```
+<section id="credibility" aria-labelledby="credibility-title">
+   <header>...</header>
+   <div class="credibility-grid">
+      <section class="credibility-highlights">...</section>
+      <aside class="credibility-metrics">...</aside>
+      <section class="credibility-timeline">...</section>
+      <section class="credibility-testimonials">...</section>
+   </div>
+   <footer>...</footer>
+</section>
+```
+
+### Ordering Guidelines
+
+1. Anchor with highlights that summarize outcomes.
+2. Follow with metrics table for quantitative detail.
+3. Present timeline milestones to illustrate sustained impact.
+4. Close with testimonials and CTA to start a conversation.
+
+Document the outline in `docs/layout.shared.md` under "Credibility section".
+
+---
+
+## Dependency Matrix
+
+Create a table in `notes/module-4-plan.md`:
+
+| Component     | Data Source                          | Refresh    | Owner     |
+| ------------- | ------------------------------------ | ---------- | --------- |
+| Highlights    | `data-sources.md` IDs: highlight\_\* | Quarterly  | Avery     |
+| Metrics table | analytics dashboard export           | Monthly    | You       |
+| Timeline      | retro notes, engagement logs         | Semiannual | You       |
+| Testimonials  | consent log                          | Annual     | Marketing |
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Sections Optional
+
+**Why:** Blueprint should handle missing data gracefully.
+
+Plan copy for when a testimonial or metric is unavailable.
+
+### 2. Align CTAs With Business Goals
+
+**Why:** Credibility should funnel visitors to next steps.
+
+Decide whether the CTA points to case studies, contact form, or newsletter.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Ignoring Content Governance
+
+**Problem:** Metrics become stale.
+
+**Fix:** Assign refresh cadence in the dependency matrix and log reminders.
+
+### 2. Overcomplicating Layout in Markup
+
+**Problem:** Nesting layout divs into HTML blueprint.
+
+**Fix:** Keep structure semantic; document layout ideas for CSS separately.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Capture the full outline in `docs/layout.shared.md` with headings, roles, and
+   fallback copy.
+2. Update `docs/state-architecture.md` with analytics IDs and event triggers per
+   component.
+3. Share the blueprint with Avery and note feedback in `notes/module-4-plan.md`.
+4. Prepare TODOs for any missing data or consent in `docs/validation-log.md`.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Blueprint documented with structure, fallbacks, and CTAs.
+-  [ ] Dependency matrix lists data sources, refresh cadence, and owners.
+-  [ ] Stakeholder approval or feedback captured in notes.
+-  [ ] Outstanding risks logged ahead of implementation.
+
+---

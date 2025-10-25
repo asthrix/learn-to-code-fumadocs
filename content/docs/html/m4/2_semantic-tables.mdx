@@ -1,0 +1,133 @@
+---
+title: "Semantic Tables"
+description:
+   "Structure comparative data with captions, summaries, and responsive
+   considerations."
+module: "M4"
+lesson: "2"
+difficulty: "intermediate"
+duration: "40"
+project_phase: "Credibility"
+prerequisites: ["/docs/html/m4/1_data-storytelling"]
+learning_objectives:
+   - "Mark up accessible tables with `<caption>` and `<summary>`"
+   - "Use scope and headers attributes for complex data"
+   - "Plan responsive behaviors without sacrificing semantics"
+tags: ["tables", "data", "accessibility"]
+---
+
+# Semantic Tables
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Present comparative metrics in accessible tables.
+-  [ ] Provide captions and summaries to set context.
+-  [ ] Prepare tables for responsive layouts while keeping semantics intact.
+
+## Why It Matters
+
+Tables communicate structured comparisons better than ad-hoc divs. Proper
+semantics ensure screen readers and data extraction tools interpret your results
+correctly.
+
+---
+
+## Core Table Pattern
+
+```html
+<table class="metrics-table">
+   <caption>
+      Portfolio Pulse impact snapshot
+   </caption>
+   <thead>
+      <tr>
+         <th scope="col">Outcome</th>
+         <th scope="col">Baseline</th>
+         <th scope="col">After engagement</th>
+         <th scope="col">Change</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <th scope="row">Onboarding completion</th>
+         <td>58%</td>
+         <td>90%</td>
+         <td><span class="metric-up">+32 pts</span></td>
+      </tr>
+      <tr>
+         <th scope="row">Support tickets</th>
+         <td>84/mo</td>
+         <td>31/mo</td>
+         <td><span class="metric-down">−63%</span></td>
+      </tr>
+   </tbody>
+</table>
+```
+
+Add a visually hidden `<p class="sr-only">` summary when context requires more
+than the caption can contain.
+
+---
+
+## Responsive Strategies
+
+-  Maintain table semantics; avoid switching to cards on mobile.
+-  Allow horizontal scrolling with `overflow-x: auto` and visible focus states.
+-  Consider stacked headings using `aria-describedby` when space is tight.
+
+Document responsive decisions in `docs/layout.shared.md` under "Metrics table".
+
+---
+
+## ✅ Best Practices
+
+### 1. Scope Attributes
+
+**Why:** Helps assistive tech relate headers to data.
+
+Use `scope="row"` on the first cell of each row when single level.
+
+### 2. Highlight Trends Semantically
+
+**Why:** Color alone is insufficient.
+
+Use `aria-label` or inline text ("increase", "decrease") to reinforce meaning.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Merging Cells Without Headers
+
+**Problem:** Complex tables become indecipherable.
+
+**Fix:** Use `headers` attribute referencing `id` of header cells when spanning.
+
+### 2. Removing Captions for Style
+
+**Problem:** Screen reader users lose context.
+
+**Fix:** Keep `<caption>` and style with CSS to meet brand guidelines.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Build the impact table markup in a scratch file or component demo.
+2. Add caption, summary, and trend text that match Module 4 data sources.
+3. Update `docs/data-sources.md` noting which metrics feed the table and refresh
+   cadence.
+4. Log responsive behavior in `docs/layout.shared.md` for future CSS work.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Table includes caption, scope attributes, and accessible summary.
+-  [ ] Responsive approach documented and tested with keyboard scroll.
+-  [ ] Trend indicators use text in addition to color.
+-  [ ] Data source references linked in documentation.
+
+---
