@@ -9,7 +9,7 @@ import { CourseCard } from "@/components/courses/CourseCard";
 import type { Course } from "@/lib/courses";
 import { courses } from "@/lib/courses";
 
-const highlightCourseIds = ["react"] as const;
+const highlightCourseIds = ["react-new", "react"] as const;
 
 const getHighlightCourses = (): Course[] =>
    highlightCourseIds
