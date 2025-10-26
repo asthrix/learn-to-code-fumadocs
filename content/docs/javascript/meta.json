@@ -1,6 +1,6 @@
 {
    "title": "JavaScript Essentials",
-   "root": true,
+   "root": false,
    "description": "Learn modern JavaScript programming from basics to advanced",
    "pages": ["index"]
 }

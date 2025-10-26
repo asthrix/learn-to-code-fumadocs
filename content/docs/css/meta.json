@@ -1,6 +1,6 @@
 {
    "title": "CSS Mastery",
-   "root": true,
+   "root": false,
    "description": "Master styling and layout with modern CSS",
    "pages": ["index"]
 }
