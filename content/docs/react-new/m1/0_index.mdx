@@ -1,0 +1,89 @@
+---
+title: "Module Overview"
+description:
+   "Launch your StaySense journey by confirming prerequisites, tooling, and the
+   learning goals for Module 1."
+module: "M1"
+lesson: "0"
+difficulty: "beginner"
+duration: "15"
+project_phase: "Foundation"
+prerequisites: ["/docs/react-new/index"]
+learning_objectives:
+   - "Confirm your local environment matches course expectations"
+   - "Understand how the mock backend fits into the StaySense build"
+   - "Preview this module's components, tasks, and success checklist"
+tags: ["module-overview", "react", "planning"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Module 1 · React Foundations
+
+Module 1 eases you into React while assembling the StaySense landing page. You
+will create the app shell, hero section, and first reusable listing card. Every
+lesson ends with a hands-on task and an accordion solution so you can compare
+approaches without losing momentum.
+
+---
+
+## Prerequisites
+
+-  Node.js 18+ and npm available on your terminal path.
+-  VS Code with ESLint and Prettier extensions (recommended but optional).
+-  Familiarity with modern JavaScript syntax (ES modules, `const`/`let`, arrow
+   functions).
+-  Optional: skim the mock API section in
+   `/course-docs/API_AND_DATA_ARCHITECTURE.md` to understand where you are
+   heading.
+
+---
+
+## What You Will Build
+
+By the end of Module 1 you will have:
+
+-  A Vite-powered React project named **StaySense**.
+-  Global styles using Tailwind CSS or the existing `global.css` utilities.
+-  A responsive hero with call-to-action buttons.
+-  A `ListingCard` component rendering mock data from `src/data/listings.ts`.
+
+These pieces establish the layout that later modules enhance with filters,
+stateful interactions, and API data.
+
+---
+
+## Lesson Roadmap
+
+1. **Lesson 1 – Why React & the StaySense vision**: understand the problem
+   you're solving and how React's design helps.
+2. **Lesson 2 – Environment setup with Vite**: scaffold the project, install UI
+   dependencies, and run the dev server.
+3. **Lesson 3 – JSX and your first components**: write semantic markup and map
+   over sample data.
+4. **Lesson 4 – Props & composition**: pass data into components and compose the
+   page.
+5. **Lesson 5 – Module task**: pull everything together with a structured
+   commit.
+
+---
+
+## Success Criteria
+
+To exit Module 1 you should confidently:
+
+-  Explain the purpose of React, components, and JSX to a teammate.
+-  Run `npm run dev` and see a customised StaySense landing page.
+-  Build presentational components that accept props and render predictable UI.
+-  Commit code following the "build, test, validate" loop used throughout the
+   course.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Curious about grading yourself?'>
+      <p>
+         Each lesson includes a validation checklist. Before moving to Module 2,
+         run through the Module 1 checklist in Lesson 5. If any item feels
+         shaky, revisit the matching lesson and re-ship the task.
+      </p>
+   </Accordion>
+</Accordions>

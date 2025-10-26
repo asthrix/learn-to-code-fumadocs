@@ -1,0 +1,185 @@
+---
+title: "Lists & Conditional Rendering"
+description:
+   "Render filtered results, communicate empty states, and derive summary data."
+module: "M2"
+lesson: "3"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react-new/m2/2_event-handling"]
+learning_objectives:
+   - "Render lists from filtered data"
+   - "Display friendly empty states when filters match nothing"
+   - "Derive summary copy such as counts and category labels"
+tags: ["lists", "conditional-rendering", "state"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Lists & Conditional Rendering
+
+StaySense now filters by category. Let's make the UI communicate results clearly
+with counts and empty states.
+
+---
+
+## 1. Derive Counts
+
+Inside `ListingSection`, compute derived metadata before returning JSX.
+
+```tsx
+const listingsToDisplay =
+   activeCategory === "All"
+      ? featuredListings
+      : featuredListings.filter(
+           (listing) => listing.category === activeCategory
+        );
+
+const resultCopy =
+   activeCategory === "All"
+      ? `${listingsToDisplay.length} stays`
+      : `${listingsToDisplay.length} ${activeCategory.toLowerCase()} escape${
+           listingsToDisplay.length === 1 ? "" : "s"
+        }`;
+```
+
+---
+
+## 2. Render Counts near the Category Pills
+
+```tsx
+<div className='flex flex-wrap items-center justify-between gap-4'>
+   <div className='flex flex-wrap gap-3'>{/* category pills */}</div>
+   <span className='text-xs uppercase tracking-[0.25em] text-slate-400'>
+      {resultCopy}
+   </span>
+</div>
+```
+
+---
+
+## 3. Communicate Empty States
+
+```tsx
+<div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+   {listingsToDisplay.length ? (
+      listingsToDisplay.map((listing) => (
+         <ListingCard
+            key={listing.id}
+            listing={listing}
+            isSaved={savedListingIds.includes(listing.id)}
+            onToggleSave={() => onToggleSave(listing.id)}
+         />
+      ))
+   ) : (
+      <div className='col-span-full rounded-2xl border border-dashed border-white/20 bg-white/5 p-10 text-center text-slate-300'>
+         <p className='text-lg font-semibold text-white'>
+            No stays match that vibe—yet.
+         </p>
+         <p className='mt-2 text-sm text-slate-400'>
+            Try a different category or clear filters to see our full
+            collection.
+         </p>
+      </div>
+   )}
+</div>
+```
+
+---
+
+## Task · Support Multiple Active Filters
+
+Extend the logic to handle multiple categories at once using checkboxes.
+
+1. Replace the single `activeCategory` state with
+   `const [activeCategories, setActiveCategories] = useState<string[]>(["All"]);`.
+2. Allow toggling multiple categories unless "All" is selected (which should
+   reset to `["All"]`).
+3. Update filtering logic to match when a listing's category exists in
+   `activeCategories`.
+4. Commit with `git commit -am "feat: allow multi-category filters"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      ```tsx
+      // src/App.tsx
+      const [activeCategories, setActiveCategories] = useState<string[]>(["All"]);
+
+      const handleCategoryChange = useCallback((category: string) => {
+         setActiveCategories((previous) => {
+            if (category === "All") return ["All"];
+            const withoutAll = previous.filter((existing) => existing !== "All");
+            return withoutAll.includes(category)
+               ? withoutAll.filter((existing) => existing !== category)
+               : [...withoutAll, category];
+         });
+      }, []);
+      ```
+
+      ```tsx
+      // src/components/ListingSection.tsx
+      type ListingSectionProps = {
+         savedListingIds: number[];
+         onToggleSave: (id: number) => void;
+         activeCategories: string[];
+         onCategoryChange: (category: string) => void;
+      };
+
+      const categories = ["All", "Cabin", "Coastal", "Desert"];
+      const filterCategories = activeCategories.includes("All")
+         ? ["Cabin", "Coastal", "Desert"]
+         : activeCategories;
+
+      const listingsToDisplay =
+         activeCategories.includes("All")
+            ? featuredListings
+            : featuredListings.filter((listing) => filterCategories.includes(listing.category));
+
+      return (
+         <section>
+            <div className='flex flex-wrap items-center justify-between gap-4'>
+               <div className='flex flex-wrap gap-3'>
+                  {categories.map((category) => {
+                     const isActive = activeCategories.includes(category);
+                     return (
+                        <button
+                           key={category}
+                           type='button'
+                           onClick={() => onCategoryChange(category)}
+                           className={`rounded-full border px-4 py-2 text-xs uppercase transition ${
+                              isActive
+                                 ? "border-emerald-300 bg-emerald-500/20 text-emerald-100"
+                                 : "border-white/15 text-slate-200 hover:border-emerald-300 hover:text-emerald-100"
+                           }`}
+                           aria-pressed={isActive}
+                        >
+                           {category}
+                        </button>
+                     );
+                  })}
+               </div>
+               <span className='text-xs uppercase tracking-[0.25em] text-slate-400'>
+                  {listingsToDisplay.length} curated stay{listingsToDisplay.length === 1 ? "" : "s"}
+               </span>
+            </div>
+            {/* conditional grid logic from above */}
+         </section>
+      );
+      ```
+
+      ```bash
+      git add src/App.tsx src/components/ListingSection.tsx
+      git commit -m "feat: allow multi-category filters"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Derived copy reflects active filters and counts.
+-  [ ] Empty state messaging shows when no listings match.
+-  [ ] Multi-select filters behave predictably, with "All" acting as reset.

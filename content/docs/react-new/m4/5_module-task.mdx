@@ -1,0 +1,94 @@
+---
+title: "Capstone Task · StaySense MVP"
+description:
+   "Deliver the StaySense MVP, record the demo, and reflect on the learning
+   journey."
+module: "M4"
+lesson: "5"
+difficulty: "intermediate"
+duration: "60"
+project_phase: "Launch"
+prerequisites:
+   [
+      "/docs/react-new/m4/1_project-brief",
+      "/docs/react-new/m4/2_detail-page",
+      "/docs/react-new/m4/3_polish-and-accessibility",
+      "/docs/react-new/m4/4_launch-checklist",
+   ]
+learning_objectives:
+   - "Pull together routing, filters, API data, and polish into a cohesive MVP"
+   - "Document lessons learned and future enhancements"
+   - "Share the project confidently with stakeholders"
+tags: ["project", "capstone", "reflection"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Capstone Task · StaySense MVP
+
+This is it—package StaySense for reviewers, hiring managers, or future you.
+Complete the checklist, capture a demo, and reflect on your wins.
+
+---
+
+## Final Deliverables
+
+1. **Fully functioning app**: Home, saved, and detail routes with filters and
+   saved state. No console warnings/errors.
+2. **Documentation**: README, module release notes, accessibility audit, smoke
+   test script.
+3. **Demo**: Loom video (≤ 3 minutes) showing user flows and architecture
+   highlights.
+4. **Retro**: Reflection on what you learned and what you'd improve next.
+
+---
+
+## Task · Ship the MVP
+
+1. Run `npm run build` to ensure production build passes.
+2. Record the Loom walkthrough (narrate filters, saved stays, detail page, retry
+   states).
+3. Create `docs/retrospectives/m4.md` answering:
+   -  What did I learn?
+   -  What slowed me down?
+   -  What will I tackle next?
+4. Tag a release in Git (`git tag v0.4.0 && git push --tags`).
+5. Commit with `git commit -am "chore: finalize staysense mvp"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Outline'>
+      ```md
+      # docs/retrospectives/m4.md
+
+      ## What I Learned
+      - Routing unlocked multi-page flows with minimal boilerplate.
+      - Mock APIs provide production-like feedback without backend stress.
+
+      ## What Slowed Me Down
+      - Debugging dependency arrays—added ESLint hook plugin to help.
+
+      ## Next Steps
+      - Explore authentication using the mock token helpers in Project React docs.
+      - Deploy to Vercel and set up CI for lint/test.
+      ```
+
+      ```bash
+      npm run build
+      git add docs/retrospectives/m4.md
+      git commit -m "chore: finalize staysense mvp"
+      git tag v0.4.0
+      git push --tags
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Final Validation Checklist
+
+-  [ ] Production build succeeds with zero errors.
+-  [ ] Loom link added to README and release notes.
+-  [ ] Retro captured with honest takeaways.
+-  [ ] Git tag created for the MVP.
+-  [ ] You can explain StaySense architecture end to end.

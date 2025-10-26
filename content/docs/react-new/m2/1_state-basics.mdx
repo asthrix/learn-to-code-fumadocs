@@ -1,0 +1,205 @@
+---
+title: "State Basics with useState"
+description:
+   "Track dynamic values with `useState`, lift state to parents, and structure
+   StaySense state logically."
+module: "M2"
+lesson: "1"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react-new/m2/0_index"]
+learning_objectives:
+   - "Create and update state using the `useState` hook"
+   - "Lift shared state to a common parent component"
+   - "Derive computed values for summarising filtered listings"
+tags: ["state", "hooks", "beginner"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# State Basics with useState
+
+StaySense filters, badges, and save buttons all rely on state. We'll introduce
+state using the simplest hook: `useState`.
+
+---
+
+## 1. Track Saved Listing IDs
+
+In `src/App.tsx`, import `useState` and manage saved listing IDs at the top
+level.
+
+```tsx
+import { useState } from "react";
+import { Header } from "./components/Header";
+import { Hero } from "./components/Hero";
+import { ListingSection } from "./components/ListingSection";
+
+export default function App() {
+   const [savedListingIds, setSavedListingIds] = useState<number[]>([]);
+
+   return (
+      <main className='min-h-screen bg-slate-950 text-slate-50'>
+         <Header savedCount={savedListingIds.length} />
+         <Hero />
+         <ListingSection
+            savedListingIds={savedListingIds}
+            onToggleSave={(id) => {
+               setSavedListingIds((previous) =>
+                  previous.includes(id)
+                     ? previous.filter((existing) => existing !== id)
+                     : [...previous, id]
+               );
+            }}
+         />
+      </main>
+   );
+}
+```
+
+---
+
+## 2. Update Header to Display Saved Count
+
+Teach the header about saved stays:
+
+```tsx
+export function Header({ savedCount = 0 }: { savedCount?: number }) {
+   return (
+      <header className='border-b border-white/10 bg-slate-950/40 backdrop-blur'>
+         <div className='mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-6'>
+            <span className='text-lg font-semibold tracking-wide'>
+               StaySense
+            </span>
+            <nav className='flex items-center gap-6 text-sm text-slate-300'>
+               <a href='#listings' className='hover:text-white'>
+                  Explore
+               </a>
+               <a href='#about' className='hover:text-white'>
+                  About
+               </a>
+               <span className='rounded-full bg-emerald-400/20 px-3 py-1 text-xs font-medium text-emerald-200'>
+                  Saved · {savedCount}
+               </span>
+            </nav>
+         </div>
+      </header>
+   );
+}
+```
+
+---
+
+## 3. Pass State into ListingSection
+
+Adjust `ListingSection` props:
+
+```tsx
+import { ListingCard } from "./ListingCard";
+import { featuredListings } from "../data/listings";
+
+type ListingSectionProps = {
+   savedListingIds: number[];
+   onToggleSave: (id: number) => void;
+};
+
+export function ListingSection({
+   savedListingIds,
+   onToggleSave,
+}: ListingSectionProps) {
+   return (
+      <section id='listings' className='bg-slate-900/60 py-16'>
+         <div className='mx-auto flex w-full max-w-5xl flex-col gap-8 px-6'>
+            {/* ... */}
+            <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+               {featuredListings.map((listing) => (
+                  <ListingCard
+                     key={listing.id}
+                     listing={listing}
+                     isSaved={savedListingIds.includes(listing.id)}
+                     onToggleSave={() => onToggleSave(listing.id)}
+                  />
+               ))}
+            </div>
+         </div>
+      </section>
+   );
+}
+```
+
+---
+
+## Task · Add Saved State to ListingCard
+
+Teach `ListingCard` to visually reflect the saved state.
+
+1. Update `ListingCard` props to accept `isSaved` (boolean) and `onToggleSave`
+   (function).
+2. Replace the "View details" button with a toggle button that switches between
+   "Save stay" and "Saved" states.
+3. Ensure keyboard and screen-reader accessibility by using a `<button>` element
+   with `aria-pressed`.
+4. Commit with `git commit -am "feat: add saved state toggle"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      ```tsx
+      type ListingCardProps = {
+         listing: Listing;
+         isSaved: boolean;
+         onToggleSave: () => void;
+      };
+
+      export function ListingCard({ listing, isSaved, onToggleSave }: ListingCardProps) {
+         const topAmenities = listing.amenities.slice(0, 3);
+
+         return (
+            <article className='overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-lg shadow-black/20 backdrop-blur'>
+               <img src={listing.imageUrl} alt={listing.name} className='h-48 w-full object-cover' loading='lazy' />
+               <div className='space-y-3 p-6'>
+                  {/* existing header */}
+                  <ul className='flex flex-wrap gap-2 text-xs text-emerald-200'>
+                     {topAmenities.length ? (
+                        topAmenities.map((amenity) => (
+                           <li key={amenity} className='rounded-full border border-emerald-200/40 px-3 py-1'>
+                              {amenity}
+                           </li>
+                        ))
+                     ) : (
+                        <li className='text-slate-400'>Amenities coming soon</li>
+                     )}
+                  </ul>
+                  <button
+                     type='button'
+                     onClick={onToggleSave}
+                     aria-pressed={isSaved}
+                     className={`w-full rounded-lg border px-4 py-2 text-sm transition ${
+                        isSaved
+                           ? "border-emerald-300 bg-emerald-500/20 text-emerald-200"
+                           : "border-white/20 text-white hover:border-emerald-400 hover:text-emerald-200"
+                     }`}
+                  >
+                     {isSaved ? "Saved" : "Save stay"}
+                  </button>
+               </div>
+            </article>
+         );
+      }
+      ```
+
+      ```bash
+      git add src/components/ListingCard.tsx src/components/ListingSection.tsx src/App.tsx
+      git commit -m "feat: add saved state toggle"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Saved count updates when toggling a listing.
+-  [ ] Save button reflects visual and accessibility state.
+-  [ ] State managed at the App level to share across children.

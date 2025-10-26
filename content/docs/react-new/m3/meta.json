@@ -1,0 +1,11 @@
+{
+   "title": "M3 · Data & Effects",
+   "pages": [
+      "0_index",
+      "1_effect-basics",
+      "2_mock-api-fetching",
+      "3_loading-and-errors",
+      "4_shared-context",
+      "5_module-task"
+   ]
+}

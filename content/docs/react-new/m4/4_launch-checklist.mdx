@@ -1,0 +1,96 @@
+---
+title: "Launch Checklist & Artifacts"
+description:
+   "Collect documentation, testing notes, and demo assets to support the
+   StaySense launch."
+module: "M4"
+lesson: "4"
+difficulty: "intermediate"
+duration: "30"
+project_phase: "Launch"
+prerequisites: ["/docs/react-new/m4/3_polish-and-accessibility"]
+learning_objectives:
+   - "Assemble README, release notes, and walkthrough"
+   - "Run smoke tests before sharing the project"
+   - "Plan optional deployment"
+tags: ["launch", "documentation", "testing"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Launch Checklist & Artifacts
+
+A great project includes documentation and proof of functionality. This lesson
+packages everything you need before the final milestone.
+
+---
+
+## 1. README Essentials
+
+Ensure `README.md` covers:
+
+-  Project summary + screenshot or GIF.
+-  Tech stack and key dependencies.
+-  Setup instructions (`npm install`, env requirements).
+-  Available scripts (dev, build, preview).
+-  Learning outcomes / future roadmap.
+
+---
+
+## 2. Smoke Test Script
+
+Create `scripts/smoke-test.md` documenting manual QA steps:
+
+1. Load `/` → expect hero & listings after skeletons.
+2. Apply filters (Cabin, price ≤ 300, guests ≥ 4) → results update.
+3. Save two listings → saved count increments; refresh persists.
+4. Navigate to `/saved` → saved listings only; unsave updates state.
+5. Open detail page → gallery, description, CTA render.
+6. Run accessibility check → skip link, focus states visible.
+
+---
+
+## 3. Demo Assets
+
+-  Record a 2-minute Loom demonstrating filters, saved stays, and detail view.
+-  Export a high-resolution screenshot for README/social sharing.
+-  Optionally create a GIF using `ffmpeg` or `ScreenToGif`.
+
+---
+
+## Task · Assemble Launch Folder
+
+1. Create `docs/launch/README-notes.md` summarising what changed since Module 3.
+2. Add `scripts/smoke-test.md` and a placeholder for Loom URL.
+3. Update project `README.md` with screenshot + Loom link.
+4. Commit with `git commit -am "docs: add launch checklist artifacts"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Outline'>
+      ```md
+      # docs/launch/README-notes.md
+
+      ## Highlights
+      - Added React Router for saved + detail routes.
+      - Improved accessibility with skip link and focus outlines.
+      - Documented manual smoke tests and Loom walkthrough.
+
+      ## Loom
+      - https://loom.com/share/staysense-launch
+      ```
+
+      ```bash
+      git add docs/launch/README-notes.md scripts/smoke-test.md README.md
+      git commit -m "docs: add launch checklist artifacts"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] README includes updated screenshot + Loom link.
+-  [ ] Smoke test script covers core flows.
+-  [ ] Launch notes summarise changes since Module 3.

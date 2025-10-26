@@ -1,0 +1,6 @@
+{
+   "title": "React Launchpad",
+   "root": true,
+   "description": "Beginner-friendly React path that builds the StaySense listing experience from first component to deployed mock backend integration.",
+   "pages": ["index", "m1", "m2", "m3", "m4"]
+}

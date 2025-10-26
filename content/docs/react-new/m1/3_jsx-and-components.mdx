@@ -1,0 +1,194 @@
+---
+title: "JSX & Your First Components"
+description:
+   "Replace the Vite starter with semantic JSX and create the StaySense hero and
+   navigation components."
+module: "M1"
+lesson: "3"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Foundation"
+prerequisites: ["/docs/react-new/m1/2_environment-setup"]
+learning_objectives:
+   - "Use JSX to author accessible markup"
+   - "Create reusable components and export them cleanly"
+   - "Compose the StaySense landing page shell"
+tags: ["jsx", "components", "layout"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# JSX & Your First Components
+
+With the workspace ready, it's time to render real UI. You'll build a global
+layout, navigation, and hero section using JSX—the syntax React uses to blend
+markup and JavaScript.
+
+---
+
+## 1. Clean the Entry Point
+
+Open `src/App.tsx` and replace the boilerplate with a semantic structure:
+
+```tsx
+import { Header } from "./components/Header";
+import { Hero } from "./components/Hero";
+
+export default function App() {
+   return (
+      <main className='min-h-screen bg-slate-950 text-slate-50'>
+         <Header />
+         <Hero />
+      </main>
+   );
+}
+```
+
+---
+
+## 2. Author the Header Component
+
+Create `src/components/Header.tsx`:
+
+```tsx
+export function Header() {
+   return (
+      <header className='border-b border-white/10 bg-slate-950/40 backdrop-blur'>
+         <div className='mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-6'>
+            <span className='text-lg font-semibold tracking-wide'>
+               StaySense
+            </span>
+            <nav className='flex items-center gap-6 text-sm text-slate-300'>
+               <a href='#listings' className='hover:text-white'>
+                  Explore
+               </a>
+               <a href='#about' className='hover:text-white'>
+                  About
+               </a>
+               <a href='#contact' className='hover:text-white'>
+                  Contact
+               </a>
+            </nav>
+         </div>
+      </header>
+   );
+}
+```
+
+---
+
+## 3. Author the Hero Component
+
+Create `src/components/Hero.tsx`:
+
+```tsx
+export function Hero() {
+   return (
+      <section className='mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-24'>
+         <p className='text-xs uppercase tracking-[0.3em] text-emerald-300'>
+            Plan your next getaway
+         </p>
+         <h1 className='text-4xl font-bold leading-tight md:text-5xl'>
+            Find boutique stays your guests will remember
+         </h1>
+         <p className='max-w-xl text-base text-slate-300'>
+            StaySense curates character-rich homes across the globe. Filter by
+            vibe, budget, and amenities—no spreadsheets required.
+         </p>
+         <div className='flex flex-wrap gap-4'>
+            <a
+               href='#listings'
+               className='rounded-full bg-emerald-400 px-6 py-3 text-sm font-medium text-emerald-950 shadow-lg shadow-emerald-400/20 hover:bg-emerald-300'
+            >
+               Browse featured stays
+            </a>
+            <a
+               href='#learn-more'
+               className='rounded-full border border-white/30 px-6 py-3 text-sm text-slate-100 hover:border-white hover:text-white'
+            >
+               Learn how it works
+            </a>
+         </div>
+      </section>
+   );
+}
+```
+
+---
+
+## 4. Fast Feedback
+
+Save your files—Vite hot reloads the page instantly. Inspect the rendered HTML
+in DevTools to reinforce how JSX translates into DOM nodes.
+
+---
+
+## Task · Shipping the Listing Section Shell
+
+Give StaySense somewhere to render listings in the next lesson.
+
+1. Create `src/components/ListingSection.tsx` exporting a `ListingSection`
+   component with a `<section>` wrapper and a heading.
+2. Import the component into `App.tsx` and render it below `<Hero />`.
+3. Add a placeholder grid
+   (`<div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>`) that will soon
+   hold `ListingCard` items.
+4. Commit with `git commit -am "feat: add listing section shell"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      ```tsx
+      // src/components/ListingSection.tsx
+      export function ListingSection({ children }: { children?: React.ReactNode }) {
+         return (
+            <section id='listings' className='bg-slate-900/60 py-16'>
+               <div className='mx-auto flex w-full max-w-5xl flex-col gap-8 px-6'>
+                  <div>
+                     <p className='text-xs uppercase tracking-[0.3em] text-emerald-300'>
+                        Curated picks
+                     </p>
+                     <h2 className='text-2xl font-semibold text-white'>
+                        Featured getaway homes
+                     </h2>
+                  </div>
+                  <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+                     {children ?? <p className='text-slate-400'>Stay tuned—listings arriving soon.</p>}
+                  </div>
+               </div>
+            </section>
+         );
+      }
+      ```
+
+      ```tsx
+      // src/App.tsx
+      import { Header } from "./components/Header";
+      import { Hero } from "./components/Hero";
+      import { ListingSection } from "./components/ListingSection";
+
+      export default function App() {
+         return (
+            <main className='min-h-screen bg-slate-950 text-slate-50'>
+               <Header />
+               <Hero />
+               <ListingSection />
+            </main>
+         );
+      }
+      ```
+
+      ```bash
+      git add src/components/Header.tsx src/components/Hero.tsx src/components/ListingSection.tsx src/App.tsx
+      git commit -m "feat: add listing section shell"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] App renders Header, Hero, and ListingSection without console warnings.
+-  [ ] Components live under `src/components` and export named functions.
+-  [ ] Commit created for the listing section shell.

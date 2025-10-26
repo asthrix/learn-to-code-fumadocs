@@ -1,0 +1,248 @@
+---
+title: "Controlled Forms & Derived Filters"
+description:
+   "Build a filter bar with controlled inputs, synchronise derived state, and
+   prepare for persistence."
+module: "M2"
+lesson: "4"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react-new/m2/3_lists-and-conditions"]
+learning_objectives:
+   - "Manage controlled form inputs in React"
+   - "Combine multiple filters to derive visible listings"
+   - "Prepare state for future persistence in Module 3"
+tags: ["forms", "state", "filters"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Controlled Forms & Derived Filters
+
+StaySense needs richer filters: price range and guest count. We'll create a
+`ListingFilters` component that reports selections upward.
+
+---
+
+## 1. Create ListingFilters Component
+
+Add `src/components/ListingFilters.tsx`:
+
+```tsx
+import { useId } from "react";
+
+type ListingFiltersProps = {
+   search: string;
+   onSearchChange: (value: string) => void;
+   maxPrice: number;
+   onMaxPriceChange: (value: number) => void;
+   guests: number;
+   onGuestsChange: (value: number) => void;
+};
+
+export function ListingFilters({
+   search,
+   onSearchChange,
+   maxPrice,
+   onMaxPriceChange,
+   guests,
+   onGuestsChange,
+}: ListingFiltersProps) {
+   const searchId = useId();
+   const priceId = useId();
+   const guestsId = useId();
+
+   return (
+      <form
+         className='grid gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-slate-100'
+         onSubmit={(event) => event.preventDefault()}
+      >
+         <label className='flex flex-col gap-2' htmlFor={searchId}>
+            <span className='text-xs uppercase tracking-[0.3em] text-slate-400'>
+               Search
+            </span>
+            <input
+               id={searchId}
+               value={search}
+               onChange={(event) => onSearchChange(event.target.value)}
+               placeholder='Try "A-Frame" or "Desert"'
+               className='rounded-lg border border-white/15 bg-slate-950/60 px-4 py-2'
+            />
+         </label>
+         <label className='flex flex-col gap-2' htmlFor={priceId}>
+            <span className='text-xs uppercase tracking-[0.3em] text-slate-400'>
+               Max price (per night)
+            </span>
+            <input
+               id={priceId}
+               type='range'
+               min={120}
+               max={600}
+               step={20}
+               value={maxPrice}
+               onChange={(event) =>
+                  onMaxPriceChange(Number(event.target.value))
+               }
+            />
+            <span className='text-xs text-slate-400'>Up to ${maxPrice}</span>
+         </label>
+         <label className='flex flex-col gap-2' htmlFor={guestsId}>
+            <span className='text-xs uppercase tracking-[0.3em] text-slate-400'>
+               Guests
+            </span>
+            <input
+               id={guestsId}
+               type='number'
+               min={1}
+               max={10}
+               value={guests}
+               onChange={(event) => onGuestsChange(Number(event.target.value))}
+               className='w-24 rounded-lg border border-white/15 bg-slate-950/60 px-4 py-2'
+            />
+         </label>
+      </form>
+   );
+}
+```
+
+---
+
+## 2. Manage Filter State in App
+
+Update `App.tsx` to include filter state:
+
+```tsx
+const [search, setSearch] = useState("");
+const [maxPrice, setMaxPrice] = useState(400);
+const [guests, setGuests] = useState(2);
+```
+
+Pass these into `ListingSection`:
+
+```tsx
+<ListingSection
+   savedListingIds={savedListingIds}
+   onToggleSave={handleToggleSave}
+   activeCategories={activeCategories}
+   onCategoryChange={handleCategoryChange}
+   search={search}
+   onSearchChange={setSearch}
+   maxPrice={maxPrice}
+   onMaxPriceChange={setMaxPrice}
+   guests={guests}
+   onGuestsChange={setGuests}
+/>
+```
+
+---
+
+## 3. Filter Listings by All Criteria
+
+Inside `ListingSection`, add filters before rendering:
+
+```tsx
+const listingsToDisplay = featuredListings
+   .filter((listing) =>
+      activeCategories.includes("All")
+         ? true
+         : activeCategories.includes(listing.category)
+   )
+   .filter((listing) => listing.pricePerNight <= maxPrice)
+   .filter((listing) => listing.maxGuests >= guests)
+   .filter((listing) =>
+      search.trim() === ""
+         ? true
+         : listing.name.toLowerCase().includes(search.toLowerCase()) ||
+           listing.location.toLowerCase().includes(search.toLowerCase())
+   );
+```
+
+Update the `Listing` type with `maxGuests: number` if you have not already.
+
+---
+
+## Task · Move Filters into Dedicated Component
+
+Render the new `ListingFilters` inside `ListingSection` above the categories.
+
+1. Import `ListingFilters` and pass through the state/handlers received from
+   `App.tsx`.
+2. Adjust layout to place filters in a responsive grid next to category pills on
+   large screens.
+3. Ensure `ListingFilters` remains controlled—inputs reflect state values.
+4. Commit with `git commit -am "feat: add filter form controls"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      ```tsx
+      // src/components/ListingSection.tsx
+      import { ListingFilters } from "./ListingFilters";
+
+      type ListingSectionProps = {
+         savedListingIds: number[];
+         onToggleSave: (id: number) => void;
+         activeCategories: string[];
+         onCategoryChange: (category: string) => void;
+         search: string;
+         onSearchChange: (value: string) => void;
+         maxPrice: number;
+         onMaxPriceChange: (value: number) => void;
+         guests: number;
+         onGuestsChange: (value: number) => void;
+      };
+
+      return (
+         <section id='listings' className='bg-slate-900/60 py-16'>
+            <div className='mx-auto flex w-full max-w-5xl flex-col gap-8 px-6'>
+               <div className='grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start'>
+                  <ListingFilters
+                     search={search}
+                     onSearchChange={onSearchChange}
+                     maxPrice={maxPrice}
+                     onMaxPriceChange={onMaxPriceChange}
+                     guests={guests}
+                     onGuestsChange={onGuestsChange}
+                  />
+                  <div className='flex flex-wrap gap-3 lg:flex-col'>
+                     {categories.map((category) => {
+                        const isActive = activeCategories.includes(category);
+                        return (
+                           <button
+                              key={category}
+                              type='button'
+                              onClick={() => onCategoryChange(category)}
+                              className={`rounded-full border px-4 py-2 text-xs uppercase transition ${
+                                 isActive
+                                    ? "border-emerald-300 bg-emerald-500/20 text-emerald-100"
+                                    : "border-white/15 text-slate-200 hover:border-emerald-300 hover:text-emerald-100"
+                              }`}
+                              aria-pressed={isActive}
+                           >
+                              {category}
+                           </button>
+                        );
+                     })}
+                  </div>
+               </div>
+               {/* counts + grid remain as before */}
+            </div>
+         </section>
+      );
+      ```
+
+      ```bash
+      git add src/components/ListingFilters.tsx src/components/ListingSection.tsx src/App.tsx
+      git commit -m "feat: add filter form controls"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Filter inputs are controlled and reflect state.
+-  [ ] Listings respect category, price, guest, and search filters.
+-  [ ] Filters and category pills coexist responsively on large screens.
