@@ -1,6 +1,6 @@
 {
    "title": "HTML Fundamentals",
-   "root": true,
+   "root": false,
    "description": "Learn the foundation of web development with HTML",
    "pages": ["index", "m0", "m1", "m2", "m3", "m4", "m5"]
 }
