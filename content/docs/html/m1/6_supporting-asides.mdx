@@ -1,0 +1,297 @@
+---
+title: "Designing Supporting Asides"
+description:
+   "Use `<aside>` to deliver credentials, press, and quick stats without
+   disrupting the main narrative."
+module: "M1"
+lesson: "6"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/5_main-content-architecture"]
+learning_objectives:
+   - "Identify content appropriate for `<aside>`"
+   - "Structure credentials and press mentions semantically"
+   - "Link asides to main content for context"
+   - "Plan responsive behavior for supplemental content"
+tags: ["aside", "supplemental", "semantics"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Designing Supporting Asides
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Determine which content belongs in `<aside>` versus `<section>`.
+-  [ ] Create semantic markup for credentials, press mentions, and quick stats.
+-  [ ] Connect asides to main content using ARIA or headings.
+-  [ ] Plan how asides adapt for mobile layouts.
+
+## Project Context
+
+Asides provide supporting information without overshadowing the main story.
+Portfolio Pulse can use them to emphasise credibility, share press quotes, or
+show availability. Well-crafted asides reinforce the narrative while staying
+accessible and responsive.
+
+---
+
+## What Belongs in an Aside?
+
+-  Press logos and quotes referencing your work
+-  Certifications or awards that support the case studies
+-  Quick stats (years of experience, shipped products)
+-  Availability or contact reminders
+
+### Basic Example
+
+```html
+<aside aria-label="Press mentions">
+   <h2>Featured In</h2>
+   <ul>
+      <li><span aria-hidden="true">🗞️</span> Product Weekly</li>
+      <li><span aria-hidden="true">🎙️</span> Design Ops Radio</li>
+   </ul>
+</aside>
+```
+
+### Practical Example
+
+```html
+<aside class="sidebar" aria-labelledby="sidebar-credentials">
+   <h2 id="sidebar-credentials">Credentials & Press</h2>
+   <section aria-labelledby="quick-stats">
+      <h3 id="quick-stats">Quick stats</h3>
+      <dl class="stat-list">
+         <div>
+            <dt>Experience</dt>
+            <dd><time datetime="2015">10 years</time></dd>
+         </div>
+         <div>
+            <dt>Shipped products</dt>
+            <dd>24 end-to-end engagements</dd>
+         </div>
+      </dl>
+   </section>
+   <section aria-labelledby="press-highlights">
+      <h3 id="press-highlights">Press highlights</h3>
+      <ul class="press-list">
+         <li>
+            <a
+               href="https://example.com/product-weekly"
+               rel="noopener"
+               target="_blank"
+            >
+               Product Weekly · Designing with accessible defaults
+            </a>
+         </li>
+         <li>
+            <a
+               href="https://example.com/design-ops-radio"
+               rel="noopener"
+               target="_blank"
+            >
+               Design Ops Radio · From prototypes to production
+            </a>
+         </li>
+      </ul>
+   </section>
+</aside>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Use `<dl>` for Stat Blocks
+
+**Why:** Definition lists pair labels with values, improving screen reader
+output.
+
+```html
+<dl>
+   <div>
+      <dt>Active clients</dt>
+      <dd>3 retainer partnerships</dd>
+   </div>
+</dl>
+```
+
+### 2. Provide Contextual Headings
+
+**Why:** Headings make asides discoverable via screen reader shortcuts.
+
+```html
+<aside aria-labelledby="availability-title">
+   <h2 id="availability-title">Availability</h2>
+   <p>Booking new projects for Q2 2026.</p>
+</aside>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Dumping Unrelated Content
+
+**Problem:** Asides should be related to the surrounding content; otherwise they
+confuse users.
+
+```html
+<aside>
+   <h2>Blog posts</h2>
+   <!-- unrelated to case studies -->
+</aside>
+```
+
+**Solution:**
+
+```html
+<aside aria-label="Credentials supporting case studies">...</aside>
+```
+
+### 2. Forgetting External Link Attributes
+
+**Problem:** Press links should open in a new tab and use `rel="noopener"` for
+security.
+
+```html
+<a href="https://example.com">Read article</a>
+```
+
+**Solution:**
+
+```html
+<a href="https://example.com" target="_blank" rel="noopener">Read article</a>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Add Supporting Asides
+
+1. Insert the practical example (customized) into `index.html`, positioning the
+   aside near case studies.
+2. Ensure each section within the aside has a heading and semantic structure
+   (`<dl>`, `<ul>`).
+3. Log any missing resources (press URLs, updated stats) in
+   `notes/retro-log.md`.
+4. Commit with `git commit -am "feat: add supporting asides"`.
+
+#### Expected Result
+
+Portfolio Pulse now features supplemental information that reinforces
+credibility without interrupting the main narrative.
+
+---
+
+<Accordions className="mt-6">
+    <Accordion title="Solution Walkthrough">
+         <p>
+             Implement a credentials aside similar to this example, then log missing
+             resources for follow-up.
+         </p>
+         ```html filename="index.html"
+         <aside class="sidebar" aria-labelledby="sidebar-credentials">
+            <h2 id="sidebar-credentials">Credentials & Press</h2>
+
+            <section aria-labelledby="quick-stats">
+               <h3 id="quick-stats">Quick stats</h3>
+               <dl class="stat-list">
+                  <div>
+                     <dt>Experience</dt>
+                     <dd>
+                        <time datetime="2015">10 years shipping products</time>
+                     </dd>
+                  </div>
+                  <div>
+                     <dt>Launched products</dt>
+                     <dd>24 end-to-end engagements</dd>
+                  </div>
+                  <div>
+                     <dt>Avg. uplift</dt>
+                     <dd>
+                        <strong>18%</strong> retention improvement
+                     </dd>
+                  </div>
+               </dl>
+            </section>
+
+            <section aria-labelledby="press-highlights">
+               <h3 id="press-highlights">Press highlights</h3>
+               <ul class="press-list">
+                  <li>
+                     <a
+                        href="https://example.com/product-weekly"
+                        target="_blank"
+                        rel="noopener"
+                     >
+                        Product Weekly · Designing with accessible defaults
+                     </a>
+                  </li>
+                  <li>
+                     <a
+                        href="https://example.com/design-ops-radio"
+                        target="_blank"
+                        rel="noopener"
+                     >
+                        Design Ops Radio · From prototypes to production
+                     </a>
+                  </li>
+               </ul>
+            </section>
+
+            <section aria-labelledby="availability-title">
+               <h3 id="availability-title">Availability</h3>
+               <p>
+                  Accepting new collaborations starting <time datetime="2024-07">July 2024</time>.
+               </p>
+            </section>
+         </aside>
+         ```
+         <p>
+             Track outstanding assets in `notes/retro-log.md`:
+         </p>
+         ```md filename="notes/retro-log.md"
+         ### Aside Follow-ups
+         - Replace placeholder press URLs with real links once approved (Owner: Avery)
+         - Confirm availability date with calendar (Owner: Avery)
+         - Gather updated stat for average uplift from analytics (Owner: Jordan)
+         ```
+         <p>
+             Update the layout plan to note that the aside should stack below the
+             highlights section on narrow viewports.
+         </p>
+    </Accordion>
+
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Aside is reachable via keyboard navigation and skip links.
+-  [ ] External links include `rel="noopener"` and open as expected.
+
+### Code Quality
+
+-  [ ] `<dl>` groups stats with `<dt>` and `<dd>` pairs.
+-  [ ] Headings exist for each subsection inside the aside.
+
+### Understanding
+
+-  [ ] You can explain why the aside content supports nearby sections.
+-  [ ] You know what additional data sources are needed.
+
+### Project Integration
+
+-  [ ] Retro log lists pending assets and approvals.
+-  [ ] Layout plan references the aside and its purpose.
+
+---

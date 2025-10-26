@@ -1,0 +1,110 @@
+---
+title: "Metadata Strategy"
+description:
+   "Establish canonical URLs, favicons, and environment-specific overrides."
+module: "M5"
+lesson: "1"
+difficulty: "advanced"
+duration: "35"
+project_phase: "Launch"
+prerequisites: ["/docs/html/m5/0_index"]
+learning_objectives:
+   - "Audit existing metadata across pages"
+   - "Define canonical and alternate link strategy"
+   - "Plan environment overrides and governance"
+tags: ["metadata", "strategy", "launch"]
+---
+
+# Metadata Strategy
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Inventory current metadata and identify gaps.
+-  [ ] Define canonical URLs, favicons, and feed links for Portfolio Pulse.
+-  [ ] Document governance for environment-specific overrides.
+
+## Why It Matters
+
+Strong metadata guides crawlers, sharing bots, and browsers. Without a strategy
+you risk duplicate content, broken favicons, or outdated titles during launch.
+
+---
+
+## Metadata Inventory
+
+Create `docs/metadata-playbook.md` with sections for:
+
+-  `<title>` and `<meta name="description">`
+-  Canonical and alternate language URLs
+-  Favicon, touch icon, and mask icon references
+-  RSS/Atom feeds (if applicable) and manifest links
+
+Log current values, owners, and update cadence.
+
+---
+
+## Canonical & Alternate Links
+
+Define rules:
+
+-  One canonical URL per page
+   (`<link rel="canonical" href="https://avery.dev/">`).
+-  Use trailing slashes consistently.
+-  Add `rel="alternate" hreflang="en"` if localization planned.
+
+Document fallback rules for staging environments (e.g., use production domain in
+canonical even on staging).
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Titles ≤ 60 Characters
+
+**Why:** Prevent truncation in search results.
+
+### 2. Author One Description Per Page
+
+**Why:** Avoid duplicates; ensure copy matches page intent.
+
+Store copy variations in `docs/content-inventory.md` if available.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting to Update Favicons
+
+**Problem:** Browsers cache outdated icons.
+
+**Fix:** Version filenames or query params when updating.
+
+### 2. Mixing HTTP/HTTPS
+
+**Problem:** Search engines penalize mixed protocols.
+
+**Fix:** Force HTTPS in canonical URLs.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Conduct metadata audit and document findings in `docs/metadata-playbook.md`.
+2. Create a canonical/alternate matrix in `notes/module-5-plan.md`.
+3. Update `docs/state-architecture.md` with environment override notes (staging,
+   preview, production).
+4. Share metadata strategy with Avery for confirmation.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Metadata playbook includes titles, descriptions, favicons, and canonical
+       rules.
+-  [ ] Environment override plan documented.
+-  [ ] Stakeholder approval logged in notes or retro.
+-  [ ] TODOs captured for missing assets or copy.
+
+---

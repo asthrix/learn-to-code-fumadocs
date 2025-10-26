@@ -1,6 +1,6 @@
 {
    "title": "Next.js Development",
-   "root": true,
+   "root": false,
    "description": "Build production-ready React applications with Next.js",
    "pages": ["index", "m0", "m1", "m3", "m4"]
 }

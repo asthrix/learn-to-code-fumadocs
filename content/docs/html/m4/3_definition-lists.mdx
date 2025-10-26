@@ -1,0 +1,125 @@
+---
+title: "Definition Lists & Key Facts"
+description:
+   "Use `<dl>`, `<dt>`, and `<dd>` to showcase services, credentials, and
+   highlights."
+module: "M4"
+lesson: "3"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Credibility"
+prerequisites: ["/docs/html/m4/2_semantic-tables"]
+learning_objectives:
+   - "Structure key-value content with definition lists"
+   - "Combine supporting icons, badges, or metrics without losing semantics"
+   - "Document styling hooks for future CMS integration"
+tags: ["definition-list", "semantics", "credibility"]
+---
+
+# Definition Lists & Key Facts
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Present credentials, services, or package details with `<dl>`.
+-  [ ] Provide accessible grouping for icons or inline badges.
+-  [ ] Document styling conventions for consistent rendering later.
+
+## Why It Matters
+
+Definition lists are perfect for "label → value" content. They keep markup
+semantic while allowing flexible layouts for stats, credentials, or service
+packages.
+
+---
+
+## Base Pattern
+
+```html
+<dl class="credibility-facts">
+   <div class="fact">
+      <dt>Years leading design strategy</dt>
+      <dd><data value="8">8 years</data></dd>
+   </div>
+   <div class="fact">
+      <dt>Notable industries</dt>
+      <dd>Fintech, healthcare, education</dd>
+   </div>
+   <div class="fact">
+      <dt>Speaking engagements</dt>
+      <dd>
+         <ul>
+            <li>UX Global Summit 2024</li>
+            <li>Design Systems Day 2025</li>
+         </ul>
+      </dd>
+   </div>
+</dl>
+```
+
+Group `<dt>` and `<dd>` pairs with a wrapper `div` or `li` to maintain styling
+control without breaking semantics.
+
+---
+
+## Enhancements
+
+-  Use `<data>` or `<abbr>` for metrics and acronyms, providing machine-readable
+   values.
+-  Add `data-metric` attributes for analytics or future automation.
+-  Support icons via CSS pseudo-elements rather than extra markup.
+
+Document component guidelines in `docs/layout.shared.md` under "Definition fact
+list".
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Pairs Together
+
+**Why:** Screen readers expect `<dt>` immediately followed by `<dd>`.
+
+### 2. Provide Context in `dt`
+
+**Why:** Titles like "Result" are ambiguous across items.
+
+Be specific: "Average stakeholder satisfaction" instead of "Result".
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Using Lists for Everything
+
+**Problem:** Overuse of `<ul>` loses semantic clarity.
+
+**Fix:** Rely on `<dl>` when pairing labels and values.
+
+### 2. Skipping Machine-Readable Values
+
+**Problem:** Automation cannot parse numbers or dates.
+
+**Fix:** Use `<data value="95">95%</data>` or
+`<time datetime="2024-09">Sep 2024</time>` as needed.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Draft a definition list representing Avery's headline credibility stats.
+2. Incorporate `<data>` and `<abbr>` where appropriate.
+3. Update `docs/data-sources.md` with references for each stat.
+4. Capture layout guidance and CSS hooks in `docs/layout.shared.md`.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Each `<dt>`/`<dd>` pair conveys a specific label and value.
+-  [ ] Machine-readable values provided for numbers, dates, or acronyms.
+-  [ ] Documentation updated with styling and data references.
+-  [ ] Component tested with screen reader to confirm logical reading order.
+
+---

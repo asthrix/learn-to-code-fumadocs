@@ -1,0 +1,295 @@
+---
+title: "Bootstrap the Portfolio Pulse Workspace"
+description:
+   "Set up folders, partials, and version control rituals to support
+   professional delivery."
+module: "M0"
+lesson: "8"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Foundation blueprint"
+prerequisites: ["/docs/html/m0/7_accessibility-first"]
+learning_objectives:
+   - "Create a repeatable project folder structure"
+   - "Organize shared partials and include statements"
+   - "Establish commit and documentation conventions"
+   - "Plan deployment-friendly asset paths"
+tags: ["workflow", "structure", "version-control"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Bootstrap the Portfolio Pulse Workspace
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Organize the `portfolio-pulse/` repository with clear folders.
+-  [ ] Extract shared snippets into partials for reuse.
+-  [ ] Set up documentation and assets directories with naming conventions.
+-  [ ] Capture version control rituals and branching strategy.
+
+## Project Context
+
+Even a single-page site benefits from structure. As you layer CSS, JavaScript,
+and deployment tooling, a tidy workspace prevents confusion. You will mirror
+production standards by separating content, assets, and documentation.
+
+---
+
+## Recommended Structure
+
+### Core Directories
+
+-  `public/` for assets served as-is (images, icons, fonts)
+-  `src/` for HTML partials, includes, and templates (if using build tooling)
+-  `docs/` for briefs, notes, and process artifacts
+-  `notes/` for personal reflections and validation logs
+
+### Naming Conventions
+
+Use kebab-case for files (`hero-section.html`, `about-story.html`) and keep
+commit messages consistent (`feat:`, `docs:`, `chore:`, `fix:`).
+
+### Basic Example
+
+```txt
+portfolio-pulse/
+├── docs/
+│   ├── project-brief.md
+│   └── accessibility.md
+├── notes/
+│   └── orientation.md
+├── public/
+│   ├── og-card.jpg
+│   └── apple-touch-icon.png
+└── index.html
+```
+
+### Practical Example
+
+```txt
+portfolio-pulse/
+├── docs/
+│   ├── project-brief.md
+│   ├── accessibility.md
+│   └── measurement.md
+├── notes/
+│   ├── orientation.md
+│   └── retro-log.md
+├── src/
+│   ├── partials/
+│   │   ├── head.html
+│   │   ├── header.html
+│   │   └── footer.html
+│   └── includes/
+│       ├── testimonials.html
+│       └── services.html
+├── public/
+│   ├── fonts/
+│   ├── images/
+│   └── icons/
+└── index.html
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Centralize Repeatable Snippets
+
+**Why:** Extracting `<head>` and `<footer>` into partials keeps metadata and
+contact info consistent across pages.
+
+```html
+<!-- src/partials/head.html -->
+<head>
+   ...
+</head>
+```
+
+### 2. Adopt a Branching Strategy Early
+
+**Why:** Even solo builders benefit from feature branches for traceability and
+safe experimentation.
+
+```bash
+git checkout -b feat/hero-structure
+# work...
+git checkout main
+git merge feat/hero-structure
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mixing Source and Build Outputs
+
+**Problem:** Serving files from both `src/` and root confuses deployment setups.
+
+```txt
+// Bad: compiled assets mixed with source partials in root
+portfolio-pulse/
+├── index.html
+├── hero-section.html
+├── build/
+```
+
+**Solution:**
+
+```txt
+portfolio-pulse/
+├── src/
+│   └── partials/
+└── public/
+```
+
+### 2. Skipping README or Project Documentation
+
+**Problem:** Collaborators (or future you) have no idea how to run or extend the
+project.
+
+```md
+<!-- Bad: empty README -->
+```
+
+**Solution:**
+
+```md
+# Portfolio Pulse
+
+-  Setup instructions
+-  Deployment commands
+-  Content update workflow
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Scaffold the Workspace
+
+1. Create the directory structure from the practical example.
+2. Extract `<head>`, `<header>`, and `<footer>` markup into `src/partials/`
+   while keeping `index.html` as the entry point (use server-side includes or
+   copy-paste until build tooling arrives).
+3. Add a `README.md` documenting repository purpose, setup, and deployment
+   TODOs.
+4. Commit with `git commit -am "chore: scaffold portfolio workspace"`.
+
+#### Expected Result
+
+You now have a disciplined folder structure that scales as the project grows and
+makes onboarding straightforward.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Create the workspace scaffold and supporting docs similar to the outline
+         below.
+      </p>
+      ```txt filename="structure.txt"
+      portfolio-pulse/
+      ├── README.md
+      ├── docs/
+      │   ├── project-brief.md
+      │   ├── accessibility.md
+      │   └── measurement.md
+      ├── notes/
+      │   ├── orientation.md
+      │   └── retro-log.md
+      ├── public/
+      │   ├── fonts/
+      │   ├── images/
+      │   └── icons/
+      ├── src/
+      │   ├── includes/
+      │   │   ├── services.html
+      │   │   └── testimonials.html
+      │   └── partials/
+      │       ├── head.html
+      │       ├── header.html
+      │       └── footer.html
+      └── index.html
+      ```
+      <p>
+         Split key markup into partials so reuse stays simple until tooling is
+         introduced.
+      </p>
+      ```html filename="src/partials"
+      <!-- src/partials/head.html -->
+      <head>
+         <!-- metadata from Lesson 6 -->
+      </head>
+
+      <!-- src/partials/header.html -->
+      <header role="banner">
+         <!-- navigation from Lesson 5 -->
+      </header>
+
+      <!-- src/partials/footer.html -->
+      <footer role="contentinfo">
+         <p>© 2024 Avery Stone · Portfolio Pulse</p>
+      </footer>
+      ```
+      <p>
+         Capture repository expectations in `README.md` so future modules inherit
+         a shared workflow:
+      </p>
+      ```md filename="README.md"
+      # Portfolio Pulse
+
+      ## Setup
+
+      -  Clone the repo and open
+      -  Serve locally with
+
+      ## Branching
+
+      -  main: production-ready
+      -  feature/*: new work
+      -  chore/*: maintenance
+
+      ## Deployment TODOs
+
+      -  Automate static hosting via Netlify
+      -  Add scheduled Lighthouse checks
+      ```
+
+      <p>
+         Log the structure in `notes/orientation.md` so collaborators know where
+         to add assets or documentation.
+      </p>
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] All required directories exist and are tracked by Git.
+-  [ ] `index.html` still renders correctly after extracting partials.
+
+### Code Quality
+
+-  [ ] README includes setup and deployment notes.
+-  [ ] Partial files use consistent casing and naming.
+
+### Understanding
+
+-  [ ] You can explain where future CSS/JS will live.
+-  [ ] You know how to reassemble partials when using static site tooling.
+
+### Project Integration
+
+-  [ ] Notes log references the new structure.
+-  [ ] Project brief links to documentation assets for easy collaboration.
+
+---

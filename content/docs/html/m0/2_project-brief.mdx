@@ -1,0 +1,236 @@
+---
+title: "Portfolio Pulse Project Brief"
+description:
+   "Translate the portfolio vision into measurable outcomes, personas, and
+   content pillars."
+module: "M0"
+lesson: "2"
+difficulty: "beginner"
+duration: "25"
+project_phase: "Foundation blueprint"
+prerequisites: ["/docs/html/m0/1_welcome"]
+learning_objectives:
+   - "Define success metrics for Portfolio Pulse"
+   - "Outline primary and secondary personas"
+   - "Map the core narrative arc for the homepage"
+   - "Prepare a content inventory for future modules"
+tags: ["planning", "project", "strategy"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Portfolio Pulse Project Brief
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Document the measurable outcomes Portfolio Pulse should deliver.
+-  [ ] Identify primary and secondary audiences for the site.
+-  [ ] Outline the narrative arc that guides visitors through the page.
+-  [ ] Capture a content inventory ready for implementation.
+
+## Project Context
+
+Before writing markup, lock in why the site exists and who it serves. The brief
+becomes your north star for decisions about layout order, semantic emphasis, and
+microcopy. Stakeholders rely on a concise brief to verify alignment before you
+spend hours coding.
+
+---
+
+## Define the Strategic Pillars
+
+### Outcomes and Signals
+
+Translate the product vision into measurable outcomes. A good brief lists the
+signals you will measure after launch (conversion rate, recruiter replies, or
+time-on-page).
+
+### Audience Personas
+
+Portfolios rarely serve a single persona. Define the hiring manager, peer
+collaborator, or client persona so you can tailor sections of the page to their
+needs.
+
+### Narrative Arc
+
+Every section of your homepage should reinforce a story: introduce yourself,
+showcase proof, share process, and invite contact. This arc keeps your markup
+purposeful.
+
+### Basic Example
+
+```md
+## Portfolio Pulse Outcomes
+
+-  5 qualified discovery calls within 60 days of launch
+-  Newsletter sign-ups growing 10% month over month
+-  Recruiter follow-ups within 48 hours of contact
+```
+
+### Practical Example
+
+```md
+# Persona Profiles
+
+1. Hiring Manager
+   -  Needs to assess collaboration ability fast
+   -  Prioritizes case studies with measurable impact
+2. Product Founder
+   -  Seeks rapid prototyping partner
+   -  Wants clarity on tooling and delivery approach
+
+# Narrative Flow
+
+1. Hero: Promise and positioning
+2. Highlights: Three case studies tied to KPIs
+3. Services: What engagements look like
+4. Testimonials: Social proof from past collaborators
+5. Contact: Invite to book a call
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Tie Metrics to Visitor Actions
+
+**Why:** Linking outcomes to actions ensures your HTML structure prioritizes
+content that moves the needle.
+
+```md
+-  Outcome: More discovery calls
+-  Correlated action: Form submission
+-  HTML focus: Prominent call-to-action anchored in `<header>` and `<footer>`
+```
+
+### 2. Keep Personas Short and Actionable
+
+**Why:** Personas should inform copy tone and ordering without overwhelming you
+with backstory.
+
+```md
+-  Role: Head of Product
+-  Primary question: "Can this person accelerate delivery?"
+-  Key evidence: Metrics snapshots, process overview, collaborative testimonials
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Overloading the Brief with Hypothetical Content
+
+**Problem:** You waste time planning sections that never ship.
+
+```md
+// Bad: 15 section ideas, no prioritization.
+```
+
+**Solution:**
+
+```md
+-  Required: Hero, Case Studies, Services, Testimonials, Contact
+-  Optional: Newsletter, Speaking, Writing
+```
+
+### 2. Skipping Measurement Plans
+
+**Problem:** Without metrics you cannot evaluate success post-launch.
+
+```md
+// Bad: "Goal is a better portfolio" with no measurable signals.
+```
+
+**Solution:**
+
+```md
+-  KPI: Discovery call bookings
+-  Baseline: 0 per month
+-  Target: 5 per month by quarter end
+-  Tracking: Airtable + calendar integrations
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Draft the Project Brief
+
+1. Create `portfolio-pulse/docs/project-brief.md`.
+2. Add sections for Outcomes, Personas, Narrative Flow, and Risks.
+3. Convert your notes into concise bullet lists similar to the practical
+   example.
+4. Highlight open questions that need validation in later modules.
+5. Commit with `git commit -am "docs: add portfolio pulse project brief"`.
+
+#### Expected Result
+
+You hold a project brief that guides copy decisions, informs semantic emphasis,
+and sets expectations with stakeholders.
+
+---
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>This sample brief demonstrates the structure and depth expected.</p>
+
+      ```md filename="portfolio-pulse/docs/project-brief.md"
+      # Portfolio Pulse · Project Brief
+
+      ## Outcomes
+      - 5 qualified discovery calls within 60 days of relaunch.
+      - Newsletter subscription rate up 10% month-over-month.
+      - Recruiting replies within 48 hours for senior product design roles.
+
+      ## Personas
+      1. **Hiring Manager** — Needs convincing social proof and measurable impact.
+      2. **Product Founder** — Evaluates collaboration style and delivery speed.
+      3. **Design Peer** — Looks for process depth and tool stack alignment.
+
+      ## Narrative Flow
+      1. Hero positioning → promise measurable change.
+      2. Highlight cards → showcase three case studies with outcome metrics.
+      3. Services section → clarify how engagements run.
+      4. Testimonials → reinforce trust with named partners.
+      5. Contact → clear invite to book a chemistry call.
+
+      ## Risks & Questions
+      - Confirm permission to reference FluxHealth metrics publicly.
+      - Need updated testimonial from Linh Chen (pending 2025-11-01 follow-up).
+      - Determine whether to expose newsletter subscription on homepage or modal.
+
+      ## Next Checks
+      - Align copy with Avery on tone and CTA language.
+      - Validate metrics still accurate during Module 4 audit.
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] `portfolio-pulse/docs/project-brief.md` exists and is versioned.
+-  [ ] Outcomes list includes at least two measurable targets.
+
+### Code Quality
+
+-  [ ] Personas and narrative flow are written as concise bullet lists.
+-  [ ] Risks or assumptions are documented for follow-up.
+
+### Understanding
+
+-  [ ] You can articulate who Portfolio Pulse is built for.
+-  [ ] You know which sections are critical vs optional.
+
+### Project Integration
+
+-  [ ] Brief is referenced in your orientation notes.
+-  [ ] Next lessons pull terminology directly from the brief.
+
+---

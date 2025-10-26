@@ -1,0 +1,193 @@
+---
+title: "Lead Capture Strategy"
+description:
+   "Align Portfolio Pulse business goals with form design decisions that drive
+   conversion."
+module: "M2"
+lesson: "1"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Lead capture"
+prerequisites: ["/docs/html/m2/0_index"]
+learning_objectives:
+   - "Define the purpose of Portfolio Pulse forms"
+   - "Map visitor intents to form fields"
+   - "Outline friction vs conversion trade-offs"
+   - "Document success metrics and analytics events"
+tags: ["forms", "strategy", "conversion"]
+---
+
+# Lead Capture Strategy
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Clarify the primary and secondary goals of Portfolio Pulse forms.
+-  [ ] Map visitor intents to required and optional fields.
+-  [ ] Balance friction and conversion using progressive disclosure.
+-  [ ] Document success metrics and analytics events.
+
+## Project Context
+
+Forms are the bridge between interest and action. Without a thoughtful plan you
+risk collecting the wrong data, overwhelming visitors, or violating privacy
+expectations. A strategic foundation ensures later implementation meets legal
+requirements and business goals.
+
+---
+
+## Defining Purpose and Intent
+
+### Primary Goal
+
+Portfolio Pulse aims to schedule discovery calls. The form should prioritize
+information that enables a tailored conversation.
+
+### Secondary Goals
+
+-  Capture newsletter opt-ins for ongoing nurture.
+-  Collect project timelines to manage pipeline.
+
+### Basic Example
+
+```md
+Primary goal: Book a discovery call Success metric: 5 qualified submissions per
+month Secondary metric: Newsletter opt-in rate > 40%
+```
+
+### Practical Example
+
+```md
+# Form Strategy
+
+## Visitor Intents
+
+1. Hiring manager seeking collaboration → needs quick response
+2. Founder exploring a redesign → wants clarity on services
+3. Recruiter browsing portfolio → mostly needs contact details
+
+## Required Fields
+
+-  Name
+-  Email
+-  Project context (dropdown)
+-  Budget range (optional but helpful)
+-  Preferred meeting date/time (optional)
+
+## Analytics Events
+
+-  `form_view`
+-  `form_submit`
+-  `form_error`
+-  `form_success`
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Ask for the Minimum Data Required
+
+**Why:** Fewer required fields improve conversion and respect visitor time.
+
+```md
+Required → Name, Email, Project type Optional → Company, Timeline, Budget
+```
+
+### 2. Provide Context for Each Field
+
+**Why:** Explaining why you ask for information builds trust.
+
+```html
+<label for="project-type">What are you exploring?</label>
+<p id="project-type-hint" class="form-hint">
+   This helps us route your request to the right workflow.
+</p>
+<select id="project-type" aria-describedby="project-type-hint">
+   ...
+</select>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Copying Generic Forms
+
+**Problem:** Generic templates collect irrelevant data and hurt conversion.
+
+```html
+<!-- Bad: asking for address for a discovery call -->
+<label for="address">Address</label>
+<input id="address" name="address" type="text" />
+```
+
+**Solution:**
+
+```html
+<label for="project-type">What are you exploring?</label>
+<select id="project-type" name="project-type">
+   ...
+</select>
+```
+
+### 2. Ignoring Privacy Requirements
+
+**Problem:** Collecting personal data without consent disclosures risks legal
+issues.
+
+```html
+<!-- Bad: no checkbox for marketing consent -->
+```
+
+**Solution:**
+
+```html
+<label>
+   <input type="checkbox" name="marketing-consent" />
+   I agree to receive occasional updates.
+</label>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Draft the Form Strategy
+
+1. Create `docs/form-strategy.md` summarizing goals, visitor intents, required
+   fields, optional fields, and success metrics.
+2. Record analytics events you plan to track after launch.
+3. Capture privacy and consent considerations, linking to policies.
+4. Commit with `git commit -am "docs: define portfolio form strategy"`.
+
+#### Expected Result
+
+You have a strategic guide that informs every markup decision in Module 2.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Form strategy document covers goals, fields, and metrics.
+-  [ ] Privacy considerations and consent language captured.
+
+### Code Quality
+
+-  [ ] Required vs optional fields clearly labeled in the strategy.
+-  [ ] Analytics events listed with naming conventions.
+
+### Understanding
+
+-  [ ] You can explain why each field exists.
+-  [ ] You know what success looks like quantitatively.
+
+### Project Integration
+
+-  [ ] Orientation notes link to the form strategy.
+-  [ ] Accessibility manifesto includes references to form requirements.
+
+---

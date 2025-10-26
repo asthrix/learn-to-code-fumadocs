@@ -1,0 +1,142 @@
+---
+title: "Module 3 Validation"
+description:
+   "Audit media accessibility, performance, and documentation before moving on."
+module: "M3"
+lesson: "9"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Showcase"
+prerequisites: ["/docs/html/m3/8_implementation"]
+learning_objectives:
+   - "Run accessibility and performance audits on the gallery"
+   - "Verify media governance documentation"
+   - "Capture retro notes for Module 4 preparation"
+tags: ["validation", "testing", "media"]
+---
+
+# Module 3 Validation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Validate the gallery across devices and connection speeds.
+-  [ ] Confirm accessibility, captions, and transcripts meet guidelines.
+-  [ ] Update documentation and retro notes ahead of Module 4.
+
+## Why It Matters
+
+Media-heavy sections are fragile. A thorough validation round ensures responsive
+imagery, embeds, and documentation stay aligned.
+
+---
+
+## Validation Workflow
+
+### 1. Cross-Browser & Device Testing
+
+-  Desktop: Chrome, Firefox, Safari.
+-  Mobile: iOS Safari, Android Chrome.
+-  Reduce network to `Fast 3G` to confirm lazy loading behaves as expected.
+
+### 2. Accessibility Audits
+
+-  Run Lighthouse Accessibility; target score ≥ 95.
+-  Use axe DevTools to check heading hierarchy, figure usage, and consent
+   interactions.
+-  Test screen reader flow (VoiceOver or NVDA) through the gallery and embedded
+   media.
+
+### 3. Performance Checks
+
+-  Measure Largest Contentful Paint (LCP) and cumulative layout shift (CLS)
+   after implementing responsive images.
+-  Capture before/after metrics in `docs/validation-log.md` with date and commit
+   hash.
+
+### 4. Documentation
+
+-  Ensure `docs/media-inventory.md` reflects final assets, alt text, and
+   transcripts.
+-  Update `docs/performance-budgets.md` with actual asset sizes.
+-  Record insights and action items in `notes/module-3-retro.md` (create if
+   missing).
+
+---
+
+## ✅ Best Practices
+
+### 1. Validate Consent Flows
+
+**Why:** Embedded media can fail or load slowly without user consent.
+
+Test both consent-granted and consent-denied paths to confirm fallbacks render
+helpful copy.
+
+### 2. Monitor Analytics with Preview IDs
+
+**Why:** Ensures `data-cta` attributes map correctly before production tracking.
+
+Use your analytics sandbox to confirm events fire without personal data.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Skipping Transcript Review
+
+**Problem:** Typos or missing sections reduce accessibility.
+
+**Fix:** Proof transcripts and caption files against source material.
+
+### 2. Leaving TODOs in HTML
+
+**Problem:** Placeholder comments leak into production.
+
+**Fix:** Resolve or track TODOs in the retro log with owners and due dates.
+
+---
+
+## 🔍 Portfolio Pulse Audit Scenario
+
+1. Run full audits and capture screenshots of Lighthouse results.
+2. Validate keyboard navigation through gallery items, ensuring focus styles are
+   visible.
+3. Simulate slow networks to watch lazy loading and consent gating behavior.
+4. Update retro notes with findings, risks, and Module 4 readiness.
+
+#### Expected Result
+
+You can confidently demonstrate that Portfolio Pulse delivers fast, accessible
+media storytelling.
+
+---
+
+## ✅ Validation Checklist
+
+### Accessibility
+
+-  [ ] Headings, figures, and captions pass automated and manual checks.
+-  [ ] Captions/transcripts verified for accuracy.
+
+### Performance
+
+-  [ ] LCP ≤ 2.5s on Fast 3G.
+-  [ ] CLS ≤ 0.1 after responsive image updates.
+
+### Documentation
+
+-  [ ] Media inventory, performance budgets, and state architecture docs
+       updated.
+-  [ ] Module 3 retro notes recorded with next steps.
+
+---
+
+## Next Steps
+
+-  Review retro findings to prioritize content updates for Module 4.
+-  Identify any data presentation needs that link current gallery outcomes to
+   upcoming case study details.
+
+---

@@ -1,0 +1,212 @@
+---
+title: "HTML5 Input Types & Attributes"
+description:
+   "Choose the right input types, attributes, and autocomplete settings to
+   improve usability and data quality."
+module: "M2"
+lesson: "3"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Lead capture"
+prerequisites: ["/docs/html/m2/2_labels-association"]
+learning_objectives:
+   - "Select appropriate HTML5 input types for common fields"
+   - "Configure autocomplete and inputmode attributes"
+   - "Use constraint attributes (`required`, `pattern`, `min`, `max`) wisely"
+   - "Document data handling policies for each field"
+tags: ["forms", "inputs", "html5"]
+---
+
+# HTML5 Input Types & Attributes
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Choose the best input types for Portfolio Pulse fields.
+-  [ ] Configure attributes that improve mobile and desktop experiences.
+-  [ ] Apply constraint attributes to guide valid data entry.
+-  [ ] Record data handling policies for compliance.
+
+## Project Context
+
+Input types matter. They trigger device-specific keyboards, validation, and
+accessibility hints. Using the right attributes also reduces manual validation
+and enhances analytics accuracy.
+
+---
+
+## Input Type Overview
+
+-  `type="email"` validates format and surfaces email keyboard on mobile.
+-  `type="tel"` provides a numeric keypad; use `inputmode` for precise control.
+-  `type="date"`, `type="datetime-local"` offer calendar pickers.
+-  `type="url"`, `type="number"`, `type="range"` provide built-in validation.
+
+### Autocomplete
+
+`autocomplete="name"`, `autocomplete="email"`, etc., reduce friction and improve
+accuracy. Use `autocomplete="off"` only when necessary.
+
+### Basic Example
+
+```html
+<label for="email">Work email</label>
+<input id="email" name="email" type="email" autocomplete="email" required />
+```
+
+### Practical Example
+
+```html
+<div class="form-grid">
+   <div class="form-field">
+      <label for="company">Company</label>
+      <input
+         id="company"
+         name="company"
+         type="text"
+         autocomplete="organization"
+      />
+   </div>
+   <div class="form-field">
+      <label for="phone">Phone (optional)</label>
+      <input
+         id="phone"
+         name="phone"
+         type="tel"
+         inputmode="tel"
+         autocomplete="tel"
+         pattern="[0-9()+\-\s]*"
+      />
+   </div>
+   <div class="form-field">
+      <label for="budget">Estimated budget</label>
+      <input
+         id="budget"
+         name="budget"
+         type="number"
+         min="500"
+         step="500"
+         inputmode="numeric"
+         aria-describedby="budget-hint"
+      />
+      <p id="budget-hint" class="form-hint">
+         Used only to recommend the right engagement.
+      </p>
+   </div>
+   <div class="form-field">
+      <label for="timeline">Target launch</label>
+      <input
+         id="timeline"
+         name="timeline"
+         type="date"
+         min="2025-01-01"
+         autocomplete="off"
+      />
+   </div>
+</div>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Leverage `autocomplete` Strategically
+
+**Why:** Autocomplete speeds up completion and ensures consistent data
+formatting.
+
+```html
+<input id="name" name="name" type="text" autocomplete="name" />
+```
+
+### 2. Use `inputmode` for Numeric Fields
+
+**Why:** `inputmode` hints to mobile browsers which keyboard to display.
+
+```html
+<input id="budget" type="text" inputmode="numeric" pattern="[0-9]*" />
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Overusing `type="text"`
+
+**Problem:** Generic inputs miss validation and mobile optimizations.
+
+```html
+<input type="text" name="email" />
+```
+
+**Solution:**
+
+```html
+<input type="email" name="email" autocomplete="email" />
+```
+
+### 2. Neglecting Pattern Feedback
+
+**Problem:** Patterns without guidance cause frustration.
+
+```html
+<input type="tel" pattern="[0-9]{10}" />
+```
+
+**Solution:**
+
+```html
+<label for="phone">Phone</label>
+<input
+   id="phone"
+   type="tel"
+   pattern="[0-9]{10}"
+   aria-describedby="phone-hint"
+/>
+<p id="phone-hint">Enter 10 digits without spaces or dashes.</p>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Configure Form Inputs
+
+1. Update contact form fields with appropriate `type`, `autocomplete`,
+   `inputmode`, `min`, `max`, and `pattern` attributes.
+2. Add hint text when using custom patterns or validation rules.
+3. Document data retention policies (how long you store submissions) in
+   `docs/form-strategy.md`.
+4. Commit with `git commit -am "feat: optimize form input types"`.
+
+#### Expected Result
+
+Form fields now provide better user experience, improved validation, and
+documented data handling policies.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Email fields reject invalid addresses.
+-  [ ] Numeric inputs respect `min`/`max` constraints where defined.
+
+### Code Quality
+
+-  [ ] All fields include appropriate `autocomplete` values.
+-  [ ] Patterns include hint text for guidance.
+
+### Understanding
+
+-  [ ] You can explain why each input type was chosen.
+-  [ ] You know how data will be stored and handled.
+
+### Project Integration
+
+-  [ ] Form strategy updated with retention and handling policies.
+-  [ ] Accessibility manifesto references input type considerations.
+
+---

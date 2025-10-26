@@ -1,0 +1,194 @@
+---
+title: "Event Handling Patterns"
+description:
+   "Handle user interactions cleanly, create reusable callbacks, and prevent
+   unnecessary re-renders."
+module: "M2"
+lesson: "2"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Interactivity"
+prerequisites: ["/docs/react-new/m2/1_state-basics"]
+learning_objectives:
+   - "Respond to click and change events using idiomatic React"
+   - "Guard against unnecessary re-renders with stable handlers"
+   - "Log events for debugging without polluting production code"
+tags: ["events", "handlers", "beginner"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Event Handling Patterns
+
+StaySense filters rely on change events from inputs, while saved toggles use
+click events. Let's review best practices for wiring handlers.
+
+---
+
+## 1. Extract Toggle Logic into a Callback
+
+Inside `App.tsx`, define the toggle handler with `useCallback` so child props
+stay stable as the component grows.
+
+```tsx
+import { useCallback, useState } from "react";
+
+export default function App() {
+   const [savedListingIds, setSavedListingIds] = useState<number[]>([]);
+
+   const handleToggleSave = useCallback((id: number) => {
+      setSavedListingIds((previous) =>
+         previous.includes(id)
+            ? previous.filter((existing) => existing !== id)
+            : [...previous, id]
+      );
+   }, []);
+
+   return (
+      <main className='min-h-screen bg-slate-950 text-slate-50'>
+         <Header savedCount={savedListingIds.length} />
+         <Hero />
+         <ListingSection
+            savedListingIds={savedListingIds}
+            onToggleSave={handleToggleSave}
+         />
+      </main>
+   );
+}
+```
+
+---
+
+## 2. Pass Stable Handlers to Children
+
+Update `ListingSection` to pass the handler the same way you defined earlier—no
+changes required beyond ensuring the prop types match.
+
+```tsx
+type ListingSectionProps = {
+   savedListingIds: number[];
+   onToggleSave: (id: number) => void;
+};
+
+export function ListingSection({
+   savedListingIds,
+   onToggleSave,
+}: ListingSectionProps) {
+   /* existing mapping */
+}
+```
+
+---
+
+## 3. Debugging Click Events
+
+Temporarily log interactions to validate handler wiring. Remember to remove logs
+before shipping production code or wrap them in a development guard.
+
+```tsx
+const handleToggleSave = useCallback((id: number) => {
+   if (import.meta.env.DEV) console.info(`[StaySense] toggled ${id}`);
+   setSavedListingIds((previous) =>
+      previous.includes(id)
+         ? previous.filter((existing) => existing !== id)
+         : [...previous, id]
+   );
+}, []);
+```
+
+---
+
+## Task · Build a Simple Filter Handler
+
+Prepare for the upcoming filter bar by handling category selection.
+
+1. Add a `category` property to each listing in `src/data/listings.ts` (e.g.,
+   `"Cabin"`, `"Coastal"`, `"Desert"`).
+2. In `App.tsx`, introduce
+   `const [activeCategory, setActiveCategory] = useState<string>("All");`.
+3. Pass `activeCategory` and `onCategoryChange` props to `ListingSection`.
+4. Inside `ListingSection`, filter `featuredListings` before mapping when
+   `activeCategory !== "All"`.
+5. Commit with `git commit -am "feat: add category filter handler"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      ```tsx
+      // src/App.tsx
+      const [activeCategory, setActiveCategory] = useState<string>("All");
+
+      const handleCategoryChange = useCallback((category: string) => {
+         setActiveCategory(category);
+      }, []);
+
+      <ListingSection
+         savedListingIds={savedListingIds}
+         onToggleSave={handleToggleSave}
+         activeCategory={activeCategory}
+         onCategoryChange={handleCategoryChange}
+      />;
+      ```
+
+      ```tsx
+      // src/components/ListingSection.tsx
+      type ListingSectionProps = {
+         savedListingIds: number[];
+         onToggleSave: (id: number) => void;
+         activeCategory: string;
+         onCategoryChange: (category: string) => void;
+      };
+
+      const categories = ["All", "Cabin", "Coastal", "Desert"];
+
+      const listingsToDisplay =
+         activeCategory === "All"
+            ? featuredListings
+            : featuredListings.filter((listing) => listing.category === activeCategory);
+
+      return (
+         <section>
+            <div className='flex flex-wrap gap-3'>
+               {categories.map((category) => (
+                  <button
+                     key={category}
+                     type='button'
+                     onClick={() => onCategoryChange(category)}
+                     className={`rounded-full border px-4 py-2 text-xs uppercase transition ${
+                        activeCategory === category
+                           ? "border-emerald-300 bg-emerald-500/20 text-emerald-100"
+                           : "border-white/15 text-slate-200 hover:border-emerald-300 hover:text-emerald-100"
+                     }`}
+                  >
+                     {category}
+                  </button>
+               ))}
+            </div>
+            <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+               {listingsToDisplay.map((listing) => (
+                  <ListingCard
+                     key={listing.id}
+                     listing={listing}
+                     isSaved={savedListingIds.includes(listing.id)}
+                     onToggleSave={() => onToggleSave(listing.id)}
+                  />
+               ))}
+            </div>
+         </section>
+      );
+      ```
+
+      ```bash
+      git add src/data/listings.ts src/components/ListingSection.tsx src/App.tsx
+      git commit -m "feat: add category filter handler"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Category buttons update `activeCategory` state.
+-  [ ] Filtering occurs before rendering cards.
+-  [ ] Event handlers use `useCallback` to stay stable.

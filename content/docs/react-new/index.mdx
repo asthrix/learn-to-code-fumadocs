@@ -1,0 +1,114 @@
+---
+title: "StaySense React Launchpad"
+description:
+   "A paced beginner curriculum that ships a booking-inspired listing app in
+   four focused modules."
+module: "ROOT"
+difficulty: "beginner"
+duration: "28"
+project_phase: "Course overview"
+prerequisites: []
+learning_objectives:
+   - "Understand the StaySense project arc and weekly milestones"
+   - "Preview each module's deliverables and success criteria"
+   - "Adopt a build-first workflow tuned for new React developers"
+tags: ["react", "course", "overview"]
+---
+
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+   Collapsible,
+   CollapsibleTrigger,
+   CollapsibleContent,
+} from "@/components/ui/collapsible";
+
+# StaySense React Launchpad
+
+StaySense is a pared-down take on a vacation rental marketplace. Across four
+modules you will spin up a modern React workspace, craft reusable UI, wire in
+stateful interactions, and finally connect to the mock API described in the
+Project React architecture docs.
+
+<div className='mt-6 flex flex-wrap gap-4'>
+   <Link href='/docs/react-new/m1/0_index'>
+      <Button>Start Module 1</Button>
+   </Link>
+   <Link href='/docs/react-new/m1/0_index'>
+      <Button variant='outline' className='hover:text-secondary'>
+         View Module Roadmap
+      </Button>
+   </Link>
+</div>
+
+---
+
+## Course at a Glance
+
+| Module | Focus                         | StaySense Milestone                |
+| ------ | ----------------------------- | ---------------------------------- |
+| M1     | React foundations + layout    | Vite app with hero + listing shell |
+| M2     | State & interactivity         | Dynamic filters and saved picks    |
+| M3     | Effects & data flow           | Live listings from the mock API    |
+| M4     | Project assembly & deployment | Polished MVP + walkthrough recap   |
+
+Each lesson keeps to a single concept, a practical example, and a concrete task
+that moves the StaySense codebase forward. Expect 20–30 minute sessions designed
+for evening study or team lunch-and-learns.
+
+---
+
+## Workflow Snapshot
+
+1. **Read**: absorb the concept in plain language with relevant visuals.
+2. **Inspect**: review the miniature StaySense snippet that applies the idea.
+3. **Ship**: complete the scoped task in your repository, validating with the
+   lesson checklist.
+4. **Reflect**: compare against the accordion solution to confirm understanding.
+
+The path mirrors the technical documentation in `/course-docs`, translating the
+broader architecture into approachable beginner steps.
+
+---
+
+## Course Commitments
+
+-  **Time:** Roughly seven hours per module including project work.
+-  **Tech:** Node.js LTS, npm, VS Code, Git, a modern Chromium-based browser.
+-  **Mindset:** Practice in small increments, keep commits scoped, lean on the
+   provided mock backend instead of building one from scratch.
+
+<Collapsible className='mt-8' defaultOpen={false}>
+   <CollapsibleTrigger className='group inline-flex w-full items-center justify-between rounded-md border px-4 py-2 text-sm font-medium'>
+      Want to understand how this path ties into Project React?
+      <span className='transition-transform group-data-[state=open]:rotate-90'>
+         ➜
+      </span>
+   </CollapsibleTrigger>
+   <CollapsibleContent className='mt-4 space-y-3 rounded-md border bg-muted/40 p-4 text-sm text-muted-foreground'>
+      <p>
+         The Launchpad course covers the same StaySense domain as Project React
+         but focuses on the essentials: component thinking, state, effects, and
+         basic API integration. The advanced topics (Redux Toolkit, auth flows,
+         deployment hardening) remain in the flagship track.
+      </p>
+      <p>
+         Because you use the shared mock API, graduating Launchpad means you can
+         jump into Module 3 of the main curriculum without missing critical
+         context.
+      </p>
+   </CollapsibleContent>
+</Collapsible>
+
+---
+
+## Next Steps
+
+1. Skim the Module 1 overview to note the tooling prerequisites.
+2. Clone the starter repository or initialise a fresh Vite app as instructed in
+   lesson one.
+3. Schedule two study blocks this week; every module includes a milestone task
+   with a guided solution.
+
+You're four modules away from shipping your first listing marketplace MVP. Let's
+build it together.

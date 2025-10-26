@@ -1,0 +1,308 @@
+---
+title: "Module 2 Implementation"
+description:
+   "Build the complete contact form with labels, validation, consent, and
+   enhancements."
+module: "M2"
+lesson: "8"
+difficulty: "intermediate"
+duration: "45"
+project_phase: "Lead capture"
+prerequisites: ["/docs/html/m2/7_form-enhancements"]
+learning_objectives:
+   - "Implement the full contact form markup"
+   - "Integrate validation, feedback, and enhancements"
+   - "Connect documentation to implementation details"
+   - "Prepare for handoff to backend or automation"
+tags: ["implementation", "forms", "contact"]
+---
+
+# Module 2 Implementation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Construct the entire contact form with semantic HTML.
+-  [ ] Wire up validation feedback and enhancement hooks.
+-  [ ] Ensure consent, privacy, and analytics requirements are met.
+-  [ ] Record integration notes for backend teams.
+
+## Project Context
+
+This implementation transforms the contact section into a production-ready lead
+capture experience. Everything you built—labels, input types, validation,
+feedback, and enhancements—comes together here.
+
+---
+
+## Assembly Steps
+
+### 1. Markup
+
+Combine all fields, hints, and consent checkboxes in the intended order. Ensure
+each field references hints or errors via `aria-describedby`.
+
+### 2. Enhancements
+
+Add honeypot field, loading indicators, and instrumentation placeholders without
+breaking progressive enhancement.
+
+### Basic Example
+
+```html
+<section id="contact" aria-labelledby="contact-title">
+   <h2 id="contact-title">Work with Avery</h2>
+   <form
+      action="/contact"
+      method="post"
+      id="contact-form"
+      class="contact-form"
+      novalidate
+   >
+      <!-- fields -->
+   </form>
+</section>
+```
+
+### Practical Example
+
+```html
+<section id="contact" aria-labelledby="contact-title">
+   <header>
+      <h2 id="contact-title">Work with Avery</h2>
+      <p>Complete the form and I will respond within two business days.</p>
+   </header>
+   <form
+      id="contact-form"
+      class="contact-form"
+      action="https://formspree.io/f/example"
+      method="post"
+      data-enhanced
+      novalidate
+   >
+      <input
+         type="text"
+         name="company-size"
+         autocomplete="off"
+         tabindex="-1"
+         class="visually-hidden"
+         aria-hidden="true"
+      />
+      <fieldset>
+         <legend>Your details</legend>
+         <div class="form-field">
+            <label for="name">Full name</label>
+            <input
+               id="name"
+               name="name"
+               type="text"
+               autocomplete="name"
+               minlength="2"
+               required
+            />
+         </div>
+         <div class="form-field">
+            <label for="email">Work email</label>
+            <input
+               id="email"
+               name="email"
+               type="email"
+               autocomplete="email"
+               required
+               aria-describedby="email-hint email-error"
+            />
+            <p id="email-hint" class="form-hint">
+               We only use this to follow up on your request.
+            </p>
+            <p id="email-error" class="form-error" role="alert" hidden></p>
+         </div>
+      </fieldset>
+      <fieldset>
+         <legend>Project context</legend>
+         <div class="form-field">
+            <label for="project-type">What are you exploring?</label>
+            <p id="project-type-hint" class="form-hint">
+               Select the option that best matches your needs.
+            </p>
+            <select
+               id="project-type"
+               name="project-type"
+               required
+               aria-describedby="project-type-hint project-type-error"
+            >
+               <option value="">Select...</option>
+               <option value="audit">UX audit</option>
+               <option value="sprint">Design sprint</option>
+               <option value="retainer">Product partnership</option>
+            </select>
+            <p
+               id="project-type-error"
+               class="form-error"
+               role="alert"
+               hidden
+            ></p>
+         </div>
+         <div class="form-field">
+            <label for="budget">Estimated budget</label>
+            <input
+               id="budget"
+               name="budget"
+               type="number"
+               min="500"
+               step="500"
+               inputmode="numeric"
+               aria-describedby="budget-hint budget-error"
+            />
+            <p id="budget-hint" class="form-hint">
+               Used to recommend the right engagement.
+            </p>
+            <p id="budget-error" class="form-error" role="alert" hidden></p>
+         </div>
+      </fieldset>
+      <div class="form-field">
+         <label for="message">Share project details</label>
+         <textarea
+            id="message"
+            name="message"
+            minlength="50"
+            required
+            aria-describedby="message-hint message-error"
+         ></textarea>
+         <p id="message-hint" class="form-hint">
+            Include goals, constraints, and timeline.
+         </p>
+         <p id="message-error" class="form-error" role="alert" hidden></p>
+      </div>
+      <div class="form-field">
+         <label>
+            <input type="checkbox" name="privacy" required />
+            I agree to the
+            <a href="/legal/privacy.html" target="_blank" rel="noopener"
+               >privacy policy</a
+            >.
+         </label>
+      </div>
+      <div class="form-field">
+         <label>
+            <input type="checkbox" name="marketing-consent" />
+            Send me updates about new case studies.
+         </label>
+      </div>
+      <div class="form-actions">
+         <button type="submit" data-submit>Send message</button>
+         <p id="form-status" role="status" aria-live="polite"></p>
+      </div>
+   </form>
+</section>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Form Accessible Without JavaScript
+
+**Why:** Progressive enhancement ensures form still submits via `action`
+attribute.
+
+```html
+<form
+   action="https://formspree.io/f/example"
+   method="post"
+   data-enhanced
+></form>
+```
+
+### 2. Document Integration Details
+
+**Why:** Backend engineers need field names, types, and consent handling.
+
+```md
+# Integration Notes
+
+-  Endpoint: /api/contact
+-  Expected payload: { name, email, projectType, budget, message, consent }
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting to Reset Errors on Success
+
+**Problem:** Error messages linger after a successful submission.
+
+```js
+status.textContent = "Success";
+// but error nodes still visible
+```
+
+**Solution:**
+
+```js
+form.querySelectorAll(".form-error").forEach((node) => {
+   node.hidden = true;
+   node.textContent = "";
+});
+```
+
+### 2. Missing Required Attributes After Refactor
+
+**Problem:** Extracting fields into partials removes `required` or other
+attributes.
+
+```html
+<input id="email" />
+<!-- missing required -->
+```
+
+**Solution:**
+
+```html
+<input id="email" required />
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Build the Contact Form
+
+1. Replace the `#contact` section in `index.html` with the practical example,
+   customizing content for your brand.
+2. Ensure all IDs, hint references, and consent links match your documentation.
+3. Update `docs/form-strategy.md` with integration notes (endpoint, payload,
+   auto-responder).
+4. Commit with `git commit -am "feat: implement contact form experience"`.
+
+#### Expected Result
+
+Portfolio Pulse now captures leads responsibly and is ready to connect to
+backend or automation services.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Form submits successfully when required fields are valid.
+-  [ ] Honeypot field prevents basic spam submissions once backend is live.
+
+### Code Quality
+
+-  [ ] Error and hint associations (`aria-describedby`) remain intact.
+-  [ ] Consent checkboxes link to privacy information.
+
+### Understanding
+
+-  [ ] You can explain the submission workflow end to end.
+-  [ ] You know which data is optional vs required.
+
+### Project Integration
+
+-  [ ] Integration notes recorded in documentation.
+-  [ ] Validation logs updated with Module 2 implementation details.
+
+---

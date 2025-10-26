@@ -34,6 +34,8 @@ export interface CourseTechnologyGroup {
 export interface CourseLesson {
    title: string;
    duration: string;
+   id?: string;
+   href?: string;
 }
 
 export interface CourseModule {

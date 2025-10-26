@@ -1,0 +1,268 @@
+---
+title: "Semantic Layout Strategy"
+description:
+   "Learn how landmarks and sectioning elements turn the Portfolio Pulse
+   skeleton into a persuasive narrative."
+module: "M1"
+lesson: "1"
+difficulty: "beginner"
+duration: "30"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/0_index"]
+learning_objectives:
+   - "Differentiate between structural and sectioning elements"
+   - "Plan landmark usage for Portfolio Pulse"
+   - "Align layout decisions with the project brief"
+   - "Document a layout sketch that guides implementation"
+tags: ["semantics", "layout", "planning"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Semantic Layout Strategy
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Distinguish between structural landmarks and sectioning elements.
+-  [ ] Map the Portfolio Pulse narrative to HTML5 semantics.
+-  [ ] Create a layout sketch that informs upcoming implementation.
+-  [ ] Document decisions that impact accessibility and SEO.
+
+## Layout Plan Outline
+
+```md filename="docs/layout-plan.md"
+# Portfolio Pulse · Layout Plan
+
+## Landmarks Overview
+
+-  Header (role="banner") · Navigation + resume CTA
+-  Main (id="main-content") · Hero, Highlights, Services, Testimonials, Contact
+-  Aside (Quick credentials) · Optional context near hero
+-  Footer (role="contentinfo") · Contact details, social, legal links
+
+## Section Outline
+
+1. Hero (h1 · id="hero-heading")
+2. Highlights (h2 · id="highlights-heading")
+3. Services (h2 · id="services-title")
+4. Testimonials (h2 · id="testimonials-title")
+5. Contact (h2 · id="contact-title")
+
+## Wireframe Sketch
+
+[Header] Logo | Nav | Resume CTA [Main] Hero intro + CTA · Case study cards ·
+Services summary · Testimonials quote · Contact CTA (email + booking) [Footer]
+Quick links | Social | Legal
+
+## Anchor Map
+
+-  #highlights · highlights cards
+-  #services · services summary
+-  #testimonials · client proof
+-  #contact · booking details
+
+## Dependencies
+
+-  Testimonials copy (Owner: Jordan · Due: Module 1, Lesson 7)
+-  Service bullet proofing (Owner: Avery · Due: Module 1, Lesson 5)
+-  Contact CTA (Owner: Avery · Due: Module 1, Lesson 7)
+
+## Notes
+
+-  Keep aside optional for quick credential highlights.
+-  Update layout plan once case studies expand beyond three.
+```
+
+```html filename="index.html"
+<section id="projects" aria-labelledby="projects-heading">
+   <header>
+      <h2 id="projects-heading">Flagship Case Studies</h2>
+      <p class="section-subtitle">
+         Proof that measurable outcomes are possible.
+      </p>
+   </header>
+   <div class="case-study-grid">...</div>
+</section>
+<aside aria-label="Quick credentials">...</aside>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Sketch the Layout Before Coding
+
+**Why:** A quick wireframe clarifies hierarchy and reduces rework.
+
+```md
+[Header]
+
+-  Logo + navigation + call-to-action [Main]
+-  Hero
+-  Case studies
+-  Services overview
+-  Testimonials
+-  Contact form [Footer]
+-  Secondary navigation
+-  Contact info
+-  Legal links
+```
+
+### 2. Use Section Headings Strategically
+
+**Why:** Clear headings let assistive technologies announce sections naturally.
+
+```html
+<section id="services" aria-labelledby="services-title">
+   <h2 id="services-title">Ways we can collaborate</h2>
+   ...
+</section>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Overusing `<section>` Without Headings
+
+**Problem:** Sections without headings confuse screen readers and create empty
+outline nodes.
+
+```html
+<section>
+   <p>We offer design sprints and product audits.</p>
+</section>
+```
+
+**Solution:**
+
+```html
+<section aria-labelledby="services-title">
+   <h2 id="services-title">Services</h2>
+   <p>We offer design sprints and product audits.</p>
+</section>
+```
+
+### 2. Nesting Landmarks Improperly
+
+**Problem:** Placing a `<header>` inside another `<header>` breaks expected
+document structure.
+
+```html
+<header>
+   <header>Logo</header>
+</header>
+```
+
+**Solution:**
+
+```html
+<header>
+   <div class="logo">Logo</div>
+</header>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Document the Layout Strategy
+
+1. Add `docs/layout-plan.md` outlining landmarks, sections, headings, and anchor
+   IDs.
+2. Include a simple ASCII wireframe or bullet list to describe the layout order.
+3. Note any dependencies (final case study copy, testimonials) with owners.
+4. Commit with `git commit -am "docs: capture semantic layout strategy"`.
+
+#### Expected Result
+
+You now have a living document that keeps markup aligned with the narrative and
+aids collaborators who join mid-project.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Draft `docs/layout-plan.md` with a structure similar to this example.
+         Customize names, owners, and notes to your project context.
+      </p>
+```md filename="docs/layout-plan.md"
+# Portfolio Pulse · Layout Plan
+
+## Landmarks Overview
+
+-  Header (role="banner") · Navigation + resume CTA
+-  Main (id="main-content") · Hero, Highlights, Services, Testimonials, Contact
+-  Aside (Quick credentials) · Optional context near hero
+-  Footer (role="contentinfo") · Contact details, social, legal links
+
+## Section Outline
+
+1. Hero (h1 · id="hero-heading")
+2. Highlights (h2 · id="highlights-heading")
+3. Services (h2 · id="services-title")
+4. Testimonials (h2 · id="testimonials-title")
+5. Contact (h2 · id="contact-title")
+
+## Wireframe Sketch
+
+[Header] Logo | Nav | Resume CTA [Main] Hero intro + CTA · Case study cards ·
+Services summary · Testimonials quote · Contact CTA (email + booking) [Footer]
+Quick links | Social | Legal
+
+## Anchor Map
+
+-  #highlights · highlights cards
+-  #services · services summary
+-  #testimonials · client proof
+-  #contact · booking details
+
+## Dependencies
+
+-  Testimonials copy (Owner: Jordan · Due: Module 1, Lesson 7)
+-  Service bullet proofing (Owner: Avery · Due: Module 1, Lesson 5)
+-  Contact CTA (Owner: Avery · Due: Module 1, Lesson 7)
+
+## Notes
+
+-  Keep aside optional for quick credential highlights.
+-  Update layout plan once case studies expand beyond three.
+
+```
+
+      <p>
+         Link this file from `docs/project-brief.md` so the layout strategy stays
+         aligned with business goals.
+      </p>
+      </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Layout plan references all sections currently in `index.html`.
+-  [ ] Landmarks are identified with roles or native semantics.
+
+### Code Quality
+
+-  [ ] Heading levels remain consistent in the plan.
+-  [ ] Dependencies include owners or due dates.
+
+### Understanding
+
+-  [ ] You can explain the difference between landmarks and sectioning elements.
+-  [ ] You know which sections require additional content.
+
+### Project Integration
+
+-  [ ] Layout plan is linked from the project brief.
+-  [ ] Notes capture any open questions about future pages or sections.
+
+---
+```

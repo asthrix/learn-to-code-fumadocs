@@ -1,0 +1,139 @@
+---
+title: "Responsive Images"
+description: "Use modern image markup to serve the right asset to every device."
+module: "M3"
+lesson: "2"
+difficulty: "intermediate"
+duration: "40"
+project_phase: "Showcase"
+prerequisites: ["/docs/html/m3/1_media-strategy-intro"]
+learning_objectives:
+   - "Understand intrinsic sizing, `srcset`, and `sizes`"
+   - "Export multiple image variants aligned to performance budgets"
+   - "Document decisions for future CMS or automation work"
+tags: ["images", "responsive", "performance"]
+---
+
+# Responsive Images
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Use `srcset` and `sizes` to tailor images per viewport.
+-  [ ] Preserve intrinsic dimensions to avoid layout shift.
+-  [ ] Plan asset exports that meet Module 3 performance goals.
+
+## Why It Matters
+
+Serving a single large image punishes mobile users; serving a tiny one wastes
+high-density displays. Responsive images balance fidelity and speed, keeping
+Portfolio Pulse fast for every client.
+
+---
+
+## Core Concepts
+
+### 1. Intrinsic Dimensions
+
+Always set `width` and `height` attributes to reserve space and prevent
+cumulative layout shift (CLS).
+
+```html
+<img
+   src="/images/showcase/workshop-768.jpg"
+   srcset="
+      /images/showcase/workshop-480.jpg   480w,
+      /images/showcase/workshop-768.jpg   768w,
+      /images/showcase/workshop-1280.jpg 1280w
+   "
+   sizes="(min-width: 960px) 50vw, 90vw"
+   width="1280"
+   height="853"
+   alt="Avery guiding stakeholders through a service blueprint workshop"
+   loading="lazy"
+   decoding="async"
+/>
+```
+
+### 2. Density vs. Layout Viewports
+
+-  Use width descriptors (`480w`) for art that adapts to layout width.
+-  Use pixel density descriptors (`1x`, `2x`) for fixed-size UI elements (logos,
+   badges).
+
+### 3. Export Workflow
+
+| Variant | Target Width | File Size Budget |
+| ------- | ------------ | ---------------- |
+| Mobile  | 480px        | ≤ 70 KB          |
+| Tablet  | 768px        | ≤ 120 KB         |
+| Desktop | 1280px       | ≤ 220 KB         |
+
+Document exports in `docs/media-inventory.md` to maintain traceability.
+
+---
+
+## ✅ Best Practices
+
+### 1. Match `sizes` to Layout Breakpoints
+
+**Why:** Ensures browsers choose the optimal resource.
+
+```
+(main content width / viewport width) = sizes value
+```
+
+### 2. Preload Critical Hero Imagery
+
+**Why:** Maintains perceived performance on largest contentful paint (LCP).
+
+```html
+<link
+   rel="preload"
+   as="image"
+   href="/images/showcase/hero-1280.jpg"
+   imagesrcset="/images/showcase/hero-768.jpg 768w, /images/showcase/hero-1280.jpg 1280w"
+   imagesizes="(min-width: 960px) 50vw, 100vw"
+/>
+```
+
+Add preload links sparingly and only for imagery above the fold.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Leaving Out `width`/`height`
+
+**Problem:** Layout shift occurs when images finish loading.
+
+**Fix:** Always set intrinsic dimensions, even when CSS scales the image.
+
+### 2. Overusing `loading="lazy"`
+
+**Problem:** Lazy loading hero imagery delays paint.
+
+**Fix:** Use `loading="eager"` or omit the attribute for above-the-fold assets.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Export responsive variants for the three strongest case studies.
+2. Update markup in `portfolio/index.html` (or equivalent) to use `srcset` and
+   `sizes`.
+3. Record export settings and compression choices in `docs/media-inventory.md`.
+4. Add a performance budget entry in `docs/validation-log.md` referencing
+   Lighthouse targets.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Each showcase image has accurate intrinsic dimensions.
+-  [ ] `srcset` and `sizes` values reflect actual layout breakpoints.
+-  [ ] Critical hero imagery preloaded when genuinely beneficial.
+-  [ ] Documentation updated with asset variants and budgets.
+
+---

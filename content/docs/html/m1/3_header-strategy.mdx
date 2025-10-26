@@ -1,0 +1,288 @@
+---
+title: "Crafting the Portfolio Header"
+description:
+   "Design a flexible header with branding, navigation, and conversions baked
+   in."
+module: "M1"
+lesson: "3"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/2_landmark-planning"]
+learning_objectives:
+   - "Structure the site header for clarity and conversion"
+   - "Implement brand, navigation, and call-to-action in a balanced layout"
+   - "Support mobile navigation without JavaScript"
+   - "Ensure accessibility through labelling and focus management"
+tags: ["header", "navigation", "branding"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Crafting the Portfolio Header
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Build a semantic header that communicates the brand quickly.
+-  [ ] Combine navigation and call-to-action elements responsibly.
+-  [ ] Provide a mobile-friendly menu using native details/summary.
+-  [ ] Document responsive considerations for future CSS work.
+
+## Project Context
+
+The header is the first impression. It must clarify who you are, where to go,
+and how to get in touch—all while staying accessible. A well-structured header
+also makes future responsiveness work easier, since semantic grouping aligns
+with design system components.
+
+---
+
+## Header Composition
+
+### Branding
+
+Include a logo or typographic mark inside a `<div>` or `<span>` that clearly
+identifies the site. For screen readers, use `aria-label` or visually hidden
+text.
+
+### Navigation
+
+Keep navigation inside `<nav>` with a descriptive `aria-label`. Provide both
+inline and mobile-friendly patterns.
+
+### Call-to-Action
+
+Include a primary button linking to `#contact` or a scheduling tool. For
+responsive behavior without JavaScript, consider `<details>` + `<summary>`.
+
+### Basic Example
+
+```html
+<header role="banner">
+   <div class="brand">
+      <a href="#top">Portfolio Pulse</a>
+   </div>
+   <nav aria-label="Primary navigation">...</nav>
+   <a class="btn-primary" href="#contact">Book a call</a>
+</header>
+```
+
+### Practical Example
+
+```html
+<header class="site-header" role="banner">
+   <div class="brand">
+      <a href="#top" aria-label="Portfolio Pulse">
+         <span aria-hidden="true">PP</span>
+         <span class="sr-only">Portfolio Pulse</span>
+      </a>
+   </div>
+   <nav aria-label="Primary navigation" class="nav-desktop">
+      <ul>
+         <li><a href="#highlights">Work</a></li>
+         <li><a href="#services">Services</a></li>
+         <li><a href="#testimonials">Proof</a></li>
+         <li><a href="#contact">Contact</a></li>
+      </ul>
+   </nav>
+   <details class="nav-mobile">
+      <summary aria-haspopup="listbox">Menu</summary>
+      <nav aria-label="Mobile navigation">
+         <ul>
+            <li><a href="#highlights">Work</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#testimonials">Proof</a></li>
+            <li><a href="#contact">Contact</a></li>
+         </ul>
+      </nav>
+   </details>
+   <a class="btn-primary" href="#contact">Book a discovery call</a>
+</header>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Reuse Navigation Lists Across Variants
+
+**Why:** Maintaining a single source of truth for nav items prevents drift
+between desktop and mobile experiences.
+
+```md
+-  Use server-side includes or a build process to reuse nav lists.
+-  If duplication is temporary, add a TODO referencing the shared file.
+```
+
+### 2. Provide Accessible Menu Toggles
+
+**Why:** `<details>` and `<summary>` give you keyboard and screen reader support
+out of the box.
+
+```html
+<details>
+   <summary>Menu</summary>
+   <ul>
+      ...
+   </ul>
+</details>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Relying on Icon Fonts Without Text Equivalents
+
+**Problem:** Icons without labels render meaningless to screen readers.
+
+```html
+<!-- Bad: icon-only brand link -->
+<a href="#top"><span class="icon-logo"></span></a>
+```
+
+**Solution:**
+
+```html
+<a href="#top" aria-label="Portfolio Pulse">
+   <span class="icon-logo" aria-hidden="true"></span>
+   <span class="sr-only">Portfolio Pulse</span>
+</a>
+```
+
+### 2. Forgetting About Focus in Mobile Menus
+
+**Problem:** If tab order does not move inside the opened menu, keyboard users
+get stuck.
+
+```html
+<!-- Bad: using div with tabindex for menu toggle -->
+<div tabindex="0">Menu</div>
+```
+
+**Solution:**
+
+```html
+<summary aria-haspopup="listbox">Menu</summary>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Upgrade the Header
+
+1. Replace the placeholder header in `index.html` with the practical example
+   structure.
+2. Add visually hidden text for the brand if you use an icon or monogram.
+3. Duplicate the navigation list inside the `<details>` element temporarily, and
+   note the plan to consolidate using partials.
+4. Update `docs/layout-plan.md` with responsive notes for the header.
+5. Commit with `git commit -am "feat: enhance portfolio header"`.
+
+#### Expected Result
+
+Your header now balances branding, navigation, and conversion while remaining
+keyboard-friendly and screen-reader-ready.
+
+---
+
+<Accordions className="mt-6">
+    <Accordion title="Solution Walkthrough">
+         <p>
+             Use this header markup as a starting point, then document responsive
+             considerations in the layout plan.
+         </p>
+         ```html filename="index.html"
+         <header class="site-header" role="banner">
+            <div class="brand">
+               <a href="#top" aria-label="Portfolio Pulse">
+                  <span aria-hidden="true" class="brand-mark">PP</span>
+                  <span class="sr-only">Portfolio Pulse</span>
+               </a>
+            </div>
+
+            <nav aria-label="Primary navigation" class="nav-desktop">
+               <ul>
+                  <li>
+                     <a href="#highlights">Work</a>
+                  </li>
+                  <li>
+                     <a href="#services">Services</a>
+                  </li>
+                  <li>
+                     <a href="#testimonials">Proof</a>
+                  </li>
+                  <li>
+                     <a href="#contact">Contact</a>
+                  </li>
+               </ul>
+            </nav>
+
+            <details class="nav-mobile">
+               <summary aria-haspopup="listbox" aria-controls="mobile-nav-list">
+                  Menu
+               </summary>
+               <nav aria-label="Mobile navigation">
+                  <ul id="mobile-nav-list">
+                     <li>
+                        <a href="#highlights">Work</a>
+                     </li>
+                     <li>
+                        <a href="#services">Services</a>
+                     </li>
+                     <li>
+                        <a href="#testimonials">Proof</a>
+                     </li>
+                     <li>
+                        <a href="#contact">Contact</a>
+                     </li>
+                  </ul>
+               </nav>
+            </details>
+
+            <a class="btn-primary" href="#contact">Book a discovery call</a>
+         </header>
+         ```
+         <p>
+             Record responsive guidance in `docs/layout-plan.md` so future styling
+             work has clear direction:
+         </p>
+         ```md filename="docs/layout-plan.md"
+         ### Header Responsive Notes
+         - Desktop: nav-desktop visible, nav-mobile hidden
+         - Mobile: nav-desktop hidden, nav-mobile expands full width
+         - Summary focus state: outline 3px accent, offset 4px
+         - TODO: replace duplicate nav lists with partial include once templating added
+         ```
+    </Accordion>
+
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Desktop navigation anchors function and match the layout plan.
+-  [ ] Mobile `<details>` opens and closes with keyboard input.
+
+### Code Quality
+
+-  [ ] Brand link includes accessible text.
+-  [ ] Navigation lists use semantic `<ul>`/`<li>` structure.
+
+### Understanding
+
+-  [ ] You can explain why `<details>`/`<summary>` improves accessibility.
+-  [ ] You know how to consolidate duplicate nav lists in future refactors.
+
+### Project Integration
+
+-  [ ] Header notes are updated in documentation with responsive behavior.
+-  [ ] TODOs for navigation reuse are logged in your notes.
+
+---

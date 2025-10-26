@@ -1,0 +1,121 @@
+---
+title: "Web App Manifest"
+description:
+   "Configure installable portfolio experiences with manifests, icons, and
+   offline fallbacks."
+module: "M5"
+lesson: "5"
+difficulty: "advanced"
+duration: "40"
+project_phase: "Launch"
+prerequisites: ["/docs/html/m5/4_custom-data-attributes"]
+learning_objectives:
+   - "Author or update the web app manifest"
+   - "Prepare icon sets and theme colors"
+   - "Plan offline fallback experiences"
+tags: ["manifest", "pwa", "offline"]
+---
+
+# Web App Manifest
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Configure `site.webmanifest` with accurate metadata and icons.
+-  [ ] Set theme and background colors that complement Portfolio Pulse branding.
+-  [ ] Plan offline fallback HTML for limited connectivity scenarios.
+
+## Why It Matters
+
+A manifest enables add-to-home-screen experiences and influences how Portfolio
+Pulse appears on mobile launchers. Even without full service workers, polished
+metadata improves perceived quality.
+
+---
+
+## Manifest Template
+
+```json
+{
+   "name": "Portfolio Pulse — Avery Rivera",
+   "short_name": "Avery Rivera",
+   "start_url": "/?utm_source=install",
+   "display": "standalone",
+   "background_color": "#0f172a",
+   "theme_color": "#e879f9",
+   "description": "Product design leader helping teams ship inclusive experiences that convert.",
+   "icons": [
+      { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+      { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+      {
+         "src": "/icons/maskable-192.png",
+         "sizes": "192x192",
+         "type": "image/png",
+         "purpose": "maskable"
+      }
+   ]
+}
+```
+
+Update `/app/site.webmanifest` (or equivalent) to match decisions logged in
+`docs/metadata-playbook.md`.
+
+---
+
+## Offline Fallback Plan
+
+Even if service workers are future work, prepare an offline HTML page:
+
+-  Create `public/offline.html` with messaging and contact email.
+-  Link to it from documentation so engineers can connect service workers later.
+-  Document desired offline behavior in `docs/state-architecture.md`.
+
+---
+
+## ✅ Best Practices
+
+### 1. Include Maskable Icons
+
+**Why:** Android devices crop icons; maskable assets prevent clipping.
+
+### 2. Align Theme Colors With CSS Variables
+
+**Why:** Maintains consistent brand experience across browsers.
+
+Document the chosen colors in `docs/style-tokens.md` if available.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Leaving Default Manifest Values
+
+**Problem:** Generic names reduce trust.
+
+### 2. Forgetting `start_url`
+
+**Problem:** Users land on cached versions without analytics tracking.
+
+**Fix:** Include UTM parameters to identify app-launch sessions.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Audit existing manifest and update fields and icons.
+2. Generate maskable and standard icons using brand assets.
+3. Document offline fallback requirements and links in
+   `docs/state-architecture.md`.
+4. Record manifest decisions in `docs/metadata-playbook.md` for governance.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Manifest passes Lighthouse PWA checks (Installable section).
+-  [ ] Icons generated at required sizes and stored in `public/icons/`.
+-  [ ] Offline fallback plan documented with next steps.
+-  [ ] Stakeholder approval captured for branding updates.
+
+---

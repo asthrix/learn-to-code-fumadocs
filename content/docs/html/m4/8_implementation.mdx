@@ -1,0 +1,149 @@
+---
+title: "Module 4 Implementation"
+description:
+   "Assemble the credibility section with tables, highlights, timeline, and
+   testimonials."
+module: "M4"
+lesson: "8"
+difficulty: "intermediate"
+duration: "45"
+project_phase: "Credibility"
+prerequisites: ["/docs/html/m4/7_credibility-blueprint"]
+learning_objectives:
+   - "Build the full credibility section markup"
+   - "Integrate data bindings and analytics attributes"
+   - "Update documentation with implementation details"
+tags: ["implementation", "credibility", "data"]
+---
+
+# Module 4 Implementation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Assemble the credibility section in Portfolio Pulse.
+-  [ ] Apply semantic patterns for tables, highlights, timeline, and
+       testimonials.
+-  [ ] Document data connections and analytics hooks for collaborators.
+
+## Project Context
+
+This section proves Avery's impact. It bridges storytelling (Module 3) and
+conversion (Module 5), so accuracy and accessibility are critical.
+
+---
+
+## Assembly Steps
+
+### 1. Section Wrapper
+
+```html
+<section id="credibility" aria-labelledby="credibility-title">
+   <header>
+      <h2 id="credibility-title">
+         Proof you're investing in measurable change
+      </h2>
+      <p>Metrics, milestones, and endorsements from recent collaborations.</p>
+   </header>
+   <div class="credibility-grid">
+      <!-- highlights, metrics, timeline, testimonials -->
+   </div>
+   <footer>
+      <a href="#contact" class="cta" data-cta="credibility-contact">
+         Partner with Avery
+      </a>
+   </footer>
+</section>
+```
+
+### 2. Highlights Column
+
+Insert highlight cards from Lesson 6 with `<data>` and CTA links.
+
+### 3. Metrics Table
+
+Reuse the semantic table from Lesson 2, ensuring caption and trend indicators
+are present.
+
+### 4. Timeline
+
+Add the `<ol>` timeline from Lesson 4 with `<time>` markers and CTA links.
+
+### 5. Testimonials
+
+Include 1–2 testimonial figures with `<blockquote>` and consent metadata.
+
+Document final structure in `docs/layout.shared.md` and capture component IDs in
+`docs/state-architecture.md`.
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Copy Flexible
+
+**Why:** Some data points may be optional.
+
+Wrap optional sections in `<section>` with fallback copy like "More case studies
+coming soon".
+
+### 2. Align CTA Targets
+
+**Why:** Reinforces lead generation.
+
+Link to the contact form or a flagship case study based on business goals.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mixing Presentational Divs Into Data Structures
+
+**Problem:** Semantics degrade.
+
+**Fix:** Use existing patterns; leave layout adjustments to CSS.
+
+### 2. Forgetting Analytics Attributes
+
+**Problem:** Marketing loses insight into engagement.
+
+**Fix:** Add `data-cta` values documented in state architecture notes.
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+1. Update the credibility section in `index.html` (or equivalent template) with
+   the assembled markup.
+2. Ensure table, timeline, and testimonials reference real data from
+   `docs/data-sources.md`.
+3. Add `data-cta` attributes and update `docs/state-architecture.md` with
+   tracking events.
+4. Commit with `git commit -am "feat: add credibility section"` after testing.
+
+#### Expected Result
+
+Visitors can scan Avery's outcomes, milestones, and endorsements quickly, and
+stakeholders have documentation to keep data current.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Section renders correctly across breakpoints.
+-  [ ] CTA links navigate to the intended destinations.
+
+### Accessibility
+
+-  [ ] Headings follow `h2` → `h3` → `h4` hierarchy as needed.
+-  [ ] Tables, timelines, and testimonials maintain semantics.
+
+### Documentation
+
+-  [ ] Layout, data sources, and analytics docs updated.
+-  [ ] Retro log notes implementation choices and open risks.
+
+---

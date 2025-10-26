@@ -1,0 +1,310 @@
+---
+title: "Planning Landmarks & Page Regions"
+description:
+   "Map Portfolio Pulse sections to landmarks that support accessibility, SEO,
+   and collaboration."
+module: "M1"
+lesson: "2"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/1_semantic-layout-intro"]
+learning_objectives:
+   - "Inventory landmarks, sections, and headings for Portfolio Pulse"
+   - "Define the expected keyboard focus order across the page"
+   - "Annotate HTML regions with comments that explain intent"
+   - "Document dependencies that affect each region's content"
+tags: ["landmarks", "layout", "planning"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Planning Landmarks & Page Regions
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Inventory key landmarks and section headings for Portfolio Pulse.
+-  [ ] Define the expected keyboard focus order across the page.
+-  [ ] Annotate HTML regions with comments that explain intent.
+-  [ ] Track dependencies that affect each region's content or copy.
+
+## Project Context
+
+Landmarks and sectioning elements form the outline that assistive technologies
+announce. When you document them first, every collaborator understands the
+page's structure, which anchors upcoming CSS, JavaScript, and copy updates. This
+lesson focuses on capturing that structure inside `docs/layout-plan.md` and
+making sure `index.html` reflects the plan through helpful comments.
+
+---
+
+## Region Inventory
+
+Start by documenting how each landmark and section maps to the Portfolio Pulse
+narrative. Include notes, owners, and pending work so anyone reading the plan
+can see what still needs attention.
+
+```md filename="docs/layout-plan.md"
+## Region Inventory
+
+| Landmark             | Section ID   | Heading               | Purpose                         | Notes                             |
+| -------------------- | ------------ | --------------------- | ------------------------------- | --------------------------------- |
+| header (banner)      | —            | —                     | Primary navigation + resume CTA | Resume link opens PDF             |
+| main                 | hero         | h1#hero-heading       | Introduce Avery and core value  | Include proof metric              |
+| main                 | highlights   | h2#highlights-heading | Showcase top case studies       | Cards link to detail pages        |
+| main                 | services     | h2#services-title     | Summarize offerings             | Reference pricing doc             |
+| main                 | testimonials | h2#testimonials-title | Social proof quotes             | Replace placeholder in Module 1.7 |
+| main                 | contact      | h2#contact-title      | Invite outreach                 | Add form in Module 3              |
+| aside                | credentials  | h2 (visually hidden)  | Supplemental credibility stats  | Optional for larger viewports     |
+| footer (contentinfo) | —            | —                     | Secondary nav + legal           | Include social icons              |
+
+### Focus Order
+
+1. Skip link → #main-content
+2. Primary navigation (Work, Services, Proof, Contact)
+3. Hero CTA button
+4. Case study cards (left to right)
+5. Services links
+6. Testimonials blockquote
+7. Contact email + button
+8. Footer links
+```
+
+---
+
+## Annotated Markup Example
+
+Translate the inventory into inline comments so anyone scanning the HTML knows
+why each region exists and what content belongs there.
+
+```html filename="index.html"
+<header role="banner">
+   <!-- Primary navigation + resume CTA -->
+</header>
+<main id="main-content" tabindex="-1">
+   <!-- Hero: Introduces Avery + headline metric -->
+   <section id="hero" aria-labelledby="hero-heading">...</section>
+
+   <!-- Highlights: Featured case studies mapped to anchor #highlights -->
+   <section id="highlights" aria-labelledby="highlights-heading">...</section>
+
+   <!-- Services: Core offers, referenced in project brief measurement section -->
+   <section id="services" aria-labelledby="services-title">...</section>
+
+   <!-- Aside: Supplemental credentials visible on desktops -->
+   <aside aria-label="Quick credentials">...</aside>
+
+   <!-- Contact: Primary CTA before footer -->
+   <section id="contact" aria-labelledby="contact-title">...</section>
+</main>
+<footer role="contentinfo">
+   <!-- Secondary nav + legal copy -->
+</footer>
+```
+
+---
+
+## Practical Example
+
+The final structure should mirror the plan so headings, landmarks, and focus
+order stay predictable.
+
+```html
+<header class="site-header" role="banner">
+   <div class="brand">Portfolio Pulse</div>
+   <nav aria-label="Primary navigation">...</nav>
+</header>
+<main id="main-content" tabindex="-1">
+   <section id="hero" aria-labelledby="hero-heading">...</section>
+   <section id="projects" aria-labelledby="projects-heading">...</section>
+   <section id="services" aria-labelledby="services-title">...</section>
+   <aside aria-label="Credentials">
+      <h2>Credentials</h2>
+      <p>Certified UX Leader · 8+ years shipping products</p>
+   </aside>
+   <section id="contact" aria-labelledby="contact-title">...</section>
+</main>
+<footer class="site-footer" role="contentinfo">...</footer>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Name Asides for Context
+
+**Why:** Adding `aria-label` clarifies how supplemental content relates to the
+main narrative.
+
+```html
+<aside aria-label="Testimonials sidebar">...</aside>
+```
+
+### 2. Document Focus Order
+
+**Why:** Knowing where focus moves allows you to test keyboard navigation and
+plan interactive elements.
+
+```md
+Focus order:
+
+1. Skip link
+2. Primary navigation items
+3. Hero call-to-action
+4. Case study cards
+5. Contact form
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Using `<aside>` for Core Content
+
+**Problem:** If content is critical (services, case studies), it belongs in
+`<section>` inside `<main>`.
+
+```html
+<!-- Bad: entire services section inside aside -->
+<aside>
+   <h2>Services</h2>
+   ...
+</aside>
+```
+
+**Solution:**
+
+```html
+<section id="services">...</section>
+```
+
+### 2. Duplicating Landmarks
+
+**Problem:** Multiple `<footer>` elements confuse assistive technologies.
+
+```html
+<footer>Primary footer</footer>
+<footer>Secondary info</footer>
+```
+
+**Solution:**
+
+```html
+<footer>
+   <section aria-label="Secondary info">...</section>
+</footer>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Build the Region Inventory
+
+1. Update `docs/layout-plan.md` with a table mapping sections to landmarks,
+   headings, IDs, and notes.
+2. Annotate `index.html` with comments describing the purpose of each region
+   (helpful for collaborators).
+3. Ensure `aside` usage fits the supplemental criteria; move critical content
+   into `<section>` if needed.
+4. Commit with `git commit -am "docs: finalize landmark inventory"`.
+
+#### Expected Result
+
+Your team can glance at the layout plan and know exactly how the page is
+structured and how focus should move.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Expand `docs/layout-plan.md` with a region inventory similar to the
+         example below, then mirror the annotations inside `index.html`.
+      </p>
+
+```md filename="docs/layout-plan.md"
+## Region Inventory
+
+| Landmark             | Section ID   | Heading               | Purpose                         | Notes                             |
+| -------------------- | ------------ | --------------------- | ------------------------------- | --------------------------------- |
+| header (banner)      | —            | —                     | Primary navigation + resume CTA | Resume link opens PDF             |
+| main                 | hero         | h1#hero-heading       | Introduce Avery and core value  | Include proof metric              |
+| main                 | highlights   | h2#highlights-heading | Showcase top case studies       | Cards link to detail pages        |
+| main                 | services     | h2#services-title     | Summarize offerings             | Reference pricing doc             |
+| main                 | testimonials | h2#testimonials-title | Social proof quotes             | Replace placeholder in Module 1.7 |
+| main                 | contact      | h2#contact-title      | Invite outreach                 | Add form in Module 3              |
+| aside                | credentials  | h2 (visually hidden)  | Supplemental credibility stats  | Optional for larger viewports     |
+| footer (contentinfo) | —            | —                     | Secondary nav + legal           | Include social icons              |
+
+### Focus Order
+
+1. Skip link → #main-content
+2. Primary navigation (Work, Services, Proof, Contact)
+3. Hero CTA button
+4. Case study cards (left to right)
+5. Services links
+6. Testimonials blockquote
+7. Contact email + button
+8. Footer links
+```
+
+      <p>
+         Annotate the HTML so collaborators see intent inline:
+      </p>
+
+```html filename="index.html"
+<header role="banner">
+   <!-- Primary navigation + resume CTA -->
+</header>
+<main id="main-content" tabindex="-1">
+   <!-- Hero: Introduces Avery + headline metric -->
+   <section id="hero" aria-labelledby="hero-heading">...</section>
+
+   <!-- Highlights: Featured case studies mapped to anchor #highlights -->
+   <section id="highlights" aria-labelledby="highlights-heading">...</section>
+
+   <!-- Services: Core offers, referenced in project brief measurement section -->
+   <section id="services" aria-labelledby="services-title">...</section>
+
+   <!-- Aside: Supplemental credentials visible on desktops -->
+   <aside aria-label="Quick credentials">...</aside>
+
+   <!-- Contact: Primary CTA before footer -->
+   <section id="contact" aria-labelledby="contact-title">...</section>
+</main>
+<footer role="contentinfo">
+   <!-- Secondary nav + legal copy -->
+</footer>
+```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Each landmark appears once and wraps the correct content.
+-  [ ] `aside` regions contain supplemental—not primary—content.
+
+### Code Quality
+
+-  [ ] Comments in `index.html` reflect the latest region inventory.
+-  [ ] Layout plan table includes headings, IDs, and responsibilities.
+
+### Understanding
+
+-  [ ] You can justify why each section uses its selected HTML element.
+-  [ ] You know how focus should move through the page.
+
+### Project Integration
+
+-  [ ] Region inventory is linked from the project brief.
+-  [ ] Notes include any open dependencies for supplemental content.
+
+---

@@ -1,0 +1,203 @@
+---
+title: "Form Validation Strategies"
+description:
+   "Combine native validation, custom messaging, and progressive enhancement to
+   reduce friction."
+module: "M2"
+lesson: "4"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Lead capture"
+prerequisites: ["/docs/html/m2/3_input-types"]
+learning_objectives:
+   - "Leverage native HTML validation attributes"
+   - "Provide custom error messaging tied to inputs"
+   - "Plan progressive enhancement for client-side scripting"
+   - "Document validation flows and fallback behavior"
+tags: ["forms", "validation", "ux"]
+---
+
+# Form Validation Strategies
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Use native validation attributes like `required`, `pattern`, and
+       `minlength` effectively.
+-  [ ] Provide accessible error messaging and instructions.
+-  [ ] Plan progressive enhancement for JavaScript-based validation.
+-  [ ] Document validation flows, including server-side fallbacks.
+
+## Project Context
+
+Validation ensures data quality and builds trust. Poor validation can feel
+punitive. Portfolio Pulse needs friendly, accessible feedback that respects user
+input and handles errors gracefully.
+
+---
+
+## Native Validation
+
+HTML provides built-in validation through attributes like `required`,
+`minlength`, `maxlength`, `pattern`, and `type`. Use these before introducing
+JavaScript.
+
+### Custom Messages
+
+Use `setCustomValidity()` in progressive enhancement scripts to create tailored
+error messages while still relying on native constraints.
+
+### Basic Example
+
+```html
+<input id="name" name="name" type="text" minlength="2" required />
+```
+
+### Practical Example
+
+```html
+<form id="contact-form" novalidate>
+   <div class="form-field" data-field>
+      <label for="email">Work email</label>
+      <input
+         id="email"
+         name="email"
+         type="email"
+         autocomplete="email"
+         required
+         aria-describedby="email-hint email-error"
+      />
+      <p id="email-hint" class="form-hint">
+         We will only use this to respond to your inquiry.
+      </p>
+      <p id="email-error" class="form-error" role="alert" hidden></p>
+   </div>
+</form>
+<script type="module">
+   const form = document.querySelector("#contact-form");
+   form?.addEventListener("submit", (event) => {
+      const emailField = form.querySelector("#email");
+      if (emailField && !emailField.checkValidity()) {
+         event.preventDefault();
+         const errorMessage = emailField.validity.typeMismatch
+            ? "Enter a valid work email (example@company.com)."
+            : "Email is required.";
+         emailField.setCustomValidity(errorMessage);
+         const errorNode = document.querySelector("#email-error");
+         if (errorNode) {
+            errorNode.textContent = errorMessage;
+            errorNode.hidden = false;
+         }
+         emailField.reportValidity();
+      }
+   });
+</script>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Validation in HTML Whenever Possible
+
+**Why:** Native validation is lightweight, accessible, and requires no extra
+JavaScript for basic checks.
+
+```html
+<input type="email" required />
+```
+
+### 2. Use `novalidate` on Forms You Control
+
+**Why:** `novalidate` allows you to manage submission flow and error display
+while still using `checkValidity()`.
+
+```html
+<form id="contact-form" novalidate>...</form>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Displaying Errors Only on Submit
+
+**Problem:** Users get frustrated when told about multiple issues after hitting
+submit.
+
+```js
+form.addEventListener("submit", validateOnlyThen);
+```
+
+**Solution:**
+
+```js
+emailField.addEventListener("blur", showErrorIfInvalid);
+```
+
+### 2. Relying on Color Alone
+
+**Problem:** Color-only cues fail colorblind users.
+
+```css
+input.error {
+   border-color: red;
+}
+```
+
+**Solution:**
+
+```css
+input.error {
+   border-color: var(--danger);
+}
+.form-error {
+   display: block;
+}
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Add Validation Hooks
+
+1. Add `required`, `minlength`, or `pattern` attributes to necessary fields in
+   `index.html`.
+2. Include hidden error elements (`<p class="form-error" role="alert">`) for
+   each field.
+3. Document how server-side validation will mirror client-side rules in
+   `docs/form-strategy.md`.
+4. Commit with `git commit -am "feat: wire native validation"`.
+
+#### Expected Result
+
+The form now protects data quality and sets the stage for progressive
+enhancement.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Required fields prevent submission when empty.
+-  [ ] Error messages appear and are announced when validation fails.
+
+### Code Quality
+
+-  [ ] Validation rules documented in the strategy file.
+-  [ ] Hidden error elements exist for each field.
+
+### Understanding
+
+-  [ ] You know when to use `novalidate` and `checkValidity()`.
+-  [ ] You can explain how server-side validation will mirror the frontend.
+
+### Project Integration
+
+-  [ ] Accessibility manifesto updated with validation considerations.
+-  [ ] Retro log notes any outstanding scripting tasks.
+
+---

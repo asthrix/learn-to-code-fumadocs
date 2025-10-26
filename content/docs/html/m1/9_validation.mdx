@@ -1,0 +1,234 @@
+---
+title: "Module 1 Validation"
+description:
+   "Audit the semantic layout for accessibility, structure, and content
+   readiness."
+module: "M1"
+lesson: "9"
+difficulty: "beginner"
+duration: "25"
+project_phase: "Semantic layout"
+prerequisites: ["/docs/html/m1/8_implementation"]
+learning_objectives:
+   - "Run complementary automated and manual audits"
+   - "Document findings with severity, owners, and deadlines"
+   - "Update reference docs with validation outcomes"
+   - "Plan Module 2 priorities based on backlog items"
+tags: ["validation", "quality", "checklist"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Module 1 Validation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Update `notes/validation/module-1.md` with automated and manual results.
+-  [ ] Categorize findings by severity and assign clear owners.
+-  [ ] Cross-reference validation outcomes in the project brief and layout plan.
+-  [ ] Prioritize follow-up work for Module 2 based on the backlog.
+
+## Project Context
+
+Module 1 delivered a complete semantic layout. Before moving forward, confirm
+that the structure holds up under validation. Pair automated tooling with manual
+reviews so you can capture accessibility gaps, structural drift, or missing
+content while momentum is high.
+
+---
+
+## Manual Checks
+
+-  Keyboard navigation through header, sections, and footer
+-  Screen reader review of landmarks (VoiceOver, NVDA)
+-  Visual scan for duplicate links or inconsistent copy
+
+## Basic Example
+
+```md
+## Module 1 Validation Notes
+
+-  ✅ axe DevTools: No violations
+-  ⚠️ Outliner: Hero uses two h1 elements (fixed)
+-  ✅ Links: All anchors resolved to sections
+```
+
+## Practical Example
+
+```md
+# Module 1 · Validation Summary
+
+## Automated Checks
+
+-  HTML Validator: 0 errors, 0 warnings
+-  axe DevTools: 1 warning (duplicate link text "Book a call" resolved by adding
+   context)
+
+## Manual Review
+
+-  Keyboard navigation: Pass (skip link visible, menu toggle accessible)
+-  Screen reader landmark review: Pass (header, navigation, main, aside, footer
+   detected)
+
+## Backlog
+
+-  Replace placeholder testimonial copy (owner: Avery, due Module 3)
+-  Consolidate duplicate nav lists using partials (owner: Avery, due Module 4)
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Pair Automated and Manual Testing
+
+**Why:** Automated tools catch structural issues, while manual reviews uncover
+contextual problems.
+
+```md
+-  Automated: axe, html-validate
+-  Manual: keyboard, screen reader, print preview
+```
+
+### 2. Assign Owners and Deadlines
+
+**Why:** Documenting who will resolve issues prevents backlog stagnation.
+
+```md
+-  Issue: Placeholder testimonial
+-  Owner: Avery
+-  Due: Module 3
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Skipping Documentation Updates
+
+**Problem:** Validation loses value when results stay in private notes.
+
+```md
+<!-- Bad: validation results not saved to repo -->
+```
+
+**Solution:**
+
+```md
+-  Commit notes/validation/module-1.md with findings.
+-  Reference the log from docs/project-brief.md.
+```
+
+### 2. Logging Issues Without Severity
+
+**Problem:** If backlog items lack severity, it becomes unclear what to tackle
+first.
+
+```md
+-  Placeholder testimonial copy needs update.
+```
+
+**Solution:**
+
+```md
+-  Severity: High — Replace placeholder testimonial copy (Owner: Avery,
+   Module 3)
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Log Module 1 Validation
+
+1. Update `notes/validation/module-1.md` with automated and manual test results.
+2. Record backlog items with severity, owner, and target module.
+3. Sync the project brief and layout plan with any scope changes or decisions.
+4. Commit with `git commit -am "docs: log module 1 validation"`.
+
+#### Expected Result
+
+You have a clear record of Module 1 quality checks and a prioritized list of
+follow-up tasks.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Populate `notes/validation/module-1.md` with a structured log similar to
+         this example.
+      </p>
+
+```md filename="notes/validation/module-1.md"
+# Module 1 · Validation Summary
+
+_Date:_ 2024-05-15 · _Owner:_ Avery Stone
+
+## Automated Checks
+
+-  HTML Validator (nu): 0 errors · 0 warnings
+-  axe DevTools: 1 warning (duplicate "Book a call" link) — resolved by adding
+   descriptive text "Book a discovery call"
+-  Link Checker: Pass (all anchors resolve)
+
+## Manual Review
+
+-  Keyboard traversal: Pass · Skip link visible, menu summary focusable, Escape
+   closes menu
+-  Screen reader (VoiceOver): Landmarks announced in order; aside labeled
+   "Credentials & Press"
+-  Print preview: Sections appear in expected sequence; aside stacks below
+   highlights
+
+## Backlog Items
+
+| Severity | Item                                         | Owner  | Target Module |
+| -------- | -------------------------------------------- | ------ | ------------- |
+| High     | Replace placeholder testimonial quote        | Avery  | Module 2      |
+| Medium   | Consolidate duplicate nav lists into partial | Avery  | Module 3      |
+| Medium   | Style skip link + menu focus states          | Avery  | Module 2      |
+| Low      | Add newsletter privacy copy                  | Jordan | Module 3      |
+
+## Decisions & Notes
+
+-  Footer CTA stays email-based; scheduling tool link optional for launch.
+-  Accessibility doc updated with navigation requirements.
+-  Layout plan references aside stacking rules for breakpoints.
+```
+
+      <p>
+         Link this validation summary from `notes/orientation.md` so future
+         collaborators can spot the latest audit at a glance.
+      </p>
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Validation log references at least one automated and one manual test.
+-  [ ] Navigation behaviors (skip link, menu toggle) documented as pass/fail.
+
+### Code Quality
+
+-  [ ] Backlog items include severity and owners.
+-  [ ] Project brief reflects any structural updates.
+
+### Understanding
+
+-  [ ] You can explain all remaining issues and why they matter.
+-  [ ] You know what Module 2 will address and how it depends on Module 1.
+
+### Project Integration
+
+-  [ ] Validation notes committed and linked in orientation file.
+-  [ ] Layout plan references validation outcomes for the main sections.
+
+---

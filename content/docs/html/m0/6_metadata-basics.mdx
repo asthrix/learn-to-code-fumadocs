@@ -1,0 +1,271 @@
+---
+title: "Metadata & SEO Foundations"
+description:
+   "Configure core metadata that drives discoverability, social previews, and
+   browser behavior."
+module: "M0"
+lesson: "6"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Foundation blueprint"
+prerequisites: ["/docs/html/m0/5_navigation-patterns"]
+learning_objectives:
+   - "Identify essential metadata tags for modern HTML documents"
+   - "Configure social preview tags for Portfolio Pulse"
+   - "Document canonical URLs and favicon strategy"
+   - "Capture analytics and privacy considerations"
+tags: ["seo", "metadata", "head"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Metadata & SEO Foundations
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Configure essential metadata, including description, robots, and
+       canonical tags.
+-  [ ] Define Open Graph and Twitter Card data for social platforms.
+-  [ ] Prepare a favicon and app icon plan for Portfolio Pulse.
+-  [ ] Record analytics and privacy considerations for later integration.
+
+## Project Context
+
+Metadata is the handshake between your site and external systems. Search
+engines, social networks, and browsers read `<head>` before the body loads.
+Tight metadata improves discoverability, click-through rates, and brand
+consistency. Capturing decisions now prevents last-minute scramble before
+launch.
+
+---
+
+## Essential Metadata
+
+### Required Tags
+
+-  `charset` and `viewport` (already added)
+-  `description` summarizing the page in 160 characters or fewer
+-  `robots` to control indexing when staging
+-  `canonical` to avoid duplicate content issues
+
+### Social Preview
+
+Configure Open Graph (`og:*`) and Twitter Card tags to control how links preview
+in messaging and social platforms.
+
+### Icons and Manifest
+
+Browsers expect favicons and Apple touch icons. Later modules cover manifests,
+but reserve the paths now.
+
+### Basic Example
+
+```html
+<meta
+   name="description"
+   content="Avery Stone helps product teams design and ship measurable experiences."
+/>
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://portfolio-pulse.example.com" />
+```
+
+### Practical Example
+
+```html
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Portfolio Pulse · Avery Stone" />
+<meta
+   property="og:description"
+   content="Product designer and frontend engineer delivering measurable product outcomes."
+/>
+<meta property="og:url" content="https://portfolio-pulse.example.com" />
+<meta
+   property="og:image"
+   content="https://portfolio-pulse.example.com/og-card.jpg"
+/>
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:creator" content="@averystone" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Descriptions Human-Readable
+
+**Why:** Search engines display descriptions; compelling copy boosts
+click-through rates.
+
+```html
+<meta
+   name="description"
+   content="Portfolio Pulse showcases product design work that grows revenue and improves customer journeys."
+/>
+```
+
+### 2. Version-Control Assets Mentioned in Metadata
+
+**Why:** Broken Open Graph images hurt credibility. Store preview images within
+the repo or a reliable CDN.
+
+```txt
+public/
+├── og-card.jpg
+├── favicon.ico
+└── apple-touch-icon.png
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Forgetting to Update Staging Robots
+
+**Problem:** Setting `noindex` in staging and forgetting to remove it for
+production.
+
+```html
+<!-- Bad: shipped to production -->
+<meta name="robots" content="noindex, nofollow" />
+```
+
+**Solution:**
+
+```html
+<meta name="robots" content="index, follow" />
+```
+
+### 2. Using Relative URLs in Open Graph Tags
+
+**Problem:** Social platforms require absolute URLs; relative paths break the
+preview.
+
+```html
+<!-- Bad: relative URL -->
+<meta property="og:image" content="/og-card.jpg" />
+```
+
+**Solution:**
+
+```html
+<meta
+   property="og:image"
+   content="https://portfolio-pulse.example.com/og-card.jpg"
+/>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Populate Metadata
+
+1. Update the `<head>` section in `index.html` with the practical example tags.
+2. Add placeholder files (`public/og-card.jpg`, `favicon.ico`,
+   `apple-touch-icon.png`) or document TODOs with expected dimensions in
+   `notes/orientation.md`.
+3. Record analytics/privacy plans in `docs/project-brief.md` under a new
+   "Measurement" section.
+4. Commit with `git commit -am "chore: configure portfolio metadata"`.
+
+#### Expected Result
+
+Your site now presents consistent metadata across search results and social
+platforms, and you have a clear plan for assets.
+
+---
+
+<Accordions className="mt-6">
+   <Accordion title="Solution Walkthrough">
+      <p>
+         Use this reference implementation to wire the `<head>` metadata, while
+         keeping project notes aligned with future asset work.
+      </p>
+      ```html filename="index.html"
+      <head>
+         <meta charset='utf-8' />
+         <meta name='viewport' content='width=device-width, initial-scale=1' />
+         <title>Portfolio Pulse · Avery Stone</title>
+         <meta
+            name='description'
+            content='Avery Stone showcases product design work that grows revenue and improves customer journeys.'
+         />
+         <meta name='robots' content='index, follow' />
+         <link rel='canonical' href='https://portfolio-pulse.example.com' />
+
+         <meta property='og:type' content='website' />
+         <meta property='og:title' content='Portfolio Pulse · Avery Stone' />
+         <meta
+            property='og:description'
+            content='Product designer and frontend engineer delivering measurable product outcomes.'
+         />
+         <meta property='og:url' content='https://portfolio-pulse.example.com' />
+         <meta
+            property='og:image'
+            content='https://portfolio-pulse.example.com/og-card.jpg'
+         />
+         <meta name='twitter:card' content='summary_large_image' />
+         <meta name='twitter:creator' content='@averystone' />
+
+         <link rel='icon' href='/favicon.ico' sizes='any' />
+         <link rel='icon' href='/icon.svg' type='image/svg+xml' />
+         <link rel='apple-touch-icon' href='/apple-touch-icon.png' />
+         <link rel='manifest' href='/site.webmanifest' />
+      </head>
+      ```
+      <p>
+         Track outstanding assets and analytics planning for quick follow-up:
+      </p>
+      ```md filename="notes/orientation.md"
+      ### Measurement
+
+      -  Primary analytics: Plausible (collect page views, outbound clicks)
+      -  Privacy note: Update privacy policy once tracking installed
+      -  TODO: confirm team handles consent banner for EU visitors
+
+      ### Metadata assets
+
+      -  og-card.jpg · 1200x630 · design mock queued for next sprint
+      -  apple-touch-icon.png · 180x180 · export from Figma brand kit
+      -  favicon.ico · multi-size export from glyph set
+      ```
+
+      <p>
+         Once metadata is committed, test using the Meta Sharing Debugger and
+         Twitter Card Validator to ensure previews render as expected.
+      </p>
+      </Accordion>
+
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Open Graph and Twitter tags use absolute URLs.
+-  [ ] `robots` meta is set correctly for the current environment.
+
+### Code Quality
+
+-  [ ] Metadata order is logical and grouped (basics, social, assets).
+-  [ ] Placeholder assets or TODOs are documented.
+
+### Understanding
+
+-  [ ] You can explain what each metadata group accomplishes.
+-  [ ] You know when to toggle `noindex` (staging) vs `index` (production).
+
+### Project Integration
+
+-  [ ] Measurement plans exist in the project brief.
+-  [ ] Notes include asset dimensions and deadlines.
+
+---

@@ -1,0 +1,257 @@
+---
+title: "HTML Document Anatomy"
+description:
+   "Rebuild the `<html>`, `<head>`, and `<body>` structure with production-ready
+   defaults."
+module: "M0"
+lesson: "3"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Foundation blueprint"
+prerequisites: ["/docs/html/m0/2_project-brief"]
+learning_objectives:
+   - "Explain the purpose of core document elements"
+   - "Configure language, character encoding, and viewport metadata"
+   - "Establish structural landmarks for the Portfolio Pulse homepage"
+   - "Prepare reusable snippets for future pages"
+tags: ["html", "structure", "metadata"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# HTML Document Anatomy
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Describe how `<html>`, `<head>`, and `<body>` cooperate.
+-  [ ] Configure metadata for language, encoding, and responsive viewports.
+-  [ ] Create semantic scaffolding for Portfolio Pulse sections.
+-  [ ] Extract a base layout snippet for future pages.
+
+## Project Context
+
+A portfolio is only as strong as its foundation. Proper document structure
+ensures browsers parse your content correctly, screen readers announce the right
+language, and future collaborators can extend your markup without surprises.
+This lesson creates the base template you will refine in later modules.
+
+---
+
+## Core Structure Review
+
+### HTML Element
+
+Wrap everything with `<html lang="en">` (or your language choice) so assistive
+technologies and search engines interpret content correctly.
+
+### Head Element
+
+The `<head>` element houses metadata, linking resources, and instructions for
+browsers. Setting `charset`, `viewport`, and canonical tags now prevents bugs
+later.
+
+### Body Element
+
+`<body>` contains everything visible or interactive. Structuring it with clear
+landmarks accelerates styling and accessibility reviews.
+
+### Basic Example
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8" />
+      <title>Portfolio Pulse</title>
+   </head>
+   <body>
+      <h1>Coming Soon</h1>
+   </body>
+</html>
+```
+
+### Practical Example
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta
+         name="description"
+         content="Portfolio Pulse showcases the work of Avery Stone, a product designer and frontend engineer."
+      />
+      <link rel="canonical" href="https://portfolio-pulse.example.com" />
+      <link
+         rel="preload"
+         href="/fonts/figtree-v7-latin-regular.woff2"
+         as="font"
+         type="font/woff2"
+         crossorigin
+      />
+      <title>Portfolio Pulse · Avery Stone</title>
+   </head>
+   <body>
+      <header id="top" class="site-header" role="banner"></header>
+      <main id="main-content" tabindex="-1"></main>
+      <footer class="site-footer" role="contentinfo"></footer>
+   </body>
+</html>
+```
+
+This template includes metadata you will extend with Open Graph tags and
+structured data in later modules.
+
+---
+
+## ✅ Best Practices
+
+### 1. Declare the Language Explicitly
+
+**Why:** Screen readers rely on `lang` to pronounce content correctly and search
+engines use it for regional indexing.
+
+```html
+<html lang="en"></html>
+```
+
+### 2. Reserve Landmarks with Semantic Elements
+
+**Why:** Defining `<header>`, `<main>`, and `<footer>` early sets expectations
+for keyboard navigation and helps CSS target regions cleanly.
+
+```html
+<body>
+   <a class="skip-link" href="#main-content">Skip to main content</a>
+   <header>...</header>
+   <main id="main-content">...</main>
+   <footer>...</footer>
+</body>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Missing Viewport Meta Tag
+
+**Problem:** Without `viewport`, mobile devices zoom out and interactions feel
+broken.
+
+```html
+<!-- Bad: No viewport meta tag -->
+<meta charset="utf-8" />
+```
+
+**Solution:**
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+```
+
+### 2. Nesting Multiple `<main>` Elements
+
+**Problem:** Multiple `main` elements confuse assistive technologies that expect
+a single primary region per page.
+
+```html
+<!-- Bad: two main elements on one page -->
+<main>Hero content</main>
+<main>Projects</main>
+```
+
+**Solution:**
+
+```html
+<main>
+   <section id="hero">...</section>
+   <section id="projects">...</section>
+</main>
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Create the Base HTML Template
+
+1. Add `portfolio-pulse/index.html` with the document structure shown above.
+2. Include placeholders for `<header>`, `<main>`, and `<footer>` with IDs for
+   skip links.
+3. Populate `<head>` with `charset`, `viewport`, `description`, `canonical`, and
+   `title` tags.
+4. Preload your primary font or asset if you already know it; otherwise, leave a
+   TODO comment.
+5. Commit with `git commit -am "feat: add portfolio pulse base document"`.
+
+#### Expected Result
+
+You now have a production-ready HTML skeleton that will host every component of
+Portfolio Pulse.
+
+---
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      <p>The example below satisfies the task requirements and mirrors the practical example.</p>
+
+      ```html filename="portfolio-pulse/index.html"
+      <!DOCTYPE html>
+      <html lang="en">
+         <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta
+               name="description"
+               content="Portfolio Pulse showcases Avery Rivera's product design work and measurable outcomes."
+            />
+            <link rel="canonical" href="https://portfolio-pulse.local" />
+            <link rel="preload" href="/fonts/figtree-v7-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+            <title>Portfolio Pulse · Avery Rivera</title>
+         </head>
+         <body>
+            <a class="skip-link" href="#main-content">Skip to main content</a>
+            <header id="top" class="site-header" role="banner">
+               <!-- Hero, navigation, and intro content will be added in Module 1 -->
+            </header>
+            <main id="main-content" tabindex="-1" role="main">
+               <!-- Case studies, highlights, and contact sections land here -->
+            </main>
+            <footer class="site-footer" role="contentinfo">
+               <!-- Footer CTA and legal links ship in Module 1 + Module 5 -->
+            </footer>
+         </body>
+      </html>
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Opening `index.html` in the browser renders without console errors.
+-  [ ] Skip link jumps focus to the main content placeholder.
+
+### Code Quality
+
+-  [ ] `<html>` includes the correct `lang` attribute for your content.
+-  [ ] Only one `<main>` element exists inside `<body>`.
+
+### Understanding
+
+-  [ ] You can explain what each required `<meta>` tag achieves.
+-  [ ] You know why canonical URLs matter for SEO.
+
+### Project Integration
+
+-  [ ] Notes include any open TODOs (fonts, analytics, etc.).
+-  [ ] The brief references the structure implemented in this template.
+
+---

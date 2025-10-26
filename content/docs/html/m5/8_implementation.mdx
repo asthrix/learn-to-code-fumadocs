@@ -1,0 +1,148 @@
+---
+title: "Module 5 Implementation"
+description:
+   "Integrate metadata, structured data, and launch governance into Portfolio
+   Pulse."
+module: "M5"
+lesson: "8"
+difficulty: "advanced"
+duration: "45"
+project_phase: "Launch"
+prerequisites: ["/docs/html/m5/7_accessibility-seo-runbook"]
+learning_objectives:
+   - "Update head metadata and manifests"
+   - "Embed JSON-LD and custom data attributes"
+   - "Finalize documentation links and governance notes"
+tags: ["implementation", "launch", "metadata"]
+---
+
+# Module 5 Implementation
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Integrate the metadata, structured data, and manifest updates into the
+       codebase.
+-  [ ] Apply `data-*` instrumentation across critical CTAs.
+-  [ ] Sync documentation with final launch details.
+
+## Project Context
+
+This is the final build step before launch. Treat it like a release candidate
+where accuracy, accessibility, and governance all converge.
+
+---
+
+## Head Integration Checklist
+
+1. Update `<title>` and `<meta>` tags per `docs/metadata-playbook.md`.
+2. Inject Open Graph, Twitter, and canonical links.
+3. Reference `site.webmanifest` and icon set.
+4. Append JSON-LD scripts for Person, WebSite, and key case studies.
+
+```html
+<link rel="canonical" href="https://avery.dev/" />
+<link rel="manifest" href="/site.webmanifest" crossorigin="use-credentials" />
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+<script type="application/ld+json">
+   {...}
+</script>
+```
+
+---
+
+## Body Instrumentation
+
+-  Ensure CTA links include `data-cta` and `data-metric-id` values.
+-  Tag testimonials, metrics, and highlights with documented IDs.
+-  Provide fallback content for offline page links if referenced.
+
+```html
+<a
+   href="#contact"
+   class="cta"
+   data-cta="credibility-contact"
+   data-track="click"
+>
+   Partner with Avery
+</a>
+```
+
+---
+
+## Documentation Sync
+
+-  Update `docs/metadata-playbook.md`, `docs/structured-data.md`,
+   `docs/state-architecture.md`, and `docs/validation-log.md` with final
+   implementation notes.
+-  Cross-link the accessibility & SEO runbook within each doc as needed.
+
+---
+
+## ✅ Best Practices
+
+### 1. Stage First
+
+**Why:** Validate metadata and structured data in a preview environment before
+production, ensuring canonical URLs still point to prod.
+
+### 2. Pair-Review
+
+**Why:** Metadata errors are subtle; get a second reviewer.
+
+Document sign-off in `notes/module-5-plan.md` or retro logs.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Duplicating JSON-LD Blocks
+
+**Problem:** Multiple Person entries confuse search crawlers.
+
+**Fix:** Consolidate into a single, comprehensive script per entity.
+
+### 2. Forgetting `crossorigin` on Manifest
+
+**Problem:** Favicons and installs fail on some browsers.
+
+**Fix:** Include `crossorigin="use-credentials"` when necessary.
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+1. Update global layout or `index.html` head with metadata, manifest, and
+   JSON-LD.
+2. Apply `data-*` instrumentation throughout key sections (hero CTA, gallery,
+   contact).
+3. Regenerate share images and ensure asset paths match metadata.
+4. Sync all documentation and commit with
+   `git commit -am "feat: finalize launch metadata"`.
+
+#### Expected Result
+
+Portfolio Pulse's HTML is launch-ready, discoverable, and instrumented for
+post-launch analysis.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Metadata renders correctly in page source.
+-  [ ] Manifest and icons load without console errors.
+
+### Accessibility & SEO
+
+-  [ ] Structured data validates with zero errors.
+-  [ ] Canonical and social metadata verified via validators.
+
+### Documentation
+
+-  [ ] Governance docs updated with final state.
+-  [ ] Stakeholder sign-off recorded for launch.
+
+---

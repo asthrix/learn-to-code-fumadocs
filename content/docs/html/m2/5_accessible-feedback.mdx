@@ -1,0 +1,192 @@
+---
+title: "Accessible Feedback & Messaging"
+description:
+   "Deliver inline errors, success states, and status updates that assistive
+   technologies can announce."
+module: "M2"
+lesson: "5"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Lead capture"
+prerequisites: ["/docs/html/m2/4_validation-strategies"]
+learning_objectives:
+   - "Implement inline error messaging with ARIA live regions"
+   - "Design success confirmations and loading states"
+   - "Use icons and text together for feedback"
+   - "Document communication patterns for developers"
+tags: ["forms", "feedback", "a11y"]
+---
+
+# Accessible Feedback & Messaging
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Provide inline error messages that announce via screen readers.
+-  [ ] Create success banners or confirmations with `role="status"`.
+-  [ ] Design loading states that do not trap focus.
+-  [ ] Document feedback patterns for consistent implementation.
+
+## Project Context
+
+Forms fail when users do not understand what went wrong. Inclusive feedback
+ensures everyone knows how to fix mistakes. These patterns also inform CSS and
+JavaScript work later.
+
+---
+
+## Inline Errors and Success States
+
+### Error Messaging
+
+Use elements with `role="alert"` for errors, populated dynamically. Connect to
+input via `aria-describedby`.
+
+### Success Messaging
+
+Use a `<p role="status">` or `<div role="status">` to announce success without
+stealing focus.
+
+### Basic Example
+
+```html
+<p id="email-error" class="form-error" role="alert" hidden></p>
+```
+
+### Practical Example
+
+```html
+<form id="contact-form" novalidate>
+   <div class="form-field">
+      <label for="email">Work email</label>
+      <input
+         id="email"
+         name="email"
+         type="email"
+         autocomplete="email"
+         required
+         aria-describedby="email-hint email-error"
+      />
+      <p id="email-hint" class="form-hint">We respond within two business days.</p>
+      <p id="email-error" class="form-error" role="alert" hidden></p>
+   </div>
+   <button type="submit">Send message</button>
+</form>
+<div id="form-status" role="status" aria-live="polite"></div>
+<script type="module">
+   const form = document.querySelector('#contact-form');
+   const status = document.querySelector('#form-status');
+   form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      status!.textContent = 'Submitting...';
+      status!.classList.add('loading');
+      setTimeout(() => {
+         status!.classList.remove('loading');
+         status!.textContent = 'Thanks! We will be in touch within 48 hours.';
+         form.reset();
+      }, 1200);
+   });
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Pair Icons with Text
+
+**Why:** Icons alone are not readable by screen readers. Ensure text conveys
+meaning.
+
+```html
+<p role="alert">
+   <span aria-hidden="true">⚠️</span> Please enter a valid email.
+</p>
+```
+
+### 2. Keep Feedback Persistent Until Resolved
+
+**Why:** Errors that disappear too quickly cause confusion.
+
+```js
+errorNode.hidden = false;
+// hide only after valid input and explanation.
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Using `alert()` for Errors
+
+**Problem:** `alert()` interrupts flow and is inaccessible.
+
+```js
+alert("Email required");
+```
+
+**Solution:**
+
+```html
+<p role="alert">Email is required.</p>
+```
+
+### 2. Removing Focus After Submission
+
+**Problem:** Automatically moving focus can disorient users.
+
+```js
+form.reset();
+form.querySelector("input").focus();
+```
+
+**Solution:**
+
+```js
+status.focus(); // only if status is focusable, otherwise leave focus on submit button.
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Add Feedback Elements
+
+1. Insert error containers with `role="alert"` for each form field.
+2. Add a status banner (e.g., `<div role="status">`) below the form for success
+   messages.
+3. Document messaging guidelines in `docs/form-strategy.md` (tone, persistence,
+   actions).
+4. Commit with `git commit -am "feat: implement accessible form feedback"`.
+
+#### Expected Result
+
+Your form communicates errors and success in a way that respects both sighted
+and non-sighted users.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Error messages appear and stay visible until resolved.
+-  [ ] Success status updates without shifting focus unexpectedly.
+
+### Code Quality
+
+-  [ ] Error and status elements have appropriate ARIA roles.
+-  [ ] Feedback messaging guidelines documented.
+
+### Understanding
+
+-  [ ] You can explain the difference between `role="alert"` and
+       `role="status"`.
+-  [ ] You know how to test announcements with screen readers.
+
+### Project Integration
+
+-  [ ] Accessibility manifesto updated with feedback patterns.
+-  [ ] Retro log notes any scripting enhancements needed later.
+
+---

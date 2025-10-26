@@ -1,0 +1,136 @@
+---
+title: "Timelines & Milestones"
+description:
+   "Build accessible timelines using ordered lists, `<time>`, and supporting
+   copy."
+module: "M4"
+lesson: "4"
+difficulty: "intermediate"
+duration: "40"
+project_phase: "Credibility"
+prerequisites: ["/docs/html/m4/3_definition-lists"]
+learning_objectives:
+   - "Mark up timelines with `<ol>`, `<li>`, and `<time>`"
+   - "Highlight milestones without breaking chronological order"
+   - "Document how timelines integrate with analytics and retro logs"
+tags: ["timeline", "time", "milestones"]
+---
+
+# Timelines & Milestones
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Present Avery's career milestones using semantic timelines.
+-  [ ] Combine metrics or testimonials within each milestone entry.
+-  [ ] Document how the timeline supports analytics and future automation.
+
+## Why It Matters
+
+Chronological storytelling demonstrates sustained impact. Semantic timelines
+help readers—and search engines—follow Avery's growth without confusion.
+
+---
+
+## Timeline Pattern
+
+```html
+<ol class="experience-timeline">
+   <li>
+      <article aria-labelledby="timeline-2024">
+         <header>
+            <h3 id="timeline-2024">
+               <time datetime="2024">2024</time> · Portfolio Pulse relaunch
+            </h3>
+            <p>Shipped end-to-end UX audit and conversion uplift roadmap.</p>
+         </header>
+         <p class="metric">Conversion rate +32% within 6 weeks.</p>
+         <footer>
+            <a
+               href="/case-studies/fintech-onboarding.html"
+               data-cta="timeline-2024"
+            >
+               View case study
+            </a>
+         </footer>
+      </article>
+   </li>
+   <li>
+      <article aria-labelledby="timeline-2023">
+         <header>
+            <h3 id="timeline-2023">
+               <time datetime="2023">2023</time> · Lead Service Designer,
+               FluxHealth
+            </h3>
+            <p>Built an in-house design system adopted by 6 product teams.</p>
+         </header>
+         <p class="metric">Support tickets dropped 45% post rollout.</p>
+      </article>
+   </li>
+</ol>
+```
+
+Use `<article>` to encapsulate entries, making them shareable snippets.
+
+---
+
+## Enhancements
+
+-  Add `<data>` or `<meter>` to highlight numeric progress within entries.
+-  Incorporate inline quotes using `<blockquote>` when testimonials align with a
+   milestone.
+-  Support vertical rhythm with CSS rather than extra markup.
+
+Document timeline guidelines in `docs/layout.shared.md` and update
+`notes/module-4-plan.md` with content decisions.
+
+---
+
+## ✅ Best Practices
+
+### 1. Use Ordered Lists
+
+**Why:** Communicates chronology and allows assistive tech to announce position.
+
+### 2. Provide Machine-Readable Dates
+
+**Why:** `<time datetime>` improves search and automation.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Styling Headings as Dates Without `<time>`
+
+**Problem:** Loses semantic value.
+
+**Fix:** Wrap visible date in `<time>` even if styled heavily.
+
+### 2. Reversing Order Without Context
+
+**Problem:** Readers expecting chronological order get confused.
+
+**Fix:** If using reverse order, add copy like "Newest first" and maintain
+`<ol>`.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Draft timeline entries for at least three milestones using the pattern above.
+2. Associate each entry with relevant metrics or testimonials from the data
+   inventory.
+3. Update `docs/data-sources.md` with references used in the timeline.
+4. Capture analytics IDs and CTA links in `docs/state-architecture.md`.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Timeline uses `<ol>` with `<time>` in each heading.
+-  [ ] Entries link back to supporting case studies where relevant.
+-  [ ] Documentation updated with data references and analytics IDs.
+-  [ ] Screen reader announcement order verified.
+
+---

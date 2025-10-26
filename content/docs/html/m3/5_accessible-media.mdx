@@ -1,0 +1,136 @@
+---
+title: "Accessible Media"
+description:
+   "Deliver alt text, captions, and transcripts that make visual stories
+   inclusive."
+module: "M3"
+lesson: "5"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Showcase"
+prerequisites: ["/docs/html/m3/4_media-performance"]
+learning_objectives:
+   - "Write effective alt text and figure captions"
+   - "Provide captions, transcripts, and audio descriptions"
+   - "Document governance for continuous accessibility"
+tags: ["accessibility", "media", "a11y"]
+---
+
+# Accessible Media
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Draft alt text and captions that communicate intent.
+-  [ ] Provide transcripts and captions for audio/video content.
+-  [ ] Update accessibility documentation with media-specific guidelines.
+
+## Why It Matters
+
+Media should amplify, not gatekeep, your story. Accessible descriptions broaden
+your audience and improve SEO while respecting legal requirements.
+
+---
+
+## Alt Text Framework
+
+Use the "What, Context, Purpose" checklist:
+
+1. **What:** Describe the primary subject.
+2. **Context:** Highlight relevant surroundings.
+3. **Purpose:** Explain why the image matters in this case study.
+
+Example:
+`"Avery presenting usability test findings to a fintech client, highlighting a simplified onboarding flow."`
+
+Document each alt text decision in `docs/media-inventory.md` under `alt_text`.
+
+---
+
+## Figures and Captions
+
+Wrap showcase imagery in `<figure>` and `<figcaption>` to bind media with
+narrative.
+
+```html
+<figure class="case-study-figure">
+   <img
+      src="/images/showcase/usability-session-768.jpg"
+      srcset="..."
+      alt="Avery facilitating a remote usability session with task checklist on screen"
+      width="1280"
+      height="853"
+      loading="lazy"
+   />
+   <figcaption>
+      Remote testing uncovered friction in the onboarding checklist, improving
+      completion rates by 32%.
+   </figcaption>
+</figure>
+```
+
+---
+
+## Captions & Transcripts
+
+-  Use `<track kind="captions" srclang="en">` for native `<video>` elements.
+-  Provide transcript download links for long-form audio.
+-  For third-party embeds (YouTube, Vimeo), confirm captions exist or upload
+   them.
+
+Store transcript files in `public/transcripts/` and reference them within the
+UI.
+
+---
+
+## ✅ Best Practices
+
+### 1. Collaborate on Alt Text
+
+**Why:** The creator of the asset often knows nuances best.
+
+Pair with Avery or stakeholders to validate descriptions before publishing.
+
+### 2. Use Plain Language
+
+**Why:** Jargon-heavy captions reduce comprehension.
+
+Focus on the outcome or insight rather than tool names unless critical.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Repeating Nearby Body Copy
+
+**Problem:** Redundant alt text adds noise.
+
+**Fix:** Provide unique detail that complements the surrounding copy.
+
+### 2. Auto-Captions Without Review
+
+**Problem:** Automated captions misrepresent names or metrics.
+
+**Fix:** Download and edit caption files before uploading.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Draft alt text for all gallery assets using the framework above.
+2. Wrap at least two showcase images in `<figure>` + `<figcaption>`.
+3. Produce transcripts or summary notes for any audio/video assets.
+4. Update `docs/accessibility-manifesto.md` with media-specific success
+   criteria.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] All images have purposeful alt text documented in the inventory.
+-  [ ] Captions/transcripts exist for every media asset.
+-  [ ] Figures use `<figcaption>` to connect narrative and visuals.
+-  [ ] Accessibility documentation reflects media guidelines.
+
+---

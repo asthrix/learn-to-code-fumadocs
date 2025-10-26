@@ -1,0 +1,109 @@
+---
+title: "Performance Audits"
+description:
+   "Execute Lighthouse, WebPageTest, and Core Web Vitals reviews for launch."
+module: "M5"
+lesson: "6"
+difficulty: "advanced"
+duration: "40"
+project_phase: "Launch"
+prerequisites: ["/docs/html/m5/5_web-manifest"]
+learning_objectives:
+   - "Run performance audits across tooling"
+   - "Interpret metrics and prioritize remediation"
+   - "Log results and ownership in validation docs"
+tags: ["performance", "audits", "metrics"]
+---
+
+# Performance Audits
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Conduct Lighthouse, WebPageTest, and Core Web Vitals audits.
+-  [ ] Analyze opportunities and plan fixes for Portfolio Pulse.
+-  [ ] Record baselines and owners in documentation.
+
+## Why It Matters
+
+Launch readiness includes objective metrics. Regular audits protect user
+experience on slow networks and keep search rankings strong.
+
+---
+
+## Audit Stack
+
+1. **Lighthouse (lab)** — run in Chrome DevTools for desktop & mobile profiles.
+2. **WebPageTest** — capture filmstrips, waterfalls, and repeat view caching.
+3. **Chrome UX Report (CrUX)** — optional field data if URL already live.
+4. **Core Web Vitals** — focus on LCP, FID (or INP), CLS.
+
+Document scores, diagnostics, and before/after comparisons in
+`docs/validation-log.md` under Module 5.
+
+---
+
+## Reporting Template
+
+Add to `docs/validation-log.md`:
+
+```
+## Module 5 Performance Audit — 2025-10-25
+- Lighthouse Mobile: 96 (LCP 1.9s, CLS 0.01)
+- WebPageTest (Dulles 4G): LCP 2.2s, TTFB 0.45s, Speed Index 2.5s
+- Opportunities: Preload primary hero image, compress testimonial poster
+- Owner: You (preload), Avery (provide updated asset)
+- Follow-up: Re-run after asset optimization
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Test Authenticated Variants
+
+**Why:** Some pages behave differently when logged in.
+
+### 2. Capture Evidence
+
+**Why:** Screenshots and HAR files help future retros.
+
+Store evidence in `/docs/assets/perf/` or link to remote storage.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Ignoring Third-Party Scripts
+
+**Problem:** Analytics or embeds can dominate payload.
+
+**Fix:** Note third-party impact in audit and coordinate with stakeholders.
+
+### 2. Running Audits Once
+
+**Problem:** Metrics fluctuate; one run can mislead.
+
+**Fix:** Average multiple runs or rely on WebPageTest repeat tests.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Execute Lighthouse mobile/desktop audits; record scores and opportunities.
+2. Run WebPageTest with target device profile and note waterfall insights.
+3. Document action items in `docs/validation-log.md` with owners and due dates.
+4. Update `notes/module-5-plan.md` with remediation backlog for Module 5
+   implementation.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Performance audit entries completed with metrics and screenshots.
+-  [ ] Owners assigned for each opportunity.
+-  [ ] Follow-up dates documented.
+-  [ ] Retro log updated with key learnings.
+
+---

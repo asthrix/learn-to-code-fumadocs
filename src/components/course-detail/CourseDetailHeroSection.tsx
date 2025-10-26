@@ -12,11 +12,15 @@ export function CourseDetailHeroSection({
 }: CourseDetailHeroSectionProps) {
    return (
       <section className='relative overflow-hidden'>
-         <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.18),_transparent_60%)] dark:bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.28),_transparent_55%)]' />
-         <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(125deg,_rgba(15,23,42,0.08)_0%,_transparent_35%,_transparent_75%,_rgba(15,23,42,0.12)_100%)] dark:bg-[linear-gradient(125deg,_rgba(2,6,23,0.55)_0%,_transparent_40%,_transparent_70%,_rgba(2,6,23,0.75)_100%)]' />
-         <div className='pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(120deg,_transparent,_transparent_32px,hsl(var(--color-primary)/0.05)_32px,hsl(var(--color-primary)/0.05)_64px)] opacity-60 dark:opacity-40' />
+         {/* <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.18),_transparent_60%)] dark:bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.28),_transparent_55%)]' /> */}
+
+         {/* <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(125deg,_rgba(15,23,42,0.08)_0%,_transparent_35%,_transparent_75%,_rgba(15,23,42,0.12)_100%)] dark:bg-[linear-gradient(125deg,_rgba(2,6,23,0.55)_0%,_transparent_40%,_transparent_70%,_rgba(2,6,23,0.75)_100%)]' /> */}
+
+         {/* <div className='pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(120deg,_transparent,_transparent_32px,hsl(var(--color-primary)/0.05)_32px,hsl(var(--color-primary)/0.05)_64px)] opacity-60 dark:opacity-40' /> */}
+
          <div className='pointer-events-none absolute -top-28 left-[10%] h-64 w-64 rounded-full bg-primary/25 blur-3xl dark:bg-primary/30' />
-         <div className='pointer-events-none absolute bottom-[-6rem] right-[8%] h-[22rem] w-[22rem] rounded-full bg-secondary/25 blur-[140px] dark:bg-secondary/40' />
+
+         <div className='pointer-events-none absolute bottom-[10rem] right-[3%] h-[22rem] w-[22rem] rounded-full bg-secondary/40 blur-[140px] dark:bg-secondary/40' />
 
          <div className='relative mx-auto max-w-6xl px-6 pb-24 pt-28 lg:px-8 lg:pb-32 lg:pt-40'>
             <div className='mx-auto max-w-5xl text-center'>
@@ -26,12 +30,12 @@ export function CourseDetailHeroSection({
                </span>
 
                <h1 className='mt-8 text-4xl font-semibold leading-tight text-foreground sm:text-5xl lg:text-6xl'>
-                  {hero.title}{" "}
+                  <span className='relative bg-gradient-to-l from-primary from-0% via-50% via-primary/70  to-secondary to-80% bg-clip-text text-transparent drop-shadow-[0_0_22px_hsl(var(--color-primary)/0.95)]'>
+                     {hero.title}
+                  </span>
                   <span className='relative inline-flex items-center'>
                      <span className='absolute inset-y-0 left-0 right-0 rounded-full' />
-                     <span className='relative bg-gradient-to-r from-primary via-primary/80 to-secondary bg-clip-text text-transparent drop-shadow-[0_0_22px_hsl(var(--color-primary)/0.45)]'>
-                        {hero.highlight}
-                     </span>
+                     {hero.highlight}{" "}
                   </span>
                </h1>
 

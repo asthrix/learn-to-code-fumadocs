@@ -1,0 +1,187 @@
+---
+title: "Label Association & Instructions"
+description:
+   "Guarantee every form control is labeled, discoverable, and paired with
+   helpful guidance."
+module: "M2"
+lesson: "2"
+difficulty: "beginner"
+duration: "35"
+project_phase: "Lead capture"
+prerequisites: ["/docs/html/m2/1_forms-introduction"]
+learning_objectives:
+   - "Associate labels with form controls using `for` and `id`"
+   - "Use `aria-describedby` to connect hints and errors"
+   - "Provide instructions before interaction"
+   - "Document reusable label patterns"
+tags: ["forms", "labels", "accessibility"]
+---
+
+# Label Association & Instructions
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Associate form controls with visible labels.
+-  [ ] Connect hints and error messages using `aria-describedby`.
+-  [ ] Provide contextual instructions that reduce friction.
+-  [ ] Create reusable label components for future forms.
+
+## Project Context
+
+Labels and instructions are the backbone of accessible forms. They allow screen
+reader users to understand what information is required and why. Portfolio Pulse
+aims to convert busy professionals, so clarity drives completion rates.
+
+---
+
+## Associating Labels with Inputs
+
+### `label` + `for` Pattern
+
+Use `<label for="field-id">` with matching `id` on the input. This ensures focus
+and announcements align.
+
+### Hints and Help Text
+
+Use `<p id="field-hint">` and reference via `aria-describedby` for additional
+context.
+
+### Basic Example
+
+```html
+<label for="name">Your name</label>
+<input id="name" name="name" type="text" required />
+```
+
+### Practical Example
+
+```html
+<div class="form-field">
+   <label for="project-type">Which engagement are you exploring?</label>
+   <p id="project-type-hint" class="form-hint">
+      Choose the option that best matches your current need.
+   </p>
+   <select
+      id="project-type"
+      name="project-type"
+      aria-describedby="project-type-hint"
+      required
+   >
+      <option value="">Select...</option>
+      <option value="audit">UX audit & accessibility review</option>
+      <option value="sprint">Design sprint</option>
+      <option value="retainer">Product discovery engagement</option>
+   </select>
+</div>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Labels Visible
+
+**Why:** Placeholder-only forms disappear when users start typing and fail
+accessibility.
+
+```html
+<label for="email">Work email</label>
+<input id="email" name="email" type="email" placeholder="you@company.com" />
+```
+
+### 2. Group Related Controls with Fieldsets
+
+**Why:** `<fieldset>` and `<legend>` convey relationships between controls
+(e.g., radio groups).
+
+```html
+<fieldset>
+   <legend>Preferred meeting slots</legend>
+   <label><input type="radio" name="meeting" value="morning" /> Morning</label>
+   <label
+      ><input type="radio" name="meeting" value="afternoon" /> Afternoon</label
+   >
+</fieldset>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Relying on Placeholder as Label
+
+**Problem:** Placeholders vanish as soon as the user types, causing confusion.
+
+```html
+<input type="text" placeholder="Your name" />
+```
+
+**Solution:**
+
+```html
+<label for="name">Your name</label> <input id="name" name="name" type="text" />
+```
+
+### 2. Forgetting to Update `aria-describedby`
+
+**Problem:** Removing hints without updating references leaves broken ARIA
+relationships.
+
+```html
+<select aria-describedby="project-type-hint">
+   ...
+</select>
+<!-- but the hint element was deleted -->
+```
+
+**Solution:**
+
+```html
+Ensure referenced hint IDs exist and remain unique.
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Scaffold Labeled Fields
+
+1. Add labeled input fields for name, email, and project type in `index.html`
+   inside the `#contact` section.
+2. Provide hint text and use `aria-describedby` for additional instructions.
+3. Document label patterns in `docs/form-strategy.md` under a "UI Patterns"
+   heading.
+4. Commit with `git commit -am "feat: add labeled contact fields"`.
+
+#### Expected Result
+
+Your contact section now includes clearly labeled fields that set expectations
+and support assistive technologies.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Each input has a visible label connected via `for`/`id`.
+-  [ ] Hint text is referenced with `aria-describedby` where applicable.
+
+### Code Quality
+
+-  [ ] Fieldsets wrap radio or checkbox groups.
+-  [ ] IDs follow consistent naming (kebab or camel case).
+
+### Understanding
+
+-  [ ] You can explain why placeholders are not a substitute for labels.
+-  [ ] You know when to use `aria-describedby` vs `aria-labelledby`.
+
+### Project Integration
+
+-  [ ] Form strategy references the label patterns and IDs.
+-  [ ] Accessibility manifesto includes form labelling considerations.
+
+---

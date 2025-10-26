@@ -1,0 +1,203 @@
+---
+title: "Sharing Data with Context"
+description:
+   "Create a ListingsProvider that caches API data, exposes hooks, and prevents
+   prop drilling."
+module: "M3"
+lesson: "4"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Data"
+prerequisites: ["/docs/react-new/m3/3_loading-and-errors"]
+learning_objectives:
+   - "Build a React context provider for listings"
+   - "Expose a custom hook for consuming context data"
+   - "Avoid redundant network requests by centralising data"
+tags: ["context", "hooks", "state-management"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Sharing Data with Context
+
+`ListingSection` currently fetches data directly. As StaySense grows, other
+components (e.g., detail pages, saved lists) need the same data. We'll create a
+Listings context to share state cleanly.
+
+---
+
+## 1. Create the Context
+
+Add `src/context/ListingsContext.tsx`:
+
+```tsx
+import { createContext, useContext, useMemo, useState } from "react";
+import type { Listing } from "../data/listings";
+import { useListings } from "../hooks/useListings";
+
+type ListingsContextValue = {
+   listings: Listing[];
+   status: "idle" | "loading" | "success" | "error";
+   error: string | null;
+   refresh: () => void;
+};
+
+const ListingsContext = createContext<ListingsContextValue | null>(null);
+
+type ListingsProviderProps = {
+   children: React.ReactNode;
+   params: Record<string, unknown>;
+};
+
+export function ListingsProvider({ children, params }: ListingsProviderProps) {
+   const [refreshToken, setRefreshToken] = useState(() => Date.now());
+   const { data, status, error } = useListings(params, refreshToken);
+
+   const value = useMemo<ListingsContextValue>(
+      () => ({
+         listings: data,
+         status,
+         error,
+         refresh: () => setRefreshToken(Date.now()),
+      }),
+      [data, status, error]
+   );
+
+   return (
+      <ListingsContext.Provider value={value}>
+         {children}
+      </ListingsContext.Provider>
+   );
+}
+
+export function useListingsContext() {
+   const context = useContext(ListingsContext);
+   if (!context) {
+      throw new Error(
+         "useListingsContext must be used within a ListingsProvider"
+      );
+   }
+   return context;
+}
+```
+
+---
+
+## 2. Wrap the App
+
+In `App.tsx`, wrap components that need listings:
+
+```tsx
+<ListingsProvider
+   params={{
+      search,
+      maxPrice,
+      guests,
+      categories: activeCategories.includes("All") ? [] : activeCategories,
+   }}
+>
+   <ListingSection
+      savedListingIds={savedListingIds}
+      onToggleSave={handleToggleSave}
+      onCategoryChange={handleCategoryChange}
+      activeCategories={activeCategories}
+      search={search}
+      onSearchChange={setSearch}
+      maxPrice={maxPrice}
+      onMaxPriceChange={setMaxPrice}
+      guests={guests}
+      onGuestsChange={setGuests}
+   />
+</ListingsProvider>
+```
+
+---
+
+## 3. Consume Context in ListingSection
+
+```tsx
+import { useListingsContext } from "../context/ListingsContext";
+
+export function ListingSection(/* props */) {
+   const { listings, status, error, refresh } = useListingsContext();
+   // remove direct useListings call
+}
+```
+
+---
+
+## Task · Expose ListingsSummary Component
+
+1. Create `src/components/ListingsSummary.tsx` that reads from
+   `useListingsContext` and displays counts + retry options.
+2. Render `ListingsSummary` above the filter pills and include the refresh
+   button from the context.
+3. Ensure `ListingSection` no longer accepts `onCategoryChange` via context
+   (keep filters local) but uses context for data/resiliency.
+4. Commit with `git commit -am "refactor: add listings context provider"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      ```tsx
+      // src/components/ListingsSummary.tsx
+      import { useListingsContext } from "../context/ListingsContext";
+
+      export function ListingsSummary({ activeCategories }: { activeCategories: string[] }) {
+         const { listings, status, refresh } = useListingsContext();
+         const categoryCopy = activeCategories.includes("All")
+            ? "all collections"
+            : activeCategories.join(", ");
+
+         return (
+            <div className='flex flex-wrap items-center gap-3 text-xs text-slate-300'>
+               <span>
+                  {status === "loading" ? "Loading stays..." : `${listings.length} stays in ${categoryCopy}`}
+               </span>
+               {status === "error" && (
+                  <button
+                     type='button'
+                     onClick={refresh}
+                     className='rounded-full border border-emerald-400 px-3 py-1 text-emerald-200'
+                  >
+                     Retry
+                  </button>
+               )}
+            </div>
+         );
+      }
+      ```
+
+      ```tsx
+      // src/components/ListingSection.tsx
+      import { ListingsSummary } from "./ListingsSummary";
+      import { useListingsContext } from "../context/ListingsContext";
+
+      export function ListingSection(props: ListingSectionProps) {
+         const { listings, status, error, refresh } = useListingsContext();
+
+         return (
+            <section id='listings' className='bg-slate-900/60 py-16'>
+               <div className='mx-auto flex w-full max-w-5xl flex-col gap-8 px-6'>
+                  <ListingsSummary activeCategories={props.activeCategories} />
+                  {/* filters + grid using listings, status, error, refresh */}
+               </div>
+            </section>
+         );
+      }
+      ```
+
+      ```bash
+      git add src/context/ListingsContext.tsx src/components/ListingsSummary.tsx src/App.tsx src/components/ListingSection.tsx
+      git commit -m "refactor: add listings context provider"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Context provider wraps components needing listings.
+-  [ ] `useListingsContext` throws helpful error when misused.
+-  [ ] Data fetch occurs once per filter change, not per component.

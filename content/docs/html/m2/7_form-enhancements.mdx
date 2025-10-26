@@ -1,0 +1,234 @@
+---
+title: "Progressive Form Enhancements"
+description:
+   "Add honeypots, loading states, analytics hooks, and graceful fallbacks
+   without sacrificing accessibility."
+module: "M2"
+lesson: "7"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Lead capture"
+prerequisites: ["/docs/html/m2/6_contact-form-blueprint"]
+learning_objectives:
+   - "Implement anti-spam strategies like honeypots and rate limits"
+   - "Add loading indicators and disable states"
+   - "Instrument analytics events for submissions and errors"
+   - "Plan graceful degradation for users without JavaScript"
+tags: ["forms", "enhancements", "progressive-enhancement"]
+---
+
+# Progressive Form Enhancements
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Add honeypots and other non-intrusive spam prevention strategies.
+-  [ ] Provide loading indicators and disabled states during submission.
+-  [ ] Instrument analytics events for submission lifecycle tracking.
+-  [ ] Plan graceful degradation when JavaScript is unavailable.
+
+## Project Context
+
+Production forms need more than labels and validation. Enhancements protect
+against spam, improve perceived performance, and provide insights. The key is
+implementing them without harming accessibility or users with limited
+capabilities.
+
+---
+
+## Anti-Spam & Enhancements
+
+### Honeypot Field
+
+Add a visually hidden field that humans will ignore but bots may populate.
+Reject submissions when the honeypot has a value.
+
+### Loading States
+
+Disable submit button and show a spinner or text update while requests process.
+
+### Analytics Hooks
+
+Fire events (`form_view`, `form_submit`, `form_error`, `form_success`) to
+measure conversion performance.
+
+### Basic Example
+
+```html
+<input
+   type="text"
+   name="company-size"
+   tabindex="-1"
+   autocomplete="off"
+   class="visually-hidden"
+   aria-hidden="true"
+/>
+```
+
+### Practical Example
+
+```html
+<form id="contact-form" novalidate data-form>
+   <input
+      type="text"
+      name="company-size"
+      tabindex="-1"
+      autocomplete="off"
+      class="visually-hidden"
+      aria-hidden="true"
+   />
+   <!-- existing fields -->
+   <button type="submit" data-submit>Send message</button>
+</form>
+<div id="form-status" role="status" aria-live="polite"></div>
+<script type="module">
+   const form = document.querySelector('[data-form]');
+   const submitButton = form?.querySelector('[data-submit]');
+   const status = document.querySelector('#form-status');
+
+   const analytics = (eventName, payload = {}) => {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: eventName, ...payload });
+   };
+
+   form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      if (formData.get('company-size')) {
+         analytics('form_spam_detected');
+         return;
+      }
+      submitButton?.setAttribute('disabled', 'true');
+      submitButton?.setAttribute('aria-busy', 'true');
+      status!.textContent = 'Submitting...';
+      analytics('form_submit_attempt');
+      try {
+         await fetch('/api/contact', { method: 'POST', body: formData });
+         status!.textContent = 'Thanks! We will respond within 48 hours.';
+         analytics('form_submit_success');
+         form.reset();
+      } catch (error) {
+         status!.textContent = 'Something went wrong. Please retry or email us directly.';
+         analytics('form_submit_error', { message: String(error) });
+      } finally {
+         submitButton?.removeAttribute('disabled');
+         submitButton?.removeAttribute('aria-busy');
+      }
+   });
+</script>
+```
+
+---
+
+## ✅ Best Practices
+
+### 1. Keep Honeypots Hidden but Accessible
+
+**Why:** Use visually hidden classes instead of `display:none` to keep fields in
+the DOM for bots.
+
+```css
+.visually-hidden {
+   position: absolute;
+   width: 1px;
+   height: 1px;
+   padding: 0;
+   margin: -1px;
+   overflow: hidden;
+   clip: rect(0, 0, 0, 0);
+   white-space: nowrap;
+   border: 0;
+}
+```
+
+### 2. Offer Email Alternative in Error Messages
+
+**Why:** If automation fails, visitors should still reach you.
+
+```html
+<p role="status">Email hello@averystone.design if the form is down.</p>
+```
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Blocking Submission on Client Errors Without Fallback
+
+**Problem:** Users without JavaScript cannot submit.
+
+```html
+<form id="contact-form">...</form>
+<script>
+   /* prevents default without fallback */
+</script>
+```
+
+**Solution:**
+
+```html
+<form action="/contact" method="post" data-enhanced>
+   <!-- JS attaches to enhance, but server still handles default submission -->
+</form>
+```
+
+### 2. Forgetting to Reset Disabled State
+
+**Problem:** Submit button stays disabled after an error.
+
+```js
+submitButton.disabled = true; // never reset
+```
+
+**Solution:**
+
+```js
+finally {
+   submitButton.removeAttribute('disabled');
+}
+```
+
+---
+
+## 🔨 Implement in Portfolio Pulse
+
+### Task: Add Enhancements Stubs
+
+1. Add a honeypot field to the form (named something innocuous) and note the
+   server-side check required.
+2. Include loading text or spinner placeholder in the status element.
+3. Document planned analytics events and dataLayer schema in
+   `docs/form-strategy.md`.
+4. Commit with `git commit -am "feat: plan form enhancements"`.
+
+#### Expected Result
+
+Your form is ready for progressive enhancement, instrumentation, and spam
+protection without harming accessibility.
+
+---
+
+## ✅ Validation Checklist
+
+### Functionality
+
+-  [ ] Honeypot field exists and is hidden visually but not removed from DOM.
+-  [ ] Submit button disables and re-enables correctly in scripts.
+
+### Code Quality
+
+-  [ ] Analytics hooks named consistently (`form_` prefix).
+-  [ ] Enhancement documentation includes fallback instructions.
+
+### Understanding
+
+-  [ ] You can explain how spam prevention works.
+-  [ ] You know how the form behaves without JavaScript.
+
+### Project Integration
+
+-  [ ] Form strategy updated with enhancement details.
+-  [ ] Accessibility manifesto references graceful degradation.
+
+---

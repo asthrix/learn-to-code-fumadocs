@@ -1,0 +1,228 @@
+---
+title: "Fetching Listings from the Mock API"
+description:
+   "Configure Axios with the provided mock adapter, seed data, and request
+   listings."
+module: "M3"
+lesson: "2"
+difficulty: "intermediate"
+duration: "40"
+project_phase: "Data"
+prerequisites: ["/docs/react-new/m3/1_effect-basics"]
+learning_objectives:
+   - "Configure Axios + Mock Adapter mirroring the technical guide"
+   - "Seed the mock database on app load"
+   - "Request listings with filters and handle responses"
+tags: ["api", "axios", "mock-data"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Fetching Listings from the Mock API
+
+Project React ships with a mock backend built using Axios Mock Adapter. We'll
+replicate the essentials so StaySense can fetch remote data without a live
+server.
+
+---
+
+## 1. Create the API Client
+
+Add `src/api/client.ts`:
+
+```tsx
+import axios from "axios";
+import MockAdapter from "axios-mock-adapter";
+import { registerListingMocks } from "./mocks/listings";
+
+const api = axios.create({
+   baseURL: "http://localhost:5173",
+});
+
+const mock = new MockAdapter(api, { delayResponse: 800 });
+registerListingMocks(mock);
+
+export { api };
+```
+
+---
+
+## 2. Define Listing Mocks
+
+Create `src/api/mocks/listings.ts`:
+
+```tsx
+import type { MockAdapter } from "axios-mock-adapter";
+import { seedListings } from "../seed";
+
+let listings = seedListings();
+
+export function registerListingMocks(mock: MockAdapter) {
+   mock.onGet("/api/listings").reply((config) => {
+      const params = config.params ?? {};
+      const search = String(params.search ?? "").toLowerCase();
+      const maxPrice = Number(params.maxPrice ?? 10000);
+      const guests = Number(params.guests ?? 1);
+      const categories = Array.isArray(params.categories)
+         ? params.categories
+         : params.categories
+         ? [params.categories]
+         : [];
+
+      const results = listings
+         .filter((listing) => listing.pricePerNight <= maxPrice)
+         .filter((listing) => listing.maxGuests >= guests)
+         .filter((listing) =>
+            categories.length && !categories.includes("All")
+               ? categories.includes(listing.category)
+               : true
+         )
+         .filter((listing) =>
+            search
+               ? listing.name.toLowerCase().includes(search) ||
+                 listing.location.toLowerCase().includes(search)
+               : true
+         );
+
+      return [200, results];
+   });
+}
+```
+
+---
+
+## 3. Seed Data
+
+Create `src/api/seed.ts` to mirror the documentation's seeding strategy:
+
+```tsx
+import { featuredListings } from "../data/listings";
+
+export function seedListings() {
+   return featuredListings.map((listing, index) => ({
+      ...listing,
+      id: index + 1,
+      createdAt: new Date().toISOString(),
+   }));
+}
+```
+
+In a larger app you would read from `localStorage` and only seed when empty, as
+outlined in the course docs. For Launchpad we reuse the static dataset.
+
+---
+
+## 4. Create a useListings Hook
+
+Add `src/hooks/useListings.ts`:
+
+```tsx
+import { useEffect, useState } from "react";
+import { api } from "../api/client";
+import type { Listing } from "../data/listings";
+
+export function useListings(params: Record<string, unknown>) {
+   const [data, setData] = useState<Listing[]>([]);
+   const [status, setStatus] = useState<
+      "idle" | "loading" | "success" | "error"
+   >("idle");
+   const [error, setError] = useState<string | null>(null);
+
+   useEffect(() => {
+      let isMounted = true;
+      const controller = new AbortController();
+
+      async function fetchListings() {
+         setStatus("loading");
+         setError(null);
+         try {
+            const response = await api.get<Listing[]>("/api/listings", {
+               params,
+               signal: controller.signal,
+            });
+            if (isMounted) {
+               setData(response.data);
+               setStatus("success");
+            }
+         } catch (fetchError) {
+            if (!isMounted) return;
+            if (controller.signal.aborted) return;
+            setError(
+               fetchError instanceof Error
+                  ? fetchError.message
+                  : "Failed to load listings"
+            );
+            setStatus("error");
+         }
+      }
+
+      fetchListings();
+      return () => {
+         isMounted = false;
+         controller.abort();
+      };
+   }, [params.search, params.maxPrice, params.guests, params.categories]);
+
+   return { data, status, error };
+}
+```
+
+Note the abort controller: it prevents state updates when the component unmounts
+or filters change quickly.
+
+---
+
+## Task · Replace Static Data with useListings
+
+1. In `ListingSection`, call `useListings` and pass current filters.
+2. Swap `featuredListings` for the returned `data` array.
+3. Show total results using `data.length`.
+4. Commit with `git commit -am "feat: fetch listings from mock api"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Walkthrough'>
+      ```tsx
+      import { useListings } from "../hooks/useListings";
+
+      export function ListingSection({
+         savedListingIds,
+         onToggleSave,
+         activeCategories,
+         onCategoryChange,
+         search,
+         onSearchChange,
+         maxPrice,
+         onMaxPriceChange,
+         guests,
+         onGuestsChange,
+      }: ListingSectionProps) {
+         const categoriesParam = activeCategories.includes("All")
+            ? []
+            : activeCategories;
+
+         const { data: listings, status, error } = useListings({
+            search,
+            maxPrice,
+            guests,
+            categories: categoriesParam,
+         });
+
+         /* render logic now uses listings */
+      }
+      ```
+
+      ```bash
+      git add src/api/client.ts src/api/mocks/listings.ts src/api/seed.ts src/hooks/useListings.ts src/components/ListingSection.tsx
+      git commit -m "feat: fetch listings from mock api"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Axios client configured with mock adapter and delay.
+-  [ ] `useListings` handles loading, success, and error states.
+-  [ ] Static featured listings replaced by API data.

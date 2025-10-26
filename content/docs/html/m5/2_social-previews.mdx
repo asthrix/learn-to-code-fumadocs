@@ -1,0 +1,143 @@
+---
+title: "Social Previews"
+description:
+   "Craft Open Graph and Twitter Card metadata that generates compelling share
+   cards."
+module: "M5"
+lesson: "2"
+difficulty: "advanced"
+duration: "40"
+project_phase: "Launch"
+prerequisites: ["/docs/html/m5/1_metadata-strategy"]
+learning_objectives:
+   - "Implement Open Graph and Twitter metadata"
+   - "Export share images that meet platform specifications"
+   - "Validate previews across major networks"
+tags: ["metadata", "social", "open-graph"]
+---
+
+# Social Previews
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Configure Open Graph and Twitter Card metadata for Portfolio Pulse.
+-  [ ] Produce performant share images in multiple aspect ratios.
+-  [ ] Validate previews using platform debugging tools.
+
+## Why It Matters
+
+Share cards are often your first impression. Misconfigured metadata leads to
+blurry images, broken descriptions, or zero engagement on social platforms.
+
+---
+
+## Core Metadata Block
+
+```html
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Avery Rivera · Product Design Leader" />
+<meta
+   property="og:description"
+   content="Product designer helping teams ship inclusive experiences that convert."
+/>
+<meta property="og:url" content="https://avery.dev/" />
+<meta
+   property="og:image"
+   content="https://avery.dev/social/portfolio-pulse-1200x630.jpg"
+/>
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Avery Rivera · Product Design Leader" />
+<meta
+   name="twitter:description"
+   content="Product designer helping teams ship inclusive experiences that convert."
+/>
+<meta
+   name="twitter:image"
+   content="https://avery.dev/social/portfolio-pulse-1200x600.jpg"
+/>
+<meta name="twitter:creator" content="@averydesigns" />
+```
+
+Use absolute URLs to prevent crawler confusion.
+
+---
+
+## Share Image Production
+
+Export at least two variants:
+
+| Platform   | Dimensions | Max Size | Notes                  |
+| ---------- | ---------- | -------- | ---------------------- |
+| Open Graph | 1200×630   | ≤ 400 KB | Use PNG for sharp text |
+| Twitter    | 1200×600   | ≤ 5 MB   | Keep safe area margins |
+
+Store files in `public/social/` and document filenames in
+`docs/metadata-playbook.md`.
+
+---
+
+## Validation Workflow
+
+-  Facebook Sharing Debugger
+-  LinkedIn Post Inspector
+-  X (Twitter) Card Validator
+-  Slack block kit builder (for internal previews)
+
+Record validation screenshots and notes in `docs/validation-log.md` under
+Module 5.
+
+---
+
+## ✅ Best Practices
+
+### 1. Localize Copy Where Needed
+
+**Why:** Social posts adapt to different markets.
+
+Document localized strings in `docs/content-inventory.md` for future use.
+
+### 2. Version Share Images
+
+**Why:** Cached images stick around.
+
+Add query params like `?v=2025-10` when updating assets.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Mixing Relative URLs
+
+**Problem:** Crawlers resolve incorrectly and return 404.
+
+### 2. Forgetting `og:type`
+
+**Problem:** Some networks default to `article`, altering layout.
+
+**Fix:** Set `website` for landing pages or `article` for posts intentionally.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Add Open Graph and Twitter metadata to the site head template.
+2. Export share images aligned with brand guidelines.
+3. Document asset locations and update cadence in `docs/metadata-playbook.md`.
+4. Log validator screenshots and follow-ups in `docs/validation-log.md`.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Open Graph and Twitter metadata present with absolute URLs.
+-  [ ] Share images optimized and documented.
+-  [ ] Validation logs updated with tool screenshots.
+-  [ ] Stakeholder approval recorded in notes.
+
+---

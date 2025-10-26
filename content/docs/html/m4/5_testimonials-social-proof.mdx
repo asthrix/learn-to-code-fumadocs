@@ -1,0 +1,146 @@
+---
+title: "Testimonials & Social Proof"
+description:
+   "Mark up quotes, endorsements, and logos ethically with clear attribution."
+module: "M4"
+lesson: "5"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Credibility"
+prerequisites: ["/docs/html/m4/4_timelines-metrics"]
+learning_objectives:
+   - "Structure testimonials with `<blockquote>` and `<cite>`"
+   - "Handle attribution, consent, and optional headshots"
+   - "Plan governance for refreshing testimonials and logos"
+tags: ["testimonials", "blockquote", "credibility"]
+---
+
+# Testimonials & Social Proof
+
+## Learning Objectives
+
+By the end of this lesson, you will:
+
+-  [ ] Present quotes with proper attribution and consent notes.
+-  [ ] Integrate optional headshots or logos without harming accessibility.
+-  [ ] Update documentation for testimonial refresh cadence.
+
+## Why It Matters
+
+Testimonials are powerful—but only when they are trustworthy. Semantic markup
+and governance keep praise credible and compliant with privacy agreements.
+
+---
+
+## Testimonial Pattern
+
+```html
+<figure class="testimonial" aria-labelledby="testimonial-jamie">
+   <blockquote>
+      <p>
+         "Avery translated complex research into actionable strategy within two
+         weeks, unlocking a 6-month roadmap our team fully embraced."
+      </p>
+   </blockquote>
+   <figcaption id="testimonial-jamie">
+      <div class="attribution">
+         <img
+            src="/images/headshots/jamie-taylor.jpg"
+            alt="Portrait of Jamie Taylor"
+            width="80"
+            height="80"
+            loading="lazy"
+         />
+         <p>
+            <span class="name">Jamie Taylor</span>
+            <span class="role">VP of Product, FluxHealth</span>
+         </p>
+      </div>
+      <cite>Excerpt from 2025 partnership retrospective</cite>
+   </figcaption>
+</figure>
+```
+
+### Accessibility Notes
+
+-  Provide `alt` text for headshots describing the person, not the photo style.
+-  Use `<cite>` for the source (report, talk, interview).
+-  Include consent metadata in `docs/testimonial-consent.md` with approval date.
+
+---
+
+## Logo or Badge Wall
+
+Use lists to present client logos with accessible text.
+
+```html
+<ul class="logo-list">
+   <li>
+      <img
+         src="/logos/fluxhealth.svg"
+         alt="FluxHealth"
+         width="120"
+         height="40"
+      />
+   </li>
+   <li>
+      <img src="/logos/northbank.svg" alt="Northbank" width="120" height="40" />
+   </li>
+</ul>
+```
+
+Avoid using logos without permission; document agreements in the consent file.
+
+---
+
+## ✅ Best Practices
+
+### 1. Rotate Testimonials Periodically
+
+**Why:** Keeps content fresh and accurate.
+
+Set a reminder in `docs/data-sources.md` with `refresh_cadence` entries.
+
+### 2. Provide Text Alternatives for Logos
+
+**Why:** Logos alone are meaningless to screen readers.
+
+Use `alt` text with the brand name or descriptive label.
+
+---
+
+## ❌ Common Mistakes
+
+### 1. Using `<q>` for Multi-Sentence Quotes
+
+**Problem:** Inline quotes break semantics.
+
+**Fix:** Use `<blockquote>` with `<p>` elements inside.
+
+### 2. Forgetting Consent Logs
+
+**Problem:** Testimonials may be retracted or time-bound.
+
+**Fix:** Track consent status, expiration, and contact info in the consent doc.
+
+---
+
+## 🔍 Portfolio Pulse Action Items
+
+1. Draft testimonial markup with attribution, headshot (optional), and citation.
+2. Build a logo wall or alternative social proof pattern approved by Avery.
+3. Create/update `docs/testimonial-consent.md` with permissions and expiry
+   dates.
+4. Log analytics hooks (e.g., `data-cta="testimonial-contact"`) in
+   `docs/state-architecture.md`.
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Testimonials use `<blockquote>` and `<cite>` with accurate attribution.
+-  [ ] Headshots and logos include descriptive `alt` text.
+-  [ ] Consent documentation updated with approval dates.
+-  [ ] Component tested for keyboard and screen reader navigation.
+
+---

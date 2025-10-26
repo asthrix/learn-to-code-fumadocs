@@ -1,0 +1,17 @@
+{
+   "title": "M0 · Foundation Blueprint",
+   "pages": [
+      "0_index",
+      "1_welcome",
+      "2_project-brief",
+      "3_document-anatomy",
+      "4_text-semantics",
+      "5_navigation-patterns",
+      "6_metadata-basics",
+      "7_accessibility-first",
+      "8_bootstrap-workspace",
+      "9_implementation",
+      "10_validation"
+   ],
+   "defaultOpen": false
+}

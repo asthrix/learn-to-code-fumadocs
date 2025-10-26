@@ -1,0 +1,123 @@
+---
+title: "Polish & Accessibility"
+description:
+   "Run accessibility checks, improve keyboard flows, and add SEO/meta polish."
+module: "M4"
+lesson: "3"
+difficulty: "intermediate"
+duration: "35"
+project_phase: "Launch"
+prerequisites: ["/docs/react-new/m4/2_detail-page"]
+learning_objectives:
+   - "Run quick accessibility audits and address issues"
+   - "Ensure focus management and skip links"
+   - "Add metadata for social sharing"
+tags: ["accessibility", "seo", "polish"]
+---
+
+import { Accordions, Accordion } from "@/components/accordion";
+
+# Polish & Accessibility
+
+StaySense is nearly launch-ready. This lesson ensures inclusive experiences and
+adds metadata for discoverability.
+
+---
+
+## 1. Add Skip Link & Focus Styles
+
+```tsx
+// src/components/Header.tsx
+export function Header({ savedCount = 0 }: { savedCount?: number }) {
+   return (
+      <>
+         <a
+            href='#main-content'
+            className='absolute left-4 top-4 z-50 -translate-y-20 rounded-full bg-emerald-400 px-4 py-2 text-sm font-medium text-emerald-950 focus:translate-y-0'
+         >
+            Skip to content
+         </a>
+         {/* existing header */}
+      </>
+   );
+}
+```
+
+Ensure global styles include visible focus outlines:
+
+```css
+:focus-visible {
+   outline: 2px solid #34d399;
+   outline-offset: 4px;
+}
+```
+
+---
+
+## 2. Audit with Lighthouse
+
+In Chrome DevTools → Lighthouse → Accessibility. Note any failures and address
+contrast, ARIA, or semantics.
+
+Common fixes:
+
+-  Add `aria-label` for icon-only buttons.
+-  Ensure `img` elements have descriptive alt text.
+-  Provide heading hierarchy (H1, H2, etc.).
+
+---
+
+## 3. Add Metadata & Open Graph Image
+
+Create `public/og-image.png` (use a mock for now). In `index.html`, add:
+
+```html
+<meta
+   name="description"
+   content="StaySense helps you find boutique stays with curated filters."
+/>
+<meta property="og:title" content="StaySense · Boutique stays" />
+<meta
+   property="og:description"
+   content="Filter, save, and explore character-rich rentals."
+/>
+<meta property="og:image" content="/og-image.png" />
+<meta name="twitter:card" content="summary_large_image" />
+```
+
+Update document title dynamically via a shared hook if desired.
+
+---
+
+## Task · Fix Three Accessibility Issues
+
+1. Run Lighthouse and list at least three issues.
+2. Fix them (e.g., button contrast, missing labels, skip link, heading order).
+3. Document fixes in `docs/accessibility-audit.md` with before/after notes.
+4. Commit with `git commit -am "chore: improve accessibility and metadata"`.
+
+<Accordions type='single' className='mt-4'>
+   <Accordion title='Solution Outline'>
+      ```md
+      # Accessibility Audit
+
+      - **Issue:** Buttons missing focus outlines → Added :focus-visible styles in global CSS.
+      - **Issue:** Skip link absent → Added visually hidden skip link to header.
+      - **Issue:** Detail page lacked h1 → Promoted listing name to h1 and adjusted hierarchy.
+      ```
+
+      ```bash
+      git add src/components/Header.tsx src/index.css index.html docs/accessibility-audit.md
+      git commit -m "chore: improve accessibility and metadata"
+      ```
+
+   </Accordion>
+</Accordions>
+
+---
+
+## ✅ Validation Checklist
+
+-  [ ] Lighthouse accessibility score ≥ 90.
+-  [ ] Skip link and focus outlines visible.
+-  [ ] Meta tags present with valid OG image path.
