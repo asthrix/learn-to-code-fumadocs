@@ -1,0 +1,361 @@
+---
+title: "Module 0: Getting Started with JavaScript"
+description:
+   "Learn the fundamentals of JavaScript, set up your development environment,
+   and build your first interactive web application."
+module: "M0"
+lesson: "0"
+difficulty: "beginner"
+duration: "45"
+project_phase: "Foundation Setup"
+learning_objectives:
+   - "Understand what JavaScript is and why it's essential"
+   - "Set up a modern JavaScript development environment"
+   - "Write your first JavaScript program"
+   - "Learn the basics of the DOM and browser console"
+tags: ["introduction", "setup", "fundamentals", "console"]
+---
+
+import { Steps, Step } from "@/components/steps";
+import { Accordions, Accordion } from "@/components/accordion";
+import { Tabs, Tab } from "@/components/tabs";
+
+# Module 0: Getting Started with JavaScript
+
+## Overview
+
+Welcome to JavaScript Essentials! In this module, you'll set up your development
+environment and write your first JavaScript code. By the end, you'll understand
+how JavaScript powers interactive websites and have a solid foundation for the
+rest of the course.
+
+## What You'll Build
+
+Throughout this course, you'll build **TaskFlow** - a modern, interactive task
+management application. In this module, you'll:
+
+-  Set up your development workspace
+-  Create the project structure
+-  Write your first JavaScript interactions
+-  Learn browser developer tools
+
+## Learning Path
+
+<Steps>
+<Step>
+### Course Introduction
+Understand the course structure, project goals, and what you'll achieve by the end.
+</Step>
+
+<Step>
+   ### Development Environment Setup Install necessary tools and configure your
+   workspace for JavaScript development.
+</Step>
+
+<Step>
+   ### JavaScript Basics Learn variables, data types, and basic syntax through
+   hands-on examples.
+</Step>
+
+<Step>
+   ### Browser Console & Debugging Master the browser console for testing and
+   debugging JavaScript code.
+</Step>
+
+<Step>
+### Project Bootstrap
+Create the TaskFlow project structure and initial files.
+</Step>
+</Steps>
+
+## Module Contents
+
+<Accordions>
+<Accordion title="What is JavaScript?">
+
+JavaScript is the programming language of the web. It enables:
+
+-  **Interactivity**: Respond to user clicks, typing, and gestures
+-  **Dynamic Content**: Update page content without reloading
+-  **Data Manipulation**: Process and display information
+-  **API Communication**: Fetch data from servers and external services
+
+```js
+// A simple interactive example
+const button = document.querySelector("#myButton");
+button.addEventListener("click", () => {
+   alert("You clicked the button!");
+});
+```
+
+</Accordion>
+
+<Accordion title="Why Learn JavaScript?">
+
+**Career Opportunities**
+
+-  Most in-demand programming language
+-  Frontend, backend (Node.js), and mobile development (React Native)
+-  Competitive salaries and remote work options
+
+**Powerful Ecosystem**
+
+-  Massive library and framework ecosystem (React, Vue, Angular)
+-  Active community and extensive learning resources
+-  Continuous evolution with new features (ES2024+)
+
+**Universal Platform**
+
+-  Runs in every modern browser
+-  Powers server applications with Node.js
+-  Build desktop apps with Electron
+
+</Accordion>
+
+<Accordion title="Course Project: TaskFlow">
+
+**TaskFlow** is a modern task management application featuring:
+
+-  ✅ Create, edit, and delete tasks
+-  🎨 Beautiful, responsive interface
+-  💾 Local storage for data persistence
+-  🔍 Search and filter functionality
+-  📊 Statistics and progress tracking
+-  🌓 Dark/light theme support
+
+**Technologies Used:**
+
+-  Vanilla JavaScript (ES6+)
+-  Modern DOM APIs
+-  CSS Grid & Flexbox
+-  Local Storage API
+-  Fetch API for future enhancements
+
+</Accordion>
+
+<Accordion title="Module Structure">
+
+Each module follows a consistent pattern:
+
+1. **Introduction**: Context and learning objectives
+2. **Concepts**: Detailed explanations with examples
+3. **Implementation**: Step-by-step coding exercises
+4. **Validation**: Checklists to verify understanding
+5. **Project Integration**: Apply concepts to TaskFlow
+
+**Time Investment:**
+
+-  Module 0: ~45 minutes
+-  Average Module: 2-3 hours
+-  Total Course: 30-35 hours
+
+</Accordion>
+</Accordions>
+
+## Prerequisites
+
+<Tabs items={["Required", "Recommended", "Optional"]}>
+<Tab value="Required">
+
+**Essential Knowledge:**
+
+-  HTML fundamentals (elements, attributes, structure)
+-  CSS basics (selectors, properties, box model)
+-  Text editor usage (VS Code recommended)
+-  Basic computer file management
+
+**If you need a refresher:**
+
+-  Complete our HTML Fundamentals course
+-  Review CSS basics in our CSS Mastery course
+
+</Tab>
+
+<Tab value="Recommended">
+
+**Helpful Background:**
+
+-  Understanding of how websites work
+-  Basic command line familiarity
+-  Git version control basics
+-  Problem-solving mindset
+
+**These will make learning easier but aren't strictly required.**
+
+</Tab>
+
+<Tab value="Optional">
+
+**Nice to Have:**
+
+-  Experience with any programming language
+-  Familiarity with developer tools
+-  Basic understanding of algorithms
+-  Previous web development experience
+
+</Tab>
+</Tabs>
+
+## Development Environment
+
+### Required Tools
+
+<Steps>
+<Step>
+
+**Code Editor: Visual Studio Code**
+
+-  Download from [code.visualstudio.com](https://code.visualstudio.com)
+-  Free, powerful, and industry-standard
+
+**Recommended Extensions:**
+
+-  ESLint (code quality)
+-  Prettier (code formatting)
+-  Live Server (local development server)
+-  JavaScript (ES6) code snippets
+
+</Step>
+
+<Step>
+
+**Modern Web Browser**
+
+-  Chrome (recommended) or Firefox
+-  Built-in Developer Tools
+-  JavaScript console access
+-  Network and performance monitoring
+
+</Step>
+
+<Step>
+
+**Optional but Helpful:**
+
+-  Node.js (for package management later)
+-  Git (for version control)
+-  GitHub account (for project hosting)
+
+</Step>
+</Steps>
+
+## Learning Approach
+
+### How This Course Works
+
+**Project-Based Learning**
+
+-  Build a real application from scratch
+-  Each lesson adds new features
+-  See immediate results in your browser
+
+**Incremental Complexity**
+
+-  Start with simple concepts
+-  Build on previous knowledge
+-  Gradual progression to advanced topics
+
+**Hands-On Practice**
+
+-  Write code in every lesson
+-  Immediate feedback and debugging
+-  Learn by doing, not just reading
+
+### Getting Help
+
+<Accordions>
+<Accordion title="When You're Stuck">
+
+1. **Read the error message** - Often tells you what's wrong
+2. **Check the console** - See JavaScript errors and logs
+3. **Review the code** - Compare with lesson examples
+4. **Search online** - MDN, Stack Overflow, and Google
+5. **Ask for help** - Community forums and Discord
+
+</Accordion>
+
+<Accordion title="Best Practices from Day One">
+
+```js
+// ✅ Good: Clear variable names
+const taskTitle = "Complete JavaScript course";
+const isCompleted = false;
+
+// ❌ Bad: Unclear abbreviations
+const tt = "Complete JavaScript course";
+const c = false;
+
+// ✅ Good: Comments for complex logic
+// Calculate completion percentage (completed / total * 100)
+const completionRate = (completedTasks / totalTasks) * 100;
+
+// ❌ Bad: No context for future readers
+const cr = (ct / tt) * 100;
+```
+
+</Accordion>
+
+<Accordion title="Common Beginner Mistakes">
+
+**1. Forgetting Semicolons**
+
+```js
+// Be consistent with your style
+const name = "TaskFlow"; // ✅ with semicolon
+const version = "1.0"; // ⚠️ works but inconsistent
+```
+
+**2. Case Sensitivity**
+
+```js
+const myVariable = "hello";
+console.log(MyVariable); // ❌ Error: MyVariable is not defined
+console.log(myVariable); // ✅ Correct
+```
+
+**3. Not Checking the Console**
+
+```js
+// Always check for errors!
+console.log("Debug: Starting function");
+// ... your code
+console.log("Debug: Function completed");
+```
+
+</Accordion>
+</Accordions>
+
+## Next Steps
+
+Ready to start? In the next lesson, we'll set up your development environment
+and write your first JavaScript code!
+
+<div className='flex justify-between mt-8'>
+   <div></div>
+   <a
+      href='/docs/javascript/m0/1_welcome'
+      className='text-blue-600 hover:text-blue-800 font-medium'
+   >
+      Next: Welcome to JavaScript →
+   </a>
+</div>
+
+---
+
+## Quick Reference
+
+### Essential Resources
+
+-  **MDN JavaScript Guide**:
+   [developer.mozilla.org/JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+-  **JavaScript.info**: Modern tutorial with interactive examples
+-  **Can I Use**: Check browser compatibility
+-  **VS Code Docs**: Learn editor shortcuts and features
+
+### Keyboard Shortcuts (VS Code)
+
+-  `Cmd/Ctrl + /` - Toggle comment
+-  `Cmd/Ctrl + S` - Save file
+-  `Cmd/Ctrl + Shift + P` - Command palette
+-  `Cmd/Ctrl + B` - Toggle sidebar
+-  `Option/Alt + Shift + F` - Format document
