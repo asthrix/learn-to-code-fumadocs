@@ -3,17 +3,11 @@ title: "Understanding React"
 description: "Learn what React is, how it works, and why it's so popular"
 ---
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Steps, Step } from "@/components/steps";
-import { Accordions, Accordion } from "@/components/accordion";
-import { CodeBlock } from "@/components/codeblock";
-
 # Understanding React
 
-<div className='flex gap-2 mb-4'>
+<div className='flex gap-2 mb-4 flex-wrap'>
    <Badge variant='primary'>Lesson 3 of 5</Badge>
-   <Badge variant='default'>4 min read</Badge>
+   <Badge>4 min read</Badge>
 </div>
 
 Let's understand what React is, how it works, and why it's become the most
@@ -30,8 +24,7 @@ how we build web applications.
 **1. Declarative** You describe what the UI should look like, and React figures
 out how to update it.
 
-<CodeBlock title="Example: Declarative vs Imperative" language="jsx">
-```jsx
+```jsx title="Example: Declarative vs Imperative"
 // Imperative (without React)
 const button = document.createElement('button');
 button.textContent = 'Click me';
@@ -42,27 +35,27 @@ document.body.appendChild(button);
 
 <button onClick={handleClick}>Click me</button>
 ```
-</CodeBlock>
 
 **2. Component-Based** Build encapsulated components that manage their own
 state, then compose them to create complex UIs.
 
-<CodeBlock title="Example: Component Composition" language="jsx">
-```jsx
+```jsx title="Example: Component Composition"
 // Small, reusable components
 function Button({ children, onClick }) {
   return <button onClick={onClick}>{children}</button>;
 }
 
 function Card({ title, content }) { return ( <div> <h2>{title}</h2>
+
 <p>{content}</p> </div> ); }
 
 // Compose them together function App() { return (
-<Card title="Welcome" content="Hello React!"> <Button onClick={() =>
-alert('Clicked!')}> Click me </Button> </Card> ); }
 
-````
-</CodeBlock>
+<Card title='Welcome' content='Hello React!'>
+   {" "}
+   <Button onClick={() => alert("Clicked!")}> Click me </Button>{" "}
+</Card> ); }
+```
 
 **3. Learn Once, Write Anywhere**
 Use React for web (React DOM), mobile (React Native), desktop, VR, and more.
@@ -93,7 +86,6 @@ Use React for web (React DOM), mobile (React Native), desktop, VR, and more.
 
 ### The Virtual DOM
 
-<CodeBlock title="How React Updates the UI" language="jsx">
 ```jsx
 // 1. Initial render
 <div>
@@ -113,7 +105,6 @@ Use React for web (React DOM), mobile (React Native), desktop, VR, and more.
 // 5. React updates ONLY the <h1> in real DOM
 ````
 
-</CodeBlock>
 
 This makes React incredibly fast, even with complex UIs.
 
@@ -123,7 +114,6 @@ This makes React incredibly fast, even with complex UIs.
 
 JSX is a syntax extension that lets you write HTML-like code in JavaScript.
 
-<CodeBlock title="JSX Example" language="jsx">
 ```jsx
 // This JSX:
 const element = <h1>Hello, {name}!</h1>;
@@ -132,7 +122,6 @@ const element = <h1>Hello, {name}!</h1>;
 name, '!' );
 
 ````
-</CodeBlock>
 
 **Why JSX?**
 - Easier to read and write than `createElement` calls
@@ -144,7 +133,6 @@ name, '!' );
 
 Components are reusable pieces of UI. Think of them as custom HTML elements.
 
-<CodeBlock title="Types of Components" language="jsx">
 ```jsx
 // Functional Component (Modern)
 function Welcome(props) {
@@ -160,13 +148,11 @@ const Welcome = (props) => {
 <Welcome name="Sarah" />
 ````
 
-</CodeBlock>
 
 ### 3. Props
 
 Props (properties) are how you pass data to components.
 
-<CodeBlock title="Props Example" language="jsx">
 ```jsx
 // Define component that accepts props
 function UserCard({ name, age, avatar }) {
@@ -187,7 +173,6 @@ function UserCard({ name, age, avatar }) {
   avatar="/john.jpg" 
 />
 ```
-</CodeBlock>
 
 Props flow **one way** - from parent to child (called "unidirectional data
 flow").
@@ -197,8 +182,7 @@ flow").
 State is data that can change over time. When state changes, React re-renders
 the component.
 
-<CodeBlock title="State Example" language="jsx">
-```jsx
+```jsx title="State Example"
 import { useState } from 'react';
 
 function Counter() { // Declare state variable const [count, setCount] =
@@ -208,7 +192,6 @@ return ( <div> <p>Count: {count}</p> <button onClick={() => setCount(count +
 1)}> Increment </button> </div> ); }
 
 ```
-</CodeBlock>
 
 **Props vs State:**
 - **Props**: Passed from parent, immutable (read-only)
@@ -352,12 +335,12 @@ How does React compare to alternatives?
 
 Now that you understand what React is, let's look at the project you'll be building!
 
-<div className="flex gap-2 mt-6">
-  <Button variant="outline" asChild>
-    <a href="/docs/react/m0/2_environment-setup">← Lesson 2: Environment Setup</a>
-  </Button>
-  <Button asChild>
-    <a href="/docs/react/m0/4_project-overview">Lesson 4: Project Overview →</a>
-  </Button>
+<div className="flex gap-2 mt-6 flex-wrap">
+  <a href="/docs/react/m0/2_environment-setup" className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4'>
+    ← Lesson 2: Environment Setup
+  </a>
+  <a href="/docs/react/m0/4_project-overview" className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4'>
+    Lesson 4: Project Overview →
+  </a>
 </div>
 ```

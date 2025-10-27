@@ -4,18 +4,11 @@ description:
    "Build your first React component - the main landing page of your application"
 ---
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Steps, Step } from "@/components/steps";
-import { CodeBlock } from "@/components/codeblock";
-import { Files, Folder, File } from "@/components/files";
-import { Tabs, Tab } from "@/components/tabs";
-
 # Create HomePage Component
 
-<div className='flex gap-2 mb-4'>
+<div className='flex gap-2 mb-4 flex-wrap'>
    <Badge variant='primary'>Lesson 1 of 7</Badge>
-   <Badge variant='default'>15 min</Badge>
+   <Badge>15 min</Badge>
 </div>
 
 Let's create your first React component! The **HomePage** will be the main
@@ -66,19 +59,13 @@ Each piece is self-contained, reusable, and easy to understand.
 
 React components are just JavaScript functions that return JSX:
 
-<CodeBlock title="Basic Component Structure" language="jsx">
-```jsx
+```jsx title="Basic Component Structure"
 function ComponentName() {
-  return (
-    <div>
-      {/* Your JSX here */}
-    </div>
-  );
+   return <div>{/* Your JSX here */}</div>;
 }
 
 export default ComponentName;
 ```
-</CodeBlock>
 
 ## Creating the HomePage
 
@@ -87,11 +74,8 @@ export default ComponentName;
       ### Create pages directory Organize page components separately from other
       components
    </Step>
-
    <Step>### Create HomePage.jsx file Create the HomePage component file</Step>
-
    <Step>### Write the component Implement the HomePage function</Step>
-
    <Step>### Export the component Make it available for import</Step>
 </Steps>
 
@@ -114,20 +98,18 @@ look like:
 
 **2. Create `src/pages/HomePage.jsx`:**
 
-<CodeBlock title="src/pages/HomePage.jsx" language="jsx">
-```jsx
+```jsx title="src/pages/HomePage.jsx"
 function HomePage() {
-  return (
-    <div className="home-page">
-      <h1>Find your next stay</h1>
-      <p>Discover amazing places to book for your next adventure</p>
-    </div>
-  );
+   return (
+      <div className='home-page'>
+         <h1>Find your next stay</h1>
+         <p>Discover amazing places to book for your next adventure</p>
+      </div>
+   );
 }
 
 export default HomePage;
 ```
-</CodeBlock>
 
 ## Code Breakdown
 
@@ -135,13 +117,11 @@ Let's understand every part of this component:
 
 ### 1. Function Declaration
 
-<CodeBlock language='jsx'>
-   ```jsx function HomePage(){" "}
-   {
-      // Component logic here
-   }
-   ```
-</CodeBlock>
+```jsx
+function HomePage() {
+   // Component logic here
+}
+```
 
 **Key points:**
 
@@ -151,10 +131,9 @@ Let's understand every part of this component:
 
 ### 2. Return Statement
 
-<CodeBlock language='jsx'>
-   ```jsx return (<div className='home-page'>{/* JSX content */}</div>
-   ); ```
-</CodeBlock>
+```jsx
+return <div className='home-page'>{/* JSX content */}</div>;
+```
 
 **Key points:**
 
@@ -164,14 +143,12 @@ Let's understand every part of this component:
 
 ### 3. JSX Content
 
-<CodeBlock language='jsx'>
-   ```jsx
-   <div className='home-page'>
-      <h1>Find your next stay</h1>
-      <p>Discover amazing places to book for your next adventure</p>
-   </div>
-   ```
-</CodeBlock>
+```jsx
+<div className='home-page'>
+   <h1>Find your next stay</h1>
+   <p>Discover amazing places to book for your next adventure</p>
+</div>
+```
 
 **Key points:**
 
@@ -181,7 +158,9 @@ Let's understand every part of this component:
 
 ### 4. Export Statement
 
-<CodeBlock language='jsx'>```jsx export default HomePage; ```</CodeBlock>
+```jsx
+export default HomePage;
+```
 
 **Key points:**
 
@@ -197,39 +176,31 @@ JavaScript.
 ### JSX vs HTML
 
 <Tabs items={["JSX", "HTML"]}>
-  <Tab value="JSX">
-    <CodeBlock language="jsx">
-    ```jsx
-    // React Component with JSX
-    function Button() {
-      const handleClick = () => alert('Clicked!');
-      
-      return (
-        <button 
-          className="btn-primary" 
-          onClick={handleClick}
-        >
-          Click me
-        </button>
-      );
-    }
-    ```
-    </CodeBlock>
-  </Tab>
+<Tab value="JSX">
+
+```jsx
+// React Component with JSX
+function Button() {
+   const handleClick = () => alert("Clicked!");
+
+   return (
+      <button className='btn-primary' onClick={handleClick}>
+         Click me
+      </button>
+   );
+}
+```
+
+</Tab>
   
-  <Tab value="HTML">
-    <CodeBlock language="html">
-    ```html
-    <!-- Traditional HTML -->
-    <button 
-      class="btn-primary" 
-      onclick="alert('Clicked!')"
-    >
-      Click me
-    </button>
-    ```
-    </CodeBlock>
-  </Tab>
+<Tab value="HTML">
+
+```html
+<!-- Traditional HTML -->
+<button class="btn-primary" onclick="alert('Clicked!')">Click me</button>
+```
+
+</Tab>
 </Tabs>
 
 ### Key Differences
@@ -246,7 +217,6 @@ JavaScript.
 
 1. **Single root element:**
 
-   <CodeBlock language="jsx">
 ```jsx
 // ✅ Correct - single root
 return (
@@ -256,41 +226,34 @@ return (
   </div>
 );
 
-   // ❌ Wrong - multiple roots return (
-
-     <h1>Title</h1>
+// ❌ Wrong - multiple roots
+return (
+  <h1>Title</h1>
   <p>Content</p>
 );
 ```
-</CodeBlock>
 
 2. **Close all tags:**
 
-   <CodeBlock language="jsx">
 ```jsx
 // ✅ Correct
 <img src="photo.jpg" />
 <br />
 
-   // ❌ Wrong
-
-   <img src="photo.jpg">
+// ❌ Wrong
+<img src="photo.jpg">
 <br>
 ```
-</CodeBlock>
 
 3. **Use camelCase for attributes:**
 
-   <CodeBlock language="jsx">
 ```jsx
 // ✅ Correct
 <div className="container" onClick={handleClick}>
 
-   // ❌ Wrong
-
-   <div class="container" onclick={handleClick}>
+// ❌ Wrong
+<div class="container" onclick={handleClick}>
 ```
-</CodeBlock>
 
 ## Component Naming Conventions
 
@@ -308,19 +271,21 @@ Follow these naming conventions for React components:
 -  Descriptive and clear
 -  Indicate what the component does
 
-<CodeBlock title='Good Examples' language='jsx'>
-   ```jsx // ✅ Good names function HomePage() {}
-   function UserProfile() {}
-   function ListingCard() {}
-   function SearchBar() {}
-   ```
-</CodeBlock>
+```jsx title="Good Examples"
+// ✅ Good names
+function HomePage() {}
+function UserProfile() {}
+function ListingCard() {}
+function SearchBar() {}
+```
 
-<CodeBlock title='Bad Examples' language='jsx'>
-   ```jsx // ❌ Bad names function homePage() {} // Should be PascalCase
-   function UP() {} // Not descriptive function Listing() {} // Too generic
-   function page1() {} // Not meaningful ```
-</CodeBlock>
+```jsx title="Bad Examples"
+// ❌ Bad names
+function homePage() {} // Should be PascalCase
+function UP() {} // Not descriptive
+function Listing() {} // Too generic
+function page1() {} // Not meaningful
+```
 
 ## Verification
 
@@ -402,13 +367,17 @@ the next lesson!
 Great! You've created your first React component. In the next lesson, we'll
 import this component into `App.jsx` so it displays in your browser.
 
-<div className='flex gap-2 mt-6'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m1'>← Back to Module</a>
-   </Button>
-   <Button asChild>
-      <a href='/docs/react/m1/2_add-homepage-to-app'>
-         Lesson 2: Add HomePage to App →
-      </a>
-   </Button>
+<div className='flex gap-2 mt-6 flex-wrap'>
+   <a
+      href='/docs/react/m1'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4'
+   >
+      ← Back to Module
+   </a>
+   <a
+      href='/docs/react/m1/2_add-homepage-to-app'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4'
+   >
+      Lesson 2: Add HomePage to App →
+   </a>
 </div>

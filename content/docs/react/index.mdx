@@ -1,189 +1,259 @@
 ---
-title: React Course
+title: "Project React Course"
 description:
-   Learn React by building a modern booking application - from fundamentals to
-   production deployment
-icon: "React"
+   "Build a production-ready booking application from scratch. Master React
+   through hands-on project-based learning."
 ---
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Steps, Step } from "@/components/steps";
-import { Banner } from "@/components/banner";
+# Project React Course
 
-<Banner variant='rainbow' id='react-course-banner'>
-   🚀 Welcome to the React Course! Build a production-ready booking app from
-   scratch.
-</Banner>
-
-# React Course
-
-<div className='flex gap-2 mb-4'>
+<div className='flex gap-2 mb-4 flex-wrap'>
    <Badge variant='primary'>9 Modules</Badge>
    <Badge variant='success'>89 Lessons</Badge>
-   <Badge variant='default'>25-30 Hours</Badge>
+   <Badge>25-30 Hours</Badge>
 </div>
 
 Learn React by building a **real-world booking application** similar to Airbnb.
-This hands-on course takes you from React fundamentals to production deployment.
+This comprehensive course takes you from absolute beginner to deploying a
+production application.
+
+<Banner variant='rainbow' id='react-course-banner'>
+   🚀 Welcome to Project React! Build a complete Airbnb-style booking app from
+   zero to production.
+</Banner>
 
 ## What You'll Build
 
-By the end of this course, you'll create a fully functional booking application
-with:
+By completing this course, you'll create a fully functional property booking
+application with:
 
 <Steps>
    <Step>
-      ### 🏠 Property Listings Browse properties with search, filters, and
-      real-time updates
+      ### 🏠 Property Listings Browse properties with search filters, real-time
+      updates, and responsive image carousels
    </Step>
-
    <Step>
-      ### 🔍 Detailed Views View property details with image carousels and
-      booking information
+      ### 🔍 Detailed Property Views View detailed property information with
+      photo galleries, amenities, and booking widgets
    </Step>
-
    <Step>
-      ### ❤️ Favorites System Save favorite properties with Redux state
-      management
+      ### ❤️ Favorites System Save favorite properties with Redux-powered global
+      state management
    </Step>
-
-   <Step>### 🔐 Authentication Secure user authentication with JWT tokens</Step>
-
    <Step>
-      ### 🌐 Multi-page Navigation Seamless routing with React Router v6
+      ### 🔐 User Authentication Secure authentication flow with JWT tokens and
+      protected routes
    </Step>
-
    <Step>
-      ### 🚀 Production Deployment Deploy to Vercel with professional workflows
+      ### 🌐 Multi-page Navigation Seamless client-side routing with React
+      Router v6
+   </Step>
+   <Step>
+      ### 🚀 Production Deployment Deploy your app to Vercel with professional
+      CI/CD workflows
    </Step>
 </Steps>
+
+---
 
 ## Course Modules
 
 ### Foundation (Beginner)
 
-**Module 0: Introduction** _(5 lessons)_
-
--  Course orientation
--  Development environment setup
--  Understanding React ecosystem
--  Project overview
-
-**Module 1: React Fundamentals** _(7 lessons)_
-
--  JSX syntax and components
--  Props and composition
--  Component structure
--  Building the homepage
-
-**Module 2: State & Events** _(7 lessons)_
-
--  useState hook
--  Event handling
--  Controlled components
--  Interactive filters
+<Accordions type='single'>
+   <Accordion id='m0' title='Module 0: Introduction' value='m0'>
+      **Duration:** 15 minutes | **Lessons:** 5 - Course platform orientation -
+      Development environment setup - Understanding the React ecosystem -
+      Project overview and architecture - Navigating course materials
+   </Accordion>
+   <Accordion id='m1' title='Module 1: React Fundamentals' value='m1'>
+      **Duration:** 2-3 hours | **Lessons:** 7 - JSX syntax and components -
+      Functional components - Props and component composition - Building
+      reusable UI components - Project structure and organization - Creating the
+      homepage layout
+   </Accordion>
+   <Accordion id='m2' title='Module 2: State & Events' value='m2'>
+      **Duration:** 2-3 hours | **Lessons:** 7 - useState hook fundamentals -
+      Event handling patterns - Controlled form components - Lifting state up -
+      Interactive search and filters - Real-time data filtering
+   </Accordion>
+</Accordions>
 
 ### Intermediate
 
-**Module 3: Effects & Data** _(10 lessons)_
-
--  useEffect hook
--  API integration
--  Loading and error states
--  Async operations
-
-**Module 4: Routes & Navigation** _(13 lessons)_
-
--  React Router setup
--  Dynamic routes
--  URL parameters
--  404 handling
+<Accordions type='single'>
+   <Accordion id='m3' title='Module 3: Effects & Data Fetching' value='m3'>
+      **Duration:** 3-4 hours | **Lessons:** 10 - useEffect hook and component
+      lifecycle - Asynchronous JavaScript with async/await - API integration and
+      data fetching - Loading and error state management - Race condition
+      prevention - Image carousels and media handling
+   </Accordion>
+   <Accordion id='m4' title='Module 4: Routes & Navigation' value='m4'>
+      **Duration:** 3-4 hours | **Lessons:** 13 - React Router v6 setup - Route
+      configuration - Dynamic routes with URL parameters - Nested routes and
+      layouts - Link component and navigation - 404 error handling - Building
+      detail pages
+   </Accordion>
+</Accordions>
 
 ### Advanced
 
-**Module 5: Hooks & Performance** _(10 lessons)_
+<Accordions type='single'>
+   <Accordion id='m5' title='Module 5: Hooks & Performance' value='m5'>
+      **Duration:** 3-4 hours | **Lessons:** 10 - Custom hooks patterns -
+      useMemo for expensive computations - useCallback for function memoization
+      - React.memo for component optimization - Performance profiling - Code
+      refactoring and cleanup
+   </Accordion>
+   <Accordion id='m6' title='Module 6: State Management' value='m6'>
+      **Duration:** 4-5 hours | **Lessons:** 15 - Redux Toolkit fundamentals -
+      Creating slices and reducers - Global state management - Async thunks for
+      API calls - Redux DevTools - Building a favorites system
+   </Accordion>
 
--  Custom hooks
--  useMemo & useCallback
--  Performance optimization
--  Code refactoring
+   <Accordion id='m7' title='Module 7: Forms & Authentication' value='m7'>
+      **Duration:** 5-6 hours | **Lessons:** 16 - React Hook Form library - Zod
+      schema validation - Form state management - JWT authentication flow -
+      Login and registration - Protected routes - User session management
+   </Accordion>
+   <Accordion id='m8' title='Module 8: Deployment' value='m8'>
+      **Duration:** 30 minutes | **Lessons:** 2 - Production build optimization
+      - Environment variables - Vercel deployment - CI/CD setup
+   </Accordion>
+</Accordions>
 
-**Module 6: State Management** _(15 lessons)_
+---
 
--  Redux Toolkit
--  Global state
--  Async thunks
--  Favorites feature
-
-**Module 7: Forms & Authentication** _(16 lessons)_
-
--  React Hook Form
--  Zod validation
--  JWT authentication
--  Protected routes
-
-**Module 8: Deployment** _(2 lessons)_
-
--  Production build
--  Vercel deployment
-
-## Technologies Covered
+## Technologies You'll Master
 
 ### Core React
 
--  JSX & Components
--  Props & Composition
--  State (useState)
--  Effects (useEffect)
+-  JSX & Functional Components
+-  Props & Component Composition
+-  State Management (useState)
+-  Side Effects (useEffect)
 -  Custom Hooks
 -  Context API
 -  Performance Optimization
 
-### Libraries & Tools
+### Essential Libraries
 
--  **React Router v6** - Client-side routing
--  **Redux Toolkit** - State management
--  **React Hook Form** - Form handling
--  **Zod** - Schema validation
--  **Axios** - HTTP client
--  **Tailwind CSS** - Styling
--  **Vite** - Build tool
+-  **React Router v6** - Client-side routing and navigation
+-  **Redux Toolkit** - Scalable state management
+-  **React Hook Form** - Performant form handling
+-  **Zod** - TypeScript-first schema validation
+-  **Axios** - Promise-based HTTP client
+-  **Tailwind CSS** - Utility-first CSS framework
+
+### Development Tools
+
+-  **Vite** - Lightning-fast build tool
+-  **ESLint** - Code quality and consistency
+-  **Git** - Version control
+-  **Vercel** - Deployment platform
+
+---
 
 ## Prerequisites
 
-Before starting, you should have:
+Before starting this course, ensure you have:
 
--  ✅ Basic JavaScript knowledge (ES6+)
--  ✅ Understanding of HTML & CSS
--  ✅ Node.js installed (v18+)
--  ✅ Code editor (VS Code recommended)
--  ✅ Basic terminal/command line familiarity
+-  ✅ **JavaScript ES6+** - Functions, arrow functions, destructuring, spread
+   operator, async/await
+-  ✅ **HTML & CSS Basics** - Understanding of HTML elements and CSS styling
+-  ✅ **Node.js (v18+)** - Installed on your machine
+-  ✅ **npm or yarn** - Package manager
+-  ✅ **Code Editor** - VS Code recommended
+-  ✅ **Terminal Skills** - Basic command line navigation
+-  ✅ **Git Basics** - Clone, commit, push
 
-## Learning Approach
+---
 
-This course follows a **project-based learning** methodology:
+## Learning Methodology
 
-1. **Context First** - Understand why before how
-2. **Incremental Building** - Add features step by step
-3. **Real Code** - Copy-paste ready examples
-4. **Detailed Explanations** - Deep dive into concepts
-5. **Verification** - Test at each step
+This course follows a **project-based learning** approach:
 
-## Course Duration
+<Steps>
+   <Step>
+      ### 1. Context First Every lesson starts with **why** before **how**.
+      Understand the problem before learning the solution.
+   </Step>
+   <Step>
+      ### 2. Incremental Building Add features step by step. Each lesson builds
+      on the previous, creating a complete application by the end.
+   </Step>
+   <Step>
+      ### 3. Working Code All code examples are **copy-paste ready**. See
+      immediate results in your project.
+   </Step>
+   <Step>
+      ### 4. Deep Explanations Learn not just what to code, but **why it works**
+      and when to use each pattern.
+   </Step>
+   <Step>
+      ### 5. Verify & Test Each step includes verification checkpoints to ensure
+      your code works correctly.
+   </Step>
+</Steps>
 
--  **Total Time:** 25-30 hours
--  **Beginner Modules:** 6-8 hours
--  **Intermediate Modules:** 6-8 hours
--  **Advanced Modules:** 12-14 hours
--  **Deployment:** 30 minutes
+---
 
-Work at your own pace!
+## Time Commitment
+
+-  **Total Course Duration:** 25-30 hours
+-  **Beginner Modules (0-2):** 6-8 hours
+-  **Intermediate Modules (3-4):** 6-8 hours
+-  **Advanced Modules (5-7):** 12-14 hours
+-  **Deployment (8):** 30 minutes
+
+**Recommended Pace:** 2-3 lessons per day, complete in 4-6 weeks
+
+---
+
+## Course Features
+
+### For Students
+
+-  ✨ Clear progression from basics to advanced concepts
+-  📚 Comprehensive explanations with visual examples
+-  💻 Production-ready code patterns
+-  🎯 Task-based learning with clear objectives
+-  🎉 Milestone celebrations to track progress
+-  🔍 Detailed code walkthroughs
+
+### For Instructors
+
+-  📖 Complete teaching curriculum
+-  🎓 Proven pedagogical structure
+-  🛠️ Ready-to-use code examples
+-  📊 Progress tracking system
+-  🎨 Customizable content
+
+---
 
 ## Ready to Start?
 
-<div className='mt-6'>
-   <Button size='lg' asChild>
-      <a href='/docs/react/m0'>Begin Module 0: Introduction →</a>
+Begin your React journey with Module 0, where you'll get familiar with the
+course structure and set up your development environment.
+
+<div className='mt-6 flex gap-4'>
+   <Button asChild>
+      <a href='/docs/react/m0'>Start Module 0: Introduction →</a>
+   </Button>
+   <Button variant='outline' asChild>
+      <a href='https://github.com/your-repo/project-react' target='_blank'>
+         View GitHub Repository
+      </a>
    </Button>
 </div>
+
+---
+
+## Support & Community
+
+-  💬 **Discord Community** - Get help from instructors and fellow students
+-  📧 **Email Support** - Direct help when you're stuck
+-  🐛 **Bug Reports** - Help improve the course
+-  💡 **Feature Requests** - Suggest new content
+
+**Let's build something amazing together!** 🚀

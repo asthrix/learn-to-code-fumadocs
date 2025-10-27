@@ -3,18 +3,11 @@ title: "Environment Setup"
 description: "Install the tools you need to build React applications"
 ---
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Steps, Step } from "@/components/steps";
-import { Tabs, Tab } from "@/components/tabs";
-import { Accordions, Accordion } from "@/components/accordion";
-import { CodeBlock } from "@/components/codeblock";
-
 # Environment Setup
 
-<div className='flex gap-2 mb-4'>
+<div className='flex gap-2 mb-4 flex-wrap'>
    <Badge variant='primary'>Lesson 2 of 5</Badge>
-   <Badge variant='default'>5 min read</Badge>
+   <Badge>5 min read</Badge>
 </div>
 
 Before we start coding, let's set up your development environment. We'll install
@@ -24,11 +17,8 @@ everything you need to build React applications.
 
 <Steps>
    <Step>### Node.js & npm JavaScript runtime and package manager</Step>
-
    <Step>### Code Editor VS Code with helpful extensions</Step>
-
    <Step>### Modern Browser Chrome or Firefox with developer tools</Step>
-
    <Step>### Terminal Command line interface</Step>
 </Steps>
 
@@ -46,14 +36,12 @@ and other dependencies.
       (recommended) 3. Run the installer 4. Follow the installation wizard
       **Option 2: Using Homebrew** ```bash brew install node ```
    </Tab>
-
    <Tab value='Windows'>
       1. Visit [nodejs.org](https://nodejs.org/) 2. Download the LTS version
-      (recommended) 3. Run the `.msi` installer 4. Follow the installation
-      wizard 5. Restart your computer **Note**: Make sure to check "Add to PATH"
-      during installation
+      (recommended) 3. Run the `.msi` installer 4. Follow the installation wizard
+      5. Restart your computer **Note**: Make sure to check "Add to PATH" during
+      installation
    </Tab>
-
    <Tab value='Linux'>
       **Ubuntu/Debian:** ```bash curl -fsSL
       https://deb.nodesource.com/setup_lts.x | sudo -E bash - sudo apt-get
@@ -68,7 +56,10 @@ and other dependencies.
 
 Open your terminal and run:
 
-<CodeBlock title='Terminal'>```bash node --version npm --version ```</CodeBlock>
+```bash title="Terminal"
+node --version
+npm --version
+```
 
 You should see version numbers like:
 
@@ -102,17 +93,19 @@ Install these extensions for a better React development experience:
       time with common patterns
    </Accordion>
 
-   <Accordion title='ESLint'>
-      **What it does**: Identifies and fixes code problems **Install**: Search
-      "ESLint" in VS Code extensions **Benefits**: - Catches bugs before runtime
-      - Enforces code style - Suggests best practices
-   </Accordion>
 
-   <Accordion title='Prettier - Code formatter'>
-      **What it does**: Automatically formats your code **Install**: Search
-      "Prettier" in VS Code extensions **Benefits**: - Consistent code
-      formatting - Saves time on styling - Works with team standards
-   </Accordion>
+<Accordion title='ESLint'>
+   **What it does**: Identifies and fixes code problems **Install**: Search
+   "ESLint" in VS Code extensions **Benefits**: - Catches bugs before runtime -
+   Enforces code style - Suggests best practices
+</Accordion>
+
+
+<Accordion title='Prettier - Code formatter'>
+   **What it does**: Automatically formats your code **Install**: Search
+   "Prettier" in VS Code extensions **Benefits**: - Consistent code formatting -
+   Saves time on styling - Works with team standards
+</Accordion>
 
    <Accordion title='Auto Rename Tag'>
       **What it does**: Automatically renames paired HTML/JSX tags **Install**:
@@ -133,8 +126,7 @@ Configure VS Code for optimal React development:
 
 Or add to your `settings.json`:
 
-<CodeBlock title="settings.json" language="json">
-```json
+```json title="settings.json"
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -145,7 +137,6 @@ Or add to your `settings.json`:
   "editor.tabSize": 2
 }
 ```
-</CodeBlock>
 
 ## Browser Setup
 
@@ -186,8 +177,7 @@ essential commands:
 
 ### Navigation
 
-<CodeBlock title="Terminal">
-```bash
+```bash title="Terminal"
 # Show current directory
 pwd
 
@@ -206,14 +196,11 @@ cd ..
 # Go to home directory
 
 cd ~
-
-````
-</CodeBlock>
+```
 
 ### File Operations
 
-<CodeBlock title="Terminal">
-```bash
+```bash title="Terminal"
 # Create a new directory
 mkdir my-folder
 
@@ -225,23 +212,18 @@ rm file.txt
 
 # Remove a directory
 rm -rf folder-name
-````
-
-</CodeBlock>
+```
 
 ### Opening Projects
 
-<CodeBlock title="Terminal">
-```bash
+```bash title="Terminal"
 # Open current directory in VS Code
 code .
 
 # Open specific folder
 
 code my-project
-
-````
-</CodeBlock>
+```
 
 ## Verification Checklist
 
@@ -289,12 +271,12 @@ Before proceeding, verify you have:
 
 Now that your environment is set up, let's learn what React is and how it works!
 
-<div className="flex gap-2 mt-6">
-  <Button variant="outline" asChild>
-    <a href="/docs/react/m0/1_welcome">← Lesson 1: Welcome</a>
-  </Button>
-  <Button asChild>
-    <a href="/docs/react/m0/3_understanding-react">Lesson 3: Understanding React →</a>
-  </Button>
+<div className="flex gap-2 mt-6 flex-wrap">
+  <a href="/docs/react/m0/1_welcome" className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4'>
+    ← Lesson 1: Welcome
+  </a>
+  <a href="/docs/react/m0/3_understanding-react" className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4'>
+    Lesson 3: Understanding React →
+  </a>
 </div>
 ````

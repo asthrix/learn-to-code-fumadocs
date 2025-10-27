@@ -3,15 +3,11 @@ title: "Welcome to React"
 description: "Your journey to becoming a React developer starts here"
 ---
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Banner } from "@/components/banner";
-
 # Welcome to React
 
-<div className='flex gap-2 mb-4'>
+<div className='flex gap-2 mb-4 flex-wrap'>
    <Badge variant='primary'>Lesson 1 of 5</Badge>
-   <Badge variant='default'>2 min read</Badge>
+   <Badge>2 min read</Badge>
 </div>
 
 <Banner variant='rainbow'>
@@ -145,13 +141,17 @@ Let's set up your development environment and start building!
 In the next lesson, we'll set up your development environment with all the tools
 you need.
 
-<div className='flex gap-2 mt-6'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m0'>← Back to Module</a>
-   </Button>
-   <Button asChild>
-      <a href='/docs/react/m0/2_environment-setup'>
-         Lesson 2: Environment Setup →
-      </a>
-   </Button>
+<div className='flex gap-2 mt-6 flex-wrap'>
+   <a
+      href='/docs/react/m0'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4'
+   >
+      ← Back to Module
+   </a>
+   <a
+      href='/docs/react/m0/2_environment-setup'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4'
+   >
+      Lesson 2: Environment Setup →
+   </a>
 </div>

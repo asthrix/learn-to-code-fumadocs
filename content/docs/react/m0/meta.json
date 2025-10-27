@@ -1,11 +1,11 @@
 {
    "title": "Module 0: Introduction",
    "pages": [
-      "0_index",
-      "1_welcome",
-      "2_environment-setup",
-      "3_understanding-react",
-      "4_project-overview",
-      "5_getting-started"
+      "index",
+      "lesson-1",
+      "lesson-2",
+      "lesson-3",
+      "lesson-4",
+      "lesson-5"
    ]
 }

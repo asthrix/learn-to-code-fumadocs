@@ -1,0 +1,315 @@
+---
+title: "Lesson 2: Reading Code Snippets"
+description:
+   "Master the art of reading and understanding code examples throughout the
+   course."
+module: 0
+lesson: 2
+---
+
+# Lesson 2: Reading Code Snippets
+
+Being able to quickly read and understand code is crucial for learning React.
+This lesson teaches you how to interpret the code examples you'll encounter.
+
+---
+
+## Anatomy of a Code Snippet
+
+Every code snippet in this course follows a consistent format. Let's break it
+down:
+
+### File Path Comments
+
+The first line tells you where the code belongs:
+
+```jsx
+// src/components/Header.jsx
+```
+
+This means: "Create or edit the file `Header.jsx` inside the `src/components/`
+directory."
+
+### Import Statements
+
+React files typically start with imports:
+
+```jsx
+import React from "react";
+import { useState } from "react";
+import Button from "./Button";
+```
+
+-  Line 1: Import React library (needed in older React versions)
+-  Line 2: Import specific hooks from React
+-  Line 3: Import a custom component from the same directory
+
+### Component Definition
+
+The main function that defines your component:
+
+```jsx
+function Header() {
+  // Component logic goes here
+  return (
+    // JSX markup goes here
+  );
+}
+```
+
+### Export Statement
+
+Makes the component available to other files:
+
+```jsx
+export default Header;
+```
+
+---
+
+## Understanding Code Changes
+
+As you progress through lessons, we'll modify existing code. Here's how to
+identify changes:
+
+### Adding New Lines
+
+When we add new code, we mark it with comments:
+
+```jsx
+import React from "react";
+import { useState } from "react"; // ← NEW
+
+function Counter() {
+   const [count, setCount] = useState(0); // ← NEW
+
+   return (
+      <div>
+         <p>Count: {count}</p>
+         <button onClick={() => setCount(count + 1)}>+</button>
+      </div>
+   );
+}
+```
+
+### Replacing Existing Code
+
+When code changes, we show before and after:
+
+**Before:**
+
+```jsx
+function Greeting() {
+   return <h1>Hello!</h1>;
+}
+```
+
+**After:**
+
+```jsx
+function Greeting({ name }) {
+   // ← CHANGED: Added parameter
+   return <h1>Hello, {name}!</h1>;
+   {
+      /* ← CHANGED: Using prop */
+   }
+}
+```
+
+### Removing Code
+
+When we remove code, we mark it:
+
+```jsx
+function App() {
+   // const oldVariable = 'test'; // ← REMOVE THIS LINE
+
+   return <div>Content</div>;
+}
+```
+
+---
+
+## Code Highlighting
+
+Some lessons will highlight specific lines to focus on:
+
+```jsx {4,7}
+import React from "react";
+
+function Welcome() {
+   const message = "Hello React!"; // This line is highlighted
+
+   return (
+      <h1>{message}</h1> // This line too
+   );
+}
+```
+
+The highlighted lines (4 and 7) are the most important to understand in that
+example.
+
+---
+
+## Reading JSX
+
+JSX looks like HTML but it's actually JavaScript. Key differences:
+
+<Accordions type="single">
+  <Accordion id="jsx-js" title="JavaScript Expressions in Curly Braces" value="jsx-js">
+    ```jsx
+    const name = "Sarah";
+    return <h1>Hello, {name}!</h1>;
+    ```
+    
+    Anything inside `{...}` is evaluated as JavaScript.
+  </Accordion>
+  
+  <Accordion id="jsx-class" title="className Instead of class" value="jsx-class">
+    ```jsx
+    // HTML uses: <div class="container">
+    // JSX uses:
+    <div className="container">
+    ```
+    
+    `class` is a reserved word in JavaScript, so JSX uses `className`.
+  </Accordion>
+  
+  <Accordion id="jsx-close" title="Self-Closing Tags" value="jsx-close">
+    ```jsx
+    <img src="photo.jpg" alt="Photo" />
+    <input type="text" />
+    ```
+    
+    All tags must be closed, even self-closing ones need `/>`
+  </Accordion>
+  
+  <Accordion id="jsx-camel" title="camelCase Attributes" value="jsx-camel">
+    ```jsx
+    <button onClick={handleClick}>Click</button>
+    <label htmlFor="input">Name</label>
+    ```
+    
+    Event handlers and attributes use camelCase.
+  </Accordion>
+</Accordions>
+
+---
+
+## Common Code Patterns
+
+You'll see these patterns frequently:
+
+### Destructuring Props
+
+```jsx
+// Instead of this:
+function Greeting(props) {
+   return <h1>Hello, {props.name}!</h1>;
+}
+
+// We use this:
+function Greeting({ name }) {
+   return <h1>Hello, {name}!</h1>;
+}
+```
+
+### Arrow Functions
+
+```jsx
+// Function declaration:
+function handleClick() {
+   console.log("Clicked!");
+}
+
+// Arrow function (more common in React):
+const handleClick = () => {
+   console.log("Clicked!");
+};
+```
+
+### Conditional Rendering
+
+```jsx
+function Message({ isLoggedIn }) {
+   return (
+      <div>{isLoggedIn ? <h1>Welcome back!</h1> : <h1>Please log in</h1>}</div>
+   );
+}
+```
+
+### Map for Lists
+
+```jsx
+function TodoList({ todos }) {
+   return (
+      <ul>
+         {todos.map((todo) => (
+            <li key={todo.id}>{todo.text}</li>
+         ))}
+      </ul>
+   );
+}
+```
+
+---
+
+## Practice Reading Code
+
+Let's put your new skills to practice. Can you identify what this code does?
+
+```jsx
+// src/components/PropertyCard.jsx
+import React from "react";
+
+function PropertyCard({ title, price, imageUrl }) {
+   return (
+      <div className='card'>
+         <img src={imageUrl} alt={title} />
+         <h3>{title}</h3>
+         <p>${price}/night</p>
+      </div>
+   );
+}
+
+export default PropertyCard;
+```
+
+<Accordions type='single'>
+   <Accordion id='answer' title='📝 Answer (expand to check)' value='answer'>
+      This component: - Accepts three props: `title`, `price`, and `imageUrl` -
+      Returns a card layout with an image, title, and price - Would be saved in
+      `src/components/PropertyCard.jsx` - Can be imported and used in other
+      components This is exactly the kind of component you'll build in Module 1!
+   </Accordion>
+</Accordions>
+
+---
+
+## Quick Reference
+
+Keep these reading tips in mind:
+
+| Symbol         | Meaning                      |
+| -------------- | ---------------------------- |
+| `// ← NEW`     | This line was just added     |
+| `// ← CHANGED` | This line was modified       |
+| `// ← REMOVE`  | Delete this line             |
+| `{...}`        | JavaScript expression in JSX |
+| `{ prop }`     | Destructured prop parameter  |
+
+---
+
+## Next Up
+
+Great! You can now read code like a pro. Next, we'll set up your development
+environment so you can start writing React code yourself.
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m0/lesson-1'>← Previous: Course Platform</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m0/lesson-3'>Next: Environment Setup →</a>
+   </Button>
+</div>

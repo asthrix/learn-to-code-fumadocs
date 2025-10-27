@@ -4,18 +4,11 @@ description:
    "Bootstrap your first React project and understand the file structure"
 ---
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Steps, Step } from "@/components/steps";
-import { CodeBlock } from "@/components/codeblock";
-import { Files, Folder, File } from "@/components/files";
-import { Tabs, Tab } from "@/components/tabs";
-
 # Getting Started
 
-<div className='flex gap-2 mb-4'>
+<div className='flex gap-2 mb-4 flex-wrap'>
    <Badge variant='primary'>Lesson 5 of 5</Badge>
-   <Badge variant='default'>5 min read</Badge>
+   <Badge>5 min read</Badge>
 </div>
 
 Let's create your first React project using Vite, a modern build tool that
@@ -37,13 +30,9 @@ provides an incredibly fast development experience.
    <Step>
       ### Open Your Terminal Navigate to where you want to create your project
    </Step>
-
    <Step>### Run the Create Command Execute the Vite creation command</Step>
-
    <Step>### Answer the Prompts Configure your project settings</Step>
-
    <Step>### Install Dependencies Install required packages</Step>
-
    <Step>### Start Development Server Run your React application</Step>
 </Steps>
 
@@ -51,15 +40,11 @@ provides an incredibly fast development experience.
 
 **1. Open your terminal** and navigate to your projects folder:
 
-<CodeBlock title='Terminal'>
    ```bash cd ~/projects # or wherever you keep your projects ```
-</CodeBlock>
 
 **2. Create a new Vite project:**
 
-<CodeBlock title='Terminal'>
    ```bash npm create vite@latest booking-app ```
-</CodeBlock>
 
 **3. Answer the prompts:**
 
@@ -79,17 +64,23 @@ provides an incredibly fast development experience.
 
 **4. Navigate into your project:**
 
-<CodeBlock title='Terminal'>```bash cd booking-app ```</CodeBlock>
+```bash
+cd booking-app 
+```
 
 **5. Install dependencies:**
 
-<CodeBlock title='Terminal'>```bash npm install ```</CodeBlock>
+```bash
+npm install 
+```
 
 This downloads all required packages. It might take a minute.
 
 **6. Start the development server:**
 
-<CodeBlock title='Terminal'>```bash npm run dev ```</CodeBlock>
+```bash
+npm run dev 
+```
 
 You should see output like:
 
@@ -138,7 +129,6 @@ Let's understand what Vite created for you:
     ### `index.html`
     The entry point of your application. Contains the root `<div>` where React renders.
     
-    <CodeBlock title="index.html" language="html">
     ```html
     <!DOCTYPE html>
     <html lang="en">
@@ -153,14 +143,12 @@ Let's understand what Vite created for you:
       </body>
     </html>
     ```
-    </CodeBlock>
   </Step>
   
   <Step>
     ### `src/main.jsx`
     Renders your React app into the DOM. This is where React takes control.
     
-    <CodeBlock title="src/main.jsx" language="jsx">
     ```jsx
     import React from 'react'
     import ReactDOM from 'react-dom/client'
@@ -173,7 +161,6 @@ Let's understand what Vite created for you:
       </React.StrictMode>,
     )
     ```
-    </CodeBlock>
 
     **What's happening:**
     - `ReactDOM.createRoot()` - Creates a React root
@@ -187,7 +174,6 @@ Let's understand what Vite created for you:
     ### `src/App.jsx`
     Your main component. This is where you'll start building.
     
-    <CodeBlock title="src/App.jsx" language="jsx">
     ```jsx
     import { useState } from 'react'
     import './App.css'
@@ -207,7 +193,6 @@ Let's understand what Vite created for you:
 
     export default App
     ```
-    </CodeBlock>
 
   </Step>
   
@@ -215,7 +200,6 @@ Let's understand what Vite created for you:
     ### `package.json`
     Defines your project dependencies and scripts.
     
-    <CodeBlock title="package.json" language="json">
     ```json
     {
       "name": "booking-app",
@@ -237,7 +221,6 @@ Let's understand what Vite created for you:
       }
     }
     ```
-    </CodeBlock>
     
     **Scripts:**
     - `npm run dev` - Start development server
@@ -249,7 +232,6 @@ Let's understand what Vite created for you:
     ### `vite.config.js`
     Vite configuration file. Usually you don't need to touch this.
     
-    <CodeBlock title="vite.config.js" language="javascript">
     ```javascript
     import { defineConfig } from 'vite'
     import react from '@vitejs/plugin-react'
@@ -258,7 +240,6 @@ Let's understand what Vite created for you:
       plugins: [react()],
     })
     ```
-    </CodeBlock>
 
   </Step>
 </Steps>
@@ -289,17 +270,16 @@ Let's make a simple change to verify everything works:
 
 **2. Change the heading:**
 
-<CodeBlock title="src/App.jsx" language="jsx">
 ```jsx
 function App() {
   const [count, setCount] = useState(0)
 
 return ( <div className="App"> <h1>My Booking App</h1> {/* Changed this line */}
+
 <button onClick={() => setCount(count + 1)}> count is {count} </button> </div> )
 }
 
 ````
-</CodeBlock>
 
 **3. Save the file**
 
@@ -383,13 +363,17 @@ In **Module 1: React Fundamentals**, you'll learn:
 -  Component composition
 -  Building the homepage structure
 
-<div className='flex gap-2 mt-6'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m0/4_project-overview'>
-         ← Lesson 4: Project Overview
-      </a>
-   </Button>
-   <Button size='lg' asChild>
-      <a href='/docs/react/m1'>Start Module 1 →</a>
-   </Button>
+<div className='flex gap-2 mt-6 flex-wrap'>
+   <a
+      href='/docs/react/m0/4_project-overview'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4'
+   >
+      ← Lesson 4: Project Overview
+   </a>
+   <a
+      href='/docs/react/m1'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8'
+   >
+      Start Module 1 →
+   </a>
 </div>

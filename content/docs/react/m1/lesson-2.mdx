@@ -1,0 +1,365 @@
+---
+title: "Lesson 2: Creating the HomePage Component"
+description: "Build your first custom React component from scratch."
+module: 1
+lesson: 2
+---
+
+# Lesson 2: Creating the HomePage Component
+
+Let's create your first React component from scratch! The `HomePage` will be the
+main landing page of our booking application.
+
+---
+
+## What is a Component?
+
+A React component is a **JavaScript function that returns JSX**. That's it!
+Every component follows this pattern:
+
+```jsx
+function ComponentName() {
+   return <div>{/* JSX goes here */}</div>;
+}
+
+export default ComponentName;
+```
+
+---
+
+## Step 1: Create the HomePage File
+
+In the `src/pages` folder, create a new file called `HomePage.jsx`:
+
+<Files>
+   <Folder name='src'>
+      <Folder name='pages' defaultOpen>
+         <File name='HomePage.jsx ← CREATE THIS FILE' />
+      </Folder>
+   </Folder>
+</Files>
+
+### Using VS Code:
+
+1. Right-click on the `pages` folder
+2. Select "New File"
+3. Name it `HomePage.jsx`
+
+---
+
+## Step 2: Write the HomePage Component
+
+Add this code to `HomePage.jsx`:
+
+```jsx
+// src/pages/HomePage.jsx
+
+function HomePage() {
+   return (
+      <div className='home-page'>
+         <header className='hero'>
+            <h1>Find Your Perfect Stay</h1>
+            <p>Discover amazing places to stay around the world</p>
+         </header>
+
+         <section className='listings'>
+            <h2>Featured Properties</h2>
+            <p>Property listings will go here...</p>
+         </section>
+      </div>
+   );
+}
+
+export default HomePage;
+```
+
+Let's break down what each part does:
+
+### Component Function
+
+```jsx
+function HomePage() {
+   // ...
+}
+```
+
+-  Function name uses **PascalCase** (first letter capitalized)
+-  Must return JSX
+-  Can contain logic before the return statement
+
+### JSX Return
+
+```jsx
+return <div className='home-page'>{/* JSX content */}</div>;
+```
+
+-  Wrapped in parentheses for multi-line JSX
+-  Must have **one root element** (the outer `<div>`)
+-  Uses `className` instead of `class`
+
+### Export Statement
+
+```jsx
+export default HomePage;
+```
+
+-  Makes the component available to other files
+-  Use `default` when exporting a single component per file
+
+---
+
+## Step 3: Import HomePage into App
+
+Now let's use the HomePage component in App.jsx:
+
+```jsx
+// src/App.jsx
+import HomePage from "./pages/HomePage"; // ← NEW: Import the component
+
+function App() {
+   return (
+      <div className='app'>
+         <HomePage /> {/* ← NEW: Use the component */}
+      </div>
+   );
+}
+
+export default App;
+```
+
+**Key points:**
+
+-  Import path is relative (`./pages/HomePage`)
+-  No need for `.jsx` extension
+-  Component used as JSX tag: `<HomePage />`
+-  Self-closing tag since HomePage has no children
+
+---
+
+## Understanding Component Composition
+
+We just composed two components together:
+
+```
+App
+ └─ HomePage
+     ├─ header (hero section)
+     └─ section (listings area)
+```
+
+**App** is the root component that renders **HomePage**. Later, HomePage will
+render more child components like PropertyList and PropertyCard.
+
+---
+
+## Why Separate Components?
+
+<Accordions type='single'>
+   <Accordion id='organization' title='1. Organization' value='organization'>
+      Each component focuses on one part of the UI. HomePage handles the home
+      page layout, not the entire app.
+   </Accordion>
+
+   <Accordion id='reusability' title='2. Reusability' value='reusability'>
+      Components can be reused multiple times or in different places (though
+      HomePage is used once).
+   </Accordion>
+
+   <Accordion
+      id='maintainability'
+      title='3. Maintainability'
+      value='maintainability'
+   >
+      When you need to change the home page, you know exactly where to look:
+      `pages/HomePage.jsx`
+   </Accordion>
+
+   <Accordion id='testing' title='4. Testing' value='testing'>
+      Smaller components are easier to test independently.
+   </Accordion>
+</Accordions>
+
+---
+
+## JSX Rules Recap
+
+<Steps>
+  <Step>
+    ### One Root Element
+    JSX must have a single parent element:
+    
+    ```jsx
+    // ❌ Wrong: Multiple root elements
+    return (
+      <h1>Title</h1>
+      <p>Text</p>
+    );
+    
+    // ✅ Correct: Wrapped in single parent
+    return (
+      <div>
+        <h1>Title</h1>
+        <p>Text</p>
+      </div>
+    );
+    ```
+  </Step>
+  
+  <Step>
+    ### Close All Tags
+    All tags must be closed, even self-closing ones:
+    
+    ```jsx
+    // ❌ Wrong
+    <img src="photo.jpg">
+    <input type="text">
+    
+    // ✅ Correct
+    <img src="photo.jpg" />
+    <input type="text" />
+    ```
+  </Step>
+  
+  <Step>
+    ### Use className
+    HTML's `class` becomes `className` in JSX:
+    
+    ```jsx
+    // ❌ Wrong
+    <div class="container">
+    
+    // ✅ Correct
+    <div className="container">
+    ```
+  </Step>
+  
+  <Step>
+    ### JavaScript Expressions in Curly Braces
+    Use `{}` to embed JavaScript:
+    
+    ```jsx
+    const name = "StayScape";
+    return <h1>{name}</h1>;
+    // Renders: <h1>StayScape</h1>
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Check Your Browser
+
+Save all files and look at your browser. You should now see:
+
+-  "Find Your Perfect Stay" as the main heading
+-  "Discover amazing places..." subtitle
+-  "Featured Properties" section heading
+-  "Property listings will go here..." placeholder
+
+---
+
+## Common Mistakes to Avoid
+
+<Accordions type="single">
+  <Accordion id="forgot-import" title="Forgetting the Import" value="forgot-import">
+    ```jsx
+    // ❌ This will cause an error:
+    function App() {
+      return <HomePage />;  // Error: HomePage is not defined
+    }
+    
+    // ✅ Always import first:
+    import HomePage from './pages/HomePage';
+    ```
+  </Accordion>
+  
+  <Accordion id="wrong-path" title="Wrong Import Path" value="wrong-path">
+    ```jsx
+    // ❌ Wrong path
+    import HomePage from './HomePage'; // Not found!
+    
+    // ✅ Correct relative path
+    import HomePage from './pages/HomePage';
+    ```
+  </Accordion>
+  
+  <Accordion id="lowercase-component" title="Lowercase Component Name" value="lowercase-component">
+    ```jsx
+    // ❌ React treats lowercase as HTML tags
+    function homepage() {
+      return <div>...</div>;
+    }
+    
+    // ✅ Always use PascalCase
+    function HomePage() {
+      return <div>...</div>;
+    }
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## What You Learned
+
+<Badge variant='success'>Concepts Mastered</Badge>
+
+-  ✅ Creating a React component (function returning JSX)
+-  ✅ Organizing files (pages vs components folders)
+-  ✅ Importing and exporting components
+-  ✅ Component composition (App contains HomePage)
+-  ✅ JSX syntax rules
+-  ✅ Using className for styling
+
+---
+
+## Practice Challenge
+
+Try this before moving on:
+
+1. Add a new paragraph to the hero section
+2. Change the heading text
+3. Add a `<footer>` section at the bottom of HomePage
+
+<Accordions type="single">
+  <Accordion id="solution" title="💡 Solution (try it yourself first!)" value="solution">
+    ```jsx
+    function HomePage() {
+      return (
+        <div className="home-page">
+          <header className="hero">
+            <h1>Find Your Dream Vacation</h1>  {/* Changed */}
+            <p>Discover amazing places to stay around the world</p>
+            <p>Book with confidence</p>  {/* New paragraph */}
+          </header>
+          
+          <section className="listings">
+            <h2>Featured Properties</h2>
+            <p>Property listings will go here...</p>
+          </section>
+          
+          <footer>  {/* New footer */}
+            <p>© 2024 StayScape. All rights reserved.</p>
+          </footer>
+        </div>
+      );
+    }
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## Next Up
+
+Great job! You've created your first custom component. Next, we'll add real
+property data to display on the home page.
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m1/lesson-1'>← Previous: Project Setup</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m1/lesson-3'>Next: Adding Property Data →</a>
+   </Button>
+</div>

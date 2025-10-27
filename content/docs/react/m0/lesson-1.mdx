@@ -1,0 +1,198 @@
+---
+title: "Lesson 1: Understanding the Course Platform"
+description:
+   "Learn how to navigate the course interface and make the most of your
+   learning experience."
+module: 0
+lesson: 1
+---
+
+# Lesson 1: Understanding the Course Platform
+
+Welcome to your first lesson! Before we dive into React, let's make sure you
+know how to navigate this course effectively.
+
+---
+
+## Course Navigation
+
+The course interface is designed to be simple and intuitive:
+
+### Sidebar Navigation
+
+On the left side, you'll find:
+
+-  **All modules** listed in order
+-  **Current module** highlighted
+-  **Lesson links** under each module
+-  **Progress indicators** showing what you've completed
+
+### Main Content Area
+
+The center displays:
+
+-  Lesson content with explanations
+-  Code examples
+-  Visual diagrams
+-  Interactive components
+
+### Next/Previous Buttons
+
+At the bottom of each lesson:
+
+-  **Previous** - Go back to review
+-  **Next** - Continue to the next lesson
+
+---
+
+## Module Structure
+
+Every module follows this pattern:
+
+<Steps>
+   <Step>
+      ### Module Introduction An overview page (like Module 0's intro)
+      explaining what you'll learn
+   </Step>
+   <Step>
+      ### Individual Lessons Step-by-step lessons teaching specific concepts
+      with code examples
+   </Step>
+   <Step>
+      ### Module Completion A celebration page summarizing what you've
+      accomplished
+   </Step>
+</Steps>
+
+---
+
+## Learning Objectives Display
+
+At the start of each module, you'll see a task list like this:
+
+<Files>
+   <File name='✅ Completed Task' />
+   <File name='📝 Current Task' />
+   <File name='⏳ Upcoming Task' />
+</Files>
+
+These help you track your progress and know what's coming next.
+
+---
+
+## Code Examples Format
+
+Throughout the course, you'll encounter code snippets. Here's how to read them:
+
+### Full File Examples
+
+When we show a complete file, it looks like this:
+
+```jsx
+// src/App.jsx
+import React from "react";
+
+function App() {
+   return (
+      <div className='app'>
+         <h1>Hello React!</h1>
+      </div>
+   );
+}
+
+export default App;
+```
+
+The comment at the top tells you the file path.
+
+### Code Changes
+
+When we modify existing code, we'll show the full context:
+
+```jsx
+// src/App.jsx
+import React from "react";
+import HomePage from "./pages/HomePage"; // ← NEW
+
+function App() {
+   return (
+      <div className='app'>
+         <HomePage /> {/* ← CHANGED */}
+      </div>
+   );
+}
+
+export default App;
+```
+
+Comments like `// ← NEW` or `{/* ← CHANGED */}` highlight what's different.
+
+---
+
+## Visual Indicators
+
+Throughout the course, you'll see these helpful markers:
+
+<Accordions type='single'>
+   <Accordion id='tip' title='💡 Tips' value='tip'>
+      Helpful hints and best practices to enhance your learning
+   </Accordion>
+
+   <Accordion id='warning' title='⚠️ Important' value='warning'>
+      Critical information you shouldn't skip
+   </Accordion>
+
+   <Accordion id='note' title='📝 Note' value='note'>
+      Additional context or explanations
+   </Accordion>
+
+   <Accordion id='checkpoint' title='✅ Checkpoint' value='checkpoint'>
+      Verification steps to confirm your code works
+   </Accordion>
+</Accordions>
+
+---
+
+## Best Practices for Learning
+
+To get the most out of this course:
+
+1. **Follow Along** - Code alongside the lessons in your own project
+2. **Don't Skip** - Each lesson builds on the previous ones
+3. **Experiment** - Try modifying the code to see what happens
+4. **Take Breaks** - Don't rush; understanding is more important than speed
+5. **Ask Questions** - Use the community forum if you're stuck
+
+---
+
+## Your Learning Environment
+
+Before moving forward, ensure you have:
+
+<Steps>
+   <Step>
+      ### Text Editor or IDE **VS Code** is recommended for its excellent React
+      support
+   </Step>
+   <Step>
+      ### Terminal Access You'll need to run commands to start your project
+   </Step>
+   <Step>### Web Browser Chrome or Firefox with developer tools</Step>
+   <Step>### Note-taking Tool Keep notes on concepts you want to remember</Step>
+</Steps>
+
+---
+
+## Next Up
+
+Now that you understand how to navigate the course, let's learn how to read and
+understand code snippets effectively!
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m0'>← Back to Module Intro</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m0/lesson-2'>Next: Reading Code Snippets →</a>
+   </Button>
+</div>

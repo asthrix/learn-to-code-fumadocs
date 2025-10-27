@@ -1,0 +1,173 @@
+---
+title: "Component Showcase"
+description:
+   "Live examples of all custom MDX components available in this course."
+---
+
+<Banner variant='rainbow' id='component-showcase-banner'>
+   ✨ Component Showcase — preview all building blocks used across the React
+   course.
+</Banner>
+
+# Component Showcase
+
+Explore the reusable UI components that power our MDX lessons. You can copy
+these patterns directly into module content.
+
+## Badges
+
+<div className='flex flex-wrap gap-2'>
+   <Badge>Default</Badge>
+   <Badge variant='primary'>Primary</Badge>
+   <Badge variant='success'>Success</Badge>
+   <Badge variant='danger'>Danger</Badge>
+   <Badge className='uppercase'>Custom class</Badge>
+   <Badge>
+      With <code>inline code</code>
+   </Badge>
+   <Badge>🚀 Emoji Friendly</Badge>
+   <Badge>Longer text to test wrapping behavior in the layout</Badge>
+</div>
+
+---
+
+## Buttons
+
+<div className='flex flex-wrap gap-3'>
+   <Button>Default</Button>
+   <Button variant='outline'>Outline</Button>
+   <Button variant='secondary'>Secondary</Button>
+   <Button variant='ghost'>Ghost</Button>
+   <Button variant='link' asChild>
+      <a href='/docs/react-new'>Link Button</a>
+   </Button>
+</div>
+
+---
+
+## Accordion
+
+<Accordions type='single' defaultValue='what-is-this'>
+   <Accordion id='acc-what' title='What is this page?' value='what-is-this'>
+      This page demonstrates every MDX component wired in{" "}
+      <code>src/mdx-components.tsx</code> so you can reuse the patterns in
+      course content.
+   </Accordion>
+   <Accordion
+      id='acc-how'
+      title={
+         <>
+            How do I copy examples?{" "}
+            <span className='text-xs text-fd-muted-foreground'>
+               (click to expand)
+            </span>
+         </>
+      }
+      value='how-to-use'
+   >
+      Simply copy the JSX from a section and adjust the text. Components are
+      globally available in MDX, so no imports are needed.
+   </Accordion>
+   <Accordion id='acc-links' title='Useful links' value='useful-links'>
+      <ul>
+         <li>
+            Course index: <a href='/docs/react-new'>/docs/react-new</a>
+         </li>
+         <li>
+            MDX docs: <a href='/MDX-docs/MDX_TEMPLATES.md'>MDX_TEMPLATES.md</a>
+         </li>
+      </ul>
+   </Accordion>
+   <Accordion
+      id='acc-copy'
+      title='Share a deep link to a section'
+      value='copy-links'
+   >
+      Click the chain icon on the right of a header to copy a URL with a hash to
+      this accordion item.
+   </Accordion>
+</Accordions>
+
+---
+
+## Steps
+
+<Steps>
+   <Step>
+      <h3>1) Read the context</h3>
+      Keep each step focused on a single concept and why it matters.
+   </Step>
+   <Step>
+      <h3>2) Implement the change</h3>
+      Show the minimal diff needed to move the project forward.
+   </Step>
+   <Step>
+      <h3>3) Verify the outcome</h3>
+      Provide a quick checklist or UI cue to validate success.
+   </Step>
+</Steps>
+
+---
+
+## Tabs
+
+<Tabs defaultValue='jsx'>
+   <TabsList>
+      <TabsTrigger value='jsx'>JSX</TabsTrigger>
+      <TabsTrigger value='explain'>Explanation</TabsTrigger>
+   </TabsList>
+   <TabsContent value='jsx'>
+      <pre>
+         {`function Hello() {
+	return <div>Hello Tabs</div>
+}`}
+      </pre>
+   </TabsContent>
+   <TabsContent value='explain'>
+      Use tabs to present code vs explanation, or multiple language variants.
+   </TabsContent>
+</Tabs>
+
+---
+
+## Files and Folders
+
+<Files>
+   <Folder name='src' defaultOpen>
+      <Folder name='components' defaultOpen>
+         <File name='Button.tsx' />
+         <File name='Badge.tsx' />
+      </Folder>
+      <Folder name='pages' defaultOpen>
+         <File name='index.tsx' />
+         <File name='course.tsx' />
+      </Folder>
+   </Folder>
+   <Folder name='content' defaultOpen>
+      <Folder name='docs' defaultOpen>
+         <Folder name='react-new' defaultOpen>
+            <File name='index.mdx' />
+            <File name='component-test.mdx' />
+         </Folder>
+      </Folder>
+   </Folder>
+</Files>
+
+---
+
+## Banner Variants
+
+<Banner id='info-banner' variant='normal' height='3rem'>
+   ℹ️ Normal banner — helpful for in-course announcements.
+</Banner>
+
+> Tip: The rainbow banner at the top can be dismissed; we persist your choice
+> with localStorage when an <code>id</code> is provided.
+
+---
+
+### Next
+
+If this page renders correctly and your build succeeds, I can scaffold the
+actual course modules based on the documentation in <code>MDX-docs</code> under
+a new folder at <code>content/docs/react</code>.

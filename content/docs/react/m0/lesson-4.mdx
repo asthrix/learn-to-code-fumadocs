@@ -1,0 +1,309 @@
+---
+title: "Lesson 4: Project Overview"
+description:
+   "Understand the complete booking application you'll build throughout this
+   course."
+module: 0
+lesson: 4
+---
+
+# Lesson 4: Project Overview
+
+Let's explore the complete application you'll build! By the end of this course,
+you'll have a fully functional property booking platform.
+
+---
+
+## The Application: "StayScape"
+
+**StayScape** is a property rental marketplace where users can:
+
+-  Browse available properties
+-  Search and filter listings
+-  View detailed property information
+-  Save favorites
+-  Book properties
+-  Create and manage accounts
+
+Think Airbnb, but you'll build it from scratch! 🏠
+
+---
+
+## Application Features
+
+Here's everything your app will do:
+
+### Module 1-2: Foundation & Interactivity
+
+<Steps>
+   <Step>
+      ### Homepage with Property Listings - Grid of property cards - Property
+      images, titles, prices - Static layout (Module 1) - Interactive filters
+      (Module 2)
+   </Step>
+   <Step>
+      ### Search & Filter System - Search by name or location - Date range
+      picker - Guest count selector - Real-time filtering
+   </Step>
+</Steps>
+
+### Module 3-4: Data & Navigation
+
+<Steps>
+   <Step>
+      ### API Integration - Fetch listings from backend - Loading spinners -
+      Error handling - Image carousels
+   </Step>
+   <Step>
+      ### Property Details Page - Full property information - Photo gallery -
+      Amenities list - Booking widget - Reviews section
+   </Step>
+   <Step>
+      ### Multi-page Navigation - React Router setup - Navigation menu -
+      URL-based routing - 404 error page
+   </Step>
+</Steps>
+
+### Module 5-7: Advanced Features
+
+<Steps>
+   <Step>
+      ### Performance Optimization - Custom hooks - Memoization - Code splitting
+      - Fast re-renders
+   </Step>
+   <Step>
+      ### Favorites System - Redux global state - Save/unsave properties -
+      Favorites page - Persistent storage
+   </Step>
+   <Step>
+      ### User Authentication - Registration form - Login form - JWT tokens -
+      Protected routes - User profile
+   </Step>
+</Steps>
+
+### Module 8: Production
+
+<Steps>
+   <Step>
+      ### Deployment - Production build - Environment configuration - Vercel
+      deployment - Live on the internet!
+   </Step>
+</Steps>
+
+---
+
+## Technology Stack
+
+You'll use modern, industry-standard tools:
+
+<Accordions type='single'>
+   <Accordion id='react' title='React 18.3 - UI Library' value='react'>
+      The core library for building the user interface. You'll learn: -
+      Functional components - Hooks (useState, useEffect, custom hooks) -
+      Context API - Performance optimization
+   </Accordion>
+
+   <Accordion id='router' title='React Router v6 - Navigation' value='router'>
+      Client-side routing for multi-page feel: - Route configuration - Dynamic
+      routes - URL parameters - Link navigation
+   </Accordion>
+
+   <Accordion id='redux' title='Redux Toolkit - State Management' value='redux'>
+      Global state management for complex features: - Store setup - Slices and
+      reducers - Async thunks - Redux DevTools
+   </Accordion>
+
+   <Accordion id='form' title='React Hook Form - Form Handling' value='form'>
+      Performant forms with validation: - Form state management - Input
+      validation - Error messages - Submission handling
+   </Accordion>
+
+   <Accordion id='zod' title='Zod - Schema Validation' value='zod'>
+      TypeScript-first schema validation: - Type-safe validation - Custom error
+      messages - Form integration
+   </Accordion>
+
+   <Accordion id='axios' title='Axios - HTTP Client' value='axios'>
+      Promise-based HTTP requests: - GET/POST requests - Request/response
+      interceptors - Error handling
+   </Accordion>
+
+   <Accordion id='tailwind' title='Tailwind CSS - Styling' value='tailwind'>
+      Utility-first CSS framework: - Rapid styling - Responsive design - Custom
+      themes
+   </Accordion>
+
+   <Accordion id='vite' title='Vite - Build Tool' value='vite'>
+      Lightning-fast development: - Hot module replacement - Optimized builds -
+      Fast refresh
+   </Accordion>
+</Accordions>
+
+---
+
+## Application Architecture
+
+Here's how the pieces fit together:
+
+```
+┌─────────────────────────────────────┐
+│         Browser (React App)         │
+├─────────────────────────────────────┤
+│  ┌─────────────────────────────┐   │
+│  │    React Router             │   │
+│  │  ┌────────┐  ┌────────────┐ │   │
+│  │  │ Home   │  │  Details   │ │   │
+│  │  │ Page   │  │   Page     │ │   │
+│  │  └────────┘  └────────────┘ │   │
+│  └─────────────────────────────┘   │
+│  ┌─────────────────────────────┐   │
+│  │    Redux Store              │   │
+│  │  - User State               │   │
+│  │  - Favorites                │   │
+│  └─────────────────────────────┘   │
+└──────────────┬──────────────────────┘
+               │
+          HTTP Requests
+         (Axios)
+               │
+               ▼
+┌─────────────────────────────────────┐
+│         Backend API                 │
+│  - Property listings                │
+│  - User authentication              │
+│  - Booking management               │
+└─────────────────────────────────────┘
+```
+
+---
+
+## Project File Structure
+
+By the end of the course, your project will look like this:
+
+<Files>
+   <Folder name='src' defaultOpen>
+      <Folder name='pages' defaultOpen>
+         <File name='HomePage.jsx' />
+         <File name='PropertyDetailsPage.jsx' />
+         <File name='FavoritesPage.jsx' />
+         <File name='LoginPage.jsx' />
+         <File name='RegisterPage.jsx' />
+         <File name='NotFoundPage.jsx' />
+      </Folder>
+      <Folder name='components'>
+         <File name='Navbar.jsx' />
+         <File name='PropertyCard.jsx' />
+         <File name='PropertyList.jsx' />
+         <File name='SearchFilters.jsx' />
+         <File name='Carousel.jsx' />
+         <File name='BookingWidget.jsx' />
+         <File name='LoginForm.jsx' />
+         <File name='RegisterForm.jsx' />
+      </Folder>
+      <Folder name='store'>
+         <File name='index.js' />
+         <File name='favoritesSlice.js' />
+         <File name='userSlice.js' />
+      </Folder>
+      <Folder name='hooks'>
+         <File name='useProperties.js' />
+         <File name='useAuth.js' />
+         <File name='useLocalStorage.js' />
+      </Folder>
+      <Folder name='api'>
+         <File name='client.js' />
+         <File name='properties.js' />
+         <File name='auth.js' />
+      </Folder>
+      <Folder name='utils'>
+         <File name='formatters.js' />
+         <File name='validators.js' />
+      </Folder>
+      <File name='App.jsx' />
+      <File name='main.jsx' />
+   </Folder>
+</Files>
+
+Don't worry if this seems complex - we'll build it step by step!
+
+---
+
+## Learning Path
+
+Each module builds on the previous:
+
+| Module | What You Build         | Key Concepts              |
+| ------ | ---------------------- | ------------------------- |
+| **1**  | Static homepage layout | Components, JSX, Props    |
+| **2**  | Interactive filters    | State, Events             |
+| **3**  | Real data from API     | Effects, Async            |
+| **4**  | Multiple pages         | Routing, Navigation       |
+| **5**  | Optimized performance  | Custom hooks, Memoization |
+| **6**  | Favorites feature      | Redux, Global state       |
+| **7**  | User accounts          | Forms, Auth               |
+| **8**  | Live website           | Deployment                |
+
+---
+
+## What You'll Learn
+
+By building this project, you'll master:
+
+### React Core
+
+-  ✅ Component architecture
+-  ✅ Props and composition
+-  ✅ State management
+-  ✅ Side effects
+-  ✅ Lifecycle methods
+-  ✅ Context API
+
+### Advanced Patterns
+
+-  ✅ Custom hooks
+-  ✅ Higher-order components
+-  ✅ Render props
+-  ✅ Compound components
+-  ✅ Performance optimization
+
+### Real-World Skills
+
+-  ✅ API integration
+-  ✅ Form handling
+-  ✅ Authentication flows
+-  ✅ State management at scale
+-  ✅ Routing and navigation
+-  ✅ Error handling
+-  ✅ Loading states
+-  ✅ Deployment
+
+---
+
+## Design Preview
+
+While we'll focus on functionality, your app will look professional with:
+
+-  Clean, modern UI
+-  Responsive design (mobile-friendly)
+-  Smooth animations
+-  Professional typography
+-  Consistent spacing and colors
+
+We'll use Tailwind CSS to make styling quick and easy!
+
+---
+
+## Next Steps
+
+Now you understand what you're building! In the final lesson of this module,
+we'll cover best practices and tips for success.
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m0/lesson-3'>← Previous: Environment Setup</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m0/lesson-5'>Next: Success Tips →</a>
+   </Button>
+</div>
