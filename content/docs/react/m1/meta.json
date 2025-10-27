@@ -1,0 +1,13 @@
+{
+   "title": "Module 1: React Fundamentals",
+   "pages": [
+      "0_index",
+      "1_create-homepage",
+      "2_add-homepage-to-app",
+      "3_create-listing-list",
+      "4_create-listing-card",
+      "5_add-listing-list",
+      "6_pass-props",
+      "7_map-listings"
+   ]
+}
