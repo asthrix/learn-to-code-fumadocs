@@ -1,0 +1,510 @@
+---
+title: "Lesson 7: Module 1 Review"
+description:
+   "Consolidate your React fundamentals knowledge and celebrate your progress."
+module: 1
+lesson: 7
+---
+
+# Lesson 7: Module 1 Review
+
+Congratulations! You've completed Module 1. Let's review everything you've
+learned and see how far you've come.
+
+---
+
+## What You Built
+
+You created a **property listing homepage** with:
+
+-  Reusable React components
+-  Dynamic data rendering
+-  Props for component communication
+-  Professional styling with Tailwind CSS
+-  Responsive grid layout
+
+---
+
+## Key Concepts Mastered
+
+### 1. JSX (JavaScript + XML)
+
+<Badge variant='primary'>Core Concept</Badge>
+
+JSX lets you write HTML-like code in JavaScript:
+
+```jsx
+const element = <h1>Hello, React!</h1>;
+```
+
+**Key points:**
+
+-  Use `className` instead of `class`
+-  Use `{}` for JavaScript expressions
+-  Close all tags (even `<img />`)
+-  camelCase for attributes (`onClick`, not `onclick`)
+
+---
+
+### 2. Components
+
+<Badge variant='primary'>Core Concept</Badge>
+
+Components are reusable pieces of UI:
+
+```jsx
+function PropertyCard({ title, price }) {
+   return (
+      <div>
+         <h3>{title}</h3>
+         <p>${price}/night</p>
+      </div>
+   );
+}
+```
+
+**Component rules:**
+
+-  Start with capital letter
+-  Can be functions or classes (we use functions)
+-  Return JSX
+-  Should be focused and reusable
+
+---
+
+### 3. Props
+
+<Badge variant='primary'>Core Concept</Badge>
+
+Props pass data from parent to child:
+
+```jsx
+// Parent passes props
+<PropertyCard title='Beach House' price={200} />;
+
+// Child receives props
+function PropertyCard({ title, price }) {
+   return (
+      <div>
+         {title}: ${price}
+      </div>
+   );
+}
+```
+
+**Props characteristics:**
+
+-  Read-only (immutable)
+-  Passed from parent to child
+-  Can be any JavaScript value
+-  Use destructuring for cleaner code
+
+---
+
+### 4. Array.map() for Lists
+
+<Badge variant='primary'>Core Concept</Badge>
+
+Render dynamic lists with `.map()`:
+
+```jsx
+function PropertyList({ properties }) {
+   return (
+      <div>
+         {properties.map((property) => (
+            <PropertyCard
+               key={property.id}
+               title={property.title}
+               price={property.price}
+            />
+         ))}
+      </div>
+   );
+}
+```
+
+**Map rules:**
+
+-  Always provide unique `key` prop
+-  Use `id` or unique identifier
+-  Keys help React track changes
+-  Don't use array index as key
+
+---
+
+### 5. Component Composition
+
+<Badge variant='primary'>Core Concept</Badge>
+
+Build complex UIs by combining small components:
+
+```
+HomePage
+├── Header
+└── PropertyList
+    └── PropertyCard (×4)
+```
+
+**Benefits:**
+
+-  Code reuse
+-  Easier testing
+-  Better organization
+-  Simpler maintenance
+
+---
+
+## Your Component Architecture
+
+Let's visualize what you built:
+
+<Files>
+   <Folder name='src' defaultOpen>
+      <Folder name='pages'>
+         <File name='HomePage.jsx' />
+      </Folder>
+      <Folder name='components'>
+         <File name='PropertyList.jsx' />
+         <File name='PropertyCard.jsx' />
+      </Folder>
+      <File name='App.jsx' />
+      <File name='main.jsx' />
+   </Folder>
+</Files>
+
+**Data flow:**
+
+<Steps>
+   <Step>### Data Creation Properties array defined in `HomePage.jsx`</Step>
+
+{" "}
+<Step>### Data Passing HomePage passes array to PropertyList via props</Step>
+
+{" "}
+<Step>
+   ### Data Transformation PropertyList maps array to PropertyCard components
+</Step>
+
+   <Step>### Data Display PropertyCard displays individual property data</Step>
+</Steps>
+
+---
+
+## Before and After
+
+### Before Module 1:
+
+-  Empty React project
+-  Default boilerplate code
+-  No understanding of components
+
+### After Module 1:
+
+-  Working property listing page
+-  Three custom components
+-  Understanding of JSX, props, and composition
+-  Professional styling with Tailwind CSS
+-  Responsive layout
+
+---
+
+## Common Patterns You Learned
+
+<Accordions type="single">
+  <Accordion id="pattern1" title="Presentational Component Pattern" value="pattern1">
+    Components that focus on UI, receiving data via props:
+    
+    ```jsx
+    function PropertyCard({ title, price, image }) {
+      return (
+        <div>
+          <img src={image} alt={title} />
+          <h3>{title}</h3>
+          <p>${price}/night</p>
+        </div>
+      );
+    }
+    ```
+  </Accordion>
+  
+  <Accordion id="pattern2" title="Container Component Pattern" value="pattern2">
+    Components that manage data and pass it to children:
+    
+    ```jsx
+    function HomePage() {
+      const properties = [/* data */];
+      
+      return <PropertyList properties={properties} />;
+    }
+    ```
+  </Accordion>
+  
+  <Accordion id="pattern3" title="List Rendering Pattern" value="pattern3">
+    Components that map arrays to child components:
+    
+    ```jsx
+    function PropertyList({ properties }) {
+      return (
+        <div>
+          {properties.map(property => (
+            <PropertyCard key={property.id} {...property} />
+          ))}
+        </div>
+      );
+    }
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## Skills Progression
+
+You can now:
+
+-  ✅ **Create functional components** with proper syntax
+-  ✅ **Write JSX** with JavaScript expressions
+-  ✅ **Pass and receive props** between components
+-  ✅ **Destructure props** for cleaner code
+-  ✅ **Render lists** dynamically with `.map()`
+-  ✅ **Use keys** correctly for list items
+-  ✅ **Style components** with Tailwind CSS
+-  ✅ **Build responsive layouts** with CSS Grid
+-  ✅ **Compose components** into larger UIs
+-  ✅ **Organize project** with proper file structure
+
+---
+
+## Module 1 Milestones
+
+<Accordions type='single'>
+   <Accordion id='lesson1' title='✅ Lesson 1: Project Setup' value='lesson1'>
+      - Cleaned up boilerplate code - Created basic project structure - Set up
+      HomePage component
+   </Accordion>
+
+{" "}
+<Accordion id='lesson2' title='✅ Lesson 2: HomePage Component' value='lesson2'>
+   - Created first custom component - Learned JSX syntax - Rendered static
+   content
+</Accordion>
+
+{" "}
+<Accordion id='lesson3' title='✅ Lesson 3: Adding Data' value='lesson3'>
+   - Created properties array - Learned JavaScript in JSX - Understood data
+   structures
+</Accordion>
+
+{" "}
+<Accordion
+   id='lesson4'
+   title='✅ Lesson 4: PropertyCard with Props'
+   value='lesson4'
+>
+   - Created reusable component - Passed data via props - Practiced props
+   destructuring
+</Accordion>
+
+{" "}
+<Accordion
+   id='lesson5'
+   title='✅ Lesson 5: PropertyList with Map'
+   value='lesson5'
+>
+   - Rendered dynamic lists - Used `.map()` method - Implemented React keys
+</Accordion>
+
+   <Accordion
+      id='lesson6'
+      title='✅ Lesson 6: Styling with Tailwind'
+      value='lesson6'
+   >
+      - Installed Tailwind CSS - Applied utility classes - Created responsive
+      layouts
+   </Accordion>
+</Accordions>
+
+---
+
+## Debugging Tips You've Learned
+
+<Banner variant='warning'>**Common Issues & Solutions**</Banner>
+
+**"Cannot read property of undefined"**
+
+-  Check that props are being passed correctly
+-  Verify data structure matches component expectations
+
+**"Each child in a list should have a unique key prop"**
+
+-  Add `key={property.id}` to mapped components
+-  Use unique identifiers, not array indexes
+
+**"className is not defined"**
+
+-  Import Tailwind directives in `index.css`
+-  Restart dev server after Tailwind installation
+
+**Component not displaying**
+
+-  Check that component is imported
+-  Verify component is exported with `export default`
+-  Ensure JSX is returned from component
+
+---
+
+## React Developer Tools
+
+<Accordions type='single'>
+   <Accordion id='devtools' title='Install React DevTools' value='devtools'>
+      Browser extensions for debugging React: - **Chrome**: [React Developer
+      Tools](https://chrome.google.com/webstore/detail/react-developer-tools) -
+      **Firefox**: [React Developer
+      Tools](https://addons.mozilla.org/en-US/firefox/addon/react-devtools/)
+      **Features:** - Inspect component hierarchy - View props and state - Track
+      component updates - Profile performance
+   </Accordion>
+</Accordions>
+
+---
+
+## What's Next?
+
+In **Module 2**, you'll learn:
+
+<Badge variant='info'>Coming Up</Badge>
+
+-  **State management** with `useState`
+-  **Event handling** (clicks, inputs, forms)
+-  **Conditional rendering** (show/hide elements)
+-  **Lifting state up** (sharing state between components)
+-  **Building search filters** for your properties
+
+You'll add interactivity to your static homepage!
+
+---
+
+## Practice Before Moving On
+
+<Accordions type="single">
+  <Accordion id="practice1" title="Challenge: Add More Properties" value="practice1">
+    Add 4 more properties to your array with different images, locations, and prices.
+  </Accordion>
+  
+  <Accordion id="practice2" title="Challenge: Create a Footer Component" value="practice2">
+    ```jsx
+    function Footer() {
+      const currentYear = new Date().getFullYear();
+      return (
+        <footer className="bg-gray-900 text-white py-8 mt-12">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <p>© {currentYear} PropertyStays. All rights reserved.</p>
+          </div>
+        </footer>
+      );
+    }
+    ```
+  </Accordion>
+  
+  <Accordion id="practice3" title="Challenge: Add Price Range Badge" value="practice3">
+    Display "Budget", "Moderate", or "Luxury" based on price:
+    
+    ```jsx
+    function PriceRangeBadge({ price }) {
+      if (price < 100) return <span className="text-green-600">Budget</span>;
+      if (price < 300) return <span className="text-blue-600">Moderate</span>;
+      return <span className="text-purple-600">Luxury</span>;
+    }
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## Celebrate Your Progress! 🎉
+
+You've learned the **fundamental building blocks** of React:
+
+-  Components
+-  JSX
+-  Props
+-  Composition
+-  Dynamic rendering
+
+These concepts form the foundation for everything else in React. You're now
+ready to add interactivity with state and events!
+
+---
+
+## Self-Assessment
+
+Rate your understanding:
+
+<Accordions type='single'>
+   <Accordion
+      id='assess1'
+      title='I can create React components'
+      value='assess1'
+   >
+      ✅ **Confident** - Move to Module 2 ⚠️ **Need practice** - Review lessons
+      1-2, try creating 2-3 more components
+   </Accordion>
+
+{" "}
+<Accordion id='assess2' title='I understand props' value='assess2'>
+   ✅ **Confident** - Move to Module 2 ⚠️ **Need practice** - Review lesson 4,
+   practice passing different data types
+</Accordion>
+
+   <Accordion
+      id='assess3'
+      title='I can render lists with .map()'
+      value='assess3'
+   >
+      ✅ **Confident** - Move to Module 2 ⚠️ **Need practice** - Review lesson
+      5, create lists with different data
+   </Accordion>
+</Accordions>
+
+---
+
+## Resources for Further Learning
+
+-  [React Docs: Thinking in React](https://react.dev/learn/thinking-in-react)
+-  [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+-  [JavaScript Array Methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)
+
+---
+
+## Final Checkpoint ✅
+
+Before moving to Module 2, ensure:
+
+-  ✅ Your homepage displays multiple property cards
+-  ✅ Data flows from HomePage → PropertyList → PropertyCard
+-  ✅ Styling looks professional with Tailwind CSS
+-  ✅ Layout is responsive on different screen sizes
+-  ✅ You understand components, props, and composition
+-  ✅ No console errors in browser DevTools
+
+---
+
+## Ready for Module 2?
+
+Great work completing Module 1! You've built a solid foundation. In Module 2,
+you'll make your application interactive with state and events.
+
+<div className='mt-8 flex gap-4 justify-between'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m1/lesson-6'>← Previous: Styling with Tailwind</a>
+   </Button>
+   <Button variant='default' asChild>
+      <a href='/docs/react/m2'>Next: Module 2 - State & Events →</a>
+   </Button>
+</div>
+
+---
+
+<Banner variant='success'>
+   **Module 1 Complete!** You're officially a React developer. Keep building! 🚀
+</Banner>

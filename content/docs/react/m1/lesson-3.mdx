@@ -1,0 +1,373 @@
+---
+title: "Lesson 3: Adding Property Data"
+description:
+   "Create a data array of property listings and learn how to work with
+   JavaScript in JSX."
+module: 1
+lesson: 3
+---
+
+# Lesson 3: Adding Property Data
+
+Now that we have a HomePage component, let's add some actual property data to
+display. You'll learn how to work with JavaScript arrays and objects inside
+React components.
+
+---
+
+## Current State
+
+Right now, the HomePage shows placeholder text: "Property listings will go
+here...". We need real property data to display!
+
+---
+
+## Understanding the Data Structure
+
+Each property in our booking app needs several pieces of information:
+
+```javascript
+{
+  id: 1,
+  title: "Cozy Beach House",
+  location: "Malibu, California",
+  price: 250,
+  rating: 4.9,
+  image: "https://images.unsplash.com/photo-1..."
+}
+```
+
+**Why these fields?**
+
+-  `id` - Unique identifier (we'll need this later for React keys)
+-  `title` - Property name
+-  `location` - Where it is
+-  `price` - Cost per night
+-  `rating` - Average guest rating
+-  `image` - Photo URL
+
+---
+
+## Step 1: Create the Properties Array
+
+Update your `HomePage.jsx` to include property data:
+
+```jsx
+// src/pages/HomePage.jsx
+
+function HomePage() {
+   // Property data array
+   const properties = [
+      {
+         id: 1,
+         title: "Cozy Beach House",
+         location: "Malibu, California",
+         price: 250,
+         rating: 4.9,
+         image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800",
+      },
+      {
+         id: 2,
+         title: "Modern Downtown Loft",
+         location: "New York, NY",
+         price: 180,
+         rating: 4.7,
+         image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800",
+      },
+      {
+         id: 3,
+         title: "Mountain Cabin Retreat",
+         location: "Aspen, Colorado",
+         price: 320,
+         rating: 5.0,
+         image: "https://images.unsplash.com/photo-1518732714860-b62714ce0c59?w=800",
+      },
+      {
+         id: 4,
+         title: "Lakefront Villa",
+         location: "Lake Tahoe, Nevada",
+         price: 400,
+         rating: 4.8,
+         image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+      },
+   ];
+
+   return (
+      <div className='home-page'>
+         <header className='hero'>
+            <h1>Find Your Perfect Stay</h1>
+            <p>Discover amazing places to stay around the world</p>
+         </header>
+
+         <section className='listings'>
+            <h2>Featured Properties</h2>
+            <p>We have {properties.length} properties available</p>
+         </section>
+      </div>
+   );
+}
+
+export default HomePage;
+```
+
+---
+
+## What Changed?
+
+### 1. Added Property Data
+
+```jsx
+const properties = [
+  { id: 1, title: "...", ... },
+  { id: 2, title: "...", ... },
+  // ... more properties
+];
+```
+
+This creates an array of objects. Each object represents one property with all
+its details.
+
+### 2. Used JavaScript in JSX
+
+```jsx
+<p>We have {properties.length} properties available</p>
+```
+
+**The curly braces `{}` let you use JavaScript inside JSX:**
+
+-  `properties.length` is a JavaScript expression
+-  It evaluates to `4` (the number of items in the array)
+-  React renders it as plain text
+
+---
+
+## Why Define Data Inside the Component?
+
+<Accordions type='single'>
+   <Accordion id='scope' title='Component Scope' value='scope'>
+      Data defined inside a component is only available to that component.
+      Later, we'll move this data outside or fetch it from an API, but for
+      learning, keeping it local is simpler.
+   </Accordion>
+
+{" "}
+<Accordion id='practice' title='Learning Step' value='practice'>
+   We're starting with hardcoded data to focus on React concepts. In Module 3,
+   you'll fetch this data from a real API!
+</Accordion>
+
+   <Accordion id='realistic' title='Realistic Structure' value='realistic'>
+      This data structure mirrors what you'd get from a real backend API. When
+      we switch to API calls, we'll only change how we get the data, not its
+      structure.
+   </Accordion>
+</Accordions>
+
+---
+
+## JavaScript in JSX Rules
+
+You can use any JavaScript expression inside `{}`:
+
+<Steps>
+   <Step>
+      ### Variables
+      
+      ```jsx
+      const name = "StayScape";
+      <h1>{name}</h1>
+      // Renders: <h1>StayScape</h1>
+      ```
+   </Step>
+
+{" "}
+<Step>
+   ### Math Operations ```jsx const price = 250;
+   <p>${price * 7} per week</p>
+   // Renders: <p>$1750 per week</p>
+   ```
+</Step>
+
+{" "}
+<Step>
+   ### String Methods ```jsx const title = "beach house";
+   <h2>{title.toUpperCase()}</h2>
+   // Renders: <h2>BEACH HOUSE</h2>
+   ```
+</Step>
+
+   <Step>
+      ### Ternary Operators
+      
+      ```jsx
+      const rating = 4.9;
+      <span>{rating >= 4.5 ? "⭐ Superhost" : "Host"}</span>
+      // Renders: <span>⭐ Superhost</span>
+      ```
+   </Step>
+</Steps>
+
+**What you CAN'T use:**
+
+-  ❌ `if/else` statements (use ternary instead)
+-  ❌ `for` loops (use `.map()` instead - next lesson!)
+-  ❌ Multi-line statements (use expressions)
+
+---
+
+## Understanding the Data
+
+Let's break down one property object:
+
+```javascript
+{
+  id: 1,                    // Unique number
+  title: "Cozy Beach House", // String
+  location: "Malibu, CA",    // String
+  price: 250,                // Number
+  rating: 4.9,               // Number (decimal)
+  image: "https://..."       // String (URL)
+}
+```
+
+**Data Types Matter:**
+
+-  Numbers don't need quotes: `price: 250`
+-  Strings need quotes: `title: "Beach House"`
+-  Use consistent formatting for readability
+
+---
+
+## Verify in Browser
+
+Save your file and check the browser. You should see:
+
+-  "Find Your Perfect Stay" heading
+-  "We have 4 properties available" text
+
+The number `4` comes from `properties.length`!
+
+---
+
+## Practice Challenge
+
+Try these modifications to practice working with the data:
+
+<Accordions type="single">
+  <Accordion id="challenge1" title="Challenge 1: Add Another Property" value="challenge1">
+    Add a 5th property to the array with your own details. Watch the count update automatically!
+    
+    ```jsx
+    {
+      id: 5,
+      title: "Your Property Name",
+      location: "Your Location",
+      price: 150,
+      rating: 4.5,
+      image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800",
+    },
+    ```
+  </Accordion>
+  
+  <Accordion id="challenge2" title="Challenge 2: Calculate Total Value" value="challenge2">
+    Display the total value of all properties per night:
+    
+    ```jsx
+    <p>
+      Total value: ${properties.reduce((sum, prop) => sum + prop.price, 0)} per night
+    </p>
+    ```
+    
+    This uses `reduce()` to sum all prices. Renders: "Total value: $1150 per night"
+  </Accordion>
+  
+  <Accordion id="challenge3" title="Challenge 3: Show Highest Rated" value="challenge3">
+    Find and display the highest rated property:
+    
+    ```jsx
+    const topRated = properties.reduce((max, prop) => 
+      prop.rating > max.rating ? prop : max
+    );
+    
+    <p>Top rated: {topRated.title} ({topRated.rating}⭐)</p>
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## What You Learned
+
+<Badge variant='success'>Concepts Mastered</Badge>
+
+-  ✅ Creating JavaScript arrays and objects
+-  ✅ Defining data inside components
+-  ✅ Using expressions in JSX with `{}`
+-  ✅ Accessing object properties (`properties.length`)
+-  ✅ Structuring realistic data models
+-  ✅ Understanding data types in JavaScript
+
+---
+
+## Common Mistakes
+
+<Accordions type="single">
+  <Accordion id="mistake1" title="Forgetting Commas in Arrays" value="mistake1">
+    ```jsx
+    // ❌ Missing comma after object
+    const properties = [
+      { id: 1, title: "House" }
+      { id: 2, title: "Loft" }  // Error!
+    ];
+    
+    // ✅ Correct: commas between items
+    const properties = [
+      { id: 1, title: "House" },
+      { id: 2, title: "Loft" },
+    ];
+    ```
+  </Accordion>
+  
+  <Accordion id="mistake2" title="Using Statements Instead of Expressions" value="mistake2">
+    ```jsx
+    // ❌ Can't use if/else in JSX
+    <p>
+      {
+        if (rating > 4) {
+          return "Great";
+        }
+      }
+    </p>
+    
+    // ✅ Use ternary operator
+    <p>{rating > 4 ? "Great" : "Good"}</p>
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## Checkpoint ✅
+
+Before moving on, confirm:
+
+-  ✅ Your HomePage has a `properties` array with 4 items
+-  ✅ The page shows "We have 4 properties available"
+-  ✅ No errors in the browser console
+-  ✅ You understand how to use `{}` in JSX
+
+---
+
+## Next Up
+
+Great! You have property data. Next, we'll create a `PropertyCard` component to
+display individual properties using **props**.
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m1/lesson-2'>← Previous: Creating HomePage</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m1/lesson-4'>Next: PropertyCard Component →</a>
+   </Button>
+</div>

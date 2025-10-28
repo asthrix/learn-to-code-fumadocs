@@ -1,0 +1,457 @@
+---
+title: "Lesson 5: PropertyList with Array.map()"
+description:
+   "Learn to render lists dynamically using JavaScript's map() function and
+   understand React keys."
+module: 1
+lesson: 5
+---
+
+# Lesson 5: PropertyList with Array.map()
+
+Instead of manually creating a `PropertyCard` for each property, let's render
+them dynamically using JavaScript's `.map()` method. This is a fundamental React
+pattern you'll use constantly!
+
+---
+
+## The Problem: Repetitive Code
+
+Right now, to show all 4 properties, you'd need to write:
+
+```jsx
+<PropertyCard title={properties[0].title} ... />
+<PropertyCard title={properties[1].title} ... />
+<PropertyCard title={properties[2].title} ... />
+<PropertyCard title={properties[3].title} ... />
+```
+
+**What if you had 100 properties?** This approach doesn't scale!
+
+---
+
+## The Solution: Array.map()
+
+JavaScript's `.map()` method transforms each item in an array:
+
+```javascript
+const numbers = [1, 2, 3];
+const doubled = numbers.map((num) => num * 2);
+// Result: [2, 4, 6]
+```
+
+**In React, we map data to JSX components:**
+
+```jsx
+const properties = [
+   { id: 1, title: "House" },
+   { id: 2, title: "Loft" },
+];
+
+const cards = properties.map((property) => (
+   <PropertyCard title={property.title} />
+));
+```
+
+---
+
+## Step 1: Create PropertyList Component
+
+Let's create a component that handles the list rendering:
+
+<Files>
+   <Folder name='src'>
+      <Folder name='components' defaultOpen>
+         <File name='PropertyCard.jsx' />
+         <File name='PropertyList.jsx ← CREATE THIS FILE' />
+      </Folder>
+   </Folder>
+</Files>
+
+```jsx
+// src/components/PropertyList.jsx
+import PropertyCard from "./PropertyCard";
+
+function PropertyList({ properties }) {
+   return (
+      <div className='property-list'>
+         {properties.map((property) => (
+            <PropertyCard
+               key={property.id}
+               title={property.title}
+               location={property.location}
+               price={property.price}
+               rating={property.rating}
+               image={property.image}
+            />
+         ))}
+      </div>
+   );
+}
+
+export default PropertyList;
+```
+
+---
+
+## Understanding the Code
+
+Let's break down the mapping logic:
+
+```jsx
+{
+   properties.map((property) => (
+      <PropertyCard
+         key={property.id}
+         title={property.title}
+         // ...
+      />
+   ));
+}
+```
+
+<Steps>
+   <Step>### properties.map() Loop through each property in the array</Step>
+   <Step>
+      ### (property) => Each item is called `property` (you can name it
+      anything)
+   </Step>
+   <Step>
+      ### Return JSX For each property, return a `PropertyCard` component
+   </Step>
+   <Step>
+      ### Pass Props Extract data from `property` object and pass as props
+   </Step>
+</Steps>
+
+---
+
+## The Special 'key' Prop
+
+Notice the `key` prop:
+
+```jsx
+<PropertyCard
+   key={property.id} // ← Required!
+   title={property.title}
+/>
+```
+
+**Why is `key` needed?**
+
+React uses keys to identify which items have changed, been added, or removed.
+This helps React update the DOM efficiently.
+
+<Accordions type='single'>
+   <Accordion id='key-rules' title='Rules for Keys' value='key-rules'>
+      1. **Must be unique** among siblings (not globally) 2. **Should be
+      stable** (don't use array index if items can move) 3. **Should be the
+      same** across re-renders ```jsx // ✅ Good: Unique IDs key={property.id}
+      // ⚠️ Okay only if list never changes key={index}
+      // ❌ Never: Random values key={Math.random()}
+      ```
+   </Accordion>
+   <Accordion
+      id='key-warning'
+      title='What Happens Without Keys?'
+      value='key-warning'
+   >
+      If you forget `key`, React shows this warning: ``` Warning: Each child in
+      a list should have a unique "key" prop. ``` Your app will still work, but
+      React can't optimize updates efficiently. Always include keys!
+   </Accordion>
+</Accordions>
+
+---
+
+## Step 2: Use PropertyList in HomePage
+
+Update HomePage to use the new PropertyList component:
+
+```jsx
+// src/pages/HomePage.jsx
+import PropertyList from "../components/PropertyList"; // ← NEW
+
+function HomePage() {
+   const properties = [
+      {
+         id: 1,
+         title: "Cozy Beach House",
+         location: "Malibu, California",
+         price: 250,
+         rating: 4.9,
+         image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800",
+      },
+      {
+         id: 2,
+         title: "Modern Downtown Loft",
+         location: "New York, NY",
+         price: 180,
+         rating: 4.7,
+         image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800",
+      },
+      {
+         id: 3,
+         title: "Mountain Cabin Retreat",
+         location: "Aspen, Colorado",
+         price: 320,
+         rating: 5.0,
+         image: "https://images.unsplash.com/photo-1518732714860-b62714ce0c59?w=800",
+      },
+      {
+         id: 4,
+         title: "Lakefront Villa",
+         location: "Lake Tahoe, Nevada",
+         price: 400,
+         rating: 4.8,
+         image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+      },
+   ];
+
+   return (
+      <div className='home-page'>
+         <header className='hero'>
+            <h1>Find Your Perfect Stay</h1>
+            <p>Discover amazing places to stay around the world</p>
+         </header>
+
+         <section className='listings'>
+            <h2>Featured Properties</h2>
+            {/* ← NEW: Use PropertyList instead of individual cards */}
+            <PropertyList properties={properties} />
+         </section>
+      </div>
+   );
+}
+
+export default HomePage;
+```
+
+---
+
+## What Changed?
+
+<Steps>
+  <Step>
+    ### Imported PropertyList
+    ```jsx
+    import PropertyList from '../components/PropertyList';
+    ```
+  </Step>
+  <Step>
+    ### Passed the Entire Array
+    ```jsx
+    <PropertyList properties={properties} />
+    ```
+    We pass the whole array as one prop!
+  </Step>
+  <Step>
+    ### Removed Individual Cards
+    No more manual `<PropertyCard>` tags. PropertyList handles all of them!
+  </Step>
+</Steps>
+
+---
+
+## Component Hierarchy
+
+Your app structure now looks like:
+
+```
+App
+ └─ HomePage
+     └─ PropertyList
+         ├─ PropertyCard (Beach House)
+         ├─ PropertyCard (Downtown Loft)
+         ├─ PropertyCard (Mountain Cabin)
+         └─ PropertyCard (Lakefront Villa)
+```
+
+**PropertyList** is a "container component" that manages the list of
+**PropertyCard** children.
+
+---
+
+## Verify in Browser
+
+Save all files and check your browser. You should see:
+
+-  Your hero section
+-  **All 4 property cards** displayed in a list
+-  Each card with unique property information
+
+If you see all 4 properties, congratulations! Your dynamic list rendering works!
+🎉
+
+---
+
+## Why This Pattern is Powerful
+
+<Accordions type="single">
+  <Accordion id="scalable" title="1. Scales Automatically" value="scalable">
+    Add 10 more properties to the array - they automatically appear. No code changes to PropertyList or PropertyCard needed!
+    
+    ```jsx
+    const properties = [
+      { id: 1, ... },
+      { id: 2, ... },
+      // Add as many as you want!
+      { id: 100, ... },
+    ];
+    ```
+  </Accordion>
+  <Accordion id="maintainable" title="2. Easy to Maintain" value="maintainable">
+    Want to change how property cards look? Edit PropertyCard once, and all cards update!
+  </Accordion>
+  <Accordion id="flexible" title="3. Works with Any Data" value="flexible">
+    When we fetch data from an API (Module 3), we just replace the array. The rendering logic stays the same!
+  </Accordion>
+</Accordions>
+
+---
+
+## Common Map Mistakes
+
+<Accordions type='single'>
+   <Accordion
+      id='missing-return'
+      title='Forgetting to Return JSX'
+      value='missing-return'
+   >
+      ```jsx // ❌ Wrong: No return, cards won't show
+      {properties.map((property) => {
+         <PropertyCard title={property.title} />;
+      })}
+      // ✅ Correct: Implicit return with ()
+      {properties.map((property) => (
+         <PropertyCard title={property.title} />
+      ))}
+      // ✅ Also correct: Explicit return
+      {properties.map((property) => {
+         return <PropertyCard title={property.title} />;
+      })}
+      ```
+   </Accordion>
+   <Accordion
+      id='missing-key'
+      title='Forgetting the Key Prop'
+      value='missing-key'
+   >
+      ```jsx // ❌ Missing key - React will warn
+      {properties.map((property) => (
+         <PropertyCard title={property.title} />
+      ))}
+      // ✅ Always include key
+      {properties.map((property) => (
+         <PropertyCard key={property.id} title={property.title} />
+      ))}
+      ```
+   </Accordion>
+   <Accordion
+      id='index-key'
+      title='Using Index as Key (When List Changes)'
+      value='index-key'
+   >
+      ```jsx // ⚠️ Risky if list can be reordered/filtered
+      {properties.map((property, index) => (
+         <PropertyCard key={index} title={property.title} />
+      ))}
+      // ✅ Better: Use unique ID
+      {properties.map((property) => (
+         <PropertyCard key={property.id} title={property.title} />
+      ))}
+      ```
+   </Accordion>
+</Accordions>
+
+---
+
+## Practice Challenge
+
+<Accordions type="single">
+  <Accordion id="chal1" title="Challenge 1: Add More Properties" value="chal1">
+    Add 2 more properties to your array. Watch them automatically appear!
+    
+    ```jsx
+    {
+      id: 5,
+      title: "Urban Studio",
+      location: "San Francisco, CA",
+      price: 150,
+      rating: 4.6,
+      image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800",
+    },
+    {
+      id: 6,
+      title: "Countryside Estate",
+      location: "Tuscany, Italy",
+      price: 500,
+      rating: 4.9,
+      image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800",
+    },
+    ```
+  </Accordion>
+  
+  <Accordion id="chal2" title="Challenge 2: Filter High-Rated Properties" value="chal2">
+    Show only properties with rating >= 4.8:
+    
+    ```jsx
+    <PropertyList 
+      properties={properties.filter(p => p.rating >= 4.8)} 
+    />
+    ```
+    
+    This filters the array before passing to PropertyList!
+  </Accordion>
+  
+  <Accordion id="chal3" title="Challenge 3: Show Property Count" value="chal3">
+    Display how many properties are showing:
+    
+    ```jsx
+    <h2>Featured Properties ({properties.length})</h2>
+    <PropertyList properties={properties} />
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## What You Learned
+
+<Badge variant='success'>Concepts Mastered</Badge>
+
+-  ✅ Using `.map()` to render lists dynamically
+-  ✅ Understanding and implementing the `key` prop
+-  ✅ Creating container components (PropertyList)
+-  ✅ Passing arrays as props
+-  ✅ Component composition with lists
+-  ✅ Avoiding common mapping mistakes
+
+---
+
+## Checkpoint ✅
+
+Before moving on, confirm:
+
+-  ✅ PropertyList.jsx exists in `src/components/`
+-  ✅ PropertyList is imported and used in HomePage
+-  ✅ All 4 (or more) properties display as cards
+-  ✅ Each card has a unique `key` prop
+-  ✅ No console warnings about missing keys
+-  ✅ Cards look correct with all data
+
+---
+
+## Next Up
+
+Your components work, but they need styling! Next, we'll add **Tailwind CSS** to
+make everything look beautiful.
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m1/lesson-4'>← Previous: PropertyCard Component</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m1/lesson-6'>Next: Styling with Tailwind →</a>
+   </Button>
+</div>
