@@ -18,7 +18,7 @@ a utility-first CSS framework that makes styling fast and consistent.
 
 Instead of writing custom CSS:
 
-```css
+```css title="Traditional CSS Approach"
 /* Traditional CSS */
 .property-card {
    padding: 16px;
@@ -29,7 +29,7 @@ Instead of writing custom CSS:
 
 Tailwind uses utility classes directly in JSX:
 
-```jsx
+```jsx title="Tailwind Utility Classes"
 <div className="p-4 rounded-lg shadow-md">
 ```
 
@@ -47,7 +47,7 @@ Tailwind uses utility classes directly in JSX:
 
 If Vite doesn't have Tailwind yet, install it:
 
-```bash
+```bash title="Install Tailwind"
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init -p
 ```
@@ -56,7 +56,7 @@ npx tailwindcss init -p
 
 Update `tailwind.config.js`:
 
-```javascript
+```javascript title="tailwind.config.js"
 /** @type {import('tailwindcss').Config} */
 export default {
    content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
@@ -71,7 +71,7 @@ export default {
 
 Update `src/index.css`:
 
-```css
+```css title="src/index.css"
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -90,7 +90,7 @@ Restart your dev server after these changes!
 
 Update your PropertyCard component with Tailwind classes:
 
-```jsx
+```jsx title="src/components/PropertyCard.jsx"
 // src/components/PropertyCard.jsx
 
 function PropertyCard({ title, location, price, rating, image }) {
@@ -143,7 +143,7 @@ Let's break down the key classes:
 
 <Accordions type='single'>
    <Accordion id='layout' title='Layout & Spacing' value='layout'>
-      ```jsx
+      ```jsx title="Layout Classes"
       className="p-4 mb-3 w-full h-64"
       ```
       
@@ -153,30 +153,42 @@ Let's break down the key classes:
       - `h-64` - Height 16rem
    </Accordion>
 
-{" "}
-<Accordion id='colors' title='Colors' value='colors'>
-   ```jsx className="bg-white text-gray-900" className="text-yellow-500" ``` -
-   `bg-white` - Background color white - `text-gray-900` - Text color dark gray
-   - `text-yellow-500` - Text color yellow (for stars)
-</Accordion>
+   <Accordion id='colors' title='Colors' value='colors'>
+      ```jsx title="Color Classes"
+      className="bg-white text-gray-900"
+      className="text-yellow-500"
+      ```
+      
+      - `bg-white` - Background color white
+      - `text-gray-900` - Text color dark gray
+      - `text-yellow-500` - Text color yellow (for stars)
+   </Accordion>
 
-{" "}
-<Accordion id='typography' title='Typography' value='typography'>
-   ```jsx className="text-lg font-semibold" ``` - `text-lg` - Font size large
-   (1.125rem) - `text-sm` - Font size small (0.875rem) - `font-semibold` - Font
-   weight 600 - `font-bold` - Font weight 700
-</Accordion>
+   <Accordion id='typography' title='Typography' value='typography'>
+      ```jsx title="Typography Classes"
+      className="text-lg font-semibold"
+      ```
+      
+      - `text-lg` - Font size large (1.125rem)
+      - `text-sm` - Font size small (0.875rem)
+      - `font-semibold` - Font weight 600
+      - `font-bold` - Font weight 700
+   </Accordion>
 
-{" "}
-<Accordion id='effects' title='Effects & Transitions' value='effects'>
-   ```jsx className="rounded-xl shadow-md hover:shadow-xl transition-shadow" ```
-   - `rounded-xl` - Border radius 0.75rem - `shadow-md` - Drop shadow -
-   `hover:shadow-xl` - Larger shadow on hover - `transition-shadow` - Smooth
-   shadow animation - `duration-300` - Animation duration 300ms
-</Accordion>
+   <Accordion id='effects' title='Effects & Transitions' value='effects'>
+      ```jsx title="Effect Classes"
+      className="rounded-xl shadow-md hover:shadow-xl transition-shadow"
+      ```
+      
+      - `rounded-xl` - Border radius 0.75rem
+      - `shadow-md` - Drop shadow
+      - `hover:shadow-xl` - Larger shadow on hover
+      - `transition-shadow` - Smooth shadow animation
+      - `duration-300` - Animation duration 300ms
+   </Accordion>
 
    <Accordion id='flexbox' title='Flexbox' value='flexbox'>
-      ```jsx
+      ```jsx title="Flexbox Classes"
       className="flex items-center justify-between"
       ```
       
@@ -193,7 +205,7 @@ Let's break down the key classes:
 
 Update PropertyList to use a responsive grid:
 
-```jsx
+```jsx title="src/components/PropertyList.jsx"
 // src/components/PropertyList.jsx
 import PropertyCard from "./PropertyCard";
 
@@ -232,7 +244,7 @@ export default PropertyList;
 
 Complete the styling with hero section and page layout:
 
-```jsx
+```jsx title="src/pages/HomePage.jsx"
 // src/pages/HomePage.jsx
 import PropertyList from "../components/PropertyList";
 
@@ -275,7 +287,7 @@ export default HomePage;
 
 Tailwind makes responsive design easy with breakpoint prefixes:
 
-```jsx
+```jsx title="Responsive Text Sizes"
 className = "text-base sm:text-lg md:text-xl lg:text-2xl";
 ```
 
@@ -294,7 +306,7 @@ className = "text-base sm:text-lg md:text-xl lg:text-2xl";
 
 Add interactivity with hover states:
 
-```jsx
+```jsx title="Hover Effects"
 className = "hover:shadow-xl hover:scale-105 transition-all duration-300";
 ```
 
@@ -323,15 +335,17 @@ Try resizing your browser to see the responsive grid in action!
 
 <Accordions type='single'>
    <Accordion id='centering' title='Centering Content' value='centering'>
-      ```jsx
+      ```jsx title="Centering Techniques"
       {/* Horizontal center */}
       <div className='flex justify-center'>
          <p>Centered horizontally</p>
       </div>
+      
       {/* Vertical center */}
       <div className='flex items-center h-screen'>
          <p>Centered vertically</p>
       </div>
+      
       {/* Both */}
       <div className='flex items-center justify-center h-screen'>
          <p>Perfectly centered</p>
@@ -339,17 +353,18 @@ Try resizing your browser to see the responsive grid in action!
       ```
    </Accordion>
 
-{" "}
-<Accordion id='container' title='Container Pattern' value='container'>
-   ```jsx
-   <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-      {/* Content stays within max width and centered */}
-   </div>
-   ``` This is the standard content wrapper pattern.
-</Accordion>
+   <Accordion id='container' title='Container Pattern' value='container'>
+      ```jsx title="Container Pattern"
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+         {/* Content stays within max width and centered */}
+      </div>
+      ```
+      
+      This is the standard content wrapper pattern.
+   </Accordion>
 
    <Accordion id='card' title='Card Pattern' value='card'>
-      ```jsx
+      ```jsx title="Card Pattern"
       <div className='bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow'>
          {/* Card content */}
       </div>
@@ -363,7 +378,7 @@ Try resizing your browser to see the responsive grid in action!
 
 Want to use your brand colors? Update `tailwind.config.js`:
 
-```javascript
+```javascript title="tailwind.config.js"
 export default {
    theme: {
       extend: {
@@ -383,7 +398,7 @@ export default {
 
 Then use:
 
-```jsx
+```jsx title="Using Custom Colors"
 className = "bg-primary-500 text-primary-900";
 ```
 
@@ -392,37 +407,30 @@ className = "bg-primary-500 text-primary-900";
 ## Practice Challenges
 
 <Accordions type='single'>
-   <Accordion
-      id='chal1'
-      title='Challenge 1: Add Dark Mode Toggle'
-      value='chal1'
-   >
+   <Accordion id='chal1' title='Challenge 1: Add Dark Mode Toggle' value='chal1'>
       Tailwind supports dark mode out of the box:
       
-      ```jsx
+      ```jsx title="Dark Mode Support"
       <div className='bg-white dark:bg-gray-900 text-gray-900 dark:text-white'>
          This adapts to system dark mode preference
       </div>
       ```
    </Accordion>
 
-{" "}
-<Accordion id='chal2' title='Challenge 2: Add a Favorite Button' value='chal2'>
-   Add a heart icon to each property card: ```jsx
-   <button className='absolute top-4 right-4 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors'>
-      <span className='text-red-500 text-xl'>♥</span>
-   </button>
-   ```
-</Accordion>
+   <Accordion id='chal2' title='Challenge 2: Add a Favorite Button' value='chal2'>
+      Add a heart icon to each property card:
+      
+      ```jsx title="Favorite Button"
+      <button className='absolute top-4 right-4 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors'>
+         <span className='text-red-500 text-xl'>♥</span>
+      </button>
+      ```
+   </Accordion>
 
-   <Accordion
-      id='chal3'
-      title='Challenge 3: Add Loading Skeleton'
-      value='chal3'
-   >
+   <Accordion id='chal3' title='Challenge 3: Add Loading Skeleton' value='chal3'>
       Create a loading placeholder:
       
-      ```jsx
+      ```jsx title="Loading Skeleton"
       <div className='bg-white rounded-xl shadow-md overflow-hidden'>
          <div className='h-64 bg-gray-200 animate-pulse'></div>
          <div className='p-4 space-y-3'>

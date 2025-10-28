@@ -1,0 +1,19 @@
+# Prettier Ignore File
+# Prevent Prettier from formatting MDX files to avoid breaking JSX component structure
+
+# Ignore all MDX files
+*.mdx
+
+# Ignore content directory MDX files specifically
+content/**/*.mdx
+
+# Ignore MDX documentation
+MDX-docs/**/*.mdx
+
+# Keep other ignores
+node_modules/
+.next/
+out/
+build/
+dist/
+.cache/

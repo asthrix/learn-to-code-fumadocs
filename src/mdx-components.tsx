@@ -8,6 +8,7 @@ import { Banner } from "@/components/banner";
 import { Accordions, Accordion } from "@/components/accordion";
 import { Files, Folder, File } from "@/components/files";
 import { Steps, Step } from "@/components/steps";
+// import { CodeBlock, Pre } from "@/components/codeblock";
 
 // use this function to get MDX components, you will need it for rendering MDX
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
@@ -24,6 +25,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
       Files,
       Folder,
       File,
+      CodeBlock,
+      Pre,
       ...components,
       // HTML `ref` attribute conflicts with `forwardRef`
       pre: ({ ref, ...props }) => {

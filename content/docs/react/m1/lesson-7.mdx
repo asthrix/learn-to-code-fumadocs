@@ -33,7 +33,7 @@ You created a **property listing homepage** with:
 
 JSX lets you write HTML-like code in JavaScript:
 
-```jsx
+```jsx title="JSX Example"
 const element = <h1>Hello, React!</h1>;
 ```
 
@@ -52,7 +52,7 @@ const element = <h1>Hello, React!</h1>;
 
 Components are reusable pieces of UI:
 
-```jsx
+```jsx title="Component Example"
 function PropertyCard({ title, price }) {
    return (
       <div>
@@ -78,7 +78,7 @@ function PropertyCard({ title, price }) {
 
 Props pass data from parent to child:
 
-```jsx
+```jsx title="Props Example"
 // Parent passes props
 <PropertyCard title='Beach House' price={200} />;
 
@@ -107,7 +107,7 @@ function PropertyCard({ title, price }) {
 
 Render dynamic lists with `.map()`:
 
-```jsx
+```jsx title="Array.map() for Lists"
 function PropertyList({ properties }) {
    return (
       <div>
@@ -177,13 +177,12 @@ Let's visualize what you built:
 <Steps>
    <Step>### Data Creation Properties array defined in `HomePage.jsx`</Step>
 
-{" "}
-<Step>### Data Passing HomePage passes array to PropertyList via props</Step>
+   <Step>### Data Passing HomePage passes array to PropertyList via props</Step>
 
-{" "}
-<Step>
-   ### Data Transformation PropertyList maps array to PropertyCard components
-</Step>
+   <Step>
+      ### Data Transformation
+      PropertyList maps array to PropertyCard components
+   </Step>
 
    <Step>### Data Display PropertyCard displays individual property data</Step>
 </Steps>
@@ -214,7 +213,7 @@ Let's visualize what you built:
   <Accordion id="pattern1" title="Presentational Component Pattern" value="pattern1">
     Components that focus on UI, receiving data via props:
     
-    ```jsx
+    ```jsx title="Presentational Component"
     function PropertyCard({ title, price, image }) {
       return (
         <div>
@@ -230,7 +229,7 @@ Let's visualize what you built:
   <Accordion id="pattern2" title="Container Component Pattern" value="pattern2">
     Components that manage data and pass it to children:
     
-    ```jsx
+    ```jsx title="Container Component"
     function HomePage() {
       const properties = [/* data */];
       
@@ -242,7 +241,7 @@ Let's visualize what you built:
   <Accordion id="pattern3" title="List Rendering Pattern" value="pattern3">
     Components that map arrays to child components:
     
-    ```jsx
+    ```jsx title="List Rendering"
     function PropertyList({ properties }) {
       return (
         <div>
@@ -279,48 +278,39 @@ You can now:
 
 <Accordions type='single'>
    <Accordion id='lesson1' title='✅ Lesson 1: Project Setup' value='lesson1'>
-      - Cleaned up boilerplate code - Created basic project structure - Set up
-      HomePage component
+      - Cleaned up boilerplate code
+      - Created basic project structure
+      - Set up HomePage component
    </Accordion>
 
-{" "}
-<Accordion id='lesson2' title='✅ Lesson 2: HomePage Component' value='lesson2'>
-   - Created first custom component - Learned JSX syntax - Rendered static
-   content
-</Accordion>
+   <Accordion id='lesson2' title='✅ Lesson 2: HomePage Component' value='lesson2'>
+      - Created first custom component
+      - Learned JSX syntax
+      - Rendered static content
+   </Accordion>
 
-{" "}
-<Accordion id='lesson3' title='✅ Lesson 3: Adding Data' value='lesson3'>
-   - Created properties array - Learned JavaScript in JSX - Understood data
-   structures
-</Accordion>
+   <Accordion id='lesson3' title='✅ Lesson 3: Adding Data' value='lesson3'>
+      - Created properties array
+      - Learned JavaScript in JSX
+      - Understood data structures
+   </Accordion>
 
-{" "}
-<Accordion
-   id='lesson4'
-   title='✅ Lesson 4: PropertyCard with Props'
-   value='lesson4'
->
-   - Created reusable component - Passed data via props - Practiced props
-   destructuring
-</Accordion>
+   <Accordion id='lesson4' title='✅ Lesson 4: PropertyCard with Props' value='lesson4'>
+      - Created reusable component
+      - Passed data via props
+      - Practiced props destructuring
+   </Accordion>
 
-{" "}
-<Accordion
-   id='lesson5'
-   title='✅ Lesson 5: PropertyList with Map'
-   value='lesson5'
->
-   - Rendered dynamic lists - Used `.map()` method - Implemented React keys
-</Accordion>
+   <Accordion id='lesson5' title='✅ Lesson 5: PropertyList with Map' value='lesson5'>
+      - Rendered dynamic lists
+      - Used `.map()` method
+      - Implemented React keys
+   </Accordion>
 
-   <Accordion
-      id='lesson6'
-      title='✅ Lesson 6: Styling with Tailwind'
-      value='lesson6'
-   >
-      - Installed Tailwind CSS - Applied utility classes - Created responsive
-      layouts
+   <Accordion id='lesson6' title='✅ Lesson 6: Styling with Tailwind' value='lesson6'>
+      - Installed Tailwind CSS
+      - Applied utility classes
+      - Created responsive layouts
    </Accordion>
 </Accordions>
 
@@ -392,7 +382,7 @@ You'll add interactivity to your static homepage!
   </Accordion>
   
   <Accordion id="practice2" title="Challenge: Create a Footer Component" value="practice2">
-    ```jsx
+    ```jsx title="Footer.jsx"
     function Footer() {
       const currentYear = new Date().getFullYear();
       return (
@@ -409,7 +399,7 @@ You'll add interactivity to your static homepage!
   <Accordion id="practice3" title="Challenge: Add Price Range Badge" value="practice3">
     Display "Budget", "Moderate", or "Luxury" based on price:
     
-    ```jsx
+    ```jsx title="PriceRangeBadge.jsx"
     function PriceRangeBadge({ price }) {
       if (price < 100) return <span className="text-green-600">Budget</span>;
       if (price < 300) return <span className="text-blue-600">Moderate</span>;
@@ -441,28 +431,22 @@ ready to add interactivity with state and events!
 Rate your understanding:
 
 <Accordions type='single'>
-   <Accordion
-      id='assess1'
-      title='I can create React components'
-      value='assess1'
-   >
-      ✅ **Confident** - Move to Module 2 ⚠️ **Need practice** - Review lessons
-      1-2, try creating 2-3 more components
+   <Accordion id='assess1' title='I can create React components' value='assess1'>
+      ✅ **Confident** - Move to Module 2
+      
+      ⚠️ **Need practice** - Review lessons 1-2, try creating 2-3 more components
    </Accordion>
 
-{" "}
-<Accordion id='assess2' title='I understand props' value='assess2'>
-   ✅ **Confident** - Move to Module 2 ⚠️ **Need practice** - Review lesson 4,
-   practice passing different data types
-</Accordion>
+   <Accordion id='assess2' title='I understand props' value='assess2'>
+      ✅ **Confident** - Move to Module 2
+      
+      ⚠️ **Need practice** - Review lesson 4, practice passing different data types
+   </Accordion>
 
-   <Accordion
-      id='assess3'
-      title='I can render lists with .map()'
-      value='assess3'
-   >
-      ✅ **Confident** - Move to Module 2 ⚠️ **Need practice** - Review lesson
-      5, create lists with different data
+   <Accordion id='assess3' title='I can render lists with .map()' value='assess3'>
+      ✅ **Confident** - Move to Module 2
+      
+      ⚠️ **Need practice** - Review lesson 5, create lists with different data
    </Accordion>
 </Accordions>
 

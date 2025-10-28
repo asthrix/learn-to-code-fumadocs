@@ -20,7 +20,7 @@ passing data between components.
 **Props** (short for "properties") are how you pass data from a parent component
 to a child component. Think of them like function arguments:
 
-```jsx
+```jsx title="Props vs Function Parameters"
 // Function with parameters
 function greet(name) {
    return `Hello, ${name}!`;
@@ -53,9 +53,7 @@ Create a new file in the `components` folder:
 
 Add this code:
 
-```jsx
-// src/components/PropertyCard.jsx
-
+```jsx title="src/components/PropertyCard.jsx"
 function PropertyCard({ title, location, price, rating, image }) {
    return (
       <div className='property-card'>
@@ -83,7 +81,7 @@ export default PropertyCard;
 
 Let's break down the component signature:
 
-```jsx
+```jsx title="Props Destructuring"
 function PropertyCard({ title, location, price, rating, image }) {
    // ...
 }
@@ -91,7 +89,7 @@ function PropertyCard({ title, location, price, rating, image }) {
 
 This is **destructuring** the props object. It's equivalent to:
 
-```jsx
+```jsx title="Without Destructuring"
 function PropertyCard(props) {
    const title = props.title;
    const location = props.location;
@@ -111,8 +109,7 @@ parameters.
 
 Now let's use the PropertyCard. Update your HomePage:
 
-```jsx
-// src/pages/HomePage.jsx
+```jsx title="src/pages/HomePage.jsx"
 import PropertyCard from "../components/PropertyCard"; // ← NEW: Import
 
 function HomePage() {
@@ -183,7 +180,7 @@ export default HomePage;
 
 When you write:
 
-```jsx
+```jsx title="Passing Props"
 <PropertyCard
    title='Cozy Beach House'
    location='Malibu, California'
@@ -193,7 +190,7 @@ When you write:
 
 React creates a props object:
 
-```javascript
+```javascript title="Props Object"
 {
   title: "Cozy Beach House",
   location: "Malibu, California",
@@ -213,32 +210,38 @@ And passes it to the PropertyCard function!
       
       Use quotes for strings:
       
-      ```jsx
+      ```jsx title="String Props"
       <PropertyCard title='Beach House' />
       ```
    </Step>
 
-{" "}
-<Step>
-   ### Number Props Use curly braces for numbers: ```jsx
-   <PropertyCard price={250} />
-   ```
-</Step>
+   <Step>
+      ### Number Props
+      
+      Use curly braces for numbers:
+      
+      ```jsx title="Number Props"
+      <PropertyCard price={250} />
+      ```
+   </Step>
 
-{" "}
-<Step>
-   ### Variable Props Use curly braces for variables: ```jsx const propertyTitle
-   = "Beach House";
-   <PropertyCard title={propertyTitle} />
-   ```
-</Step>
+   <Step>
+      ### Variable Props
+      
+      Use curly braces for variables:
+      
+      ```jsx title="Variable Props"
+      const propertyTitle = "Beach House";
+      <PropertyCard title={propertyTitle} />
+      ```
+   </Step>
 
    <Step>
       ### Object Properties as Props
       
       Access object properties:
       
-      ```jsx
+      ```jsx title="Object Property Props"
       <PropertyCard title={properties[0].title} />
       ```
    </Step>
@@ -268,7 +271,7 @@ The card should show:
 
 The same `PropertyCard` component can display different properties:
 
-```jsx
+```jsx title="Component Reusability"
 // Same component, different data!
 <PropertyCard title="Beach House" price={250} />
 <PropertyCard title="City Loft" price={180} />
@@ -298,16 +301,27 @@ We're building a tree of components, each handling a specific piece of the UI!
 
 <Accordions type='single'>
    <Accordion id='props' title='Props (What We Just Learned)' value='props'>
-      - **Passed from parent** to child - **Read-only** (child can't modify
-      them) - Used to configure a component - Like function parameters ```jsx
-      <PropertyCard price={250} /> // Parent passes // PropertyCard receives and
-      displays ```
+      - **Passed from parent** to child
+      - **Read-only** (child can't modify them)
+      - Used to configure a component
+      - Like function parameters
+      
+      ```jsx title="Props Example"
+      <PropertyCard price={250} /> // Parent passes
+      // PropertyCard receives and displays
+      ```
    </Accordion>
 
    <Accordion id='state' title='State (Coming in Module 2)' value='state'>
-      - **Managed within** a component - **Can be modified** by the component -
-      Causes re-renders when changed - Used for interactive data ```jsx const
-      [count, setCount] = useState(0); // Component owns and can change this ```
+      - **Managed within** a component
+      - **Can be modified** by the component
+      - Causes re-renders when changed
+      - Used for interactive data
+      
+      ```jsx title="State Example (Preview)"
+      const [count, setCount] = useState(0);
+      // Component owns and can change this
+      ```
    </Accordion>
 </Accordions>
 
@@ -317,7 +331,7 @@ We're building a tree of components, each handling a specific piece of the UI!
 
 <Accordions type="single">
   <Accordion id="wrong-curly" title="Forgetting Curly Braces for Numbers" value="wrong-curly">
-    ```jsx
+    ```jsx title="Number Prop Syntax"
     // ❌ Wrong: Number as string
     <PropertyCard price="250" />
     // PropertyCard receives: "250" (string)
@@ -331,7 +345,7 @@ We're building a tree of components, each handling a specific piece of the UI!
   </Accordion>
   
   <Accordion id="typo" title="Mismatched Prop Names" value="typo">
-    ```jsx
+    ```jsx title="Prop Name Mismatch"
     // In PropertyCard:
     function PropertyCard({ title, location }) {
       return <h3>{title}</h3>;
@@ -347,7 +361,7 @@ We're building a tree of components, each handling a specific piece of the UI!
   </Accordion>
   
   <Accordion id="missing-import" title="Forgetting to Import" value="missing-import">
-    ```jsx
+    ```jsx title="Import Requirements"
     // ❌ Will cause error: PropertyCard is not defined
     function HomePage() {
       return <PropertyCard title="House" />;
@@ -373,7 +387,7 @@ Try these exercises:
   <Accordion id="ex1" title="Exercise 1: Add Another PropertyCard" value="ex1">
     Display the second property as well:
     
-    ```jsx
+    ```jsx title="Multiple PropertyCards"
     <PropertyCard
       title={properties[1].title}
       location={properties[1].location}
@@ -389,7 +403,7 @@ Try these exercises:
   <Accordion id="ex2" title="Exercise 2: Add a 'Featured' Badge" value="ex2">
     Add a boolean prop to highlight special properties:
     
-    ```jsx
+    ```jsx title="src/components/PropertyCard.jsx"
     // In PropertyCard.jsx
     function PropertyCard({ title, location, price, rating, image, featured }) {
       return (
@@ -408,7 +422,7 @@ Try these exercises:
   <Accordion id="ex3" title="Exercise 3: Calculate Nightly Cost" value="ex3">
     Show both nightly and weekly prices:
     
-    ```jsx
+    ```jsx title="Calculate Weekly Price"
     function PropertyCard({ title, location, price, rating, image }) {
       const weeklyPrice = price * 7;
       

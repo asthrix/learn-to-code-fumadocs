@@ -19,7 +19,7 @@ pattern you'll use constantly!
 
 Right now, to show all 4 properties, you'd need to write:
 
-```jsx
+```jsx title="Manual Repetition (Not Scalable)"
 <PropertyCard title={properties[0].title} ... />
 <PropertyCard title={properties[1].title} ... />
 <PropertyCard title={properties[2].title} ... />
@@ -34,7 +34,7 @@ Right now, to show all 4 properties, you'd need to write:
 
 JavaScript's `.map()` method transforms each item in an array:
 
-```javascript
+```javascript title="Array.map() Basics"
 const numbers = [1, 2, 3];
 const doubled = numbers.map((num) => num * 2);
 // Result: [2, 4, 6]
@@ -42,7 +42,7 @@ const doubled = numbers.map((num) => num * 2);
 
 **In React, we map data to JSX components:**
 
-```jsx
+```jsx title="Mapping Data to Components"
 const properties = [
    { id: 1, title: "House" },
    { id: 2, title: "Loft" },
@@ -68,7 +68,7 @@ Let's create a component that handles the list rendering:
    </Folder>
 </Files>
 
-```jsx
+```jsx title="src/components/PropertyList.jsx"
 // src/components/PropertyList.jsx
 import PropertyCard from "./PropertyCard";
 
@@ -98,7 +98,7 @@ export default PropertyList;
 
 Let's break down the mapping logic:
 
-```jsx
+```jsx title="Map Function Breakdown"
 {
    properties.map((property) => (
       <PropertyCard
@@ -113,14 +113,16 @@ Let's break down the mapping logic:
 <Steps>
    <Step>### properties.map() Loop through each property in the array</Step>
    <Step>
-      ### (property) => Each item is called `property` (you can name it
-      anything)
+      ### (property) =>
+      Each item is called `property` (you can name it anything)
    </Step>
    <Step>
-      ### Return JSX For each property, return a `PropertyCard` component
+      ### Return JSX
+      For each property, return a `PropertyCard` component
    </Step>
    <Step>
-      ### Pass Props Extract data from `property` object and pass as props
+      ### Pass Props
+      Extract data from `property` object and pass as props
    </Step>
 </Steps>
 
@@ -130,7 +132,7 @@ Let's break down the mapping logic:
 
 Notice the `key` prop:
 
-```jsx
+```jsx title="Key Prop Example"
 <PropertyCard
    key={property.id} // ← Required!
    title={property.title}
@@ -144,21 +146,30 @@ This helps React update the DOM efficiently.
 
 <Accordions type='single'>
    <Accordion id='key-rules' title='Rules for Keys' value='key-rules'>
-      1. **Must be unique** among siblings (not globally) 2. **Should be
-      stable** (don't use array index if items can move) 3. **Should be the
-      same** across re-renders ```jsx // ✅ Good: Unique IDs key={property.id}
-      // ⚠️ Okay only if list never changes key={index}
-      // ❌ Never: Random values key={Math.random()}
+      1. **Must be unique** among siblings (not globally)
+      2. **Should be stable** (don't use array index if items can move)
+      3. **Should be the same** across re-renders
+      
+      ```jsx title="Key Best Practices"
+      // ✅ Good: Unique IDs
+      key={property.id}
+      
+      // ⚠️ Okay only if list never changes
+      key={index}
+      
+      // ❌ Never: Random values
+      key={Math.random()}
       ```
    </Accordion>
-   <Accordion
-      id='key-warning'
-      title='What Happens Without Keys?'
-      value='key-warning'
-   >
-      If you forget `key`, React shows this warning: ``` Warning: Each child in
-      a list should have a unique "key" prop. ``` Your app will still work, but
-      React can't optimize updates efficiently. Always include keys!
+   
+   <Accordion id='key-warning' title='What Happens Without Keys?' value='key-warning'>
+      If you forget `key`, React shows this warning:
+      
+      ```
+      Warning: Each child in a list should have a unique "key" prop.
+      ```
+      
+      Your app will still work, but React can't optimize updates efficiently. Always include keys!
    </Accordion>
 </Accordions>
 
@@ -168,7 +179,7 @@ This helps React update the DOM efficiently.
 
 Update HomePage to use the new PropertyList component:
 
-```jsx
+```jsx title="src/pages/HomePage.jsx"
 // src/pages/HomePage.jsx
 import PropertyList from "../components/PropertyList"; // ← NEW
 
@@ -234,17 +245,22 @@ export default HomePage;
 <Steps>
   <Step>
     ### Imported PropertyList
-    ```jsx
+    
+    ```jsx title="Import Statement"
     import PropertyList from '../components/PropertyList';
     ```
   </Step>
+  
   <Step>
     ### Passed the Entire Array
-    ```jsx
+    
+    ```jsx title="Passing Array Prop"
     <PropertyList properties={properties} />
     ```
+    
     We pass the whole array as one prop!
   </Step>
+  
   <Step>
     ### Removed Individual Cards
     No more manual `<PropertyCard>` tags. PropertyList handles all of them!
@@ -291,7 +307,7 @@ If you see all 4 properties, congratulations! Your dynamic list rendering works!
   <Accordion id="scalable" title="1. Scales Automatically" value="scalable">
     Add 10 more properties to the array - they automatically appear. No code changes to PropertyList or PropertyCard needed!
     
-    ```jsx
+    ```jsx title="Easy Scaling"
     const properties = [
       { id: 1, ... },
       { id: 2, ... },
@@ -300,9 +316,11 @@ If you see all 4 properties, congratulations! Your dynamic list rendering works!
     ];
     ```
   </Accordion>
+  
   <Accordion id="maintainable" title="2. Easy to Maintain" value="maintainable">
     Want to change how property cards look? Edit PropertyCard once, and all cards update!
   </Accordion>
+  
   <Accordion id="flexible" title="3. Works with Any Data" value="flexible">
     When we fetch data from an API (Module 3), we just replace the array. The rendering logic stays the same!
   </Accordion>
@@ -313,49 +331,46 @@ If you see all 4 properties, congratulations! Your dynamic list rendering works!
 ## Common Map Mistakes
 
 <Accordions type='single'>
-   <Accordion
-      id='missing-return'
-      title='Forgetting to Return JSX'
-      value='missing-return'
-   >
-      ```jsx // ❌ Wrong: No return, cards won't show
+   <Accordion id='missing-return' title='Forgetting to Return JSX' value='missing-return'>
+      ```jsx title="Common Return Mistakes"
+      // ❌ Wrong: No return, cards won't show
       {properties.map((property) => {
          <PropertyCard title={property.title} />;
       })}
+      
       // ✅ Correct: Implicit return with ()
       {properties.map((property) => (
          <PropertyCard title={property.title} />
       ))}
+      
       // ✅ Also correct: Explicit return
       {properties.map((property) => {
          return <PropertyCard title={property.title} />;
       })}
       ```
    </Accordion>
-   <Accordion
-      id='missing-key'
-      title='Forgetting the Key Prop'
-      value='missing-key'
-   >
-      ```jsx // ❌ Missing key - React will warn
+   
+   <Accordion id='missing-key' title='Forgetting the Key Prop' value='missing-key'>
+      ```jsx title="Key Prop Required"
+      // ❌ Missing key - React will warn
       {properties.map((property) => (
          <PropertyCard title={property.title} />
       ))}
+      
       // ✅ Always include key
       {properties.map((property) => (
          <PropertyCard key={property.id} title={property.title} />
       ))}
       ```
    </Accordion>
-   <Accordion
-      id='index-key'
-      title='Using Index as Key (When List Changes)'
-      value='index-key'
-   >
-      ```jsx // ⚠️ Risky if list can be reordered/filtered
+   
+   <Accordion id='index-key' title='Using Index as Key (When List Changes)' value='index-key'>
+      ```jsx title="Index as Key Considerations"
+      // ⚠️ Risky if list can be reordered/filtered
       {properties.map((property, index) => (
          <PropertyCard key={index} title={property.title} />
       ))}
+      
       // ✅ Better: Use unique ID
       {properties.map((property) => (
          <PropertyCard key={property.id} title={property.title} />
@@ -372,7 +387,7 @@ If you see all 4 properties, congratulations! Your dynamic list rendering works!
   <Accordion id="chal1" title="Challenge 1: Add More Properties" value="chal1">
     Add 2 more properties to your array. Watch them automatically appear!
     
-    ```jsx
+    ```jsx title="Adding More Properties"
     {
       id: 5,
       title: "Urban Studio",
@@ -395,7 +410,7 @@ If you see all 4 properties, congratulations! Your dynamic list rendering works!
   <Accordion id="chal2" title="Challenge 2: Filter High-Rated Properties" value="chal2">
     Show only properties with rating >= 4.8:
     
-    ```jsx
+    ```jsx title="Filtering Properties"
     <PropertyList 
       properties={properties.filter(p => p.rating >= 4.8)} 
     />
@@ -407,7 +422,7 @@ If you see all 4 properties, congratulations! Your dynamic list rendering works!
   <Accordion id="chal3" title="Challenge 3: Show Property Count" value="chal3">
     Display how many properties are showing:
     
-    ```jsx
+    ```jsx title="Showing Count"
     <h2>Featured Properties ({properties.length})</h2>
     <PropertyList properties={properties} />
     ```

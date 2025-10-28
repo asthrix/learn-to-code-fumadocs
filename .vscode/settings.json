@@ -1,0 +1,16 @@
+{
+   "editor.formatOnSave": true,
+   "[mdx]": {
+      "editor.formatOnSave": false,
+      "editor.defaultFormatter": null
+   },
+   "[markdown]": {
+      "editor.formatOnSave": false
+   },
+   "files.associations": {
+      "*.mdx": "mdx"
+   },
+   "editor.quickSuggestions": {
+      "strings": true
+   }
+}

@@ -6,7 +6,33 @@
 
 ## Quick Start Guide
 
-This document provides copy-paste ready templates for converting the Project React modules into MDX format. Each template follows the established patterns and can be customized for your content.
+This document provides copy-paste ready templates for converting the Project
+React modules into MDX format. Each template follows the established patterns
+and can be customized for your content.
+
+### Code Block Syntax
+
+**Always use standard markdown code fences with `title` attribute:**
+
+````mdx
+```jsx title="src/components/Example.jsx"
+import React from 'react';
+
+export function Example() {
+  return <div>Example Component</div>;
+}
+```
+````
+
+**Supported languages:** `jsx`, `tsx`, `javascript`, `typescript`, `bash`, `json`, `css`, `html`, `mdx`
+
+**Features:**
+- ✅ Automatic syntax highlighting
+- ✅ Copy button included
+- ✅ File path display via title
+- ✅ No wrapper components needed
+
+**IMPORTANT:** Never use inline code blocks inside JSX components. Always use blank lines before and after code blocks.
 
 ---
 
@@ -42,20 +68,20 @@ content/
 ---
 title: "Module {N}: {Module Title}"
 description: "{Brief description of module content}"
-module: {N}
-totalSteps: {X}
+module: { N }
+totalSteps: { X }
 duration: "{X-Y} hours"
 difficulty: "beginner|intermediate|advanced"
-prerequisites: 
-  - "module-{N-1}"
+prerequisites:
+   - "module-{N-1}"
 objectives:
-  - "First learning objective"
-  - "Second learning objective"
-  - "Third learning objective"
-tags: 
-  - "react"
-  - "hooks"
-  - "state"
+   - "First learning objective"
+   - "Second learning objective"
+   - "Third learning objective"
+tags:
+   - "react"
+   - "hooks"
+   - "state"
 published: true
 ---
 ```
@@ -72,92 +98,111 @@ module: 2
 totalSteps: 7
 duration: "2-3 hours"
 difficulty: "beginner"
-prerequisites: 
-  - "module-1"
+prerequisites:
+   - "module-1"
 objectives:
-  - "Use useState to manage component state"
-  - "Handle user events and interactions"
-  - "Create controlled form inputs"
-  - "Pass callbacks between components"
-  - "Filter data dynamically"
-tags: 
-  - "react"
-  - "state"
-  - "events"
-  - "useState"
+   - "Use useState to manage component state"
+   - "Handle user events and interactions"
+   - "Create controlled form inputs"
+   - "Pass callbacks between components"
+   - "Filter data dynamically"
+tags:
+   - "react"
+   - "state"
+   - "events"
+   - "useState"
 published: true
 ---
 
-import { Separator } from '@/components/ui/separator'
-import { TaskList } from '@/components/course/task-list'
-import { Callout } from '@/components/ui/callout'
-import { Button } from '@/components/ui/button'
+import { Separator } from "@/components/ui/separator";
+import { TaskList } from "@/components/course/task-list";
+import { Callout } from "@/components/ui/callout";
+import { Button } from "@/components/ui/button";
 
 # Module 2 - State and Events
 
-<Separator className="mb-4" />
+<Separator className='mb-4' />
 
 ## Overview
 
-In this module, you'll learn how to make React applications interactive. We'll introduce **state management** using the `useState` hook and show you how to respond to user events like clicks, typing, and selections.
+In this module, you'll learn how to make React applications interactive. We'll
+introduce **state management** using the `useState` hook and show you how to
+respond to user events like clicks, typing, and selections.
 
-By the end of this module, your application will be fully interactive with working filters and search functionality!
+By the end of this module, your application will be fully interactive with
+working filters and search functionality!
 
 ## Description
 
-<Separator className="mb-2" />
+<Separator className='mb-2' />
 
-Right now, our application displays static listings - the same data every time, with no way for users to interact. That's about to change!
+Right now, our application displays static listings - the same data every time,
+with no way for users to interact. That's about to change!
 
-We'll transform the static homepage into a dynamic, interactive experience where users can:
-- Search listings by name or location
-- Filter by date ranges
-- Adjust the number of guests
-- See results update in real-time
+We'll transform the static homepage into a dynamic, interactive experience where
+users can:
+
+-  Search listings by name or location
+-  Filter by date ranges
+-  Adjust the number of guests
+-  See results update in real-time
 
 To accomplish this, we'll learn about:
 
 ### **State Management**
-State is data that can change over time. When state changes, React automatically updates the UI to reflect those changes. Think of it like a variable that React "watches" - whenever it changes, the component re-renders with the new value.
+
+State is data that can change over time. When state changes, React automatically
+updates the UI to reflect those changes. Think of it like a variable that React
+"watches" - whenever it changes, the component re-renders with the new value.
 
 ### **Event Handling**
-Events are how users interact with your application - clicking buttons, typing in inputs, selecting dates. We'll learn how to "listen" for these events and respond appropriately.
+
+Events are how users interact with your application - clicking buttons, typing
+in inputs, selecting dates. We'll learn how to "listen" for these events and
+respond appropriately.
 
 ### **Controlled Components**
-We'll create form inputs where React controls the value at all times. This gives us complete control over what the user sees and types.
+
+We'll create form inputs where React controls the value at all times. This gives
+us complete control over what the user sees and types.
 
 ## What You'll Build
 
 By the end of this module, your homepage will have:
-- ✨ A search bar for filtering listings
-- 📅 A date range picker for check-in/checkout
-- 👥 A guest selector
-- 🔄 Real-time filtering as users interact
 
-<Callout type="info">
-  **Important Concept:** State is what makes React apps dynamic. Without state, your app would always show the same content - no interactivity, no user input, no dynamic updates.
+-  ✨ A search bar for filtering listings
+-  📅 A date range picker for check-in/checkout
+-  👥 A guest selector
+-  🔄 Real-time filtering as users interact
+
+<Callout type='info'>
+   **Important Concept:** State is what makes React apps dynamic. Without state,
+   your app would always show the same content - no interactivity, no user
+   input, no dynamic updates.
 </Callout>
 
 ## Learning Objectives
 
-<Separator className="mb-2" />
+<Separator className='mb-2' />
 
-<TaskList 
-  checked={false}
-  tasks={[
-    "Turn the <code>listings</code> array in <code>HomePage</code> into state",
-    "Create the <code>ListingFilters</code> component",
-    "Add state for <code>dates</code> and <code>guests</code> in <code>ListingFilters</code>",
-    "Pass filter values from <code>ListingFilters</code> to <code>HomePage</code>",
-    "Add state for the <code>search</code> value in <code>HomePage</code>",
-    "Filter listings by <code>search</code>, <code>dates</code>, and <code>guests</code>",
-  ]} 
+<TaskList
+   checked={false}
+   tasks={[
+      "Turn the <code>listings</code> array in <code>HomePage</code> into state",
+      "Create the <code>ListingFilters</code> component",
+      "Add state for <code>dates</code> and <code>guests</code> in <code>ListingFilters</code>",
+      "Pass filter values from <code>ListingFilters</code> to <code>HomePage</code>",
+      "Add state for the <code>search</code> value in <code>HomePage</code>",
+      "Filter listings by <code>search</code>, <code>dates</code>, and <code>guests</code>",
+   ]}
 />
 
 ## Prerequisites
 
 Before starting this module, make sure you've completed:
-- ✅ **Module 1: React Fundamentals** - Understanding of JSX, components, and props
+
+-  ✅ **Module 1: React Fundamentals** - Understanding of JSX, components, and
+   props
 
 ## Estimated Time
 
@@ -165,13 +210,11 @@ Before starting this module, make sure you've completed:
 
 ---
 
-<div className="flex justify-between mt-8">
-  <Button variant="outline" href="/modules/module-1/completed">
-    ← Previous Module
-  </Button>
-  <Button href="/modules/module-2/step-1">
-    Start Module 2 →
-  </Button>
+<div className='flex justify-between mt-8'>
+   <Button variant='outline' href='/modules/module-1/completed'>
+      ← Previous Module
+   </Button>
+   <Button href='/modules/module-2/step-1'>Start Module 2 →</Button>
 </div>
 ```
 
@@ -181,7 +224,7 @@ Before starting this module, make sure you've completed:
 
 ### Template 1: Basic Step Structure
 
-```mdx
+````mdx
 ---
 title: "Step 1: Turn Listings into State"
 module: 2
@@ -191,37 +234,44 @@ prev: "/modules/module-2"
 next: "/modules/module-2/step-2"
 ---
 
-import { Separator } from '@/components/ui/separator'
-import { CodeBlock } from '@/components/course/code-block'
-import { Callout } from '@/components/ui/callout'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Separator } from "@/components/ui/separator";
+import { CodeBlock } from "@/components/course/code-block";
+import { Callout } from "@/components/ui/callout";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 # Turn Listings into State
 
-<Separator className="mb-4" />
+<Separator className='mb-4' />
 
 ## Context
 
-Currently, the `listings` in our `HomePage` component are defined as a regular JavaScript array constant. This works fine for displaying static data, but there's a problem: **we can't change this data**.
+Currently, the `listings` in our `HomePage` component are defined as a regular
+JavaScript array constant. This works fine for displaying static data, but
+there's a problem: **we can't change this data**.
 
 ```jsx
 // This is static - it never changes
 const listings = [
-  { id: 1, title: 'Beach House' },
-  { id: 2, title: 'Mountain Cabin' },
+   { id: 1, title: "Beach House" },
+   { id: 2, title: "Mountain Cabin" },
 ];
 ```
+````
 
-In the next steps, we'll add filters that should update which listings are displayed. To do that, we need to convert `listings` into **state**.
+In the next steps, we'll add filters that should update which listings are
+displayed. To do that, we need to convert `listings` into **state**.
 
 ## What We're Building
 
-We'll transform the static `listings` array into React state. This will allow us to:
-- Update the listings when filters change
-- Add new listings dynamically
-- Remove listings if needed
+We'll transform the static `listings` array into React state. This will allow us
+to:
 
-While the functionality won't visibly change yet, this is a crucial foundation for making our app interactive.
+-  Update the listings when filters change
+-  Add new listings dynamically
+-  Remove listings if needed
+
+While the functionality won't visibly change yet, this is a crucial foundation
+for making our app interactive.
 
 ## React Concept: State
 
@@ -232,12 +282,14 @@ While the functionality won't visibly change yet, this is a crucial foundation f
 ### Why State?
 
 Regular variables won't trigger re-renders:
+
 ```jsx
 ❌ let count = 0;
 count = 1; // Component doesn't update!
 ```
 
 State triggers re-renders:
+
 ```jsx
 ✅ const [count, setCount] = useState(0);
 setCount(1); // Component re-renders with new value!
@@ -286,6 +338,7 @@ setCount(1); // Component re-renders with new value!
       export default HomePage;
       ```
     </CodeBlock>
+
   </TabsContent>
   
   <TabsContent value="after">
@@ -320,6 +373,7 @@ setCount(1); // Component re-renders with new value!
       export default HomePage;
       ```
     </CodeBlock>
+
   </TabsContent>
 </Tabs>
 
@@ -328,24 +382,31 @@ setCount(1); // Component re-renders with new value!
 Let's break down what changed:
 
 ### 1. Import useState
+
 ```jsx
-import { useState } from 'react';
+import { useState } from "react";
 ```
-We import the `useState` hook from the React library. Hooks are special functions that let us use React features.
+
+We import the `useState` hook from the React library. Hooks are special
+functions that let us use React features.
 
 ### 2. Call useState
+
 ```jsx
 const [listings, setListings] = useState([...]);
 ```
 
 This line does several things:
-- **`useState([...])`** - Creates state with initial value (the array)
-- **`listings`** - The current state value (like a variable)
-- **`setListings`** - Function to update the state
-- **Array destructuring** - Getting both values from useState's return
+
+-  **`useState([...])`** - Creates state with initial value (the array)
+-  **`listings`** - The current state value (like a variable)
+-  **`setListings`** - Function to update the state
+-  **Array destructuring** - Getting both values from useState's return
 
 ### 3. Move Array Inside
-The listings array is now **inside** the `useState()` call instead of being a separate constant.
+
+The listings array is now **inside** the `useState()` call instead of being a
+separate constant.
 
 ## Understanding useState
 
@@ -363,14 +424,14 @@ The listings array is now **inside** the `useState()` call instead of being a se
 // Boolean state
 const [isOpen, setIsOpen] = useState(false);
 
-// Number state  
+// Number state
 const [count, setCount] = useState(0);
 
 // String state
-const [name, setName] = useState('');
+const [name, setName] = useState("");
 
 // Object state
-const [user, setUser] = useState({ name: '', email: '' });
+const [user, setUser] = useState({ name: "", email: "" });
 
 // Array state (our case!)
 const [items, setItems] = useState([]);
@@ -414,7 +475,8 @@ After making these changes:
 
 ## What's Next?
 
-In the next step, we'll create the `ListingFilters` component that will eventually update this state to show filtered results.
+In the next step, we'll create the `ListingFilters` component that will
+eventually update this state to show filtered results.
 
 ---
 
@@ -430,7 +492,7 @@ In the next step, we'll create the `ListingFilters` component that will eventual
 
 ### Template 2: Implementation-Heavy Step
 
-```mdx
+````mdx
 ---
 title: "Step 3: Add State for Filters"
 module: 2
@@ -440,24 +502,29 @@ prev: "/modules/module-2/step-2"
 next: "/modules/module-2/step-4"
 ---
 
-import { Separator } from '@/components/ui/separator'
-import { CodeBlock } from '@/components/course/code-block'
-import { Callout } from '@/components/ui/callout'
+import { Separator } from "@/components/ui/separator";
+import { CodeBlock } from "@/components/course/code-block";
+import { Callout } from "@/components/ui/callout";
 
 # Add State for Filters
 
-<Separator className="mb-4" />
+<Separator className='mb-4' />
 
 ## Context
 
-Our `ListingFilters` component currently renders the UI elements (date picker and guest input) but they don't actually store or track any values. When a user selects dates or changes the guest count, nothing happens - the inputs don't "remember" what was selected.
+Our `ListingFilters` component currently renders the UI elements (date picker
+and guest input) but they don't actually store or track any values. When a user
+selects dates or changes the guest count, nothing happens - the inputs don't
+"remember" what was selected.
 
 We need to add **state** to track these filter values.
 
 ## What We're Building
 
 We'll add two pieces of state to `ListingFilters`:
-1. **`dates`** - An object with `from` and `to` properties for check-in/check-out
+
+1. **`dates`** - An object with `from` and `to` properties for
+   check-in/check-out
 2. **`guests`** - A number for how many guests
 
 These states will make the inputs "controlled" - React will manage their values.
@@ -475,31 +542,22 @@ These states will make the inputs "controlled" - React will manage their values.
 import { useState } from 'react';
 import { DateRangePicker, Input } from '@/components/ui';
 
-const ListingFilters = () => {
-  const [dates, setDates] = useState({ from: null, to: null });
-  const [guests, setGuests] = useState(1);
+const ListingFilters = () => { const [dates, setDates] = useState({ from: null,
+to: null }); const [guests, setGuests] = useState(1);
 
-  return (
-    <div className="flex gap-4 p-4 border rounded-lg">
-      <DateRangePicker 
+return ( <div className="flex gap-4 p-4 border rounded-lg"> <DateRangePicker 
         value={dates}
         onChange={setDates}
         placeholder="Select dates"
-      />
-      <Input
-        type="number"
-        value={guests}
-        onChange={(e) => setGuests(Number(e.target.value))}
-        min={1}
-        placeholder="Guests"
-        className="w-32"
-      />
-    </div>
-  );
-};
+      /> <Input type="number" value={guests} onChange={(e) =>
+setGuests(Number(e.target.value))} min={1} placeholder="Guests" className="w-32"
+/> </div> ); };
 
 export default ListingFilters;
-```
+
+;
+````
+
 </CodeBlock>
 
 ## Detailed Explanation
@@ -511,12 +569,14 @@ const [dates, setDates] = useState({ from: null, to: null });
 ```
 
 **Initial value:** `{ from: null, to: null }`
-- An object with two properties
-- Both start as `null` (no dates selected)
-- Will eventually hold Date objects when user selects dates
+
+-  An object with two properties
+-  Both start as `null` (no dates selected)
+-  Will eventually hold Date objects when user selects dates
 
 **Why an object?**  
-We need to track TWO dates (check-in and check-out), so we use an object to group them together.
+We need to track TWO dates (check-in and check-out), so we use an object to
+group them together.
 
 ```jsx
 // Example of what dates looks like when selected:
@@ -533,20 +593,22 @@ const [guests, setGuests] = useState(1);
 ```
 
 **Initial value:** `1`
-- Default to 1 guest
-- Simple number value
-- User can increase/decrease
+
+-  Default to 1 guest
+-  Simple number value
+-  User can increase/decrease
 
 ### Controlled DateRangePicker
 
 ```jsx
-<DateRangePicker 
-  value={dates}           // Show current dates
-  onChange={setDates}     // Update when user selects
+<DateRangePicker
+   value={dates} // Show current dates
+   onChange={setDates} // Update when user selects
 />
 ```
 
 **How it works:**
+
 1. User clicks the date picker
 2. Selects check-in and check-out dates
 3. Component calls `setDates({ from: date1, to: date2 })`
@@ -562,10 +624,10 @@ const [guests, setGuests] = useState(1);
 
 ```jsx
 <Input
-  type="number"
-  value={guests}                              // Show current guests
-  onChange={(e) => setGuests(Number(e.target.value))}  // Update on change
-  min={1}
+   type='number'
+   value={guests} // Show current guests
+   onChange={(e) => setGuests(Number(e.target.value))} // Update on change
+   min={1}
 />
 ```
 
@@ -575,18 +637,19 @@ const [guests, setGuests] = useState(1);
 onChange={(e) => setGuests(Number(e.target.value))}
 ```
 
-- `(e)` - Event object (contains info about the change)
-- `e.target` - The input element itself
-- `e.target.value` - The input's new value (as a string!)
-- `Number(...)` - Convert string to number
-- `setGuests(...)` - Update state with new number
+-  `(e)` - Event object (contains info about the change)
+-  `e.target` - The input element itself
+-  `e.target.value` - The input's new value (as a string!)
+-  `Number(...)` - Convert string to number
+-  `setGuests(...)` - Update state with new number
 
 **Why `Number()`?**  
-Input values are always strings in JavaScript, even for `type="number"`. We convert to a number for proper filtering later.
+Input values are always strings in JavaScript, even for `type="number"`. We
+convert to a number for proper filtering later.
 
 ```jsx
-e.target.value // "3" (string)
-Number(e.target.value) // 3 (number)
+e.target.value; // "3" (string)
+Number(e.target.value); // 3 (number)
 ```
 
 ## The Data Flow
@@ -594,6 +657,7 @@ Number(e.target.value) // 3 (number)
 Here's what happens when a user interacts with the filters:
 
 ### Date Selection Flow
+
 ```
 1. User clicks DateRangePicker
 2. User selects March 15 - March 20
@@ -605,6 +669,7 @@ Here's what happens when a user interacts with the filters:
 ```
 
 ### Guest Input Flow
+
 ```
 1. User types "3" in input
 2. Input calls: onChange(event)
@@ -621,6 +686,7 @@ Here's what happens when a user interacts with the filters:
 ### Controlled vs Uncontrolled Components
 
 **Uncontrolled (bad for React):**
+
 ```jsx
 ❌ <input type="number" />
 // React doesn't know the value
@@ -628,6 +694,7 @@ Here's what happens when a user interacts with the filters:
 ```
 
 **Controlled (React way):**
+
 ```jsx
 ✅ <input type="number" value={guests} onChange={handleChange} />
 // React always knows the value
@@ -646,23 +713,30 @@ Here's what happens when a user interacts with the filters:
 ## Common Patterns
 
 ### Text Input
+
 ```jsx
-const [text, setText] = useState('');
-<input value={text} onChange={(e) => setText(e.target.value)} />
+const [text, setText] = useState("");
+<input value={text} onChange={(e) => setText(e.target.value)} />;
 ```
 
 ### Checkbox
+
 ```jsx
 const [checked, setChecked] = useState(false);
-<input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
+<input
+   type='checkbox'
+   checked={checked}
+   onChange={(e) => setChecked(e.target.checked)}
+/>;
 ```
 
 ### Select Dropdown
+
 ```jsx
-const [selected, setSelected] = useState('option1');
+const [selected, setSelected] = useState("option1");
 <select value={selected} onChange={(e) => setSelected(e.target.value)}>
-  <option value="option1">Option 1</option>
-</select>
+   <option value='option1'>Option 1</option>
+</select>;
 ```
 
 ## Verification
@@ -670,20 +744,23 @@ const [selected, setSelected] = useState('option1');
 After making these changes, test the filters:
 
 ✅ **Date Picker:**
-- Click the date picker
-- Select a date range
-- Selected dates should display in the picker
-- Clear button should reset to no selection
+
+-  Click the date picker
+-  Select a date range
+-  Selected dates should display in the picker
+-  Clear button should reset to no selection
 
 ✅ **Guest Input:**
-- Type a number in the guest field
-- Value should update as you type
-- Minimum value should be 1 (can't go below)
-- Can increment/decrement with arrows
+
+-  Type a number in the guest field
+-  Value should update as you type
+-  Minimum value should be 1 (can't go below)
+-  Can increment/decrement with arrows
 
 ✅ **No Errors:**
-- Check the console for errors
-- App should compile without issues
+
+-  Check the console for errors
+-  App should compile without issues
 
 <Callout type="success">
   **Try it out!** Your filters now track user input, even though they don't filter the listings yet. That's coming in the next steps!
@@ -691,7 +768,9 @@ After making these changes, test the filters:
 
 ## What's Next?
 
-The filters now store values, but they're isolated in the `ListingFilters` component. In the next step, we'll learn how to pass these values up to the `HomePage` so we can actually filter the listings!
+The filters now store values, but they're isolated in the `ListingFilters`
+component. In the next step, we'll learn how to pass these values up to the
+`HomePage` so we can actually filter the listings!
 
 ---
 
@@ -709,7 +788,7 @@ The filters now store values, but they're isolated in the `ListingFilters` compo
 
 ## Completion Template
 
-```mdx
+````mdx
 ---
 title: "Module 2 Complete!"
 module: 2
@@ -717,13 +796,13 @@ type: "completion"
 next: "/modules/module-3"
 ---
 
-import { CheckCircle } from 'lucide-react'
-import Confetti from 'react-confetti'
-import { Separator } from '@/components/ui/separator'
-import { TaskList } from '@/components/course/task-list'
-import { Callout } from '@/components/ui/callout'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CheckCircle } from "lucide-react";
+import Confetti from "react-confetti";
+import { Separator } from "@/components/ui/separator";
+import { TaskList } from "@/components/course/task-list";
+import { Callout } from "@/components/ui/callout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 <div className="relative">
   <Confetti
@@ -733,17 +812,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
     width={650}
   />
 
-  <div className="text-center mb-8">
-    <CheckCircle className="w-40 h-40 mx-auto mb-4 text-green-500" />
-    <h1 className="text-4xl font-bold mb-2">Module 2 Completed!</h1>
-    <p className="text-xl text-muted-foreground">
+{" "}
+<div className='text-center mb-8'>
+   <CheckCircle className='w-40 h-40 mx-auto mb-4 text-green-500' />
+   <h1 className='text-4xl font-bold mb-2'>Module 2 Completed!</h1>
+   <p className='text-xl text-muted-foreground'>
       Congratulations! You've mastered state management and event handling! 🎉
-    </p>
-  </div>
+   </p>
+</div>
 
-  <Separator className="my-8" />
+{" "}
+<Separator className='my-8' />
 
-  ## What You've Accomplished
+## What You've Accomplished
 
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
     <Card>
@@ -776,86 +857,86 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
         </ul>
       </CardContent>
     </Card>
+
   </div>
 
-  ## Tasks Completed
+## Tasks Completed
 
-  <TaskList 
-    checked={true}
-    tasks={[
+{" "}
+<TaskList
+   checked={true}
+   tasks={[
       "Turn the <code>listings</code> array in <code>HomePage</code> into state",
       "Create the <code>ListingFilters</code> component",
       "Add state for <code>dates</code> and <code>guests</code> in <code>ListingFilters</code>",
       "Pass filter values from <code>ListingFilters</code> to <code>HomePage</code>",
       "Add state for the <code>search</code> value in <code>HomePage</code>",
       "Filter listings by <code>search</code>, <code>dates</code>, and <code>guests</code>",
-    ]} 
-  />
+   ]}
+/>
 
-  <Separator className="my-8" />
+{" "}
+<Separator className='my-8' />
 
-  ## Key Concepts Learned
+## Key Concepts Learned
 
-  ### 1. State Management with useState
+### 1. State Management with useState
 
-  You learned that state is React's way of tracking data that can change:
+You learned that state is React's way of tracking data that can change:
 
-  ```jsx
-  const [value, setValue] = useState(initialValue);
-  ```
+```jsx
+const [value, setValue] = useState(initialValue);
+```
+````
 
-  - **Value** - Current state
-  - **Setter** - Function to update state
-  - **Initial value** - Starting value
+-  **Value** - Current state
+-  **Setter** - Function to update state
+-  **Initial value** - Starting value
 
-  ### 2. Event Handling
+### 2. Event Handling
 
-  You learned how to respond to user actions:
+You learned how to respond to user actions:
 
-  ```jsx
-  const handleClick = (event) => {
-    // Do something
-  };
+```jsx
+const handleClick = (event) => {
+   // Do something
+};
 
-  <button onClick={handleClick}>Click Me</button>
-  ```
+<button onClick={handleClick}>Click Me</button>;
+```
 
-  ### 3. Controlled Components
+### 3. Controlled Components
 
-  You learned to let React control form inputs:
+You learned to let React control form inputs:
 
-  ```jsx
-  <input 
-    value={state} 
-    onChange={(e) => setState(e.target.value)} 
-  />
-  ```
+```jsx
+<input value={state} onChange={(e) => setState(e.target.value)} />
+```
 
-  ### 4. Lifting State Up
+### 4. Lifting State Up
 
-  You learned to share state between components:
+You learned to share state between components:
 
-  ```jsx
-  // Parent holds state
-  const [data, setData] = useState();
+```jsx
+// Parent holds state
+const [data, setData] = useState();
 
-  // Child receives callback
-  <Child onUpdate={setData} />
+// Child receives callback
+<Child onUpdate={setData} />;
 
-  // Child calls callback
-  props.onUpdate(newValue);
-  ```
+// Child calls callback
+props.onUpdate(newValue);
+```
 
-  ### 5. Dynamic Filtering
+### 5. Dynamic Filtering
 
-  You learned to filter data in real-time:
+You learned to filter data in real-time:
 
-  ```jsx
-  const filtered = data.filter(item => {
-    return item.title.includes(search) &&
-           item.guests >= selectedGuests;
-  });
-  ```
+```jsx
+const filtered = data.filter((item) => {
+   return item.title.includes(search) && item.guests >= selectedGuests;
+});
+```
 
   <Callout type="success">
     **Great Job!** You've transformed a static application into an interactive experience. Your listings now respond to user input in real-time!
@@ -863,18 +944,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
   <Separator className="my-8" />
 
-  ## What's Next?
+## What's Next?
 
-  In **Module 3: Effects and Data Fetching**, you'll learn:
+In **Module 3: Effects and Data Fetching**, you'll learn:
 
-  - 📡 **useEffect Hook** - Managing side effects
-  - 🌐 **API Integration** - Fetching real data from a backend
-  - ⏳ **Loading States** - Showing spinners during async operations
-  - ❌ **Error Handling** - Gracefully handling failures
-  - 🚫 **Race Conditions** - Preventing stale data issues
-  - 🎠 **Image Carousels** - Building interactive UI components
+-  📡 **useEffect Hook** - Managing side effects
+-  🌐 **API Integration** - Fetching real data from a backend
+-  ⏳ **Loading States** - Showing spinners during async operations
+-  ❌ **Error Handling** - Gracefully handling failures
+-  🚫 **Race Conditions** - Preventing stale data issues
+-  🎠 **Image Carousels** - Building interactive UI components
 
-  Your application will connect to a mock API and fetch real data dynamically!
+Your application will connect to a mock API and fetch real data dynamically!
 
   <div className="mt-8 flex justify-center gap-4">
     <Button variant="outline" href="/modules/module-2">
@@ -896,29 +977,29 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 ```jsx
 // components/course/task-list.jsx
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const TaskList = ({ tasks, checked = false }) => {
-  return (
-    <div className="space-y-3 my-4">
-      {tasks.map((task, index) => (
-        <div 
-          key={index} 
-          className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
-        >
-          <Checkbox 
-            checked={checked} 
-            className="mt-0.5 flex-shrink-0"
-            disabled
-          />
-          <div 
-            className="text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: task }} 
-          />
-        </div>
-      ))}
-    </div>
-  );
+   return (
+      <div className='space-y-3 my-4'>
+         {tasks.map((task, index) => (
+            <div
+               key={index}
+               className='flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors'
+            >
+               <Checkbox
+                  checked={checked}
+                  className='mt-0.5 flex-shrink-0'
+                  disabled
+               />
+               <div
+                  className='text-sm leading-relaxed'
+                  dangerouslySetInnerHTML={{ __html: task }}
+               />
+            </div>
+         ))}
+      </div>
+   );
 };
 ```
 
@@ -926,60 +1007,67 @@ export const TaskList = ({ tasks, checked = false }) => {
 
 ```jsx
 // components/course/code-block.jsx
-import { Highlight, themes } from 'prism-react-renderer';
+import { Highlight, themes } from "prism-react-renderer";
 
-export const CodeBlock = ({ 
-  children, 
-  language = 'jsx', 
-  title, 
-  highlightLines = [] 
+export const CodeBlock = ({
+   children,
+   language = "jsx",
+   title,
+   highlightLines = [],
 }) => {
-  const code = children?.props?.children || children;
-  
-  const shouldHighlight = (lineNumber) => {
-    return highlightLines.some(line => {
-      if (typeof line === 'number') {
-        return line === lineNumber;
-      }
-      // Handle ranges like "5-10"
-      const [start, end] = line.toString().split('-').map(Number);
-      return lineNumber >= start && lineNumber <= end;
-    });
-  };
+   const code = children?.props?.children || children;
 
-  return (
-    <div className="my-6 rounded-lg overflow-hidden border">
-      {title && (
-        <div className="px-4 py-2 bg-muted border-b text-sm font-mono">
-          {title}
-        </div>
-      )}
-      <Highlight
-        theme={themes.vsDark}
-        code={code.trim()}
-        language={language}
-      >
-        {({ className, style, tokens, getLineProps, getTokenProps }) => (
-          <pre className={`${className} p-4 overflow-x-auto`} style={style}>
-            {tokens.map((line, i) => (
-              <div
-                key={i}
-                {...getLineProps({ line })}
-                className={shouldHighlight(i + 1) ? 'bg-yellow-500/20 -mx-4 px-4' : ''}
-              >
-                <span className="inline-block w-8 text-gray-500 select-none">
-                  {i + 1}
-                </span>
-                {line.map((token, key) => (
-                  <span key={key} {...getTokenProps({ token })} />
-                ))}
-              </div>
-            ))}
-          </pre>
-        )}
-      </Highlight>
-    </div>
-  );
+   const shouldHighlight = (lineNumber) => {
+      return highlightLines.some((line) => {
+         if (typeof line === "number") {
+            return line === lineNumber;
+         }
+         // Handle ranges like "5-10"
+         const [start, end] = line.toString().split("-").map(Number);
+         return lineNumber >= start && lineNumber <= end;
+      });
+   };
+
+   return (
+      <div className='my-6 rounded-lg overflow-hidden border'>
+         {title && (
+            <div className='px-4 py-2 bg-muted border-b text-sm font-mono'>
+               {title}
+            </div>
+         )}
+         <Highlight
+            theme={themes.vsDark}
+            code={code.trim()}
+            language={language}
+         >
+            {({ className, style, tokens, getLineProps, getTokenProps }) => (
+               <pre
+                  className={`${className} p-4 overflow-x-auto`}
+                  style={style}
+               >
+                  {tokens.map((line, i) => (
+                     <div
+                        key={i}
+                        {...getLineProps({ line })}
+                        className={
+                           shouldHighlight(i + 1)
+                              ? "bg-yellow-500/20 -mx-4 px-4"
+                              : ""
+                        }
+                     >
+                        <span className='inline-block w-8 text-gray-500 select-none'>
+                           {i + 1}
+                        </span>
+                        {line.map((token, key) => (
+                           <span key={key} {...getTokenProps({ token })} />
+                        ))}
+                     </div>
+                  ))}
+               </pre>
+            )}
+         </Highlight>
+      </div>
+   );
 };
 ```
 
@@ -989,7 +1077,7 @@ export const CodeBlock = ({
 
 ### Example: Module 1, Step 1 (Complete)
 
-```mdx
+````mdx
 ---
 title: "Step 1: Create the HomePage Component"
 module: 1
@@ -998,29 +1086,36 @@ prev: "/modules/module-1"
 next: "/modules/module-1/step-2"
 ---
 
-import { CodeBlock } from '@/components/course/code-block'
-import { Callout } from '@/components/ui/callout'
-import { Button } from '@/components/ui/button'
+import { CodeBlock } from "@/components/course/code-block";
+import { Callout } from "@/components/ui/callout";
+import { Button } from "@/components/ui/button";
 
 # Create the HomePage Component
 
 ## Context
 
-Right now, our React application shows a basic welcome message defined directly in `App.jsx`. As our application grows, we don't want everything crammed into one file. We need to organize our code into separate, focused components.
+Right now, our React application shows a basic welcome message defined directly
+in `App.jsx`. As our application grows, we don't want everything crammed into
+one file. We need to organize our code into separate, focused components.
 
-The first component we'll create is the `HomePage` - the main landing page users will see when they visit our booking application.
+The first component we'll create is the `HomePage` - the main landing page users
+will see when they visit our booking application.
 
 ## What We're Building
 
-A new React component that will serve as the homepage for our application. For now, it will display a simple heading, but in future steps, we'll add listing cards, filters, and search functionality.
+A new React component that will serve as the homepage for our application. For
+now, it will display a simple heading, but in future steps, we'll add listing
+cards, filters, and search functionality.
 
-Think of this as laying the foundation - we're building the structure now, and we'll add the details later.
+Think of this as laying the foundation - we're building the structure now, and
+we'll add the details later.
 
 ## Implementation
 
 ### Creating the Component
 
-We'll create a new file in the `pages` directory and write a functional component that returns JSX.
+We'll create a new file in the `pages` directory and write a functional
+component that returns JSX.
 
 <CodeBlock language="jsx" title="src/pages/HomePage.jsx">
 ```jsx
@@ -1033,7 +1128,10 @@ const HomePage = () => {
 };
 
 export default HomePage;
-```
+
+;
+````
+
 </CodeBlock>
 
 ## Code Explanation
@@ -1044,35 +1142,41 @@ Let's break down each part:
 
 ```jsx
 const HomePage = () => {
-  return (
-    <div>
-      <h1>Find your next stay</h1>
-    </div>
-  );
+   return (
+      <div>
+         <h1>Find your next stay</h1>
+      </div>
+   );
 };
 ```
 
-This creates a **functional component** - the modern way to write React components. It's just a JavaScript function that returns JSX (the HTML-like syntax).
+This creates a **functional component** - the modern way to write React
+components. It's just a JavaScript function that returns JSX (the HTML-like
+syntax).
 
 **Key points:**
-- Component names must start with a capital letter (`HomePage`, not `homePage`)
-- The arrow function `() => {}` is a concise way to define functions
-- Components must return a single root element (our `<div>` wrapper)
+
+-  Component names must start with a capital letter (`HomePage`, not `homePage`)
+-  The arrow function `() => {}` is a concise way to define functions
+-  Components must return a single root element (our `<div>` wrapper)
 
 ### JSX Return
 
 ```jsx
 return (
-  <div>
-    <h1>Find your next stay</h1>
-  </div>
+   <div>
+      <h1>Find your next stay</h1>
+   </div>
 );
 ```
 
-JSX looks like HTML, but it's actually JavaScript. React transforms this into real DOM elements that appear in the browser.
+JSX looks like HTML, but it's actually JavaScript. React transforms this into
+real DOM elements that appear in the browser.
 
 **Why wrap in `<div>`?**  
-React components can only return one root element. If you want multiple elements, wrap them in a container like `<div>` or use a React Fragment `<>...</>`.
+React components can only return one root element. If you want multiple
+elements, wrap them in a container like `<div>` or use a React Fragment
+`<>...</>`.
 
 ### Default Export
 
@@ -1080,11 +1184,12 @@ React components can only return one root element. If you want multiple elements
 export default HomePage;
 ```
 
-This makes the component available to other files. The `default` keyword means when we import this file, we'll get the `HomePage` component.
+This makes the component available to other files. The `default` keyword means
+when we import this file, we'll get the `HomePage` component.
 
 ```jsx
 // Other files can now import it:
-import HomePage from './pages/HomePage';
+import HomePage from "./pages/HomePage";
 ```
 
 ## React Concepts
@@ -1115,7 +1220,8 @@ class HomePage extends React.Component {
 }
 ```
 
-**Always use functional components** - they're simpler, easier to read, and support React Hooks.
+**Always use functional components** - they're simpler, easier to read, and
+support React Hooks.
 
 ### JSX Rules to Remember
 
@@ -1139,7 +1245,9 @@ src/
   main.jsx
 ```
 
-The `pages` directory contains **page-level components** - full pages that users navigate to. Later we'll create smaller components in the `components` directory.
+The `pages` directory contains **page-level components** - full pages that users
+navigate to. Later we'll create smaller components in the `components`
+directory.
 
 ## Verification
 
@@ -1157,7 +1265,8 @@ After creating `HomePage.jsx`:
 
 ## What's Next?
 
-You've created your first React component! In the next step, we'll import this component into `App.jsx` so it actually displays in the browser.
+You've created your first React component! In the next step, we'll import this
+component into `App.jsx` so it actually displays in the browser.
 
 ---
 
@@ -1170,6 +1279,235 @@ You've created your first React component! In the next step, we'll import this c
   </Button>
 </div>
 ```
+
+---
+
+## MDX Formatting Best Practices
+
+### Critical Rules for Build Success
+
+To ensure your MDX files compile successfully without errors, follow these
+formatting rules:
+
+#### 1. Code Blocks Must Be On Separate Lines
+
+**❌ WRONG - Inline code blocks:**
+
+````mdx
+<Step>### Variables ```jsx const name = "Value"; ``` explanation text</Step>
+````
+
+**✅ CORRECT - Separated code blocks:**
+
+````mdx
+<Step>
+  ### Variables
+  
+  ```jsx
+  const name = "Value";
+````
+
+Explanation text here. </Step>
+
+````
+
+#### 2. Never Inline Code Blocks in Component Props
+
+**❌ WRONG:**
+```mdx
+<Accordion id="example" title="Example">
+  Some text ```jsx code here ``` more text
+</Accordion>
+````
+
+**✅ CORRECT:**
+
+````mdx
+<Accordion id="example" title="Example">
+  Some text before the code:
+  
+  ```jsx
+  code here
+````
+
+More text after the code. </Accordion>
+
+````
+
+#### 3. Always Close JSX Components Properly
+
+**❌ WRONG - Missing closing tags:**
+```mdx
+<Accordions type="single">
+  <Accordion id="test" title="Test">
+    Content
+  // Missing </Accordion>
+</Accordions>
+````
+
+**✅ CORRECT:**
+
+```mdx
+<Accordions type='single'>
+   <Accordion id='test' title='Test'>
+      Content
+   </Accordion>
+</Accordions>
+```
+
+#### 4. No Duplicate Component Tags
+
+**❌ WRONG - Duplicate tags:**
+
+```mdx
+<Accordion id="test" title="Test">
+<Accordion id="test" title="Test">
+  Content
+</Accordion>
+```
+
+**✅ CORRECT:**
+
+```mdx
+<Accordion id='test' title='Test'>
+   Content
+</Accordion>
+```
+
+#### 5. Proper Whitespace and Indentation
+
+**❌ WRONG - Text merged with code:**
+
+````mdx
+<Step>
+   ### Title Use this pattern: ```jsx const value = 1; ``` to define state
+</Step>
+````
+
+**✅ CORRECT - Clear separation:**
+
+````mdx
+<Step>
+  ### Title
+  
+  Use this pattern:
+  
+  ```jsx
+  const value = 1;
+````
+
+This helps define state properly. </Step>
+
+````
+
+#### 6. Code Block Positioning in Lists
+
+**❌ WRONG:**
+```mdx
+<Steps>
+  <Step>
+    ### Point 1 ```jsx code ``` explanation
+  </Step>
+</Steps>
+````
+
+**✅ CORRECT:**
+
+````mdx
+<Steps>
+   <Step>
+      ### Point 1 Explanation before code: ```jsx code ``` Explanation after
+      code.
+   </Step>
+</Steps>
+````
+
+### Common Formatter Issues
+
+**Problem:** Auto-formatters (Prettier, etc.) may move code blocks inline with
+text, breaking MDX compilation.
+
+**Solutions:**
+
+1. **Add `.prettierignore`** for MDX files:
+
+   ```
+   *.mdx
+   ```
+
+2. **Use Prettier with MDX plugin:**
+
+   ```bash
+   npm install --save-dev prettier prettier-plugin-mdx
+   ```
+
+3. **Manual review** after auto-formatting to ensure code blocks are properly
+   separated
+
+### Validation Before Build
+
+Before running `npm run build`, check for these patterns:
+
+````bash
+# Search for potential inline code issues
+grep -r "```jsx" --include="*.mdx" | grep -v "^[[:space:]]*```"
+````
+
+**Red flags to look for:**
+
+-  ` ```jsx ` (code fence with text before it on same line)
+-  Text immediately after closing ` ``` ` without blank line
+-  Code blocks inside component opening tags
+-  Unclosed `<Accordion>`, `<Step>`, or other JSX components
+
+### Build Error Examples
+
+**Error: "Expected a closing tag for `<Accordion>`"**
+
+-  **Cause:** Code block inline broke component structure
+-  **Fix:** Move code blocks to separate lines with blank lines around them
+
+**Error: "Unexpected character `<`"**
+
+-  **Cause:** Duplicate or malformed JSX tags
+-  **Fix:** Check for duplicate component declarations, ensure all have closing
+   tags
+
+**Error: "Expected component to be defined"**
+
+-  **Cause:** Component used outside code block without import
+-  **Fix:** Ensure component examples are inside ` ```jsx ` code fences
+
+### Testing Workflow
+
+1. **Create/edit MDX file** with proper spacing
+2. **Visual check** - Ensure code blocks are visually separated from text
+3. **Build locally** - Run `npm run build`
+4. **Check errors** - If build fails, search for inline code blocks
+5. **Fix spacing** - Add blank lines before/after code blocks
+6. **Rebuild** - Verify success
+
+### Quick Fix Template
+
+If you encounter build errors, use this pattern to fix code blocks:
+
+````mdx
+<!-- Before (causing errors) -->
+
+Some text `jsx code ` more text
+
+<!-- After (correct) -->
+
+Some text
+
+```jsx
+code;
+```
+````
+
+More text
+
+````
 
 ---
 
@@ -1224,29 +1562,28 @@ import { TaskList } from '@/components/course/task-list'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CheckCircle } from 'lucide-react'
 import Confetti from 'react-confetti'
-```
+````
 
 ### Common Patterns
 
-```mdx
+````mdx
 # Heading 1
+
 ## Heading 2
+
 ### Heading 3
 
-**Bold text**
-*Italic text*
-`inline code`
+**Bold text** _Italic text_ `inline code`
 
 <Separator />
 
-<Callout type="info|warning|success|error">
-  Content
-</Callout>
+<Callout type='info|warning|success|error'>Content</Callout>
 
 <CodeBlock language="jsx" title="file/path.jsx" highlightLines={[1, 5-8]}>
   ```jsx
   code here
-  ```
+````
+
 </CodeBlock>
 
 <Button href="/path">Label</Button>
@@ -1258,7 +1595,8 @@ import Confetti from 'react-confetti'
 
 ## Conclusion
 
-These templates provide everything you need to convert the Project React curriculum to MDX format. Simply:
+These templates provide everything you need to convert the Project React
+curriculum to MDX format. Simply:
 
 1. Copy the appropriate template
 2. Fill in your content

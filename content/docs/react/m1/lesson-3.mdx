@@ -26,7 +26,7 @@ here...". We need real property data to display!
 
 Each property in our booking app needs several pieces of information:
 
-```javascript
+```javascript title="Property Data Structure"
 {
   id: 1,
   title: "Cozy Beach House",
@@ -52,9 +52,7 @@ Each property in our booking app needs several pieces of information:
 
 Update your `HomePage.jsx` to include property data:
 
-```jsx
-// src/pages/HomePage.jsx
-
+```jsx title="src/pages/HomePage.jsx"
 function HomePage() {
    // Property data array
    const properties = [
@@ -116,7 +114,7 @@ export default HomePage;
 
 ### 1. Added Property Data
 
-```jsx
+```jsx title="Properties Array"
 const properties = [
   { id: 1, title: "...", ... },
   { id: 2, title: "...", ... },
@@ -129,7 +127,7 @@ its details.
 
 ### 2. Used JavaScript in JSX
 
-```jsx
+```jsx title="Using JavaScript in JSX"
 <p>We have {properties.length} properties available</p>
 ```
 
@@ -150,7 +148,6 @@ its details.
       learning, keeping it local is simpler.
    </Accordion>
 
-{" "}
 <Accordion id='practice' title='Learning Step' value='practice'>
    We're starting with hardcoded data to focus on React concepts. In Module 3,
    you'll fetch this data from a real API!
@@ -173,33 +170,37 @@ You can use any JavaScript expression inside `{}`:
    <Step>
       ### Variables
       
-      ```jsx
+      ```jsx title="Using Variables in JSX"
       const name = "StayScape";
       <h1>{name}</h1>
       // Renders: <h1>StayScape</h1>
       ```
    </Step>
 
-{" "}
-<Step>
-   ### Math Operations ```jsx const price = 250;
-   <p>${price * 7} per week</p>
-   // Renders: <p>$1750 per week</p>
-   ```
-</Step>
+   <Step>
+      ### Math Operations
+      
+      ```jsx title="Math in JSX"
+      const price = 250;
+      <p>${price * 7} per week</p>
+      // Renders: <p>$1750 per week</p>
+      ```
+   </Step>
 
-{" "}
-<Step>
-   ### String Methods ```jsx const title = "beach house";
-   <h2>{title.toUpperCase()}</h2>
-   // Renders: <h2>BEACH HOUSE</h2>
-   ```
-</Step>
+   <Step>
+      ### String Methods
+      
+      ```jsx title="String Manipulation"
+      const title = "beach house";
+      <h2>{title.toUpperCase()}</h2>
+      // Renders: <h2>BEACH HOUSE</h2>
+      ```
+   </Step>
 
    <Step>
       ### Ternary Operators
       
-      ```jsx
+      ```jsx title="Conditional Rendering"
       const rating = 4.9;
       <span>{rating >= 4.5 ? "⭐ Superhost" : "Host"}</span>
       // Renders: <span>⭐ Superhost</span>
@@ -219,7 +220,7 @@ You can use any JavaScript expression inside `{}`:
 
 Let's break down one property object:
 
-```javascript
+```javascript title="Property Object Structure"
 {
   id: 1,                    // Unique number
   title: "Cozy Beach House", // String
@@ -257,7 +258,7 @@ Try these modifications to practice working with the data:
   <Accordion id="challenge1" title="Challenge 1: Add Another Property" value="challenge1">
     Add a 5th property to the array with your own details. Watch the count update automatically!
     
-    ```jsx
+    ```jsx title="Adding New Property"
     {
       id: 5,
       title: "Your Property Name",
@@ -272,7 +273,7 @@ Try these modifications to practice working with the data:
   <Accordion id="challenge2" title="Challenge 2: Calculate Total Value" value="challenge2">
     Display the total value of all properties per night:
     
-    ```jsx
+    ```jsx title="Calculate Total"
     <p>
       Total value: ${properties.reduce((sum, prop) => sum + prop.price, 0)} per night
     </p>
@@ -284,7 +285,7 @@ Try these modifications to practice working with the data:
   <Accordion id="challenge3" title="Challenge 3: Show Highest Rated" value="challenge3">
     Find and display the highest rated property:
     
-    ```jsx
+    ```jsx title="Find Top Rated"
     const topRated = properties.reduce((max, prop) => 
       prop.rating > max.rating ? prop : max
     );
@@ -313,7 +314,7 @@ Try these modifications to practice working with the data:
 
 <Accordions type="single">
   <Accordion id="mistake1" title="Forgetting Commas in Arrays" value="mistake1">
-    ```jsx
+    ```jsx title="Common Array Syntax Error"
     // ❌ Missing comma after object
     const properties = [
       { id: 1, title: "House" }
@@ -329,7 +330,7 @@ Try these modifications to practice working with the data:
   </Accordion>
   
   <Accordion id="mistake2" title="Using Statements Instead of Expressions" value="mistake2">
-    ```jsx
+    ```jsx title="JSX Expression Requirements"
     // ❌ Can't use if/else in JSX
     <p>
       {

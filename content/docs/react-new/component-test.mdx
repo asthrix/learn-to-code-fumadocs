@@ -109,6 +109,93 @@ these patterns directly into module content.
 
 ---
 
+## CodeBlock
+
+CodeBlock provides syntax highlighting with copy functionality:
+
+---
+
+## CodeBlock
+
+CodeBlock provides syntax highlighting with copy functionality.
+
+**Example 1: React Component**
+
+```tsx title="src/components/Example.tsx"
+import React from "react";
+
+interface ExampleProps {
+   title: string;
+   count: number;
+}
+
+export function Example({ title, count }: ExampleProps) {
+   return (
+      <div className='p-4'>
+         <h2>{title}</h2>
+         <p>Count: {count}</p>
+      </div>
+   );
+}
+```
+
+**Example 2: Default Export**
+
+```tsx title="src/components/Feature.tsx"
+import React from "react";
+
+export default function Feature() {
+   return (
+      <div className='p-4'>
+         <h2>Feature</h2>
+         <p>Safe CodeBlock usage example.</p>
+      </div>
+   );
+}
+```
+
+**Example 3: Configuration File**
+
+```javascript title="config.js"
+export default {
+   apiUrl: "https://api.example.com",
+   timeout: 5000,
+   retries: 3,
+};
+```
+
+**Features:**
+
+-  Syntax highlighting for multiple languages
+-  Copy button for easy code copying
+-  Optional file path title
+-  Line highlighting support
+
+**Usage in MDX:**
+
+Simply use standard markdown code fences with the `title` attribute:
+
+````mdx
+```tsx title="path/to/file.tsx"
+// Your code here
+export default function Example() {
+   return <div>Example</div>;
+}
+```
+````
+
+```
+
+**Supported languages:** `tsx`, `jsx`, `typescript`, `javascript`, `bash`,
+`json`, `css`, `html`, `mdx`, and more.
+
+**Supported languages:** `tsx`, `jsx`, `typescript`, `javascript`, `bash`,
+`json`, `css`, `html`, `mdx`, and more.
+
+```
+
+---
+
 ## Tabs
 
 <Tabs defaultValue='jsx'>
