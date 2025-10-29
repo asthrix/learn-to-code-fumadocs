@@ -1,0 +1,874 @@
+---
+title: "L7: Fetching Listing Details"
+description: "Fetch individual listing data using the ID from URL parameters"
+---
+
+
+# Fetching Listing Details
+
+Now that we can extract the ID from the URL, it's time to use it! In this lesson, we'll fetch the specific listing data from the API based on the ID parameter.
+
+This combines concepts from Module 3 (data fetching, useEffect, loading/error states) with the routing knowledge from Module 4.
+
+## What You'll Learn
+
+- Fetch single listing by ID from API
+- Use useParams with useEffect
+- Handle loading and error states
+- Deal with invalid listing IDs
+- Implement proper cleanup with AbortController
+
+## The Goal
+
+Transform this:
+
+```jsx
+// ❌ Hardcoded data
+<h1>Cozy Beach House</h1>
+<p>$250 / night</p>
+```
+
+Into this:
+
+```jsx
+// ✅ Dynamic data from API
+<h1>{listing.title}</h1>
+<p>${listing.price} / night</p>
+```
+
+Each URL (`/listing/1`, `/listing/2`, etc.) will fetch and display different data!
+
+## API Endpoint
+
+We'll use this API endpoint to fetch a single listing:
+
+```
+GET /api/listings/:id
+```
+
+**Examples:**
+
+```bash
+GET /api/listings/1  → Returns listing with ID 1
+GET /api/listings/2  → Returns listing with ID 2
+GET /api/listings/42 → Returns listing with ID 42
+```
+
+**Response format:**
+
+```json
+{
+  "id": 1,
+  "title": "Cozy Beach House",
+  "location": "Malibu, California",
+  "price": 250,
+  "rating": 4.8,
+  "reviews": 124,
+  "description": "Wake up to the sound of waves...",
+  "bedrooms": 2,
+  "bathrooms": 2,
+  "guests": 4,
+  "images": [...]
+}
+```
+
+## Step 1: Set Up State and Imports
+
+Let's add the necessary imports and state management:
+
+<Steps>
+
+<Step>
+
+### Import useState and useEffect
+
+Update the imports in `ListingDetailsPage.jsx`:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+// [!code word:useParams]
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react'; // [!code ++]
+
+export default function ListingDetailsPage() {
+  const { id } = useParams();
+  
+  // Add state for listing data // [!code ++]
+  const [listing, setListing] = useState(null); // [!code ++]
+  const [isLoading, setIsLoading] = useState(true); // [!code ++]
+  const [error, setError] = useState(null); // [!code ++]
+
+  // Rest of component...
+}
+```
+
+**What we added:**
+
+- **listing** - Stores the fetched listing data
+- **isLoading** - Tracks loading state
+- **error** - Stores any error messages
+
+</Step>
+
+</Steps>
+
+## Step 2: Implement Data Fetching
+
+Now let's fetch the listing data using the ID:
+
+<Steps>
+
+<Step>
+
+### Add useEffect with Fetch Logic
+
+Add this useEffect after your state declarations:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+export default function ListingDetailsPage() {
+  const { id } = useParams();
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => { // [!code ++]
+    // Reset states when ID changes // [!code ++]
+    setIsLoading(true); // [!code ++]
+    setError(null); // [!code ++]
+    // [!code ++]
+    // Create AbortController for cleanup // [!code ++]
+    const controller = new AbortController(); // [!code ++]
+    // [!code ++]
+    // Fetch listing by ID // [!code ++]
+    fetch(`/api/listings/${id}`, { // [!code ++]
+      signal: controller.signal // [!code ++]
+    }) // [!code ++]
+      .then(response => { // [!code ++]
+        // Check if listing exists // [!code ++]
+        if (!response.ok) { // [!code ++]
+          throw new Error('Listing not found'); // [!code ++]
+        } // [!code ++]
+        return response.json(); // [!code ++]
+      }) // [!code ++]
+      .then(data => { // [!code ++]
+        setListing(data); // [!code ++]
+        setIsLoading(false); // [!code ++]
+      }) // [!code ++]
+      .catch(err => { // [!code ++]
+        // Ignore abort errors // [!code ++]
+        if (err.name === 'AbortError') return; // [!code ++]
+        // [!code ++]
+        setError(err.message); // [!code ++]
+        setIsLoading(false); // [!code ++]
+      }); // [!code ++]
+    // [!code ++]
+    // Cleanup: abort fetch on unmount or ID change // [!code ++]
+    return () => controller.abort(); // [!code ++]
+  }, [id]); // Re-run when ID changes // [!code ++]
+
+  // Rest of component...
+}
+```
+
+**What this does:**
+
+1. **Reset states** - Clear previous data when ID changes
+2. **Create AbortController** - For canceling requests
+3. **Fetch listing** - Use ID in API URL
+4. **Check response** - Throw error if listing not found
+5. **Update state** - Set listing data or error
+6. **Cleanup** - Cancel request if component unmounts
+7. **Dependency array** - Re-fetch when `id` changes
+
+</Step>
+
+<Step>
+
+### Understanding the Flow
+
+Let's trace what happens when you visit `/listing/42`:
+
+```jsx
+// 1. URL: /listing/42
+const { id } = useParams(); // id = "42"
+
+// 2. Initial state
+useState(null);        // listing = null
+useState(true);        // isLoading = true
+useState(null);        // error = null
+
+// 3. useEffect runs
+fetch('/api/listings/42') // Fetch specific listing
+
+// 4. Response received (success)
+setListing(data);      // listing = { id: 42, title: "...", ... }
+setIsLoading(false);   // isLoading = false
+
+// 5. Component re-renders with data
+return <h1>{listing.title}</h1>
+```
+
+</Step>
+
+</Steps>
+
+## Step 3: Handle Loading State
+
+Show a loading spinner while fetching:
+
+<Steps>
+
+<Step>
+
+### Add Loading UI
+
+Before the return statement, add loading check:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+export default function ListingDetailsPage() {
+  const { id } = useParams();
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // ... fetch logic
+  }, [id]);
+
+  // Show loading spinner // [!code ++]
+  if (isLoading) { // [!code ++]
+    return ( // [!code ++]
+      <div className="flex items-center justify-center min-h-screen"> // [!code ++]
+        <div className="text-center"> // [!code ++]
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div> // [!code ++]
+          <p className="mt-4 text-gray-600">Loading listing...</p> // [!code ++]
+        </div> // [!code ++]
+      </div> // [!code ++]
+    ); // [!code ++]
+  } // [!code ++]
+
+  return (
+    // ... main content
+  );
+}
+```
+
+**Why this matters:**
+
+- Provides visual feedback to users
+- Prevents showing empty/broken UI
+- Indicates data is being fetched
+
+</Step>
+
+</Steps>
+
+## Step 4: Handle Error State
+
+Show error message if listing not found:
+
+<Steps>
+
+<Step>
+
+### Add Error UI
+
+After the loading check, add error handling:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+export default function ListingDetailsPage() {
+  const { id } = useParams();
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // ... fetch logic
+  }, [id]);
+
+  // Show loading spinner
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+          <p className="mt-4 text-gray-600">Loading listing...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error message // [!code ++]
+  if (error) { // [!code ++]
+    return ( // [!code ++]
+      <div className="flex items-center justify-center min-h-screen"> // [!code ++]
+        <div className="text-center"> // [!code ++]
+          <div className="text-6xl mb-4">😞</div> // [!code ++]
+          <h1 className="text-3xl font-bold text-gray-900 mb-2"> // [!code ++]
+            Listing Not Found // [!code ++]
+          </h1> // [!code ++]
+          <p className="text-gray-600 mb-6"> // [!code ++]
+            Listing #{id} doesn't exist or has been removed. // [!code ++]
+          </p> // [!code ++]
+          <a // [!code ++]
+            href="/" // [!code ++]
+            className="inline-block bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors" // [!code ++]
+          > // [!code ++]
+            Back to Home // [!code ++]
+          </a> // [!code ++]
+        </div> // [!code ++]
+      </div> // [!code ++]
+    ); // [!code ++]
+  } // [!code ++]
+
+  return (
+    // ... main content
+  );
+}
+```
+
+**What this handles:**
+
+- Invalid listing IDs (e.g., `/listing/99999`)
+- Network errors
+- Server errors
+- Provides way to return home
+
+</Step>
+
+</Steps>
+
+## Step 5: Display Real Data
+
+Now update the UI to use the fetched listing data:
+
+<Steps>
+
+<Step>
+
+### Replace Hardcoded Values
+
+Update the return statement to use `listing` state:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+// [!code word:listing]
+return (
+  <div className="container mx-auto px-4 py-8">
+    {/* Page Header */}
+    <div className="mb-6">
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        Cozy Beach House {/* [!code --] */}
+        {listing.title} {/* [!code ++] */}
+      </h1>
+      <div className="flex items-center gap-4 text-sm text-gray-600">
+        <span>📍 Malibu, California</span> {/* [!code --] */}
+        <span>⭐ 4.8</span> {/* [!code --] */}
+        <span>👥 124 reviews</span> {/* [!code --] */}
+        <span>📍 {listing.location}</span> {/* [!code ++] */}
+        <span>⭐ {listing.rating}</span> {/* [!code ++] */}
+        <span>👥 {listing.reviews} reviews</span> {/* [!code ++] */}
+      </div>
+    </div>
+
+    {/* Image Placeholder */}
+    <div className="bg-gray-200 rounded-lg h-96 mb-6 flex items-center justify-center">
+      <p className="text-gray-500 text-lg">Image Gallery Coming Soon</p>
+    </div>
+
+    {/* Main Content Grid */}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Left Column */}
+      <div className="lg:col-span-2 space-y-6">
+        <div className="border-b border-gray-200 pb-6">
+          <h2 className="text-xl font-semibold mb-2">
+            Entire place hosted by John {/* [!code --] */}
+            Entire place hosted by {listing.host?.name || 'Host'} {/* [!code ++] */}
+          </h2>
+          <div className="text-gray-600">
+            4 guests · 2 bedrooms · 3 beds · 2 bathrooms {/* [!code --] */}
+            {listing.guests} guests · {listing.bedrooms} bedrooms · {listing.bathrooms} bathrooms {/* [!code ++] */}
+          </div>
+        </div>
+
+        <div className="border-b border-gray-200 pb-6">
+          <h2 className="text-xl font-semibold mb-3">About this place</h2>
+          <p className="text-gray-600 leading-relaxed">
+            Wake up to the sound of waves in this stunning beach house. {/* [!code --] */}
+            {listing.description} {/* [!code ++] */}
+          </p>
+        </div>
+
+        <div className="border-b border-gray-200 pb-6">
+          <h2 className="text-xl font-semibold mb-3">What this place offers</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center gap-3"> {/* [!code --] */}
+              <span>🏖️</span> {/* [!code --] */}
+              <span>Beach access</span> {/* [!code --] */}
+            </div> {/* [!code --] */}
+            {/* More hardcoded amenities... */} {/* [!code --] */}
+            {listing.amenities?.map((amenity, index) => ( {/* [!code ++] */}
+              <div key={index} className="flex items-center gap-3"> {/* [!code ++] */}
+                <span>{amenity.icon}</span> {/* [!code ++] */}
+                <span>{amenity.name}</span> {/* [!code ++] */}
+              </div> {/* [!code ++] */}
+            ))} {/* [!code ++] */}
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column - Booking Card */}
+      <div className="lg:col-span-1">
+        <div className="border border-gray-200 rounded-lg p-6 shadow-md sticky top-4">
+          <div className="mb-4">
+            <span className="text-2xl font-bold">$250</span> {/* [!code --] */}
+            <span className="text-2xl font-bold">${listing.price}</span> {/* [!code ++] */}
+            <span className="text-gray-600"> / night</span>
+          </div>
+
+          <div className="mb-4">
+            <div className="text-sm text-gray-600 mb-2">
+              ⭐ 4.8 · 124 reviews {/* [!code --] */}
+              ⭐ {listing.rating} · {listing.reviews} reviews {/* [!code ++] */}
+            </div>
+          </div>
+
+          <button className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+            Check Availability
+          </button>
+
+          <p className="text-center text-sm text-gray-600 mt-4">
+            You won't be charged yet
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+```
+
+**What changed:**
+
+- Used `listing.title` instead of hardcoded "Cozy Beach House"
+- Dynamic location, rating, reviews from `listing` state
+- Host name from `listing.host?.name` (with fallback)
+- Guest/bedroom/bathroom counts from data
+- Description from `listing.description`
+- Amenities mapped from array
+- Price from `listing.price`
+
+</Step>
+
+</Steps>
+
+## Complete ListingDetailsPage Code
+
+Here's the full component with all changes:
+
+```jsx title="src/pages/ListingDetailsPage.jsx (Complete)"
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+export default function ListingDetailsPage() {
+  const { id } = useParams();
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const controller = new AbortController();
+
+    fetch(`/api/listings/${id}`, {
+      signal: controller.signal
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Listing not found');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setListing(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') return;
+        setError(err.message);
+        setIsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [id]);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+          <p className="mt-4 text-gray-600">Loading listing...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-6xl mb-4">😞</div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Listing Not Found
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Listing #{id} doesn't exist or has been removed.
+          </p>
+          <a
+            href="/"
+            className="inline-block bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+          >
+            Back to Home
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Success state - display listing
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {listing.title}
+        </h1>
+        <div className="flex items-center gap-4 text-sm text-gray-600">
+          <span>📍 {listing.location}</span>
+          <span>⭐ {listing.rating}</span>
+          <span>👥 {listing.reviews} reviews</span>
+        </div>
+      </div>
+
+      <div className="bg-gray-200 rounded-lg h-96 mb-6 flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Image Gallery Coming Soon</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-2">
+              Entire place hosted by {listing.host?.name || 'Host'}
+            </h2>
+            <div className="text-gray-600">
+              {listing.guests} guests · {listing.bedrooms} bedrooms · {listing.bathrooms} bathrooms
+            </div>
+          </div>
+
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-3">About this place</h2>
+            <p className="text-gray-600 leading-relaxed">
+              {listing.description}
+            </p>
+          </div>
+
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-3">What this place offers</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {listing.amenities?.map((amenity, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <span>{amenity.icon}</span>
+                  <span>{amenity.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-1">
+          <div className="border border-gray-200 rounded-lg p-6 shadow-md sticky top-4">
+            <div className="mb-4">
+              <span className="text-2xl font-bold">${listing.price}</span>
+              <span className="text-gray-600"> / night</span>
+            </div>
+
+            <div className="mb-4">
+              <div className="text-sm text-gray-600 mb-2">
+                ⭐ {listing.rating} · {listing.reviews} reviews
+              </div>
+            </div>
+
+            <button className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+              Check Availability
+            </button>
+
+            <p className="text-center text-sm text-gray-600 mt-4">
+              You won't be charged yet
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## Testing the Feature
+
+Try these URLs to see different listings:
+
+<Tabs items={['Valid Listing', 'Different Listing', 'Invalid ID']}>
+
+<Tab value="Valid Listing">
+
+**URL:** `http://localhost:5173/listing/1`
+
+**What you should see:**
+
+1. Loading spinner appears briefly
+2. Listing #1 data loads
+3. Title, location, price all show real data
+4. All dynamic fields populated
+
+</Tab>
+
+<Tab value="Different Listing">
+
+**URL:** `http://localhost:5173/listing/2`
+
+**What you should see:**
+
+1. Loading spinner appears
+2. Different listing data loads
+3. All fields show different values
+4. URL ID matches displayed listing
+
+**Try more:**
+- `/listing/3`
+- `/listing/4`
+- `/listing/5`
+
+</Tab>
+
+<Tab value="Invalid ID">
+
+**URL:** `http://localhost:5173/listing/99999`
+
+**What you should see:**
+
+1. Loading spinner appears
+2. Error message displays
+3. "Listing Not Found" heading
+4. Listing ID shown in message
+5. "Back to Home" button
+
+</Tab>
+
+</Tabs>
+
+## Why useEffect Depends on ID
+
+The dependency array `[id]` is crucial:
+
+<Accordions>
+
+<Accordion title="With [id] Dependency (Correct)">
+
+```jsx
+useEffect(() => {
+  fetch(`/api/listings/${id}`)
+    .then(/* ... */);
+}, [id]); // ✅ Re-runs when ID changes
+```
+
+**What happens:**
+
+- User visits `/listing/1` → Fetches listing 1
+- User navigates to `/listing/2` → Fetches listing 2
+- User navigates to `/listing/3` → Fetches listing 3
+
+**Each navigation triggers a new fetch!**
+
+</Accordion>
+
+<Accordion title="Without Dependencies (Wrong)">
+
+```jsx
+useEffect(() => {
+  fetch(`/api/listings/${id}`)
+    .then(/* ... */);
+}, []); // ❌ Only runs once
+```
+
+**Problem:**
+
+- User visits `/listing/1` → Fetches listing 1 ✅
+- User navigates to `/listing/2` → Nothing happens ❌
+- Still shows listing 1 data!
+
+**useEffect never re-runs, so new data never fetches!**
+
+</Accordion>
+
+<Accordion title="No Dependency Array (Also Wrong)">
+
+```jsx
+useEffect(() => {
+  fetch(`/api/listings/${id}`)
+    .then(/* ... */);
+}); // ❌ Runs on EVERY render
+```
+
+**Problem:**
+
+- Component renders
+- useEffect runs → fetches data
+- Setting state causes re-render
+- useEffect runs again → fetches data
+- Setting state causes re-render
+- **Infinite loop!**
+
+</Accordion>
+
+</Accordions>
+
+## AbortController Cleanup
+
+Why we use AbortController:
+
+<Callout type="info" title="Preventing Race Conditions">
+
+If user navigates quickly between listings, multiple fetch requests could be in flight. AbortController cancels old requests when a new one starts!
+
+</Callout>
+
+**Scenario without cleanup:**
+
+```
+1. Visit /listing/1  → Fetch listing 1 (slow)
+2. Visit /listing/2  → Fetch listing 2 (fast)
+3. Listing 2 loads   → Shows listing 2 ✅
+4. Listing 1 finishes → Shows listing 1 ❌ (WRONG!)
+```
+
+**With AbortController:**
+
+```
+1. Visit /listing/1  → Fetch listing 1
+2. Visit /listing/2  → Abort fetch 1, Fetch listing 2
+3. Listing 2 loads   → Shows listing 2 ✅
+4. Listing 1 aborted → Ignored ✅
+```
+
+## Common Data Fetching Patterns
+
+<Accordions>
+
+<Accordion title="Pattern 1: Fetch with Error Handling">
+
+```jsx
+useEffect(() => {
+  setIsLoading(true);
+  setError(null);
+
+  fetch(`/api/listings/${id}`)
+    .then(res => {
+      if (!res.ok) throw new Error('Not found');
+      return res.json();
+    })
+    .then(setListing)
+    .catch(err => setError(err.message))
+    .finally(() => setIsLoading(false));
+}, [id]);
+```
+
+</Accordion>
+
+<Accordion title="Pattern 2: Async/Await Syntax">
+
+```jsx
+useEffect(() => {
+  const fetchListing = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/listings/${id}`);
+      if (!response.ok) throw new Error('Not found');
+      
+      const data = await response.json();
+      setListing(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchListing();
+}, [id]);
+```
+
+</Accordion>
+
+<Accordion title="Pattern 3: With Timeout">
+
+```jsx
+useEffect(() => {
+  const controller = new AbortController();
+  
+  // Set timeout for request
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  fetch(`/api/listings/${id}`, {
+    signal: controller.signal
+  })
+    .then(res => res.json())
+    .then(setListing)
+    .catch(err => {
+      if (err.name === 'AbortError') {
+        setError('Request timeout');
+      }
+    });
+
+  return () => {
+    clearTimeout(timeoutId);
+    controller.abort();
+  };
+}, [id]);
+```
+
+</Accordion>
+
+</Accordions>
+
+<Callout type="success" title="Dynamic Listing Pages Complete!">
+
+You now have fully functional listing detail pages! Each URL fetches and displays different listing data from the API with proper loading and error states.
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Set up state for listing, loading, and errors
+- ✅ Implemented data fetching with useParams ID
+- ✅ Added loading spinner UI
+- ✅ Created error handling with helpful message
+- ✅ Displayed real data dynamically
+- ✅ Implemented AbortController cleanup
+- ✅ Made useEffect depend on ID parameter
+
+**Key concepts:**
+
+- **useParams + useEffect** - Fetch data based on URL
+- **Dependency array** - `[id]` triggers re-fetch on navigation
+- **Loading states** - Show spinner during fetch
+- **Error handling** - Graceful failure with user feedback
+- **AbortController** - Prevent race conditions
+- **Conditional rendering** - if loading/error/success
+
+## What's Next?
+
+In **Lesson 8**, we'll **extract the listing display logic** into a reusable `ListingDetailsCard` component. This will clean up our code and make the details section more maintainable! 🎨

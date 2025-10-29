@@ -1,0 +1,689 @@
+---
+title: "L13: Module 4 Challenge"
+description: "Build a complete routing feature with search, favorites, and breadcrumbs"
+---
+
+
+# Module 4 Challenge: Advanced Routing Features
+
+Time to test everything you've learned! Build three advanced routing features from scratch: search with URL parameters, favorites system, and breadcrumb navigation.
+
+## Challenge Overview
+
+You'll build:
+
+1. **Search Page** - Search listings with URL query parameters
+2. **Favorites System** - Favorite listings with dedicated page
+3. **Breadcrumb Navigation** - Show current location hierarchy
+
+**Estimated time:** 2-3 hours
+
+**Difficulty:** Intermediate
+
+## Requirements
+
+### Feature 1: Search Page
+
+**Route:** `/search?q={query}&location={location}`
+
+**Requirements:**
+- Create SearchPage component
+- Read query params from URL
+- Filter listings based on search
+- Update URL when filters change
+- Show search results count
+- Handle empty results
+
+**Example URLs:**
+```
+/search?q=beach
+/search?q=beach&location=california
+/search?location=malibu
+```
+
+### Feature 2: Favorites System
+
+**Routes:**
+- `/favorites` - View all favorite listings
+
+**Requirements:**
+- Create FavoritesPage component
+- Add "favorite" button to listing cards
+- Store favorites in localStorage
+- Show count of favorites
+- Remove from favorites
+- Empty state when no favorites
+
+### Feature 3: Breadcrumb Navigation
+
+**Requirements:**
+- Create Breadcrumbs component
+- Show on all pages except home
+- Dynamic breadcrumbs based on route
+- Clickable navigation
+- Current page not clickable
+
+**Example breadcrumbs:**
+```
+Home > Listings
+Home > Listing > Beach House
+Home > Search > Results
+Home > Favorites
+```
+
+## Setup
+
+<Steps>
+
+<Step>
+
+### Create Required Files
+
+```bash title="Terminal"
+touch src/pages/SearchPage.jsx
+touch src/pages/FavoritesPage.jsx
+touch src/components/Breadcrumbs.jsx
+touch src/hooks/useFavorites.js
+```
+
+</Step>
+
+</Steps>
+
+## Challenge Tasks
+
+<Accordions>
+
+<Accordion title="Task 1: Create SearchPage Component">
+
+**Requirements:**
+
+```jsx title="src/pages/SearchPage.jsx"
+import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+export default function SearchPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const query = searchParams.get('q') || '';
+  const location = searchParams.get('location') || '';
+
+  useEffect(() => {
+    // Fetch and filter listings
+    const fetchListings = async () => {
+      setIsLoading(true);
+      
+      const res = await fetch('/api/listings');
+      const data = await res.json();
+      
+      // Filter by query and location
+      const filtered = data.filter(listing => {
+        const matchesQuery = query === '' || 
+          listing.title.toLowerCase().includes(query.toLowerCase());
+        
+        const matchesLocation = location === '' ||
+          listing.location.toLowerCase().includes(location.toLowerCase());
+        
+        return matchesQuery && matchesLocation;
+      });
+      
+      setListings(filtered);
+      setIsLoading(false);
+    };
+
+    fetchListings();
+  }, [query, location]);
+
+  const handleSearch = (newQuery) => {
+    // Update URL params
+    setSearchParams({ q: newQuery, location });
+  };
+
+  const handleLocationChange = (newLocation) => {
+    // Update URL params
+    setSearchParams({ q: query, location: newLocation });
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Search Listings</h1>
+
+      {/* Search Filters */}
+      <div className="mb-8 flex gap-4">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Search by title..."
+          className="flex-1 px-4 py-2 border rounded-lg"
+        />
+        
+        <input
+          type="text"
+          value={location}
+          onChange={(e) => handleLocationChange(e.target.value)}
+          placeholder="Location..."
+          className="w-64 px-4 py-2 border rounded-lg"
+        />
+      </div>
+
+      {/* Results Count */}
+      <p className="text-gray-600 mb-4">
+        Found {listings.length} listing{listings.length !== 1 ? 's' : ''}
+      </p>
+
+      {/* Results */}
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : listings.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-600">No listings found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {listings.map(listing => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+**Key concepts:**
+- `useSearchParams` for query strings
+- URL updates with `setSearchParams`
+- Filtering based on params
+- Real-time search updates
+
+</Accordion>
+
+<Accordion title="Task 2: Create Favorites System">
+
+**Step 1: Create useFavorites Hook**
+
+```jsx title="src/hooks/useFavorites.js"
+import { useState, useEffect } from 'react';
+
+export function useFavorites() {
+  const [favorites, setFavorites] = useState([]);
+
+  // Load from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('favorites');
+    if (stored) {
+      setFavorites(JSON.parse(stored));
+    }
+  }, []);
+
+  // Save to localStorage
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const addFavorite = (listingId) => {
+    if (!favorites.includes(listingId)) {
+      setFavorites([...favorites, listingId]);
+    }
+  };
+
+  const removeFavorite = (listingId) => {
+    setFavorites(favorites.filter(id => id !== listingId));
+  };
+
+  const isFavorite = (listingId) => {
+    return favorites.includes(listingId);
+  };
+
+  return {
+    favorites,
+    addFavorite,
+    removeFavorite,
+    isFavorite,
+    count: favorites.length
+  };
+}
+```
+
+**Step 2: Create FavoritesPage**
+
+```jsx title="src/pages/FavoritesPage.jsx"
+import { useFavorites } from '../hooks/useFavorites';
+import { useState, useEffect } from 'react';
+
+export default function FavoritesPage() {
+  const { favorites, removeFavorite } = useFavorites();
+  const [listings, setListings] = useState([]);
+
+  useEffect(() => {
+    // Fetch favorite listings
+    const fetchFavorites = async () => {
+      const promises = favorites.map(id =>
+        fetch(`/api/listings/${id}`).then(res => res.json())
+      );
+      
+      const data = await Promise.all(promises);
+      setListings(data);
+    };
+
+    if (favorites.length > 0) {
+      fetchFavorites();
+    }
+  }, [favorites]);
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        My Favorites ({favorites.length})
+      </h1>
+
+      {favorites.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-6xl mb-4">❤️</p>
+          <p className="text-xl text-gray-600 mb-4">
+            No favorites yet
+          </p>
+          <Link 
+            to="/"
+            className="text-pink-600 hover:underline"
+          >
+            Browse listings
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {listings.map(listing => (
+            <div key={listing.id}>
+              <ListingCard listing={listing} />
+              <button
+                onClick={() => removeFavorite(listing.id)}
+                className="w-full mt-2 bg-red-100 text-red-600 py-2 rounded-lg hover:bg-red-200"
+              >
+                Remove from Favorites
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+**Step 3: Add Favorite Button to ListingCard**
+
+```jsx title="src/components/ListingCard.jsx"
+import { useFavorites } from '../hooks/useFavorites';
+
+export default function ListingCard({ listing }) {
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+  const favorite = isFavorite(listing.id);
+
+  const toggleFavorite = (e) => {
+    e.preventDefault(); // Prevent Link navigation
+    
+    if (favorite) {
+      removeFavorite(listing.id);
+    } else {
+      addFavorite(listing.id);
+    }
+  };
+
+  return (
+    <Link to={`/listing/${listing.id}`}>
+      <div className="relative">
+        {/* Favorite Button */}
+        <button
+          onClick={toggleFavorite}
+          className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md hover:scale-110 transition-transform z-10"
+        >
+          {favorite ? '❤️' : '🤍'}
+        </button>
+
+        {/* Card Content */}
+        <div className="card">
+          {/* ... existing card content ... */}
+        </div>
+      </div>
+    </Link>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="Task 3: Create Breadcrumbs Component">
+
+```jsx title="src/components/Breadcrumbs.jsx"
+import { Link, useLocation, useParams } from 'react-router-dom';
+
+export default function Breadcrumbs() {
+  const location = useLocation();
+  const params = useParams();
+
+  // Don't show on homepage
+  if (location.pathname === '/') {
+    return null;
+  }
+
+  // Build breadcrumb items
+  const pathnames = location.pathname.split('/').filter(x => x);
+  
+  const breadcrumbs = [
+    { label: 'Home', path: '/' }
+  ];
+
+  pathnames.forEach((segment, index) => {
+    const path = `/${pathnames.slice(0, index + 1).join('/')}`;
+    
+    // Custom labels for routes
+    let label = segment;
+    
+    if (segment === 'listing' && pathnames[index + 1]) {
+      label = 'Listing';
+    } else if (segment === 'search') {
+      label = 'Search';
+    } else if (segment === 'favorites') {
+      label = 'Favorites';
+    } else if (params.id && segment === params.id) {
+      // For dynamic segments, show ID or fetch title
+      label = `#${segment}`;
+    }
+    
+    breadcrumbs.push({ label, path });
+  });
+
+  return (
+    <nav className="container mx-auto px-4 py-4">
+      <ol className="flex items-center gap-2 text-sm text-gray-600">
+        {breadcrumbs.map((crumb, index) => {
+          const isLast = index === breadcrumbs.length - 1;
+          
+          return (
+            <li key={crumb.path} className="flex items-center gap-2">
+              {!isLast ? (
+                <>
+                  <Link 
+                    to={crumb.path}
+                    className="hover:text-pink-600 transition-colors"
+                  >
+                    {crumb.label}
+                  </Link>
+                  <span>/</span>
+                </>
+              ) : (
+                <span className="text-gray-900 font-medium">
+                  {crumb.label}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+```
+
+**Add to App Layout:**
+
+```jsx title="src/App.jsx"
+import Router from './components/Router';
+import Breadcrumbs from './components/Breadcrumbs';
+
+function App() {
+  return (
+    <div>
+      <Breadcrumbs />
+      <Router />
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="Task 4: Update Router with New Routes">
+
+```jsx title="src/components/Router.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
+import ListingDetailsPage from '../pages/ListingDetailsPage';
+import SearchPage from '../pages/SearchPage';
+import FavoritesPage from '../pages/FavoritesPage';
+import NotFoundPage from '../pages/NotFoundPage';
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
+        <Route path="/listing/:id" element={<ListingDetailsPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+## Bonus Challenges
+
+Want to take it further? Try these:
+
+<Accordions>
+
+<Accordion title="Bonus 1: Search History">
+
+Track recent searches and show them as suggestions:
+
+```jsx
+// Store in localStorage
+const [history, setHistory] = useState([]);
+
+useEffect(() => {
+  const stored = localStorage.getItem('searchHistory');
+  if (stored) setHistory(JSON.parse(stored));
+}, []);
+
+const addToHistory = (query) => {
+  const updated = [query, ...history.slice(0, 4)]; // Keep last 5
+  setHistory(updated);
+  localStorage.setItem('searchHistory', JSON.stringify(updated));
+};
+
+// Show as suggestions
+<div className="suggestions">
+  {history.map(item => (
+    <button onClick={() => handleSearch(item)}>
+      {item}
+    </button>
+  ))}
+</div>
+```
+
+</Accordion>
+
+<Accordion title="Bonus 2: Scroll Restoration">
+
+Restore scroll position when navigating back:
+
+```jsx
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
+// Add to App
+<BrowserRouter>
+  <ScrollToTop />
+  <Routes>...</Routes>
+</BrowserRouter>
+```
+
+</Accordion>
+
+<Accordion title="Bonus 3: Loading Transitions">
+
+Add page transition animations:
+
+```jsx
+import { useLocation } from 'react-router-dom';
+import { useTransition, animated } from 'react-spring';
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  
+  const transitions = useTransition(location, {
+    from: { opacity: 0, transform: 'translateX(100px)' },
+    enter: { opacity: 1, transform: 'translateX(0px)' },
+    leave: { opacity: 0, transform: 'translateX(-100px)' },
+  });
+
+  return transitions((style, item) => (
+    <animated.div style={style}>
+      <Routes location={item}>
+        {/* Routes */}
+      </Routes>
+    </animated.div>
+  ));
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+## Testing Checklist
+
+Use this to verify your implementation:
+
+### Search Page
+- [ ] Can access `/search` route
+- [ ] Query param appears in URL
+- [ ] Search updates URL in real-time
+- [ ] Results filter correctly
+- [ ] Shows result count
+- [ ] Handles empty results
+- [ ] Can bookmark search URLs
+
+### Favorites
+- [ ] Can favorite/unfavorite from cards
+- [ ] Heart icon updates correctly
+- [ ] Favorites persist on refresh
+- [ ] Can view all favorites at `/favorites`
+- [ ] Can remove from favorites page
+- [ ] Shows empty state when no favorites
+
+### Breadcrumbs
+- [ ] Shows on all pages except home
+- [ ] Builds correct path hierarchy
+- [ ] All links navigate correctly
+- [ ] Current page not clickable
+- [ ] Responsive on mobile
+
+## Solution Hints
+
+<Accordions>
+
+<Accordion title="Hint 1: useSearchParams">
+
+```jsx
+// Get params
+const [searchParams] = useSearchParams();
+const query = searchParams.get('q');
+
+// Set params
+const [searchParams, setSearchParams] = useSearchParams();
+setSearchParams({ q: 'beach', location: 'malibu' });
+
+// Update one param
+setSearchParams(prev => {
+  prev.set('q', 'new search');
+  return prev;
+});
+```
+
+</Accordion>
+
+<Accordion title="Hint 2: localStorage">
+
+```jsx
+// Save
+localStorage.setItem('favorites', JSON.stringify(array));
+
+// Load
+const stored = localStorage.getItem('favorites');
+const parsed = stored ? JSON.parse(stored) : [];
+
+// Remove
+localStorage.removeItem('favorites');
+```
+
+</Accordion>
+
+<Accordion title="Hint 3: Prevent Link Click">
+
+```jsx
+<Link to="/path">
+  <button onClick={(e) => {
+    e.preventDefault(); // Stop Link navigation
+    handleClick(); // Do custom action
+  }}>
+    Click me
+  </button>
+</Link>
+```
+
+</Accordion>
+
+</Accordions>
+
+## Success Criteria
+
+Your challenge is complete when:
+
+- ✅ All three features work correctly
+- ✅ URLs update properly
+- ✅ Data persists on refresh
+- ✅ No console errors
+- ✅ Professional UI/UX
+- ✅ Code is clean and commented
+
+<Callout type="success" title="Module 4 Challenge Complete! 🎉">
+
+Congratulations! You've built advanced routing features with search, favorites, and breadcrumbs. You're now a React Router expert!
+
+</Callout>
+
+## What You've Accomplished
+
+In this challenge, you've demonstrated:
+
+- ✅ URL query parameter management
+- ✅ localStorage persistence
+- ✅ Dynamic component rendering
+- ✅ Complex routing patterns
+- ✅ Real-world feature implementation
+
+## Next Steps
+
+With Module 4 complete, you're ready for **Module 5: Hooks & Performance**! You'll learn about custom hooks, useMemo, useCallback, and optimization techniques.
+
+Keep building! 🚀

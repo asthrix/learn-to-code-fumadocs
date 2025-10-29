@@ -1,0 +1,540 @@
+---
+title: "L3: Adding the HomePage Route"
+description: "Define your first route and bring back the HomePage"
+---
+
+
+# Adding the HomePage Route
+
+Time to define our first route and see the HomePage again! You'll learn how to map URLs to components using the `<Route>` component.
+
+## What You'll Learn
+
+- How to define a route with `<Route>`
+- Understanding the `path` and `element` props
+- What an "index route" is
+- Seeing your first route in action
+
+## The Route Component
+
+The `<Route>` component creates a mapping between a URL and a component:
+
+```jsx title="Route Syntax"
+<Route path="/some-url" element={<SomeComponent />} />
+```
+
+**Two required props:**
+
+1. **`path`** - The URL pattern to match
+2. **`element`** - The JSX component to render
+
+<Callout type="info" title="Element Prop">
+
+Notice `element` receives JSX (`<Component />`), not a reference (`Component`). This changed in React Router v6!
+
+**v6 (Current):** `element={<HomePage />}`  
+**v5 (Old):** `component={HomePage}`
+
+</Callout>
+
+## Understanding Paths
+
+The `path` prop defines what URL triggers this route:
+
+<Tabs items={['Index Route', 'Static Route', 'Dynamic Route']}>
+
+<Tab value="Index Route">
+
+**Path:** `"/"`
+
+**Matches:** The root/homepage URL
+
+```jsx
+<Route path="/" element={<HomePage />} />
+```
+
+**Examples:**
+- ✅ `http://localhost:5173/`
+- ✅ `http://example.com/`
+- ❌ `http://localhost:5173/about`
+
+</Tab>
+
+<Tab value="Static Route">
+
+**Path:** Any fixed string
+
+**Matches:** Exact URL
+
+```jsx
+<Route path="/about" element={<AboutPage />} />
+<Route path="/contact" element={<ContactPage />} />
+<Route path="/pricing" element={<PricingPage />} />
+```
+
+**Examples:**
+- ✅ `/about` → AboutPage
+- ✅ `/contact` → ContactPage
+- ❌ `/about/team` → No match (unless nested)
+
+</Tab>
+
+<Tab value="Dynamic Route">
+
+**Path:** Contains parameters with `:`
+
+**Matches:** Variable segments
+
+```jsx
+<Route path="/listing/:id" element={<DetailsPage />} />
+<Route path="/user/:username" element={<ProfilePage />} />
+```
+
+**Examples:**
+- ✅ `/listing/1` → DetailsPage (id="1")
+- ✅ `/listing/42` → DetailsPage (id="42")
+- ✅ `/user/john` → ProfilePage (username="john")
+
+We'll cover this in Lesson 5!
+
+</Tab>
+
+</Tabs>
+
+## Step 1: Add the HomePage Route
+
+Let's define our first route in the Router component!
+
+<Steps>
+
+<Step>
+
+### Import HomePage
+
+First, import the HomePage component:
+
+```jsx title="src/components/Router.jsx" {2}
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Routes will be defined here */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+</Step>
+
+<Step>
+
+### Define the Route
+
+Add the Route inside `<Routes>`:
+
+```jsx title="src/components/Router.jsx" {9}
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+**What this does:**
+
+- When URL is exactly `/`, render `<HomePage />`
+- No other URLs will match yet
+
+</Step>
+
+<Step>
+
+### Complete Router Code
+
+Here's the full Router component:
+
+```jsx title="src/components/Router.jsx"
+// [!code word:Route]
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+</Step>
+
+</Steps>
+
+## Step 2: Test the Route
+
+<Steps>
+
+<Step>
+
+### Check Your Browser
+
+Go to `http://localhost:5173/`
+
+**You should see:** Your HomePage with all the listings! 🎉
+
+Everything works exactly as before, but now it's powered by React Router!
+
+</Step>
+
+<Step>
+
+### Try an Invalid Route
+
+In your browser, navigate to `http://localhost:5173/doesnotexist`
+
+**You should see:** A blank page
+
+**Why?** No route matches `/doesnotexist`, so nothing renders. We'll fix this with a 404 page in a later lesson!
+
+</Step>
+
+</Steps>
+
+## How Route Matching Works
+
+When you navigate to a URL, React Router:
+
+1. **Looks at the current URL** - Example: `/`
+2. **Checks each `<Route>` in order** - Finds `path="/"`
+3. **Finds the first match** - Matches our HomePage route
+4. **Renders that route's element** - Renders `<HomePage />`
+
+<Callout type="info" title="Exact Matching">
+
+In React Router v6, paths match exactly by default. You don't need an `exact` prop like in v5!
+
+**v6:** `<Route path="/" element={<Home />} />`  
+**v5:** `<Route exact path="/" component={Home} />`
+
+</Callout>
+
+## Route Order and Priority
+
+<Tabs items={['Specific to General', 'Common Pitfall']}>
+
+<Tab value="Specific to General">
+
+**Best practice:** Put more specific routes before general ones
+
+```jsx title="Good Order"
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/listing/:id" element={<DetailsPage />} />
+  <Route path="/about" element={<AboutPage />} />
+  <Route path="*" element={<NotFoundPage />} />
+</Routes>
+```
+
+**Why:** React Router picks the first match, and `*` matches everything!
+
+</Tab>
+
+<Tab value="Common Pitfall">
+
+**Don't do this:**
+
+```jsx title="Bad Order"
+<Routes>
+  <Route path="*" element={<NotFoundPage />} />
+  <Route path="/" element={<HomePage />} />
+</Routes>
+```
+
+**Problem:** `*` catches ALL routes, including `/`. HomePage never shows!
+
+**Rule:** Always put catch-all routes (`*`) last.
+
+</Tab>
+
+</Tabs>
+
+## Multiple Routes Example
+
+Here's what your Router will look like by the end of this module:
+
+```jsx title="src/components/Router.jsx (Preview)"
+// [!code word:Route]
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
+import ListingDetailsPage from '../pages/ListingDetailsPage';
+import NotFoundPage from '../pages/NotFoundPage';
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Index route */}
+        <Route path="/" element={<HomePage />} />
+        
+        {/* Dynamic route */}
+        <Route path="/listing/:id" element={<ListingDetailsPage />} />
+        
+        {/* Catch-all (404) */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+## Understanding the Element Prop
+
+The `element` prop can accept any JSX:
+
+<Accordions>
+
+<Accordion title="Simple Component">
+
+Most common - render a component:
+
+```jsx
+<Route path="/" element={<HomePage />} />
+```
+
+</Accordion>
+
+<Accordion title="Component with Props">
+
+Pass props to the routed component:
+
+```jsx
+<Route 
+  path="/dashboard" 
+  element={<Dashboard user={currentUser} />} 
+/>
+```
+
+</Accordion>
+
+<Accordion title="Wrapped Component">
+
+Wrap with providers or layouts:
+
+```jsx
+<Route 
+  path="/admin" 
+  element={
+    <AdminLayout>
+      <AdminDashboard />
+    </AdminLayout>
+  } 
+/>
+```
+
+</Accordion>
+
+<Accordion title="Conditional Rendering">
+
+Render different components based on state:
+
+```jsx
+<Route 
+  path="/profile" 
+  element={isLoggedIn ? <Profile /> : <LoginPage />} 
+/>
+```
+
+</Accordion>
+
+</Accordions>
+
+## Route vs Routes
+
+Don't confuse these two components!
+
+<Tabs items={['Routes (Container)', 'Route (Individual)']}>
+
+<Tab value="Routes (Container)">
+
+**`<Routes>`** - Plural, wraps multiple routes
+
+**Purpose:** Container for all `<Route>` components
+
+**Usage:**
+
+```jsx
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/about" element={<About />} />
+</Routes>
+```
+
+**Key features:**
+- Matches the current URL
+- Renders the first matching route
+- Only one route renders at a time
+
+</Tab>
+
+<Tab value="Route (Individual)">
+
+**`<Route>`** - Singular, one route definition
+
+**Purpose:** Defines a single URL → Component mapping
+
+**Usage:**
+
+```jsx
+<Route path="/home" element={<HomePage />} />
+```
+
+**Key features:**
+- Must be inside `<Routes>`
+- Has `path` and `element` props
+- Can have URL parameters
+
+</Tab>
+
+</Tabs>
+
+## Common Mistakes
+
+<Accordions>
+
+<Accordion title="Forgetting to Import Component">
+
+```jsx
+// ❌ Error: HomePage is not defined
+<Route path="/" element={<HomePage />} />
+
+// ✅ Import it first
+import HomePage from '../pages/HomePage';
+<Route path="/" element={<HomePage />} />
+```
+
+</Accordion>
+
+<Accordion title="Wrong Element Syntax">
+
+```jsx
+// ❌ Don't pass component reference
+<Route path="/" element={HomePage} />
+
+// ✅ Pass JSX element
+<Route path="/" element={<HomePage />} />
+```
+
+</Accordion>
+
+<Accordion title="Route Outside Routes">
+
+```jsx
+// ❌ Route must be inside Routes
+<BrowserRouter>
+  <Route path="/" element={<HomePage />} />
+</BrowserRouter>
+
+// ✅ Wrap with Routes
+<BrowserRouter>
+  <Routes>
+    <Route path="/" element={<HomePage />} />
+  </Routes>
+</BrowserRouter>
+```
+
+</Accordion>
+
+</Accordions>
+
+## Debugging Routes
+
+If your route isn't working:
+
+<Steps>
+
+<Step>
+
+### Check the Console
+
+Look for errors like:
+
+- `Cannot read property 'path' of undefined` → Route syntax error
+- `Component is not defined` → Missing import
+- `useRoutes() may be used only...` → Missing BrowserRouter
+
+</Step>
+
+<Step>
+
+### Verify Path Matches URL
+
+```jsx
+// Route
+<Route path="/home" element={<HomePage />} />
+
+// URL must exactly match
+http://localhost:5173/home  ✅
+http://localhost:5173/      ❌ (doesn't match)
+```
+
+</Step>
+
+<Step>
+
+### Check Route Order
+
+Make sure specific routes come before general ones:
+
+```jsx
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/about" element={<About />} />
+  <Route path="*" element={<NotFound />} /> {/* Last! */}
+</Routes>
+```
+
+</Step>
+
+</Steps>
+
+<Callout type="success" title="First Route Complete!">
+
+Your HomePage is now rendered by React Router! This is the foundation for building multi-page applications. Next, we'll create additional pages to navigate to.
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Defined our first route with `<Route>`
+- ✅ Learned about `path` and `element` props
+- ✅ Understood how route matching works
+- ✅ Saw HomePage render via React Router
+- ✅ Learned route order best practices
+
+**Key concepts:**
+
+- **Route** - Maps URL to component
+- **Path** - URL pattern to match (`/`, `/about`, `/listing/:id`)
+- **Element** - JSX component to render
+- **Index route** - Route at `/` (homepage)
+- **Route order matters** - Specific before general
+
+## What's Next?
+
+In **Lesson 4**, we'll create a new page - the `ListingDetailsPage` - to show full information about individual listings. This will prepare us for dynamic routing in Lesson 5!

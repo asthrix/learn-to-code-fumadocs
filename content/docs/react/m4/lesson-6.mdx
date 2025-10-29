@@ -1,0 +1,706 @@
+---
+title: "L6: Extracting URL Parameters"
+description: "Use the useParams hook to read dynamic values from the URL"
+---
+
+
+# Extracting URL Parameters
+
+In the last lesson, we created a dynamic route `/listing/:id`. Now we need to **access** that ID so we can use it to fetch the correct listing data!
+
+React Router provides the `useParams` hook for exactly this purpose - it extracts parameters from the URL and makes them available in your component.
+
+## What You'll Learn
+
+- What the `useParams` hook does
+- How to extract URL parameters in components
+- Understanding parameter data types
+- Using parameters to fetch data
+- Handling multiple parameters
+
+## The useParams Hook
+
+`useParams` is a React Router hook that returns an object containing all URL parameters:
+
+```jsx title="Basic useParams Example"
+import { useParams } from 'react-router-dom';
+
+function ListingDetailsPage() {
+  const params = useParams();
+  console.log(params); // { id: "42" } for URL /listing/42
+  
+  return <div>Listing ID: {params.id}</div>;
+}
+```
+
+**How it works:**
+
+1. React Router sees you're on `/listing/42`
+2. Matches it to route `/listing/:id`
+3. Extracts the value `"42"` and names it `id`
+4. `useParams()` returns `{ id: "42" }`
+
+## Step 1: Import and Use useParams
+
+Let's update `ListingDetailsPage` to extract the ID:
+
+<Steps>
+
+<Step>
+
+### Add useParams to ListingDetailsPage
+
+Open `ListingDetailsPage.jsx` and import the hook:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+// [!code word:useParams]
+import { useParams } from 'react-router-dom'; // [!code ++]
+
+export default function ListingDetailsPage() {
+  const { id } = useParams(); // [!code ++]
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Cozy Beach House
+        </h1>
+        <div className="flex items-center gap-4 text-sm text-gray-600">
+          <span>📍 Malibu, California</span>
+          <span>⭐ 4.8</span>
+          <span>👥 124 reviews</span>
+        </div>
+        
+        {/* Display the ID from URL */} {/* [!code ++] */}
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded"> {/* [!code ++] */}
+          <p className="text-sm text-blue-800"> {/* [!code ++] */}
+            <strong>Listing ID from URL:</strong> {id} {/* [!code ++] */}
+          </p> {/* [!code ++] */}
+        </div> {/* [!code ++] */}
+      </div>
+
+      {/* Rest of the component stays the same... */}
+      {/* Image Placeholder */}
+      <div className="bg-gray-200 rounded-lg h-96 mb-6 flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Image Gallery Coming Soon</p>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Content sections... */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-2">
+              Entire place hosted by John
+            </h2>
+            <div className="text-gray-600">
+              4 guests · 2 bedrooms · 3 beds · 2 bathrooms
+            </div>
+          </div>
+
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-3">About this place</h2>
+            <p className="text-gray-600 leading-relaxed">
+              Wake up to the sound of waves in this stunning beach house.
+            </p>
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="lg:col-span-1">
+          <div className="border border-gray-200 rounded-lg p-6 shadow-md sticky top-4">
+            <div className="mb-4">
+              <span className="text-2xl font-bold">$250</span>
+              <span className="text-gray-600"> / night</span>
+            </div>
+            <button className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+              Check Availability
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+**What changed:**
+
+1. **Imported useParams** - From 'react-router-dom'
+2. **Called useParams()** - Returns object with all parameters
+3. **Destructured id** - Extract the id property using `{ id }`
+4. **Displayed the ID** - Show it in a blue box for testing
+
+</Step>
+
+<Step>
+
+### Test Different URLs
+
+Now try visiting different URLs in your browser:
+
+**Try these:**
+
+```
+http://localhost:5173/listing/1   → Shows "Listing ID from URL: 1"
+http://localhost:5173/listing/42  → Shows "Listing ID from URL: 42"
+http://localhost:5173/listing/999 → Shows "Listing ID from URL: 999"
+```
+
+**What you should see:**
+
+The blue box displays the ID from the URL! Each URL shows a different number.
+
+</Step>
+
+</Steps>
+
+## Understanding useParams
+
+Let's break down how `useParams` works:
+
+<Tabs items={['Basic Usage', 'Destructuring', 'Multiple Parameters']}>
+
+<Tab value="Basic Usage">
+
+**Return value:** An object with all parameters
+
+```jsx
+import { useParams } from 'react-router-dom';
+
+function Component() {
+  const params = useParams();
+  // URL: /listing/42
+  // params = { id: "42" }
+  
+  return <div>ID: {params.id}</div>;
+}
+```
+
+**When to use:**
+- When you have many parameters
+- When parameter names might conflict with existing variables
+- For debugging (see all parameters at once)
+
+</Tab>
+
+<Tab value="Destructuring">
+
+**Extract specific parameters** (Recommended)
+
+```jsx
+import { useParams } from 'react-router-dom';
+
+function Component() {
+  const { id } = useParams();
+  // URL: /listing/42
+  // id = "42"
+  
+  return <div>ID: {id}</div>;
+}
+```
+
+**When to use:**
+- Most common pattern
+- Cleaner code
+- Direct access to parameter values
+
+**Multiple destructuring:**
+
+```jsx
+const { id, section, page } = useParams();
+```
+
+</Tab>
+
+<Tab value="Multiple Parameters">
+
+**Route with multiple parameters:**
+
+```jsx
+// Route definition
+<Route 
+  path="/listing/:id/review/:reviewId" 
+  element={<ReviewPage />} 
+/>
+
+// Component
+function ReviewPage() {
+  const { id, reviewId } = useParams();
+  // URL: /listing/42/review/7
+  // id = "42"
+  // reviewId = "7"
+  
+  return (
+    <div>
+      <p>Listing: {id}</p>
+      <p>Review: {reviewId}</p>
+    </div>
+  );
+}
+```
+
+**All parameters available at once!**
+
+</Tab>
+
+</Tabs>
+
+## Important: Parameters Are Strings
+
+<Callout type="warn" title="Parameters Are Always Strings!">
+
+URL parameters are **always strings**, even if they look like numbers!
+
+</Callout>
+
+```jsx
+const { id } = useParams();
+
+// URL: /listing/42
+console.log(id);          // "42" (string)
+console.log(typeof id);   // "string"
+
+// This might cause issues:
+if (id === 42) {
+  // ❌ Never true! Comparing string to number
+}
+
+// Convert to number if needed:
+const numericId = Number(id);
+console.log(numericId);    // 42 (number)
+console.log(typeof numericId); // "number"
+
+// Now comparison works:
+if (numericId === 42) {
+  // ✅ This works!
+}
+```
+
+### When to Convert Types
+
+<Accordions>
+
+<Accordion title="Using ID for API Calls">
+
+**Usually not needed!** Most APIs accept string IDs:
+
+```jsx
+const { id } = useParams();
+
+// ✅ Works fine - APIs accept strings
+fetch(`/api/listings/${id}`);
+```
+
+Backend will handle the conversion if needed.
+
+</Accordion>
+
+<Accordion title="Using ID for Math Operations">
+
+**Convert to number:**
+
+```jsx
+const { id } = useParams();
+const numericId = Number(id);
+
+// ✅ Now you can do math
+const nextId = numericId + 1;
+const prevId = numericId - 1;
+
+// Navigate to next/prev listing
+navigate(`/listing/${nextId}`);
+```
+
+</Accordion>
+
+<Accordion title="Using ID for Array Indexing">
+
+**Convert to number:**
+
+```jsx
+const { id } = useParams();
+const index = Number(id);
+
+// ✅ Array indexing needs numbers
+const item = items[index];
+```
+
+</Accordion>
+
+<Accordion title="Using ID for Comparisons">
+
+**Convert if comparing to numbers:**
+
+```jsx
+const { id } = useParams();
+const numericId = Number(id);
+
+// ✅ Comparing numbers
+if (numericId > 100) {
+  console.log('High ID');
+}
+
+// Or compare as strings
+if (id === '100') {
+  console.log('Exactly 100');
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+## Using the ID for Data Fetching
+
+Now that we have the ID, we can use it to fetch the correct listing! (We'll implement this fully in Lesson 7)
+
+**Preview of what's coming:**
+
+```jsx title="Preview: Lesson 7 - Fetching with ID"
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+function ListingDetailsPage() {
+  const { id } = useParams(); // Get ID from URL
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch listing based on ID
+    fetch(`/api/listings/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        setListing(data);
+        setIsLoading(false);
+      });
+  }, [id]); // Re-fetch when ID changes!
+
+  if (isLoading) return <div>Loading...</div>;
+  
+  return (
+    <div>
+      <h1>{listing.title}</h1>
+      <p>{listing.description}</p>
+    </div>
+  );
+}
+```
+
+**Key points:**
+
+- Use `id` in the API URL
+- Include `id` in useEffect dependencies
+- Fetch re-runs when ID changes (navigating to different listing)
+
+## Handling Missing or Invalid IDs
+
+What if someone visits `/listing/` without an ID, or uses an invalid ID like `/listing/abc`?
+
+<Tabs items={['Missing ID', 'Invalid ID', 'Handling Errors']}>
+
+<Tab value="Missing ID">
+
+**URL:** `/listing` (no ID)
+
+**What happens:**
+- Route `/listing/:id` doesn't match (ID required)
+- User sees blank page or 404
+
+**Solution:** Add a separate route for listings list:
+
+```jsx
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/listing" element={<AllListingsPage />} />
+  <Route path="/listing/:id" element={<ListingDetailsPage />} />
+</Routes>
+```
+
+Now `/listing` shows all listings, `/listing/42` shows one listing.
+
+</Tab>
+
+<Tab value="Invalid ID">
+
+**URL:** `/listing/abc` or `/listing/999999`
+
+**What happens:**
+- Route matches (`:id` accepts any string)
+- `useParams()` returns `{ id: "abc" }` or `{ id: "999999" }`
+- API call likely fails
+
+**Solution:** Handle in data fetching (Lesson 7):
+
+```jsx
+useEffect(() => {
+  fetch(`/api/listings/${id}`)
+    .then(res => {
+      if (!res.ok) throw new Error('Listing not found');
+      return res.json();
+    })
+    .catch(error => {
+      setError('Listing not found');
+      setIsLoading(false);
+    });
+}, [id]);
+```
+
+</Tab>
+
+<Tab value="Handling Errors">
+
+**Best practice:** Check if listing exists after fetching
+
+```jsx
+function ListingDetailsPage() {
+  const { id } = useParams();
+  const [listing, setListing] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/listings/${id}`)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Listing not found');
+        }
+        return res.json();
+      })
+      .then(setListing)
+      .catch(err => setError(err.message));
+  }, [id]);
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <h1 className="text-2xl font-bold text-red-600">
+          {error}
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Listing #{id} doesn't exist
+        </p>
+      </div>
+    );
+  }
+
+  // ... rest of component
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Multiple Parameters Example
+
+If you ever need multiple URL parameters:
+
+```jsx title="Example: Nested Route with Multiple Parameters"
+// Route definition
+<Route 
+  path="/listing/:listingId/booking/:bookingId" 
+  element={<BookingDetailsPage />} 
+/>
+
+// Component
+function BookingDetailsPage() {
+  const { listingId, bookingId } = useParams();
+  
+  // URL: /listing/42/booking/123
+  // listingId = "42"
+  // bookingId = "123"
+  
+  return (
+    <div>
+      <h1>Booking Details</h1>
+      <p>Listing ID: {listingId}</p>
+      <p>Booking ID: {bookingId}</p>
+    </div>
+  );
+}
+```
+
+**For StaySense, we only need one parameter (`:id`)!**
+
+## Debugging useParams
+
+If `useParams()` isn't working, check these:
+
+<Steps>
+
+<Step>
+
+### Verify Route Configuration
+
+Make sure the route has a parameter:
+
+```jsx
+// ✅ Has parameter
+<Route path="/listing/:id" element={<Page />} />
+
+// ❌ No parameter
+<Route path="/listing" element={<Page />} />
+```
+
+</Step>
+
+<Step>
+
+### Check Component is Rendered by Router
+
+`useParams` only works in components rendered by React Router:
+
+```jsx
+// ✅ Works - rendered by Router
+<Route path="/listing/:id" element={<ListingDetailsPage />} />
+
+// ❌ Doesn't work - rendered outside Router
+function App() {
+  return <ListingDetailsPage />; // No route context!
+}
+```
+
+</Step>
+
+<Step>
+
+### Console.log for Debugging
+
+Add logging to see what you're getting:
+
+```jsx
+function ListingDetailsPage() {
+  const params = useParams();
+  console.log('All params:', params);
+  console.log('ID:', params.id);
+  console.log('Type:', typeof params.id);
+  
+  // ...
+}
+```
+
+</Step>
+
+</Steps>
+
+## Common useParams Patterns
+
+<Accordions>
+
+<Accordion title="Pattern 1: Fetch Data on Mount">
+
+**Fetch data when component loads:**
+
+```jsx
+function ListingDetailsPage() {
+  const { id } = useParams();
+  const [listing, setListing] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/listings/${id}`)
+      .then(res => res.json())
+      .then(setListing);
+  }, [id]); // Re-fetch if ID changes
+
+  return <div>{listing?.title}</div>;
+}
+```
+
+</Accordion>
+
+<Accordion title="Pattern 2: Navigate to Related Pages">
+
+**Use ID to build navigation:**
+
+```jsx
+function ListingDetailsPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const goToBooking = () => {
+    navigate(`/listing/${id}/booking`);
+  };
+
+  const goToReviews = () => {
+    navigate(`/listing/${id}/reviews`);
+  };
+
+  return (
+    <div>
+      <button onClick={goToBooking}>Book Now</button>
+      <button onClick={goToReviews}>See Reviews</button>
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="Pattern 3: Default Fallback Value">
+
+**Provide fallback if parameter is missing:**
+
+```jsx
+function ListingDetailsPage() {
+  const { id = '1' } = useParams(); // Default to '1'
+  
+  // If somehow accessed without ID, uses '1'
+  return <div>Listing {id}</div>;
+}
+```
+
+**Note:** With proper routing, this shouldn't be needed!
+
+</Accordion>
+
+<Accordion title="Pattern 4: Validate Parameter Format">
+
+**Check if ID is valid:**
+
+```jsx
+function ListingDetailsPage() {
+  const { id } = useParams();
+  
+  // Check if ID is numeric
+  const isValidId = /^\d+$/.test(id);
+  
+  if (!isValidId) {
+    return <div>Invalid listing ID</div>;
+  }
+  
+  return <div>Listing {id}</div>;
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+<Callout type="success" title="You Can Now Access URL Parameters!">
+
+The `useParams` hook gives you access to dynamic route values. You can now use the ID to fetch listing-specific data in the next lesson!
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Imported and used `useParams` hook
+- ✅ Extracted `id` from URL parameters
+- ✅ Displayed the ID in the UI
+- ✅ Tested with different URLs
+- ✅ Understood parameter types (always strings)
+
+**Key concepts:**
+
+- **useParams hook** - Extracts route parameters from URL
+- **Destructuring** - `const { id } = useParams()`
+- **String type** - Parameters are always strings
+- **Dynamic values** - Different for each URL
+- **Dependencies** - Include in useEffect when fetching
+
+## What's Next?
+
+In **Lesson 7**, we'll use the `id` to **fetch the actual listing data** from the API! We'll implement loading states, error handling, and display real data based on the URL parameter. This is where everything comes together! 🚀

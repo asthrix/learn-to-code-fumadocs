@@ -1,0 +1,572 @@
+---
+title: "L2: Setting Up the Router"
+description: "Create the Router component and configure React Router in your application"
+---
+
+
+# Setting Up the Router
+
+Now that React Router is installed, let's set up the routing infrastructure for your application! We'll create a Router component and wrap our app with `BrowserRouter`.
+
+## What You'll Learn
+
+- How to set up `BrowserRouter` in your app
+- Creating a centralized Router component
+- Understanding the routing hierarchy
+- Preparing for route definitions
+
+## Understanding BrowserRouter
+
+`BrowserRouter` is the foundation of React Router. It must wrap your entire application to enable routing.
+
+### How It Works
+
+```jsx title="Conceptual Overview"
+<BrowserRouter>
+  {/* 
+    Everything inside has access to routing features:
+    - useNavigate hook
+    - useParams hook  
+    - Link component
+    - Route definitions
+  */}
+  <App />
+</BrowserRouter>
+```
+
+<Callout type="info" title="Router Context">
+
+`BrowserRouter` creates a React Context that provides routing data to all components below it. This is why it must be at the root of your app!
+
+</Callout>
+
+## Two Approach Options
+
+You can set up routing in two ways:
+
+<Tabs items={['Approach 1: Router Component', 'Approach 2: Direct in App']}>
+
+<Tab value="Approach 1: Router Component">
+
+**Create a separate Router component** (Recommended)
+
+**Pros:**
+- ✅ Clean separation of concerns
+- ✅ Easy to modify routes
+- ✅ Testable in isolation
+- ✅ Follows single responsibility principle
+
+**Structure:**
+
+```jsx title="src/components/Router.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Route definitions here */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+```jsx title="src/App.jsx"
+import Router from './components/Router';
+
+function App() {
+  return <Router />;
+}
+```
+
+We'll use this approach!
+
+</Tab>
+
+<Tab value="Approach 2: Direct in App">
+
+**Put routing directly in App.jsx**
+
+**Pros:**
+- ✅ Fewer files
+- ✅ Simpler for small apps
+
+**Cons:**
+- ❌ App.jsx becomes bloated
+- ❌ Harder to maintain
+
+**Structure:**
+
+```jsx title="src/App.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Route definitions here */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+This works, but isn't ideal for larger apps.
+
+</Tab>
+
+</Tabs>
+
+## Step 1: Create the Router Component
+
+<Steps>
+
+<Step>
+
+### Create the File
+
+Create a new file for the Router:
+
+```bash title="Terminal"
+touch src/components/Router.jsx
+```
+
+</Step>
+
+<Step>
+
+### Build the Basic Structure
+
+Add this code to `Router.jsx`:
+
+```jsx title="src/components/Router.jsx"
+// [!code word:BrowserRouter]
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Routes will be defined here in the next lessons */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+**What's happening:**
+
+- **Import statements** - Getting routing components from React Router
+- **BrowserRouter** - Enables routing for the entire app
+- **Routes** - Container for all route definitions
+- **Route** - Individual routes will go inside (next lesson)
+
+</Step>
+
+<Step>
+
+### Understanding the Imports
+
+Let's break down each import:
+
+<Accordions>
+
+<Accordion title="BrowserRouter">
+
+**Purpose:** Uses browser's History API to keep UI in sync with URL
+
+```jsx
+// [!code word:BrowserRouter]
+import { BrowserRouter } from 'react-router-dom';
+
+<BrowserRouter>
+  {/* Your app */}
+</BrowserRouter>
+```
+
+**What it does:**
+- Listens for URL changes
+- Updates browser history
+- Enables forward/back navigation
+- Provides routing context to children
+
+</Accordion>
+
+<Accordion title="Routes">
+
+**Purpose:** Container for all `<Route>` components
+
+```jsx
+import { Routes } from 'react-router-dom';
+
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/about" element={<About />} />
+</Routes>
+```
+
+**What it does:**
+- Matches current URL against all routes
+- Renders the first matching route
+- Replaces old `<Switch>` from v5
+
+</Accordion>
+
+<Accordion title="Route">
+
+**Purpose:** Defines a single route (URL → Component mapping)
+
+```jsx
+import { Route } from 'react-router-dom';
+
+<Route path="/listing/:id" element={<DetailsPage />} />
+```
+
+**What it does:**
+- Matches a URL pattern
+- Renders specified component when matched
+- Can extract URL parameters
+
+We'll use this extensively in the next lesson!
+
+</Accordion>
+
+</Accordions>
+
+</Step>
+
+</Steps>
+
+## Step 2: Update App.jsx
+
+Now let's use our new Router component in `App.jsx`.
+
+<Steps>
+
+<Step>
+
+### Current App.jsx
+
+Your `App.jsx` currently looks like this:
+
+```jsx title="src/App.jsx (Current)"
+import HomePage from './pages/HomePage';
+
+function App() {
+  return <HomePage />;
+}
+
+export default App;
+```
+
+It directly renders `HomePage`. We'll change this!
+
+</Step>
+
+<Step>
+
+### Update with Router
+
+Replace the content with:
+
+```jsx title="src/App.jsx (Updated)"
+// [!code ++]import Router from './components/Router';
+// [!code --]import HomePage from './pages/HomePage';
+
+function App() {
+  // [!code --]return <HomePage />;
+  // [!code ++]return <Router />;
+}
+
+export default App;
+```
+
+**What changed:**
+- Removed direct `HomePage` import
+- Imported `Router` component
+- Rendering `Router` instead of `HomePage`
+
+</Step>
+
+<Step>
+
+### Complete Updated App.jsx
+
+Your `App.jsx` should now look like this:
+
+```jsx title="src/App.jsx"
+import Router from './components/Router';
+
+function App() {
+  return <Router />;
+}
+
+export default App;
+```
+
+Simple and clean! All routing logic is now contained in the `Router` component.
+
+</Step>
+
+</Steps>
+
+## Step 3: Verify the Setup
+
+Let's make sure everything is working:
+
+<Steps>
+
+<Step>
+
+### Check Your Browser
+
+Open your browser and go to `http://localhost:5173/`
+
+**You should see:** A blank page (this is expected!)
+
+**Why blank?** We haven't defined any routes yet. The `<Routes>` component is empty, so nothing renders.
+
+</Step>
+
+<Step>
+
+### Check for Errors
+
+Open your browser's developer console (F12):
+
+**Expected:** No errors
+
+**If you see errors:**
+
+<Accordions>
+
+<Accordion title="Module not found: 'react-router-dom'">
+
+**Solution:** React Router isn't installed
+
+```bash title="Terminal"
+npm install react-router-dom
+```
+
+Then restart your dev server.
+
+</Accordion>
+
+<Accordion title="Cannot find module './components/Router'">
+
+**Solution:** File path is wrong or file doesn't exist
+
+**Check:**
+1. File is at `src/components/Router.jsx` (exact path)
+2. File has correct casing (capital R)
+3. Import path in App.jsx matches
+
+</Accordion>
+
+<Accordion title="Routes is not defined">
+
+**Solution:** Missing import in Router.jsx
+
+```jsx
+// Make sure you have this line:
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+```
+
+</Accordion>
+
+</Accordions>
+
+</Step>
+
+</Steps>
+
+## Understanding the Routing Hierarchy
+
+Your application now has this component structure:
+
+```
+App
+ └─ Router
+     └─ BrowserRouter (provides routing context)
+         └─ Routes (matches URL to routes)
+             └─ Route (individual routes)
+                 └─ Component (HomePage, DetailsPage, etc.)
+```
+
+<Callout type="info" title="Context Flow">
+
+Routing context flows down from `BrowserRouter`:
+
+```
+BrowserRouter (creates context)
+    ↓
+Routes (consumes context, matches URL)
+    ↓
+Your Components (can use routing hooks)
+```
+
+</Callout>
+
+## File Structure Check
+
+Your project should now have this structure:
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <File name="App.jsx" />
+    <File name="main.jsx" />
+    <Folder name="components" defaultOpen>
+      <File name="Router.jsx" />
+      <File name="ListingCard.jsx" />
+      <File name="Spinner.jsx" />
+      <File name="ErrorMessage.jsx" />
+    </Folder>
+    <Folder name="pages">
+      <File name="HomePage.jsx" />
+    </Folder>
+    <Folder name="api">
+      <File name="mockApi.js" />
+    </Folder>
+  </Folder>
+</Files>
+
+## Alternative Routers
+
+While we're using `BrowserRouter`, React Router offers other router types:
+
+<Accordions>
+
+<Accordion title="BrowserRouter (We're using this)">
+
+**Uses:** HTML5 History API
+
+**URLs:** Clean paths (`/about`, `/listing/5`)
+
+**Best for:** Modern web apps
+
+**Requirements:** Server must be configured to handle all routes
+
+```jsx
+<BrowserRouter>
+  <Routes>...</Routes>
+</BrowserRouter>
+```
+
+</Accordion>
+
+<Accordion title="HashRouter">
+
+**Uses:** URL hash (`#`)
+
+**URLs:** Hash-based (`/#/about`, `/#/listing/5`)
+
+**Best for:** Static hosting without server config (GitHub Pages)
+
+**Trade-off:** Ugly URLs with `#`
+
+```jsx
+import { HashRouter } from 'react-router-dom';
+
+<HashRouter>
+  <Routes>...</Routes>
+</HashRouter>
+```
+
+</Accordion>
+
+<Accordion title="MemoryRouter">
+
+**Uses:** In-memory history (no URL changes)
+
+**Best for:** Testing, React Native
+
+**URLs:** No actual URL changes
+
+```jsx
+import { MemoryRouter } from 'react-router-dom';
+
+<MemoryRouter>
+  <Routes>...</Routes>
+</MemoryRouter>
+```
+
+</Accordion>
+
+</Accordions>
+
+## Common Questions
+
+<Accordions>
+
+<Accordion title="Why not put BrowserRouter in main.jsx?">
+
+**You could**, and some tutorials do:
+
+```jsx title="src/main.jsx (Alternative)"
+import { BrowserRouter } from 'react-router-dom';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+);
+```
+
+**Why we don't:**
+- Makes App harder to test
+- Less flexible (can't easily swap routers)
+- Mixes concerns (rendering setup vs routing)
+
+</Accordion>
+
+<Accordion title="Can I have multiple BrowserRouters?">
+
+**No!** Only one BrowserRouter per app.
+
+**Why:** It manages browser history - multiple instances would conflict.
+
+**If you need sub-routing:** Use nested `<Routes>` inside a single BrowserRouter.
+
+</Accordion>
+
+<Accordion title="What if I forget BrowserRouter?">
+
+Without `BrowserRouter`, routing hooks and components won't work:
+
+```
+Error: useRoutes() may be used only in the context of a <Router> component.
+```
+
+**Solution:** Make sure `<BrowserRouter>` wraps your entire app.
+
+</Accordion>
+
+</Accordions>
+
+<Callout type="success" title="Router Setup Complete!">
+
+Your app is now routing-ready! The foundation is in place, and in the next lesson, we'll add our first route to bring back the HomePage.
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Created a `Router` component
+- ✅ Set up `BrowserRouter` and `Routes`
+- ✅ Updated `App.jsx` to use Router
+- ✅ Understood the routing hierarchy
+- ✅ Verified the setup (blank page expected)
+
+**Key concepts:**
+
+- **BrowserRouter** - Provides routing context to entire app
+- **Routes** - Container for route definitions
+- **Route** - Individual URL → Component mapping
+- **Component hierarchy** - Router context flows down
+
+## What's Next?
+
+In **Lesson 3**, we'll define our first route and get the HomePage showing again. We'll learn about route paths, the `element` prop, and index routes!

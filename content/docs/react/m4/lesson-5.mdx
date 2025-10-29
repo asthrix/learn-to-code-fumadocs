@@ -1,0 +1,707 @@
+---
+title: "L5: Adding Dynamic Route Parameter"
+description: "Configure routes with URL parameters to handle multiple listings"
+---
+
+
+# Adding Dynamic Route Parameter
+
+Now that we have a `ListingDetailsPage` component, we need to connect it to a route. But here's the challenge: we have many listings (listing 1, listing 2, listing 3, etc.), and we need **one route** that works for all of them!
+
+This is where **dynamic routes** come in - routes with variable parts that change based on the URL.
+
+## What You'll Learn
+
+- What dynamic routes are and why we need them
+- How to add URL parameters to routes
+- Understanding the `:id` syntax
+- How React Router matches dynamic routes
+- Preparing for data fetching based on URL
+
+## The Problem: One Page, Many Listings
+
+Right now, we could create separate routes for each listing:
+
+```jsx title="❌ Bad Approach - Don't Do This"
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/listing-1" element={<ListingDetailsPage />} />
+  <Route path="/listing-2" element={<ListingDetailsPage />} />
+  <Route path="/listing-3" element={<ListingDetailsPage />} />
+  {/* What about listing 100? Or 1000? */}
+</Routes>
+```
+
+**Problems with this approach:**
+
+- ❌ Need to manually add a route for every listing
+- ❌ Can't add new listings dynamically
+- ❌ Lots of repetitive code
+- ❌ Doesn't scale at all
+
+## The Solution: Dynamic Routes
+
+Instead, we create **one route** that handles **all listings**:
+
+```jsx title="✅ Good Approach - Dynamic Route"
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/listing/:id" element={<ListingDetailsPage />} />
+</Routes>
+```
+
+**What `:id` means:**
+
+- `:` tells React Router "this part is variable"
+- `id` is the parameter name (you choose this)
+- Works for `/listing/1`, `/listing/2`, `/listing/999`, etc.
+
+<Callout type="success" title="Dynamic Routes Rock!">
+
+With one dynamic route, you can handle unlimited listings! The `:id` part acts as a placeholder that matches any value in that position of the URL.
+
+</Callout>
+
+## Understanding Dynamic Segments
+
+Let's break down the route path:
+
+<Tabs items={['Static Part', 'Dynamic Part', 'Full Path']}>
+
+<Tab value="Static Part">
+
+**`/listing/`** - The static part
+
+This part never changes. It's always literally "listing".
+
+**Examples:**
+- ✅ `/listing/1` - Matches
+- ✅ `/listing/abc` - Matches
+- ❌ `/property/1` - Doesn't match
+
+The static part helps organize your URLs and makes them readable.
+
+</Tab>
+
+<Tab value="Dynamic Part">
+
+**`:id`** - The dynamic part
+
+This part can be anything! The `:` makes it a parameter.
+
+**Examples:**
+- `/listing/1` → id = "1"
+- `/listing/42` → id = "42"
+- `/listing/abc-123` → id = "abc-123"
+
+You can name it anything:
+- `:id` (common for IDs)
+- `:listingId` (more specific)
+- `:slug` (for text-based URLs)
+
+</Tab>
+
+<Tab value="Full Path">
+
+**`/listing/:id`** - Complete route
+
+Combines static and dynamic parts.
+
+**What matches:**
+- ✅ `/listing/1`
+- ✅ `/listing/999`
+- ✅ `/listing/beach-house`
+
+**What doesn't match:**
+- ❌ `/listing` (missing ID)
+- ❌ `/listing/1/details` (extra segment)
+- ❌ `/listings/1` (wrong static part)
+
+The route must match exactly, except for the dynamic segment!
+
+</Tab>
+
+</Tabs>
+
+## Step 1: Add the Dynamic Route
+
+Let's update the `Router` component to include our dynamic route:
+
+<Steps>
+
+<Step>
+
+### Update Router.jsx
+
+Open `Router.jsx` and add the new route:
+
+```jsx title="src/components/Router.jsx"
+// [!code word:/listing/:id]
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
+import ListingDetailsPage from '../pages/ListingDetailsPage'; // [!code ++]
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/listing/:id" element={<ListingDetailsPage />} /> // [!code ++]
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+**What changed:**
+
+1. **Imported ListingDetailsPage** - Need to import before using
+2. **Added dynamic route** - `/listing/:id` matches any listing URL
+3. **Order matters** - More specific routes should come before general ones
+
+</Step>
+
+<Step>
+
+### Test the Route
+
+Open your browser and manually type these URLs:
+
+**Try these in your browser:**
+
+```
+http://localhost:5173/listing/1
+http://localhost:5173/listing/2
+http://localhost:5173/listing/999
+```
+
+**What you should see:**
+
+- The same `ListingDetailsPage` component renders for all URLs
+- The page shows the same content (we haven't used the ID yet)
+- No 404 error or blank page
+
+**Why it's the same content:**
+
+Right now, the page shows hardcoded data. In Lesson 6, we'll extract the `id` from the URL and use it to fetch the correct listing!
+
+</Step>
+
+</Steps>
+
+## How Route Matching Works
+
+React Router follows this process when you navigate to a URL:
+
+<Steps>
+
+<Step>
+
+### Step 1: Parse the URL
+
+User navigates to `/listing/42`
+
+React Router breaks it down:
+- Segment 1: `listing`
+- Segment 2: `42`
+
+</Step>
+
+<Step>
+
+### Step 2: Check Each Route
+
+React Router compares the URL against each route in order:
+
+**Route 1:** `path="/"`
+- Segments: `[]` (empty, just root)
+- Match? ❌ No (different number of segments)
+
+**Route 2:** `path="/listing/:id"`
+- Segments: `listing`, `:id` (variable)
+- Match? ✅ Yes!
+  - Segment 1: `listing` matches `listing`
+  - Segment 2: `:id` matches anything (`42`)
+
+</Step>
+
+<Step>
+
+### Step 3: Render the Element
+
+Match found! Render the `ListingDetailsPage` component.
+
+React Router also stores the parameter:
+- Parameter name: `id`
+- Parameter value: `"42"`
+
+In Lesson 6, we'll learn how to access this stored value!
+
+</Step>
+
+</Steps>
+
+## Multiple Dynamic Parameters
+
+You can have multiple dynamic segments in one route:
+
+<Tabs items={['One Parameter', 'Two Parameters', 'Three Parameters']}>
+
+<Tab value="One Parameter">
+
+**Route:** `/listing/:id`
+
+**Example URLs:**
+- `/listing/1` → id = "1"
+- `/listing/42` → id = "42"
+
+**Use case:** Single resource by ID
+
+```jsx
+<Route path="/listing/:id" element={<ListingDetailsPage />} />
+```
+
+</Tab>
+
+<Tab value="Two Parameters">
+
+**Route:** `/listing/:id/review/:reviewId`
+
+**Example URLs:**
+- `/listing/1/review/5` → id = "1", reviewId = "5"
+- `/listing/42/review/99` → id = "42", reviewId = "99"
+
+**Use case:** Nested resources
+
+```jsx
+<Route 
+  path="/listing/:id/review/:reviewId" 
+  element={<ReviewPage />} 
+/>
+```
+
+</Tab>
+
+<Tab value="Three Parameters">
+
+**Route:** `/user/:userId/listing/:listingId/booking/:bookingId`
+
+**Example URL:**
+- `/user/10/listing/42/booking/123`
+  - userId = "10"
+  - listingId = "42"
+  - bookingId = "123"
+
+**Use case:** Deeply nested resources
+
+```jsx
+<Route 
+  path="/user/:userId/listing/:listingId/booking/:bookingId" 
+  element={<BookingDetailsPage />} 
+/>
+```
+
+</Tab>
+
+</Tabs>
+
+<Callout type="info" title="Nested Routes">
+
+For our StaySense app, we only need one parameter (`:id`). But knowing you can use multiple parameters helps when building more complex applications!
+
+</Callout>
+
+## Complete Router Code
+
+Here's what your Router component should look like now:
+
+```jsx title="src/components/Router.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
+import ListingDetailsPage from '../pages/ListingDetailsPage';
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Static route - exact match */}
+        <Route path="/" element={<HomePage />} />
+        
+        {/* Dynamic route - matches any ID */}
+        <Route path="/listing/:id" element={<ListingDetailsPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+## Route Order and Priority
+
+The order of routes matters when you have overlapping patterns:
+
+<Tabs items={['Correct Order', 'Wrong Order', 'Why Order Matters']}>
+
+<Tab value="Correct Order">
+
+**✅ Specific routes before general routes:**
+
+```jsx
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/listing/new" element={<CreateListingPage />} />
+  <Route path="/listing/:id" element={<ListingDetailsPage />} />
+  <Route path="*" element={<NotFoundPage />} />
+</Routes>
+```
+
+**Why this works:**
+
+- `/listing/new` is checked before `/listing/:id`
+- If URL is `/listing/new`, it matches the specific route
+- If URL is `/listing/42`, it matches the dynamic route
+- `*` (catch-all) is last, so it only matches if nothing else does
+
+</Tab>
+
+<Tab value="Wrong Order">
+
+**❌ General routes before specific routes:**
+
+```jsx
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/listing/:id" element={<ListingDetailsPage />} />
+  <Route path="/listing/new" element={<CreateListingPage />} />
+  <Route path="*" element={<NotFoundPage />} />
+</Routes>
+```
+
+**Problem:**
+
+- URL `/listing/new` matches `/listing/:id` first
+- `:id` becomes "new"
+- `CreateListingPage` never renders!
+- User sees listing details for ID "new" (probably an error)
+
+</Tab>
+
+<Tab value="Why Order Matters">
+
+**React Router uses "first match wins" strategy:**
+
+1. Check routes in order (top to bottom)
+2. First route that matches the URL wins
+3. Render that route's element
+4. Stop checking remaining routes
+
+**Best practice:**
+
+```
+Most Specific
+    ↓
+Less Specific
+    ↓
+Catch-All (*)
+```
+
+**Example:**
+
+```jsx
+// 1. Exact matches
+<Route path="/about" element={<AboutPage />} />
+
+// 2. Specific dynamic routes
+<Route path="/listing/new" element={<CreateListingPage />} />
+
+// 3. General dynamic routes
+<Route path="/listing/:id" element={<ListingDetailsPage />} />
+
+// 4. Catch-all
+<Route path="*" element={<NotFoundPage />} />
+```
+
+</Tab>
+
+</Tabs>
+
+## Common URL Parameter Patterns
+
+<Accordions>
+
+<Accordion title="Numeric IDs">
+
+**Pattern:** `/resource/:id`
+
+```jsx
+<Route path="/listing/:id" element={<ListingDetailsPage />} />
+```
+
+**URLs:**
+- `/listing/1`
+- `/listing/42`
+- `/listing/999`
+
+**Best for:** Database primary keys, auto-incrementing IDs
+
+</Accordion>
+
+<Accordion title="Slugs (Text-based)">
+
+**Pattern:** `/resource/:slug`
+
+```jsx
+<Route path="/listing/:slug" element={<ListingDetailsPage />} />
+```
+
+**URLs:**
+- `/listing/cozy-beach-house`
+- `/listing/downtown-loft-apartment`
+- `/listing/mountain-cabin-retreat`
+
+**Best for:** SEO-friendly URLs, readable links
+
+</Accordion>
+
+<Accordion title="UUIDs">
+
+**Pattern:** `/resource/:uuid`
+
+```jsx
+<Route path="/listing/:uuid" element={<ListingDetailsPage />} />
+```
+
+**URLs:**
+- `/listing/123e4567-e89b-12d3-a456-426614174000`
+
+**Best for:** Unique identifiers, distributed systems
+
+</Accordion>
+
+<Accordion title="Optional Parameters">
+
+**Pattern:** Routes without optional params (React Router v6 uses different syntax)
+
+In React Router v6, you typically use separate routes or query parameters for optional values:
+
+```jsx
+{/* Both routes point to same component */}
+<Route path="/search" element={<SearchPage />} />
+<Route path="/search/:query" element={<SearchPage />} />
+```
+
+Or use query strings:
+- `/search?q=beach` (handled separately)
+
+</Accordion>
+
+</Accordions>
+
+## What Happens Next?
+
+Right now, our dynamic route works, but the page doesn't use the ID from the URL. Here's what we'll do in the next lessons:
+
+<Steps>
+
+<Step>
+
+### Lesson 6: Extract the ID
+
+Use the `useParams` hook to get the `id` from the URL:
+
+```jsx
+const { id } = useParams(); // id = "42" from /listing/42
+```
+
+</Step>
+
+<Step>
+
+### Lesson 7: Fetch Data
+
+Use the ID to fetch the correct listing from the API:
+
+```jsx
+useEffect(() => {
+  fetch(`/api/listings/${id}`).then(/* ... */);
+}, [id]);
+```
+
+</Step>
+
+<Step>
+
+### Lesson 8: Display Data
+
+Create a component to show the fetched listing details beautifully!
+
+</Step>
+
+</Steps>
+
+## Testing Your Routes
+
+Here's how to verify your dynamic route is working:
+
+<Steps>
+
+<Step>
+
+### Test Different IDs
+
+Manually type these URLs in your browser:
+
+```
+http://localhost:5173/listing/1
+http://localhost:5173/listing/2
+http://localhost:5173/listing/99
+http://localhost:5173/listing/test
+```
+
+All should render the `ListingDetailsPage` (with same hardcoded content).
+
+</Step>
+
+<Step>
+
+### Check the Browser Console
+
+Open DevTools (F12) and check for errors. You should see no errors.
+
+</Step>
+
+<Step>
+
+### Try Invalid Routes
+
+Try a URL that doesn't match any route:
+
+```
+http://localhost:5173/invalid-page
+```
+
+You should see a blank page (we'll fix this with a 404 page in Lesson 10).
+
+</Step>
+
+</Steps>
+
+## Common Questions
+
+<Accordions>
+
+<Accordion title="Can I use any name instead of :id?">
+
+**Yes!** The parameter name is up to you:
+
+```jsx
+// All of these work:
+<Route path="/listing/:id" element={<Page />} />
+<Route path="/listing/:listingId" element={<Page />} />
+<Route path="/listing/:lid" element={<Page />} />
+<Route path="/listing/:slug" element={<Page />} />
+```
+
+**Best practice:** Use descriptive names that indicate what the parameter represents:
+
+- `:id` - Generic ID
+- `:listingId` - Specific to listings
+- `:slug` - Text-based identifier
+- `:userId` - User-specific ID
+
+</Accordion>
+
+<Accordion title="Why does everything show the same content?">
+
+**Because we haven't used the ID yet!**
+
+Right now, `ListingDetailsPage` has hardcoded data:
+
+```jsx
+<h1>Cozy Beach House</h1>
+```
+
+In Lesson 6, we'll extract the ID from the URL:
+
+```jsx
+const { id } = useParams(); // Get ID from URL
+```
+
+In Lesson 7, we'll fetch data based on that ID:
+
+```jsx
+fetch(`/api/listings/${id}`); // Fetch specific listing
+```
+
+Then each URL will show different data!
+
+</Accordion>
+
+<Accordion title="What if I visit /listing without an ID?">
+
+**It won't match the route!**
+
+Route: `/listing/:id`
+
+- ✅ `/listing/1` - Matches (id = "1")
+- ✅ `/listing/42` - Matches (id = "42")
+- ❌ `/listing` - No match (missing ID)
+
+If you want `/listing` to work, add another route:
+
+```jsx
+<Route path="/listing" element={<AllListingsPage />} />
+<Route path="/listing/:id" element={<ListingDetailsPage />} />
+```
+
+</Accordion>
+
+<Accordion title="Can I have multiple dynamic segments?">
+
+**Yes!** You can have as many as needed:
+
+```jsx
+<Route path="/user/:userId/listing/:listingId" element={<Page />} />
+```
+
+This matches:
+- `/user/10/listing/42`
+  - userId = "10"
+  - listingId = "42"
+
+You can access both parameters:
+
+```jsx
+const { userId, listingId } = useParams();
+```
+
+</Accordion>
+
+</Accordions>
+
+<Callout type="success" title="Dynamic Route Added!">
+
+Your Router now supports unlimited listings with one dynamic route! In the next lesson, we'll learn how to extract and use the ID from the URL with the `useParams` hook.
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Added dynamic route with `:id` parameter
+- ✅ Imported and used ListingDetailsPage component
+- ✅ Tested URLs with different IDs
+- ✅ Understood route matching and order
+- ✅ Learned about multiple parameters
+
+**Key concepts:**
+
+- **Dynamic routes** - Routes with variable segments (`:paramName`)
+- **`:id` syntax** - Defines a URL parameter
+- **Route matching** - First match wins strategy
+- **Route order** - Specific before general
+- **Scalability** - One route handles unlimited resources
+
+## What's Next?
+
+In **Lesson 6**, we'll use the **`useParams` hook** to extract the `id` from the URL. This is how we'll know which listing to display - the ID tells us exactly what data to fetch! 🎯

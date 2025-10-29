@@ -1,0 +1,545 @@
+---
+title: "L8: Creating ListingDetailsCard Component"
+description: "Extract listing display logic into a reusable component"
+---
+
+
+# Creating ListingDetailsCard Component
+
+Right now, `ListingDetailsPage` handles both data fetching AND display logic. Let's follow React best practices by extracting the display part into a separate component!
+
+This makes our code cleaner, more reusable, and easier to test.
+
+## What You'll Learn
+
+- Extract display logic into a component
+- Design clear component props interfaces
+- Separate concerns (data vs presentation)
+- Create reusable UI components
+- Component composition patterns
+
+## Why Extract Components?
+
+**Current problem:**
+
+```jsx
+// ListingDetailsPage does EVERYTHING
+function ListingDetailsPage() {
+  // 1. Data fetching (useEffect, fetch, state)
+  // 2. Loading/error handling
+  // 3. Display logic (JSX)
+  // = 200+ lines in one component!
+}
+```
+
+**Better approach:**
+
+```jsx
+// Page handles data, Card handles display
+function ListingDetailsPage() {
+  // Data fetching only
+  const listing = useFetch(`/api/listings/${id}`);
+  return <ListingDetailsCard listing={listing} />;
+}
+
+function ListingDetailsCard({ listing }) {
+  // Display logic only
+  return <div>{/* JSX */}</div>;
+}
+```
+
+**Benefits:**
+
+- ✅ Single Responsibility Principle
+- ✅ Easier to test
+- ✅ Reusable across pages
+- ✅ Cleaner, more maintainable code
+
+## Step 1: Create the Component File
+
+<Steps>
+
+<Step>
+
+### Create ListingDetailsCard.jsx
+
+Create the new component file:
+
+```bash title="Terminal"
+touch src/components/ListingDetailsCard.jsx
+```
+
+Your components folder should have:
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="components" defaultOpen>
+      <File name="Router.jsx" />
+      <File name="ListingDetailsCard.jsx" />
+    </Folder>
+  </Folder>
+</Files>
+
+</Step>
+
+</Steps>
+
+## Step 2: Build the Component
+
+<Steps>
+
+<Step>
+
+### Add Component Structure
+
+Create the card component:
+
+```jsx title="src/components/ListingDetailsCard.jsx"
+export default function ListingDetailsCard({ listing }) {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {listing.title}
+        </h1>
+        <div className="flex items-center gap-4 text-sm text-gray-600">
+          <span>📍 {listing.location}</span>
+          <span>⭐ {listing.rating}</span>
+          <span>👥 {listing.reviews} reviews</span>
+        </div>
+      </div>
+
+      {/* Image Placeholder */}
+      <div className="bg-gray-200 rounded-lg h-96 mb-6 flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Image Gallery Coming Soon</p>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Main Info */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Host Info */}
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-2">
+              Entire place hosted by {listing.host?.name || 'Host'}
+            </h2>
+            <div className="text-gray-600">
+              {listing.guests} guests · {listing.bedrooms} bedrooms · {listing.bathrooms} bathrooms
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-3">About this place</h2>
+            <p className="text-gray-600 leading-relaxed">
+              {listing.description}
+            </p>
+          </div>
+
+          {/* Amenities */}
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-3">What this place offers</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {listing.amenities?.map((amenity, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <span>{amenity.icon}</span>
+                  <span>{amenity.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Booking Card */}
+        <div className="lg:col-span-1">
+          <div className="border border-gray-200 rounded-lg p-6 shadow-md sticky top-4">
+            <div className="mb-4">
+              <span className="text-2xl font-bold">${listing.price}</span>
+              <span className="text-gray-600"> / night</span>
+            </div>
+
+            <div className="mb-4">
+              <div className="text-sm text-gray-600 mb-2">
+                ⭐ {listing.rating} · {listing.reviews} reviews
+              </div>
+            </div>
+
+            <button className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+              Check Availability
+            </button>
+
+            <p className="text-center text-sm text-gray-600 mt-4">
+              You won't be charged yet
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+**What this component does:**
+
+- Receives `listing` data as a prop
+- Displays all listing information
+- No data fetching (pure presentation)
+- Reusable in other pages
+
+</Step>
+
+</Steps>
+
+## Step 3: Update ListingDetailsPage
+
+Now simplify the page component:
+
+<Steps>
+
+<Step>
+
+### Refactor to Use Card Component
+
+Update `ListingDetailsPage.jsx`:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import ListingDetailsCard from '../components/ListingDetailsCard'; // [!code ++]
+
+export default function ListingDetailsPage() {
+  const { id } = useParams();
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const controller = new AbortController();
+
+    fetch(`/api/listings/${id}`, {
+      signal: controller.signal
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Listing not found');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setListing(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') return;
+        setError(err.message);
+        setIsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+          <p className="mt-4 text-gray-600">Loading listing...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-6xl mb-4">😞</div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Listing Not Found
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Listing #{id} doesn't exist or has been removed.
+          </p>
+          <a
+            href="/"
+            className="inline-block bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+          >
+            Back to Home
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Just pass data to card component! // [!code ++]
+  return <ListingDetailsCard listing={listing} />; // [!code ++]
+}
+```
+
+**What changed:**
+
+- ✅ Imported `ListingDetailsCard`
+- ✅ Removed all display JSX
+- ✅ Now just: `return <ListingDetailsCard listing={listing} />`
+- ✅ Page handles data, Card handles display
+
+**Much cleaner!** The page is now ~70 lines instead of 200+
+
+</Step>
+
+</Steps>
+
+## Component Separation Benefits
+
+<Tabs items={['Before', 'After', 'Comparison']}>
+
+<Tab value="Before">
+
+**One large component:**
+
+```jsx
+function ListingDetailsPage() {
+  // State (20 lines)
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Data fetching (30 lines)
+  useEffect(() => {
+    fetch(`/api/listings/${id}`)
+      .then(/* ... */);
+  }, [id]);
+
+  // Loading UI (10 lines)
+  if (isLoading) return <Spinner />;
+
+  // Error UI (15 lines)
+  if (error) return <ErrorMessage />;
+
+  // Display UI (150+ lines)
+  return (
+    <div>
+      {/* Massive JSX */}
+    </div>
+  );
+}
+```
+
+**Total:** ~225 lines, does everything
+
+</Tab>
+
+<Tab value="After">
+
+**Two focused components:**
+
+```jsx
+// Page: Data fetching (70 lines)
+function ListingDetailsPage() {
+  const { id } = useParams();
+  const [listing, setListing] = useState(null);
+  
+  useEffect(() => {
+    fetch(`/api/listings/${id}`)
+      .then(setListing);
+  }, [id]);
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage />;
+
+  return <ListingDetailsCard listing={listing} />;
+}
+
+// Card: Display only (80 lines)
+function ListingDetailsCard({ listing }) {
+  return (
+    <div>
+      {/* Clean display JSX */}
+    </div>
+  );
+}
+```
+
+**Total:** ~150 lines split across 2 files
+
+</Tab>
+
+<Tab value="Comparison">
+
+**Before:**
+
+- ❌ 225 lines in one file
+- ❌ Multiple responsibilities
+- ❌ Hard to test display logic
+- ❌ Can't reuse display elsewhere
+
+**After:**
+
+- ✅ 70 lines (data) + 80 lines (display)
+- ✅ Single responsibility each
+- ✅ Easy to test separately
+- ✅ Card reusable anywhere
+
+**Wins:**
+
+- Shorter files
+- Clearer purpose
+- Easier maintenance
+- Better testability
+
+</Tab>
+
+</Tabs>
+
+## When to Extract Components
+
+<Accordions>
+
+<Accordion title="Extract when component does multiple things">
+
+**Signs to extract:**
+
+- Component over 150-200 lines
+- Has data fetching AND complex display
+- Multiple unrelated responsibilities
+- Hard to understand at a glance
+
+**Solution:** Split into container (data) + presentational (UI)
+
+</Accordion>
+
+<Accordion title="Extract when you need reusability">
+
+**Signs to extract:**
+
+- Same UI used in multiple places
+- Want to test display logic separately
+- Need different data sources for same UI
+
+**Example:**
+
+```jsx
+// Use same card for different data
+<ListingDetailsCard listing={fetchedListing} />
+<ListingDetailsCard listing={previewListing} />
+<ListingDetailsCard listing={savedListing} />
+```
+
+</Accordion>
+
+<Accordion title="Don't extract too early">
+
+**Wait to extract if:**
+
+- Component under 100 lines
+- Only used in one place
+- Still figuring out the design
+
+**Premature extraction = unnecessary complexity!**
+
+Start simple, extract when needed.
+
+</Accordion>
+
+</Accordions>
+
+## Props Best Practices
+
+<Accordions>
+
+<Accordion title="1. Clear Prop Names">
+
+```jsx
+// ✅ Good - clear what prop contains
+<ListingDetailsCard listing={data} />
+
+// ❌ Bad - unclear
+<ListingDetailsCard data={data} />
+<ListingDetailsCard item={data} />
+<ListingDetailsCard props={data} />
+```
+
+</Accordion>
+
+<Accordion title="2. Single Responsibility Props">
+
+```jsx
+// ✅ Good - one object with all data
+<ListingDetailsCard listing={listing} />
+
+// ❌ Bad - many individual props
+<ListingDetailsCard 
+  title={title}
+  price={price}
+  rating={rating}
+  reviews={reviews}
+  description={description}
+  // 20 more props...
+/>
+```
+
+</Accordion>
+
+<Accordion title="3. PropTypes or TypeScript">
+
+**Add type checking (optional but recommended):**
+
+```jsx
+// PropTypes (JavaScript)
+import PropTypes from 'prop-types';
+
+ListingDetailsCard.propTypes = {
+  listing: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    // ... more properties
+  }).isRequired
+};
+
+// Or TypeScript
+interface ListingDetailsCardProps {
+  listing: {
+    id: number;
+    title: string;
+    price: number;
+    // ... more properties
+  };
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+<Callout type="success" title="Component Extracted!">
+
+Your code is now cleaner and more maintainable! The page handles data fetching, and the card handles display - perfect separation of concerns.
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Created `ListingDetailsCard` component
+- ✅ Extracted display logic from page
+- ✅ Simplified `ListingDetailsPage` to ~70 lines
+- ✅ Made display logic reusable
+- ✅ Improved code organization
+
+**Key concepts:**
+
+- **Component extraction** - Split large components
+- **Separation of concerns** - Data vs display
+- **Props interface** - Clear component API
+- **Reusability** - Use component anywhere
+- **Maintainability** - Smaller, focused files
+
+## What's Next?
+
+In **Lesson 9**, we'll add **Link components** to navigate from the homepage listing cards to the details page. No more typing URLs manually - users can click cards to view details! 🔗
