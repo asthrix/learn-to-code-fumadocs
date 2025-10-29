@@ -1,0 +1,700 @@
+---
+title: "L9: Add Caching to useFetch"
+description: "Implement in-memory caching to prevent duplicate API requests"
+---
+
+# Add Caching to useFetch
+
+Enhance our `useFetch` hook with caching to eliminate duplicate API requests and improve performance!
+
+## What You'll Learn
+
+- Implement in-memory caching
+- Cache invalidation strategies
+- Prevent duplicate requests
+- Share cached data between components
+- Configure cache behavior
+- Measure cache effectiveness
+
+## The Problem: Duplicate Requests
+
+Currently, every component that uses `useFetch` makes its own request:
+
+```jsx
+// Component 1
+function ListingDetailsPage() {
+  const { data } = useFetch('/listings/123');  // Request 1
+  return <div>{data?.title}</div>;
+}
+
+// Component 2 (same listing!)
+function RelatedListings() {
+  const { data } = useFetch('/listings/123');  // Request 2 (duplicate!)
+  return <div>{data?.title}</div>;
+}
+```
+
+**Problems:**
+- Wastes bandwidth
+- Slower load times
+- Unnecessary API load
+- Poor user experience
+
+<Callout type="warning">
+**Performance impact:** In development (React.StrictMode), components mount twice, causing double requests. Caching solves this!
+</Callout>
+
+## Solution: In-Memory Cache
+
+We'll create a cache object that stores API responses:
+
+```jsx
+// Cache structure
+const cache = {
+  '/listings': { data: [...], timestamp: 1234567890 },
+  '/listings/123': { data: {...}, timestamp: 1234567891 }
+};
+```
+
+**How it works:**
+
+1. Check if URL is in cache
+2. If yes → Return cached data (instant! ⚡)
+3. If no → Fetch from API, store in cache
+4. Optionally expire old cache entries
+
+## Implementing the Cache
+
+<Steps>
+
+<Step>
+
+### Create cache object
+
+```jsx title="src/hooks/useFetch.js" {4-9}
+import { useState, useEffect } from 'react';
+import api from '@/api';
+
+// In-memory cache outside component
+const cache = {};
+
+// Cache configuration
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const ENABLE_CACHE = true;
+
+export function useFetch(url) {
+  // ... hook implementation
+}
+```
+
+Cache is outside the hook so it's shared across all components!
+
+</Step>
+
+<Step>
+
+### Check cache before fetching
+
+```jsx title="src/hooks/useFetch.js" {10-20}
+export function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchData = async () => {
+      // Check cache first
+      if (ENABLE_CACHE && cache[url]) {
+        const cached = cache[url];
+        const age = Date.now() - cached.timestamp;
+        
+        // Use cached data if fresh
+        if (age < CACHE_DURATION) {
+          setData(cached.data);
+          setIsLoading(false);
+          return; // Skip fetch!
+        }
+      }
+      
+      // Cache miss or expired - fetch from API
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await api.get(url, {
+          signal: controller.signal
+        });
+        
+        // Store in cache
+        cache[url] = {
+          data: response.data,
+          timestamp: Date.now()
+        };
+        
+        setData(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+    
+    return () => controller.abort();
+  }, [url]);
+  
+  return { data, isLoading, error };
+}
+```
+
+**Flow:**
+1. Check if `cache[url]` exists
+2. Check if cache is fresh (< 5 minutes)
+3. If yes → Return cached data, skip fetch
+4. If no → Fetch and update cache
+
+</Step>
+
+<Step>
+
+### Add cache inspection
+
+```jsx title="src/hooks/useFetch.js" {5-8}
+export function useFetch(url) {
+  // ... existing code
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      if (ENABLE_CACHE && cache[url]) {
+        console.log(`Cache HIT: ${url}`);
+        // ... return cached data
+      } else {
+        console.log(`Cache MISS: ${url}`);
+        // ... fetch from API
+      }
+    };
+    
+    fetchData();
+  }, [url]);
+  
+  return { data, isLoading, error };
+}
+```
+
+Check browser console to see cache hits!
+
+</Step>
+
+</Steps>
+
+## Complete Cached Hook
+
+```jsx title="src/hooks/useFetch.js"
+import { useState, useEffect } from 'react';
+import api from '@/api';
+
+// Cache configuration
+const cache = {};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const ENABLE_CACHE = true;
+
+export function useFetch(url, options = {}) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const {
+    cacheTime = CACHE_DURATION,
+    enableCache = ENABLE_CACHE
+  } = options;
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchData = async () => {
+      // Check cache
+      if (enableCache && cache[url]) {
+        const cached = cache[url];
+        const age = Date.now() - cached.timestamp;
+        
+        if (age < cacheTime) {
+          console.log(`✅ Cache HIT: ${url} (age: ${Math.round(age/1000)}s)`);
+          setData(cached.data);
+          setIsLoading(false);
+          return;
+        } else {
+          console.log(`⏰ Cache EXPIRED: ${url}`);
+        }
+      } else if (enableCache) {
+        console.log(`❌ Cache MISS: ${url}`);
+      }
+      
+      // Fetch from API
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await api.get(url, {
+          signal: controller.signal
+        });
+        
+        // Update cache
+        if (enableCache) {
+          cache[url] = {
+            data: response.data,
+            timestamp: Date.now()
+          };
+          console.log(`💾 Cached: ${url}`);
+        }
+        
+        setData(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+    
+    return () => controller.abort();
+  }, [url, cacheTime, enableCache]);
+  
+  return { data, isLoading, error };
+}
+
+// Utility functions
+export function clearCache(url) {
+  if (url) {
+    delete cache[url];
+    console.log(`🗑️ Cleared cache: ${url}`);
+  } else {
+    Object.keys(cache).forEach(key => delete cache[key]);
+    console.log('🗑️ Cleared all cache');
+  }
+}
+
+export function getCacheStats() {
+  const keys = Object.keys(cache);
+  const stats = keys.map(key => ({
+    url: key,
+    age: Math.round((Date.now() - cache[key].timestamp) / 1000),
+    size: JSON.stringify(cache[key].data).length
+  }));
+  
+  console.table(stats);
+  return stats;
+}
+```
+
+## Usage Examples
+
+<Tabs items={['Basic', 'Custom Cache Time', 'Disable Cache', 'Clear Cache']}>
+
+<Tab value="Basic">
+
+```jsx
+// Uses default 5-minute cache
+function HomePage() {
+  const { data: listings } = useFetch('/listings');
+  return <ListingList listings={listings} />;
+}
+
+// Second component uses cached data!
+function FeaturedListings() {
+  const { data: listings } = useFetch('/listings');  // Cache HIT!
+  return <FeaturedList listings={listings?.slice(0, 3)} />;
+}
+```
+
+**Result:** Only one API request, two components get data instantly!
+
+</Tab>
+
+<Tab value="Custom Cache Time">
+
+```jsx
+// Cache for 1 minute (data changes frequently)
+function RealTimeStats() {
+  const { data: stats } = useFetch('/stats', {
+    cacheTime: 60 * 1000  // 1 minute
+  });
+  return <Stats data={stats} />;
+}
+
+// Cache for 1 hour (data rarely changes)
+function AppConfig() {
+  const { data: config } = useFetch('/config', {
+    cacheTime: 60 * 60 * 1000  // 1 hour
+  });
+  return <Config data={config} />;
+}
+```
+
+</Tab>
+
+<Tab value="Disable Cache">
+
+```jsx
+// Always fetch fresh data (for critical data)
+function BankBalance() {
+  const { data: balance } = useFetch('/balance', {
+    enableCache: false  // Always fresh
+  });
+  return <div>${balance}</div>;
+}
+```
+
+</Tab>
+
+<Tab value="Clear Cache">
+
+```jsx
+import { useFetch, clearCache } from '@/hooks/useFetch';
+
+function DataManager() {
+  const { data, isLoading } = useFetch('/data');
+  
+  const handleRefresh = () => {
+    clearCache('/data');  // Clear specific URL
+    window.location.reload();  // Reload to refetch
+  };
+  
+  const handleClearAll = () => {
+    clearCache();  // Clear all cache
+    window.location.reload();
+  };
+  
+  return (
+    <>
+      <button onClick={handleRefresh}>Refresh Data</button>
+      <button onClick={handleClearAll}>Clear All Cache</button>
+      <div>{data}</div>
+    </>
+  );
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Performance Impact
+
+<Tabs items={['Without Cache', 'With Cache']}>
+
+<Tab value="Without Cache">
+
+**Scenario:** User navigates between pages
+
+1. HomePage → Fetch /listings (500ms)
+2. Navigate to details → Fetch /listings/123 (300ms)
+3. Back to HomePage → Fetch /listings again (500ms)
+4. Navigate to details again → Fetch /listings/123 again (300ms)
+
+**Total:** 1600ms of waiting, 4 API requests
+
+</Tab>
+
+<Tab value="With Cache">
+
+**Scenario:** Same navigation
+
+1. HomePage → Fetch /listings (500ms) → Cache it
+2. Navigate to details → Fetch /listings/123 (300ms) → Cache it
+3. Back to HomePage → Use cached /listings (0ms) ⚡
+4. Navigate to details again → Use cached /listings/123 (0ms) ⚡
+
+**Total:** 800ms of waiting, 2 API requests
+
+**Performance improvement: 50% faster, 50% fewer requests!** 🚀
+
+</Tab>
+
+</Tabs>
+
+## Advanced: Stale-While-Revalidate
+
+Show cached data immediately, then update in background:
+
+```jsx
+export function useFetch(url, options = {}) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isStale, setIsStale] = useState(false);
+  
+  const { staleWhileRevalidate = false } = options;
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchData = async () => {
+      // Check cache
+      if (cache[url]) {
+        const cached = cache[url];
+        const age = Date.now() - cached.timestamp;
+        
+        // Show cached data immediately
+        setData(cached.data);
+        setIsLoading(false);
+        
+        if (age < CACHE_DURATION) {
+          if (!staleWhileRevalidate) {
+            return; // Fresh, don't refetch
+          }
+        }
+        
+        // Mark as stale, refetch in background
+        setIsStale(true);
+      }
+      
+      // Fetch (either no cache, or revalidating)
+      try {
+        if (!cache[url]) {
+          setIsLoading(true);
+        }
+        
+        const response = await api.get(url, {
+          signal: controller.signal
+        });
+        
+        cache[url] = {
+          data: response.data,
+          timestamp: Date.now()
+        };
+        
+        setData(response.data);
+        setIsStale(false);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+    return () => controller.abort();
+  }, [url, staleWhileRevalidate]);
+  
+  return { data, isLoading, error, isStale };
+}
+
+// Usage
+function Component() {
+  const { data, isStale } = useFetch('/data', {
+    staleWhileRevalidate: true
+  });
+  
+  return (
+    <div>
+      {isStale && <span>Updating...</span>}
+      <div>{data}</div>
+    </div>
+  );
+}
+```
+
+**Benefits:**
+- Instant UI (show cached data)
+- Always up-to-date (background refetch)
+- Best user experience!
+
+## Cache Invalidation Strategies
+
+<Accordions>
+
+<Accordion title="1. Time-Based (Current Implementation)">
+
+```jsx
+// Expire after 5 minutes
+const CACHE_DURATION = 5 * 60 * 1000;
+
+if (age < CACHE_DURATION) {
+  return cached.data;
+}
+```
+
+**Pros:** Simple, automatic
+**Cons:** May show stale data
+
+</Accordion>
+
+<Accordion title="2. Manual Invalidation">
+
+```jsx
+// Clear cache on specific actions
+function handleUpdate() {
+  await api.post('/listings', newListing);
+  clearCache('/listings');  // Force refetch
+}
+```
+
+**Pros:** Always fresh after updates
+**Cons:** Requires manual management
+
+</Accordion>
+
+<Accordion title="3. Tag-Based Invalidation">
+
+```jsx
+const cacheTags = {
+  '/listings': ['listings'],
+  '/listings/123': ['listings', 'listing-123']
+};
+
+function invalidateTag(tag) {
+  Object.keys(cacheTags).forEach(url => {
+    if (cacheTags[url].includes(tag)) {
+      delete cache[url];
+    }
+  });
+}
+
+// Invalidate all listings
+invalidateTag('listings');
+```
+
+**Pros:** Flexible, granular control
+**Cons:** More complex
+
+</Accordion>
+
+<Accordion title="4. Mutation-Based">
+
+```jsx
+// Optimistic update
+function useUpdateListing() {
+  const updateListing = async (id, changes) => {
+    // Update cache immediately
+    if (cache[`/listings/${id}`]) {
+      cache[`/listings/${id}`].data = {
+        ...cache[`/listings/${id}`].data,
+        ...changes
+      };
+    }
+    
+    // Then update server
+    await api.put(`/listings/${id}`, changes);
+  };
+  
+  return { updateListing };
+}
+```
+
+**Pros:** Instant UI updates
+**Cons:** Must handle errors
+
+</Accordion>
+
+</Accordions>
+
+## Monitoring Cache Performance
+
+```jsx
+// Add to useFetch for metrics
+let cacheHits = 0;
+let cacheMisses = 0;
+
+export function getCacheMetrics() {
+  const total = cacheHits + cacheMisses;
+  const hitRate = total ? (cacheHits / total * 100).toFixed(1) : 0;
+  
+  return {
+    hits: cacheHits,
+    misses: cacheMisses,
+    total,
+    hitRate: `${hitRate}%`
+  };
+}
+
+// View in console
+console.log('Cache metrics:', getCacheMetrics());
+// { hits: 45, misses: 12, total: 57, hitRate: "78.9%" }
+```
+
+## Best Practices
+
+<Steps>
+
+<Step>
+
+### Choose appropriate cache duration
+
+```jsx
+// Frequently changing data - short cache
+useFetch('/live-stats', { cacheTime: 10000 });  // 10 seconds
+
+// Rarely changing data - long cache
+useFetch('/categories', { cacheTime: 3600000 });  // 1 hour
+
+// Static data - very long cache
+useFetch('/constants', { cacheTime: 86400000 });  // 24 hours
+```
+
+</Step>
+
+<Step>
+
+### Clear cache on mutations
+
+```jsx
+async function createListing(data) {
+  await api.post('/listings', data);
+  clearCache('/listings');  // Refetch will get new listing
+}
+
+async function updateListing(id, changes) {
+  await api.put(`/listings/${id}`, changes);
+  clearCache(`/listings/${id}`);  // Specific URL
+  clearCache('/listings');  // List page too
+}
+```
+
+</Step>
+
+<Step>
+
+### Monitor cache effectiveness
+
+```jsx
+// Log cache metrics periodically
+useEffect(() => {
+  const interval = setInterval(() => {
+    console.log('Cache stats:', getCacheMetrics());
+    getCacheStats();  // Shows table
+  }, 60000);  // Every minute
+  
+  return () => clearInterval(interval);
+}, []);
+```
+
+**Target:** 70%+ cache hit rate
+
+</Step>
+
+</Steps>
+
+## What's Next?
+
+In **Lesson 10**, we'll **review all Module 5 concepts** - custom hooks, useMemo, useCallback, React.memo, profiling, and caching. We'll see how they all work together! 🚀
+
+## Summary
+
+- ✅ Implemented in-memory caching in useFetch
+- ✅ Eliminates duplicate API requests
+- ✅ 50% faster page navigation
+- ✅ Configurable cache duration
+- ✅ Manual cache invalidation
+- ✅ Stale-while-revalidate pattern
+- ✅ Cache performance monitoring
+
+**Key concept:** Caching prevents duplicate work. It's one of the most effective optimizations you can make!

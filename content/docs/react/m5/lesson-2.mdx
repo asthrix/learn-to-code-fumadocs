@@ -1,0 +1,440 @@
+---
+title: "L2: Refactor HomePage with useFetch"
+description: "Replace manual fetch logic with the useFetch custom hook"
+---
+
+# Refactor HomePage with useFetch
+
+Time to put our custom hook to work! We'll replace all the manual fetch logic in `HomePage` with a single line using `useFetch`.
+
+## What You'll Learn
+
+- Use custom hooks in components
+- Replace useState + useEffect patterns
+- Simplify component code
+- Handle loading and error states
+- Pass parameters to custom hooks
+
+## Current HomePage Code
+
+Right now, `HomePage` has about 30 lines of fetch logic:
+
+```jsx title="src/pages/HomePage.jsx" {5-7,9-27}
+import { useState, useEffect } from 'react';
+import api from '@/api';
+
+export function HomePage() {
+  const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchListings = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get('/listings', {
+          signal: controller.signal
+        });
+        setListings(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchListings();
+    return () => controller.abort();
+  }, []);
+  
+  // Filter state
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  // Filter logic
+  const filteredListings = listings.filter(listing => {
+    // ... filtering code
+  });
+  
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+  
+  return (
+    <div>
+      <ListingFilters
+        search={search}
+        onSearchChange={setSearch}
+        dates={dates}
+        onDatesChange={setDates}
+        guests={guests}
+        onGuestsChange={setGuests}
+      />
+      <ListingList listings={filteredListings} />
+    </div>
+  );
+}
+```
+
+All those highlighted lines can be replaced with `useFetch`!
+
+## Step-by-Step Refactoring
+
+<Steps>
+
+<Step>
+
+### Import useFetch
+
+```jsx title="src/pages/HomePage.jsx" {2}
+import { useState } from 'react';
+import { useFetch } from '@/hooks/useFetch';
+import { ListingList } from '@/components/ListingList';
+import { ListingFilters } from '@/components/ListingFilters';
+import { Spinner } from '@/components/ui/Spinner';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
+```
+
+We can remove `useEffect` and `api` imports - the hook handles those!
+
+</Step>
+
+<Step>
+
+### Replace fetch logic with useFetch
+
+```jsx title="src/pages/HomePage.jsx" {4}
+export function HomePage() {
+  // Replace all this:
+  // const [listings, setListings] = useState([]);
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [error, setError] = useState(null);
+  // useEffect(() => { ... }, []);
+  
+  // With this:
+  const { data: listings, isLoading, error } = useFetch('/listings');
+  
+  // Filter state (unchanged)
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  // ... rest of component
+}
+```
+
+**One line replaces 30+** lines of boilerplate! 🎉
+
+**Note:** We use `data: listings` to rename `data` to `listings` for clarity.
+
+</Step>
+
+<Step>
+
+### Handle null data case
+
+Since `useFetch` initializes `data` as `null`, we need to handle that:
+
+```jsx title="src/pages/HomePage.jsx" {8}
+export function HomePage() {
+  const { data: listings, isLoading, error } = useFetch('/listings');
+  
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  const filteredListings = (listings || []).filter(listing => {
+    const matchesSearch = listing.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    
+    const matchesGuests = listing.maxGuests >= guests;
+    
+    // Date filtering logic...
+    
+    return matchesSearch && matchesGuests;
+  });
+  
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+  
+  return (
+    <div>
+      <ListingFilters
+        search={search}
+        onSearchChange={setSearch}
+        dates={dates}
+        onDatesChange={setDates}
+        guests={guests}
+        onGuestsChange={setGuests}
+      />
+      <ListingList listings={filteredListings} />
+    </div>
+  );
+}
+```
+
+`(listings || [])` ensures we have an empty array if `listings` is null.
+
+</Step>
+
+</Steps>
+
+## Complete Refactored Code
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState } from 'react';
+import { useFetch } from '@/hooks/useFetch';
+import { ListingList } from '@/components/ListingList';
+import { ListingFilters } from '@/components/ListingFilters';
+import { Spinner } from '@/components/ui/Spinner';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
+
+export function HomePage() {
+  // Data fetching with custom hook
+  const { data: listings, isLoading, error } = useFetch('/listings');
+  
+  // Filter state
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  // Filter listings
+  const filteredListings = (listings || []).filter(listing => {
+    const matchesSearch = listing.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    
+    const matchesGuests = listing.maxGuests >= guests;
+    
+    const matchesDates = dates.from && dates.to
+      ? isAvailable(listing, dates.from, dates.to)
+      : true;
+    
+    return matchesSearch && matchesGuests && matchesDates;
+  });
+  
+  // Loading and error states
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+  
+  // Render
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <ListingFilters
+        search={search}
+        onSearchChange={setSearch}
+        dates={dates}
+        onDatesChange={setDates}
+        guests={guests}
+        onGuestsChange={setGuests}
+      />
+      <ListingList listings={filteredListings} />
+    </div>
+  );
+}
+
+function isAvailable(listing, from, to) {
+  // Date availability logic
+  return true; // Simplified for example
+}
+```
+
+## Code Comparison
+
+<Tabs items={['Before', 'After']}>
+
+<Tab value="Before">
+
+```jsx
+import { useState, useEffect } from 'react';
+import api from '@/api';
+
+export function HomePage() {
+  // 3 state variables
+  const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // 30+ lines of fetch logic
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchListings = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get('/listings', {
+          signal: controller.signal
+        });
+        setListings(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchListings();
+    return () => controller.abort();
+  }, []);
+  
+  // ... rest
+}
+```
+
+**Line count:** ~50 lines (including fetch logic)
+
+</Tab>
+
+<Tab value="After">
+
+```jsx
+import { useState } from 'react';
+import { useFetch } from '@/hooks/useFetch';
+
+export function HomePage() {
+  // 1 line replaces 30+
+  const { data: listings, isLoading, error } = useFetch('/listings');
+  
+  // ... rest
+}
+```
+
+**Line count:** ~25 lines (50% reduction!)
+
+**Removed:**
+- ❌ Manual state management
+- ❌ useEffect boilerplate
+- ❌ Fetch logic
+- ❌ Error handling
+- ❌ AbortController setup
+
+**Kept:**
+- ✅ Same functionality
+- ✅ Same error handling
+- ✅ Same loading states
+- ✅ Cleaner code
+
+</Tab>
+
+</Tabs>
+
+## Benefits
+
+<Callout type="success">
+**Code Reduction:**
+- Before: ~50 lines
+- After: ~25 lines
+- **Savings: 50% fewer lines**
+</Callout>
+
+**Other benefits:**
+
+1. **Easier to read** - Intent is clear
+2. **Less error-prone** - No manual state management
+3. **Consistent** - Same pattern everywhere
+4. **Maintainable** - Bug fixes in one place
+5. **Testable** - Hook can be tested separately
+
+## Testing the Refactored Code
+
+Open your app and verify:
+
+1. **Loading state** - Should see spinner initially
+2. **Data loads** - Listings appear after fetch
+3. **Filters work** - Search, dates, guests still function
+4. **No errors** - Check browser console
+
+Everything should work exactly the same, but with cleaner code!
+
+## Common Issues
+
+<Accordions>
+
+<Accordion title="listings is null error">
+
+**Problem:** Trying to call `.filter()` on null
+
+**Solution:** Use optional chaining or default value
+
+```jsx
+// Option 1: Default value
+const filteredListings = (listings || []).filter(...)
+
+// Option 2: Optional chaining
+const filteredListings = listings?.filter(...) || []
+```
+
+</Accordion>
+
+<Accordion title="Hook not found">
+
+**Problem:** `useFetch` is not defined
+
+**Solution:** Check import path
+
+```jsx
+// Make sure path is correct
+import { useFetch } from '@/hooks/useFetch';
+
+// If @ doesn't work, use relative path
+import { useFetch } from '../hooks/useFetch';
+```
+
+</Accordion>
+
+<Accordion title="Multiple renders">
+
+**Problem:** Component re-renders too much
+
+**Solution:** This is normal during development (React.StrictMode). In production, it only renders once per state change.
+
+</Accordion>
+
+</Accordions>
+
+## What Changed?
+
+**Removed:**
+```jsx
+import { useEffect } from 'react';
+import api from '@/api';
+
+const [listings, setListings] = useState([]);
+const [isLoading, setIsLoading] = useState(true);
+const [error, setError] = useState(null);
+
+useEffect(() => {
+  // 25+ lines of fetch logic
+}, []);
+```
+
+**Added:**
+```jsx
+import { useFetch } from '@/hooks/useFetch';
+
+const { data: listings, isLoading, error } = useFetch('/listings');
+```
+
+**Result:** Same functionality, 50% less code! 🎉
+
+## What's Next?
+
+In **Lesson 3**, we'll **refactor ListingDetailsPage** to also use `useFetch`. We'll see even more benefits when using the hook with dynamic URLs! 🚀
+
+## Summary
+
+- ✅ Replaced 30+ lines with 1 line
+- ✅ Removed manual state management
+- ✅ Removed useEffect boilerplate
+- ✅ Kept all functionality
+- ✅ Code is cleaner and easier to read
+- ✅ HomePage is now 50% shorter
+
+**Key concept:** Custom hooks make complex logic reusable and keep components focused on rendering!

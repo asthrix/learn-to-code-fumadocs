@@ -1,0 +1,520 @@
+---
+title: "L8: Performance Profiling"
+description: "Use React DevTools Profiler to measure and optimize performance"
+---
+
+# Performance Profiling
+
+Learn to identify performance bottlenecks using React DevTools Profiler and make data-driven optimization decisions!
+
+## What You'll Learn
+
+- Use React DevTools Profiler
+- Interpret flamegraphs
+- Identify slow components
+- Measure optimization impact
+- Find unnecessary re-renders
+- Make data-driven decisions
+
+## Why Profile Performance?
+
+<Callout type="warning">
+**Don't guess, measure!** Premature optimization wastes time. Profile first, then optimize slow parts.
+</Callout>
+
+**Benefits of profiling:**
+- Find actual bottlenecks
+- Measure optimization impact
+- Avoid wasted effort
+- Understand render behavior
+- Track performance over time
+
+## React DevTools Profiler
+
+The Profiler tab in React DevTools shows component render times and why components rendered.
+
+### Installation
+
+1. **Chrome:** Install "React Developer Tools" extension
+2. **Firefox:** Install "React Developer Tools" add-on
+3. **Edge:** Install from Edge Add-ons store
+
+After installing, you'll see two new tabs in DevTools:
+- ⚛️ **Components** - Inspect component tree
+- ⚛️ **Profiler** - Record and analyze performance
+
+## Using the Profiler
+
+<Steps>
+
+<Step>
+
+### Start Recording
+
+1. Open React DevTools
+2. Click **Profiler** tab
+3. Click **Record** button (●)
+4. Interact with your app
+5. Click **Stop** button (■)
+
+</Step>
+
+<Step>
+
+### View Results
+
+You'll see:
+- **Flamegraph** - Visual render tree
+- **Ranked** - Slowest components first
+- **Component chart** - Individual component over time
+
+</Step>
+
+<Step>
+
+### Interpret Colors
+
+- **Gray** - Did not render (good!)
+- **Green** - Fast render (< 2ms)
+- **Yellow** - Medium render (2-10ms)
+- **Orange** - Slow render (10-50ms)
+- **Red** - Very slow (> 50ms)
+
+</Step>
+
+</Steps>
+
+## Understanding the Flamegraph
+
+```
+App (15ms)
+├─ Header (2ms)          [Green]
+├─ HomePage (12ms)       [Yellow]
+│  ├─ Filters (1ms)      [Green]
+│  └─ ListingList (10ms) [Orange]
+│     └─ ListingCard × 100 (0.1ms each)
+└─ Footer (1ms)          [Green]
+```
+
+**Reading the graph:**
+- **Width** - How long component took
+- **Height** - Component hierarchy
+- **Color** - Performance (green = good, red = bad)
+
+## Practical Example: Profiling HomePage
+
+<Tabs items={['Before Optimization', 'After Optimization', 'Analysis']}>
+
+<Tab value="Before Optimization">
+
+**Profile your current HomePage:**
+
+```jsx
+// No optimizations
+export function HomePage() {
+  const { data: listings } = useFetch('/listings');
+  const [search, setSearch] = useState('');
+  
+  const filtered = listings?.filter(listing =>
+    listing.title.toLowerCase().includes(search.toLowerCase())
+  );
+  
+  return (
+    <>
+      <ListingFilters 
+        search={search}
+        onSearchChange={setSearch}
+      />
+      <ListingList listings={filtered} />
+    </>
+  );
+}
+```
+
+**Profiler shows:**
+- Type "b" → HomePage: 45ms (Orange)
+  - ListingList: 38ms (Orange)
+    - ListingCard × 1000: 0.038ms each (Red aggregate)
+- Type "e" → HomePage: 42ms (Orange)
+  - ListingList: 35ms (Orange)
+- Type "a" → HomePage: 40ms (Orange)
+
+**Problem:** Every keystroke renders all components!
+
+</Tab>
+
+<Tab value="After Optimization">
+
+**With optimizations applied:**
+
+```jsx
+export function HomePage() {
+  const { data: listings } = useFetch('/listings');
+  const [search, setSearch] = useState('');
+  
+  const handleSearchChange = useCallback((value) => {
+    setSearch(value);
+  }, []);
+  
+  const filtered = useMemo(() => {
+    return listings?.filter(listing =>
+      listing.title.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [listings, search]);
+  
+  return (
+    <>
+      <MemoizedFilters 
+        search={search}
+        onSearchChange={handleSearchChange}
+      />
+      <MemoizedList listings={filtered} />
+    </>
+  );
+}
+
+const MemoizedFilters = React.memo(ListingFilters);
+const MemoizedList = React.memo(ListingList);
+```
+
+**Profiler shows:**
+- Type "b" → HomePage: 12ms (Yellow)
+  - ListingFilters: 0ms (Gray - didn't render!)
+  - ListingList: 10ms (Yellow)
+    - ListingCard × 200: 0.05ms each (Green - only new cards)
+- Type "e" → HomePage: 10ms (Yellow)
+- Type "a" → HomePage: 8ms (Green)
+
+**Improvement:** 73% faster! (45ms → 12ms)
+
+</Tab>
+
+<Tab value="Analysis">
+
+**What changed:**
+
+| Component | Before | After | Improvement |
+|-----------|--------|-------|-------------|
+| HomePage | 45ms | 12ms | 73% faster |
+| ListingFilters | 2ms | 0ms (skipped) | 100% faster |
+| ListingList | 38ms | 10ms | 74% faster |
+| ListingCard (each) | Always renders | Only new ones | 80% fewer |
+
+**Why:**
+1. **useMemo** - Prevents filter recalculation
+2. **useCallback** - Keeps onChange reference stable
+3. **React.memo** - Skips Filters re-render
+4. **React.memo** - Only renders new cards in List
+
+</Tab>
+
+</Tabs>
+
+## Identifying Problems
+
+### Unnecessary Re-renders
+
+**Symptom:** Component renders but looks identical
+
+```jsx
+// Profile shows HomePage renders 5 times per second
+function HomePage() {
+  const [time, setTime] = useState(Date.now());
+  
+  // Problem: Updates every 200ms!
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(Date.now());
+    }, 200);
+    return () => clearInterval(interval);
+  }, []);
+  
+  return (
+    <>
+      <ExpensiveComponent />  {/* Renders 5x/sec unnecessarily! */}
+    </>
+  );
+}
+```
+
+**Solution:** Memoize child or move state down
+
+### Slow Renders
+
+**Symptom:** Component takes > 16ms (causes frame drops)
+
+```jsx
+// Profile shows Component takes 50ms
+function SlowComponent({ data }) {
+  // Problem: Sorting large array every render
+  const sorted = data.sort((a, b) => a.value - b.value);
+  
+  return <List items={sorted} />;
+}
+```
+
+**Solution:** Use useMemo
+
+```jsx
+const sorted = useMemo(() => {
+  return [...data].sort((a, b) => a.value - b.value);
+}, [data]);
+```
+
+### Cascading Renders
+
+**Symptom:** Changing one thing causes many components to render
+
+```jsx
+// Profile shows entire tree renders
+function App() {
+  const [theme, setTheme] = useState('light');
+  
+  // Problem: theme object recreated every render
+  const themeConfig = {
+    colors: theme === 'light' ? lightColors : darkColors,
+    mode: theme
+  };
+  
+  return (
+    <ThemeContext.Provider value={themeConfig}>
+      {/* All consumers re-render! */}
+      <HomePage />
+    </ThemeContext.Provider>
+  );
+}
+```
+
+**Solution:** Memoize context value
+
+```jsx
+const themeConfig = useMemo(() => ({
+  colors: theme === 'light' ? lightColors : darkColors,
+  mode: theme
+}), [theme]);
+```
+
+## Profiler Settings
+
+### Highlighted Updates
+
+Enable to see which components update in real-time:
+
+1. Open Components tab
+2. Click ⚙️ settings icon
+3. Check "Highlight updates when components render"
+
+Now when components render, they flash with colored borders!
+
+### Record Why Components Rendered
+
+Shows why each component rendered:
+
+1. In Profiler tab
+2. Check "Record why each component rendered while profiling"
+3. Click on component in flamegraph
+4. See "Why did this render?" section
+
+**Reasons shown:**
+- Props changed (which props)
+- State changed (which state)
+- Parent rendered
+- Context changed
+- Hooks changed
+
+## Best Practices
+
+<Accordions>
+
+<Accordion title="1. Profile in Production Mode">
+
+```bash
+# Development mode has extra checks (slower)
+npm run dev
+
+# Production mode is faster (profile this!)
+npm run build
+npm run start
+```
+
+Development is 2-3x slower than production!
+
+</Accordion>
+
+<Accordion title="2. Test Real User Scenarios">
+
+Profile actual user workflows:
+- Typing in search boxes
+- Scrolling through lists
+- Clicking between pages
+- Submitting forms
+- Loading data
+
+Don't just click randomly!
+
+</Accordion>
+
+<Accordion title="3. Focus on Slow Parts">
+
+Optimize components that are:
+- **Red/orange** in profiler
+- **Render frequently** (high in ranked view)
+- **User-facing** (affect interactivity)
+
+Don't optimize green components!
+
+</Accordion>
+
+<Accordion title="4. Measure Before and After">
+
+```jsx
+// Before optimization
+console.time('Filter');
+const filtered = items.filter(...);
+console.timeEnd('Filter');
+// Filter: 25ms
+
+// Add useMemo
+const filtered = useMemo(() => {
+  console.time('Filter');
+  const result = items.filter(...);
+  console.timeEnd('Filter');
+  return result;
+}, [items, search]);
+// Filter: 25ms (first render)
+// (no output on subsequent renders - cached!)
+```
+
+</Accordion>
+
+</Accordions>
+
+## Performance Targets
+
+**Target render times:**
+- **16ms** - Maintain 60 FPS
+- **< 5ms** - Great performance
+- **< 10ms** - Good performance
+- **< 20ms** - Acceptable
+- **> 50ms** - Needs optimization
+
+**User perception:**
+- **< 100ms** - Feels instant
+- **100-300ms** - Slight delay
+- **300-1000ms** - Noticeable
+- **> 1000ms** - Too slow
+
+## Common Patterns
+
+<Tabs items={['Lists', 'Forms', 'Data Fetching']}>
+
+<Tab value="Lists">
+
+```jsx
+// Profile shows list rendering is slow
+
+// ❌ Before: 100ms for 1000 items
+function List({ items }) {
+  return items.map(item => (
+    <Card key={item.id} item={item} />
+  ));
+}
+
+// ✅ After: 20ms for 1000 items
+const Card = React.memo(({ item }) => {
+  return <div>{item.name}</div>;
+});
+
+function List({ items }) {
+  return items.map(item => (
+    <Card key={item.id} item={item} />
+  ));
+}
+```
+
+**80% improvement** by memoizing list items!
+
+</Tab>
+
+<Tab value="Forms">
+
+```jsx
+// Profile shows form re-renders entire page
+
+// ❌ Before: Typing causes HomePage to render
+function HomePage() {
+  const [formData, setFormData] = useState({});
+  
+  return (
+    <>
+      <Form data={formData} onChange={setFormData} />
+      <ExpensiveComponent />  {/* Renders on every keystroke! */}
+    </>
+  );
+}
+
+// ✅ After: Move form state down
+function HomePage() {
+  return (
+    <>
+      <FormContainer />  {/* State is local */}
+      <ExpensiveComponent />  {/* Doesn't re-render! */}
+    </>
+  );
+}
+
+function FormContainer() {
+  const [formData, setFormData] = useState({});
+  return <Form data={formData} onChange={setFormData} />;
+}
+```
+
+</Tab>
+
+<Tab value="Data Fetching">
+
+```jsx
+// Profile shows component re-fetches on every render
+
+// ❌ Before: Infinite fetch loop
+function Component() {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    fetch('/api/data').then(r => r.json()).then(setData);
+  }, [setData]);  // setData changes every render!
+  
+  return <div>{data}</div>;
+}
+
+// ✅ After: Empty dependency array
+function Component() {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    fetch('/api/data').then(r => r.json()).then(setData);
+  }, []);  // Only fetch once
+  
+  return <div>{data}</div>;
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+In **Lesson 9**, we'll **add caching** to our `useFetch` hook to prevent duplicate API requests and improve performance even more! 🚀
+
+## Summary
+
+- ✅ Use React DevTools Profiler to measure performance
+- ✅ Interpret flamegraphs (colors = speed)
+- ✅ Identify unnecessary re-renders
+- ✅ Focus on slow, frequent renders
+- ✅ Measure before and after optimizations
+- ✅ Target < 16ms for 60 FPS
+- ✅ Profile production builds
+
+**Key concept:** Measure first, optimize second. The profiler shows you where to focus your efforts!
