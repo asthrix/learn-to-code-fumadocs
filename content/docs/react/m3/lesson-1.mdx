@@ -1,0 +1,690 @@
+---
+title: "L1: Introduction to useEffect"
+description: "Learn how to handle side effects in React components using the useEffect hook"
+---
+
+
+# Lesson 1: Introduction to useEffect
+
+## What You'll Learn
+
+In this lesson, you'll discover how React handles **side effects** - operations that reach outside your component to interact with the browser, APIs, or external systems. You'll learn:
+
+- What side effects are and why they matter
+- How to use the `useEffect` hook
+- Understanding the dependency array
+- Common patterns and best practices
+- When to use useEffect vs when not to
+
+## Understanding Side Effects
+
+### What is a Side Effect?
+
+In React, a **side effect** is any operation that affects something outside the scope of the current component being rendered. Think of it as reaching beyond your component's borders.
+
+**Examples of side effects:**
+
+- 🌐 Fetching data from an API
+- 📝 Updating the document title
+- ⏰ Setting up timers or intervals
+- 🔔 Subscribing to external data sources
+- 💾 Reading/writing to localStorage
+- 📊 Logging analytics events
+- 🎨 Manually manipulating the DOM
+
+> **Key Concept:** Side effects happen *outside* the normal React render flow. They're operations that can't be done during rendering.
+
+### Why Do We Need useEffect?
+
+React components should be **pure functions** during rendering - they take props and state, and return JSX. But real applications need to do more:
+
+```jsx title="❌ Problem: Side effects during render"
+function Component() {
+  // This runs during EVERY render!
+  document.title = "My App"; // Side effect!
+  fetch("/api/data"); // Side effect!
+  
+  return <div>Component</div>;
+}
+```
+
+This causes problems:
+
+- 🔄 Side effects run on every render (too often!)
+- 🐛 No way to clean up (memory leaks)
+- ⚡ Can't control when they run
+- 🔁 Can cause infinite loops
+
+**useEffect solves this:**
+
+```jsx title="✅ Solution: useEffect controls when side effects run"
+// [!code word:useEffect]
+import { useEffect } from 'react';
+
+function Component() {
+  useEffect(() => {
+    document.title = "My App";
+  }, []); // Runs only once!
+  
+  return <div>Component</div>;
+}
+```
+
+## The useEffect Hook
+
+### Basic Syntax
+
+```jsx title="useEffect Basic Pattern"
+// [!code word:useEffect]
+import { useEffect } from 'react';
+
+function Component() {
+  useEffect(() => {
+    // Your side effect code here
+    console.log('Effect ran!');
+  }, [dependencies]);
+  
+  return <div>Component</div>;
+}
+```
+
+**The three parts:**
+
+1. **Effect function** - The code you want to run
+2. **Dependencies array** - Controls when the effect runs
+3. **Cleanup function** (optional) - Runs before the effect re-runs or component unmounts
+
+### When Does useEffect Run?
+
+The timing depends on the dependency array:
+
+<Tabs items={['Empty Array', 'With Dependencies', 'No Array']}>
+  <Tab value="Empty Array">
+    ```jsx title="Runs Once After Mount"
+    // [!code word:useEffect]
+    useEffect(() => {
+      console.log('Component mounted!');
+    }, []); // Empty array = run once
+    ```
+
+    **When:** Once, after the first render
+
+    **Use case:** Initial data fetching, subscriptions, one-time setup
+  </Tab>
+
+  <Tab value="With Dependencies">
+    ```jsx title="Runs When Dependencies Change"
+    // [!code word:useEffect]
+    useEffect(() => {
+      console.log(`Count changed to ${count}`);
+    }, [count]); // Runs when count changes
+    ```
+
+    **When:** After first render, and whenever dependencies change
+
+    **Use case:** Syncing with external systems, responding to state changes
+  </Tab>
+
+  <Tab value="No Array">
+    ```jsx title="Runs After Every Render"
+    // [!code word:useEffect]
+    useEffect(() => {
+      console.log('Component rendered!');
+    }); // No array = run every render
+    ```
+
+    **When:** After every render (usually not what you want!)
+
+    **Use case:** Rare - usually indicates a code smell
+  </Tab>
+</Tabs>
+
+> **Important:** useEffect runs *after* the component renders and the browser paints the screen. This prevents blocking the UI.
+
+## Common Patterns
+
+### Pattern 1: Document Title
+
+Update the browser tab title based on component state:
+
+```jsx title="src/pages/HomePage.jsx"
+// [!code word:useEffect]
+import { useState, useEffect } from 'react';
+
+function HomePage() {
+  const [listings, setListings] = useState([]);
+
+  useEffect(() => {
+    document.title = `StaySense - ${listings.length} listings`;
+  }, [listings]); // Updates when listings change
+
+  return (
+    <div>
+      <h1>Available Listings: {listings.length}</h1>
+      {/* ... */}
+    </div>
+  );
+}
+```
+
+**Why it works:**
+
+- Effect runs when `listings` changes
+- Document title stays in sync with state
+- Clean and declarative
+
+### Pattern 2: Console Logging (Debugging)
+
+Track when your component renders and why:
+
+```jsx title="Debugging Component Lifecycle"
+// [!code word:useEffect]
+import { useEffect } from 'react';
+
+function ListingCard({ listing }) {
+  useEffect(() => {
+    console.log('ListingCard mounted:', listing.id);
+    
+    return () => {
+      console.log('ListingCard unmounting:', listing.id);
+    };
+  }, [listing.id]);
+
+  useEffect(() => {
+    console.log('Listing data changed:', listing);
+  }, [listing]);
+
+  return <div>{listing.title}</div>;
+}
+```
+
+**What happens:**
+
+- First effect logs when component mounts/unmounts
+- Second effect logs when listing data changes
+- Cleanup function runs before unmount
+
+### Pattern 3: Timer/Interval
+
+Set up timers that automatically clean up:
+
+```jsx title="Auto-updating Timestamp"
+// [!code word:useEffect]
+import { useState, useEffect } from 'react';
+
+function Clock() {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(new Date());
+    }, 1000);
+
+    // Cleanup: Clear interval when component unmounts
+    return () => clearInterval(interval);
+  }, []); // Empty array = set up once
+
+  return <div>{time.toLocaleTimeString()}</div>;
+}
+```
+
+**Key points:**
+
+- `setInterval` is a side effect (it runs a background timer)
+- Cleanup function prevents memory leaks
+- Empty dependency array means timer is set up once
+
+### Pattern 4: Event Listeners
+
+Add and remove event listeners properly:
+
+```jsx title="Window Resize Listener"
+// [!code word:useEffect]
+import { useState, useEffect } from 'react';
+
+function ResponsiveComponent() {
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+    };
+
+    // Add listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup: Remove listener
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []); // Set up once
+
+  return <div>Window width: {width}px</div>;
+}
+```
+
+## Rules of useEffect
+
+<Accordions type="single">
+  <Accordion id="rule-1" title="1. Only Call Hooks at the Top Level">
+    Never call useEffect inside loops, conditions, or nested functions:
+
+    ```jsx title="❌ Wrong: Conditional useEffect"
+    function Component({ shouldFetch }) {
+      if (shouldFetch) {
+        useEffect(() => {
+          fetchData();
+        }, []);
+      }
+    }
+    ```
+
+    ```jsx title="✅ Correct: Condition inside useEffect"
+    function Component({ shouldFetch }) {
+      useEffect(() => {
+        if (shouldFetch) {
+          fetchData();
+        }
+      }, [shouldFetch]);
+    }
+    ```
+
+    **Why:** React relies on the order of Hook calls to track state correctly.
+  </Accordion>
+
+  <Accordion id="rule-2" title="2. Only Call Hooks from React Functions">
+    Call useEffect only from:
+
+    - ✅ React function components
+    - ✅ Custom Hooks (functions starting with `use`)
+
+    Don't call from:
+
+    - ❌ Regular JavaScript functions
+    - ❌ Event handlers
+    - ❌ Class components
+
+    ```jsx title="✅ Correct Usage"
+    // In a component
+    function Component() {
+      useEffect(() => {
+        // Effect code
+      }, []);
+    }
+
+    // In a custom hook
+    function useFetchData() {
+      useEffect(() => {
+        // Effect code
+      }, []);
+    }
+    ```
+  </Accordion>
+
+  <Accordion id="rule-3" title="3. Include All Dependencies">
+    If your effect uses a value from props or state, include it in the dependency array:
+
+    ```jsx title="❌ Wrong: Missing dependency"
+    function Component({ userId }) {
+      const [user, setUser] = useState(null);
+
+      useEffect(() => {
+        fetchUser(userId); // Uses userId but not in deps!
+      }, []);
+    }
+    ```
+
+    ```jsx title="✅ Correct: All dependencies included"
+    function Component({ userId }) {
+      const [user, setUser] = useState(null);
+
+      useEffect(() => {
+        fetchUser(userId);
+      }, [userId]); // userId is included
+    }
+    ```
+
+    **Why:** Missing dependencies cause stale closures and bugs.
+
+    **Tip:** Use the ESLint plugin `eslint-plugin-react-hooks` to catch these automatically!
+  </Accordion>
+
+  <Accordion id="rule-4" title="4. Clean Up Side Effects">
+    Always clean up subscriptions, timers, and listeners:
+
+    ```jsx title="✅ Cleanup Pattern"
+    // [!code word:useEffect]
+    useEffect(() => {
+      // Setup
+      const subscription = dataSource.subscribe();
+      const timer = setInterval(doSomething, 1000);
+
+      // Cleanup
+      return () => {
+        subscription.unsubscribe();
+        clearInterval(timer);
+      };
+    }, []);
+    ```
+
+    **Why:** Prevents memory leaks and unexpected behavior.
+  </Accordion>
+</Accordions>
+
+## Comparison: useEffect vs Class Lifecycle
+
+If you're coming from class components, here's how useEffect relates:
+
+<Tabs items={['componentDidMount', 'componentDidUpdate', 'componentWillUnmount', 'All Three']}>
+  <Tab value="componentDidMount">
+    ```jsx title="Class Component"
+    class Component extends React.Component {
+      componentDidMount() {
+        fetchData();
+      }
+    }
+    ```
+
+    ```jsx title="Function Component with useEffect"
+    // [!code word:useEffect]
+    function Component() {
+      useEffect(() => {
+        fetchData();
+      }, []); // Empty array = mount only
+    }
+    ```
+  </Tab>
+
+  <Tab value="componentDidUpdate">
+    ```jsx title="Class Component"
+    class Component extends React.Component {
+      componentDidUpdate(prevProps) {
+        if (prevProps.userId !== this.props.userId) {
+          fetchUser(this.props.userId);
+        }
+      }
+    }
+    ```
+
+    ```jsx title="Function Component with useEffect"
+    // [!code word:useEffect]
+    function Component({ userId }) {
+      useEffect(() => {
+        fetchUser(userId);
+      }, [userId]); // Runs when userId changes
+    }
+    ```
+  </Tab>
+
+  <Tab value="componentWillUnmount">
+    ```jsx title="Class Component"
+    class Component extends React.Component {
+      componentWillUnmount() {
+        subscription.unsubscribe();
+      }
+    }
+    ```
+
+    ```jsx title="Function Component with useEffect"
+    // [!code word:useEffect]
+    function Component() {
+      useEffect(() => {
+        return () => {
+          subscription.unsubscribe();
+        };
+      }, []);
+    }
+    ```
+  </Tab>
+
+  <Tab value="All Three">
+    ```jsx title="Class Component"
+    class Component extends React.Component {
+      componentDidMount() {
+        this.subscribe();
+      }
+
+      componentDidUpdate(prevProps) {
+        if (prevProps.id !== this.props.id) {
+          this.unsubscribe();
+          this.subscribe();
+        }
+      }
+
+      componentWillUnmount() {
+        this.unsubscribe();
+      }
+
+      subscribe() { /* ... */ }
+      unsubscribe() { /* ... */ }
+    }
+    ```
+
+    ```jsx title="Function Component with useEffect"
+    // [!code word:useEffect]
+    function Component({ id }) {
+      useEffect(() => {
+        subscribe(id);
+        
+        return () => unsubscribe(id);
+      }, [id]); // Handles all three lifecycle methods!
+    }
+    ```
+
+    **Much simpler!** One useEffect handles mount, update, and unmount.
+  </Tab>
+</Tabs>
+
+## When NOT to Use useEffect
+
+Some things don't need useEffect:
+
+### ❌ Don't: Calculate Derived State
+
+```jsx title="❌ Wrong: useEffect for derived state"
+function Component({ items }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    setCount(items.length); // Unnecessary effect!
+  }, [items]);
+
+  return <div>{count} items</div>;
+}
+```
+
+```jsx title="✅ Correct: Calculate during render"
+function Component({ items }) {
+  const count = items.length; // Just calculate it!
+
+  return <div>{count} items</div>;
+}
+```
+
+### ❌ Don't: Handle User Events
+
+```jsx title="❌ Wrong: useEffect for event handling"
+function Component() {
+  const [clicked, setClicked] = useState(false);
+
+  useEffect(() => {
+    if (clicked) {
+      alert('Clicked!');
+      setClicked(false);
+    }
+  }, [clicked]);
+
+  return <button onClick={() => setClicked(true)}>Click</button>;
+}
+```
+
+```jsx title="✅ Correct: Direct event handler"
+function Component() {
+  const handleClick = () => {
+    alert('Clicked!');
+  };
+
+  return <button onClick={handleClick}>Click</button>;
+}
+```
+
+**Use event handlers for user interactions, not useEffect!**
+
+### ❌ Don't: Initialize State
+
+```jsx title="❌ Wrong: useEffect for initial state"
+function Component({ userId }) {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    setUser({ id: userId, name: 'Unknown' });
+  }, []);
+
+  return <div>{user?.name}</div>;
+}
+```
+
+```jsx title="✅ Correct: Initialize in useState"
+function Component({ userId }) {
+  const [user, setUser] = useState({ 
+    id: userId, 
+    name: 'Unknown' 
+  });
+
+  return <div>{user.name}</div>;
+}
+```
+
+## Practice Exercise
+
+Let's practice what you've learned! Try to predict what happens:
+
+<Steps>
+  <Step>
+    ### Exercise 1: Predict the Output
+
+    ```jsx title="Exercise"
+    // [!code word:useEffect]
+    function Counter() {
+      const [count, setCount] = useState(0);
+
+      useEffect(() => {
+        console.log('Effect ran, count:', count);
+      }, [count]);
+
+      return (
+        <button onClick={() => setCount(count + 1)}>
+          Count: {count}
+        </button>
+      );
+    }
+    ```
+
+    **Questions:**
+
+    1. When does the console.log run?
+    2. How many times if you click the button 3 times?
+    3. What if the dependency array was `[]`?
+
+    <Accordions type="single">
+      <Accordion id="answer-1" title="Show Answer">
+        **Answers:**
+
+        1. After the first render, and after every button click
+        2. 4 times (once on mount + 3 clicks)
+        3. With `[]`, it would only log once on mount (count would always be 0)
+
+        **Why:** The effect depends on `count`, so it re-runs whenever `count` changes.
+      </Accordion>
+    </Accordions>
+  </Step>
+
+  <Step>
+    ### Exercise 2: Fix the Bug
+
+    ```jsx title="Buggy Code"
+    // [!code word:useEffect]
+    function Timer() {
+      const [seconds, setSeconds] = useState(0);
+
+      useEffect(() => {
+        setInterval(() => {
+          setSeconds(seconds + 1);
+        }, 1000);
+      }, []);
+
+      return <div>{seconds} seconds</div>;
+    }
+    ```
+
+    **Problems:**
+
+    1. Missing cleanup - interval never stops
+    2. Stale closure - `seconds` is always 0
+    3. New interval created on every render
+
+    <Accordions type="single">
+      <Accordion id="answer-2" title="Show Fixed Code">
+        ```jsx title="Fixed Code"
+        // [!code word:useEffect]
+        function Timer() {
+          const [seconds, setSeconds] = useState(0);
+
+          useEffect(() => {
+            const interval = setInterval(() => {
+              setSeconds(prev => prev + 1); // Use updater function
+            }, 1000);
+
+            return () => clearInterval(interval); // Cleanup
+          }, []); // Empty deps is correct here
+
+          return <div>{seconds} seconds</div>;
+        }
+        ```
+
+        **Fixes:**
+
+        1. ✅ Store interval ID and clear it in cleanup
+        2. ✅ Use updater function `prev => prev + 1` to avoid stale closure
+        3. ✅ Empty dependency array ensures single interval
+      </Accordion>
+    </Accordions>
+  </Step>
+</Steps>
+
+## Key Takeaways
+
+<Callout type="success" title="You've learned the fundamentals!">
+  **Understanding Side Effects:**
+
+  - Side effects reach outside your component
+  - Common examples: API calls, timers, subscriptions
+  - useEffect lets you control when side effects run
+
+  **useEffect Syntax:**
+
+  - Effect function contains your side effect code
+  - Dependency array controls when it runs
+  - Cleanup function runs before re-running or unmounting
+
+  **Best Practices:**
+
+  - Always include dependencies
+  - Clean up side effects (timers, listeners, subscriptions)
+  - Don't use useEffect for derived state or event handlers
+  - Use ESLint plugin to catch mistakes
+
+  **Next Up:** In the next lesson, we'll set up a mock API and use useEffect to fetch real data for our StaySense listings!
+</Callout>
+
+## What's Next?
+
+Now that you understand the basics of useEffect, you're ready to use it for real-world scenarios. In the next lesson, you'll:
+
+- 🛠️ Create a mock API for listing data
+- 📡 Use useEffect to fetch data on component mount
+- ⚡ Learn async/await patterns with useEffect
+- 🔄 Update your HomePage to load data dynamically
+
+Ready to fetch some data? Let's go! 🚀
+

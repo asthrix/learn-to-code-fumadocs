@@ -1,0 +1,682 @@
+---
+title: "L4: Loading States"
+description: "Add loading indicators to provide feedback during data fetching"
+---
+
+
+# Lesson 4: Loading States
+
+## What You'll Learn
+
+Right now, when your app loads, there's a brief flash of "no listings" before data appears. This is confusing! In this lesson, you'll:
+
+- Add `isLoading` state to track fetch status
+- Create a reusable `Spinner` component
+- Show loading UI while data fetches
+- Provide better user experience
+- Learn conditional rendering patterns
+
+## The Problem
+
+Currently, users see this sequence:
+
+1. **0ms:** Empty list (no listings)
+2. **1500ms:** Data suddenly appears
+
+**User experience issues:**
+
+- 😕 Is the app broken or loading?
+- ❓ Should I wait or refresh?
+- 👎 No feedback during wait time
+- 🐛 Looks like a bug
+
+**Solution:** Show a loading indicator!
+
+## The Loading Pattern
+
+The standard pattern for loading states:
+
+```jsx title="Loading State Pattern"
+// [!code word:useEffect]
+const [data, setData] = useState([]);
+const [isLoading, setIsLoading] = useState(true); // Start as loading
+
+useEffect(() => {
+  const fetchData = async () => {
+    setIsLoading(true); // Set loading before fetch
+    const result = await apiCall();
+    setData(result);
+    setIsLoading(false); // Clear loading after fetch
+  };
+  
+  fetchData();
+}, []);
+
+// Conditional rendering
+if (isLoading) {
+  return <Spinner />;
+}
+
+return <DataDisplay data={data} />;
+```
+
+## Step 1: Create the Spinner Component
+
+Let's build a reusable loading spinner:
+
+<Steps>
+  <Step>
+    ### Create Spinner File
+
+    ```jsx title="src/components/Spinner.jsx"
+    export function Spinner({ size = 'medium', message = 'Loading...' }) {
+      const sizeClasses = {
+        small: 'w-6 h-6',
+        medium: 'w-12 h-12',
+        large: 'w-16 h-16'
+      };
+
+      return (
+        <div className="flex flex-col items-center justify-center p-8">
+          <div
+            className={`
+              ${sizeClasses[size]}
+              border-4 
+              border-gray-200 
+              border-t-blue-600 
+              rounded-full 
+              animate-spin
+            `}
+          />
+          {message && (
+            <p className="mt-4 text-gray-600 font-medium">
+              {message}
+            </p>
+          )}
+        </div>
+      );
+    }
+    ```
+
+    **Component features:**
+
+    - **`size` prop** - Small, medium, or large spinner
+    - **`message` prop** - Optional loading message
+    - **`animate-spin`** - Tailwind CSS rotation animation
+    - **Reusable** - Can be used anywhere in your app
+
+  </Step>
+
+  <Step>
+    ### Understanding the Spinner
+
+    **CSS Animation:**
+
+    ```css title="What animate-spin does"
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+    ```
+
+    **Border Trick:**
+
+    - All borders are gray: `border-gray-200`
+    - Top border is blue: `border-t-blue-600`
+    - When spinning, creates a "loading circle" effect
+
+  </Step>
+</Steps>
+
+## Step 2: Add Loading State to HomePage
+
+Now let's use the spinner in our data fetching:
+
+<Steps>
+  <Step>
+    ### Add isLoading State
+
+    ```jsx title="src/pages/HomePage.jsx"
+    // [!code word:useEffect]
+    import { useState, useEffect } from 'react';
+    import { ListingList } from '@/components/ListingList';
+    import { ListingFilters } from '@/components/ListingFilters';
+    import { Spinner } from '@/components/Spinner'; // [!code ++]
+    import { getAllListings } from '@/api';
+
+    export function HomePage() {
+      const [listings, setListings] = useState([]);
+      const [isLoading, setIsLoading] = useState(true); // [!code ++]
+      const [search, setSearch] = useState('');
+      const [dates, setDates] = useState({ checkIn: null, checkOut: null });
+      const [guests, setGuests] = useState(1);
+
+      useEffect(() => {
+        const fetchListings = async () => {
+          setIsLoading(true); // [!code ++]
+          
+          try {
+            const data = await getAllListings();
+            setListings(data);
+          } catch (error) {
+            console.error('Failed to fetch listings:', error);
+          } finally {
+            setIsLoading(false); // [!code ++]
+          }
+        };
+
+        fetchListings();
+      }, []);
+
+      // ... rest of component
+    }
+    ```
+
+    **Changes:**
+
+    1. Import `Spinner` component
+    2. Add `isLoading` state (starts as `true`)
+    3. Set `isLoading = true` before fetch
+    4. Set `isLoading = false` in `finally` block
+
+    > **Why `finally`?** It runs whether the fetch succeeds or fails, ensuring loading state always clears.
+
+  </Step>
+
+  <Step>
+    ### Add Conditional Rendering
+
+    ```jsx title="src/pages/HomePage.jsx (return statement)"
+    export function HomePage() {
+      // ... state and useEffect
+
+      // Filter listings
+      const filteredListings = listings.filter(listing => {
+        // ... filter logic
+      });
+
+      // Show loading spinner
+      if (isLoading) { // [!code ++]
+        return ( // [!code ++]
+          <div className="min-h-screen bg-gray-50"> // [!code ++]
+            <div className="container mx-auto px-4 py-8"> // [!code ++]
+              <h1 className="text-3xl font-bold mb-8"> // [!code ++]
+                Find Your Perfect Stay // [!code ++]
+              </h1> // [!code ++]
+              <Spinner // [!code ++]
+                size="large" // [!code ++]
+                message="Loading amazing stays..." // [!code ++]
+              /> // [!code ++]
+            </div> // [!code ++]
+          </div> // [!code ++]
+        ); // [!code ++]
+      } // [!code ++]
+
+      // Show content when loaded
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-8">
+              Find Your Perfect Stay
+            </h1>
+            
+            <ListingFilters 
+              search={search}
+              onSearchChange={setSearch}
+              dates={dates}
+              onDatesChange={setDates}
+              guests={guests}
+              onGuestsChange={setGuests}
+            />
+
+            <div className="mt-8">
+              <p className="text-gray-600 mb-4">
+                Showing {filteredListings.length} of {listings.length} listings
+              </p>
+              
+              <ListingList listings={filteredListings} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ```
+
+    **Early return pattern:**
+
+    - If `isLoading` is true, return spinner immediately
+    - Component stops rendering here
+    - When loading finishes, component re-renders with data
+
+  </Step>
+</Steps>
+
+## Complete Updated Component
+
+```jsx title="src/pages/HomePage.jsx (Complete with Loading)"
+// [!code word:useEffect]
+import { useState, useEffect } from 'react';
+import { ListingList } from '@/components/ListingList';
+import { ListingFilters } from '@/components/ListingFilters';
+import { Spinner } from '@/components/Spinner';
+import { getAllListings } from '@/api';
+
+export function HomePage() {
+  // State
+  const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ checkIn: null, checkOut: null });
+  const [guests, setGuests] = useState(1);
+
+  // Fetch listings on mount
+  useEffect(() => {
+    const fetchListings = async () => {
+      setIsLoading(true);
+      
+      try {
+        const data = await getAllListings();
+        setListings(data);
+        console.log('Fetched listings:', data);
+      } catch (error) {
+        console.error('Failed to fetch listings:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchListings();
+  }, []);
+
+  // Filter listings
+  const filteredListings = listings.filter(listing => {
+    const matchesSearch = 
+      search === '' ||
+      listing.title.toLowerCase().includes(search.toLowerCase()) ||
+      listing.location.toLowerCase().includes(search.toLowerCase());
+
+    const matchesGuests = listing.maxGuests >= guests;
+    const matchesDates = true;
+
+    return matchesSearch && matchesGuests && matchesDates;
+  });
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8">
+            Find Your Perfect Stay
+          </h1>
+          <Spinner 
+            size="large"
+            message="Loading amazing stays..."
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Main content
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Find Your Perfect Stay</h1>
+        
+        <ListingFilters 
+          search={search}
+          onSearchChange={setSearch}
+          dates={dates}
+          onDatesChange={setDates}
+          guests={guests}
+          onGuestsChange={setGuests}
+        />
+
+        <div className="mt-8">
+          <p className="text-gray-600 mb-4">
+            Showing {filteredListings.length} of {listings.length} listings
+          </p>
+          
+          <ListingList listings={filteredListings} />
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## Loading State Patterns
+
+<Tabs items={['Inline Loading', 'Partial Loading', 'Skeleton Screens', 'Progress Bars']}>
+  <Tab value="Inline Loading">
+    ### Inline Loading (Alternative to Full Screen)
+
+    Instead of replacing the entire UI, show a spinner inline:
+
+    ```jsx title="Inline Spinner Pattern"
+    return (
+      <div>
+        <h1>Listings</h1>
+        <Filters {...filterProps} />
+        
+        {isLoading ? (
+          <Spinner message="Loading listings..." />
+        ) : (
+          <ListingList listings={listings} />
+        )}
+      </div>
+    );
+    ```
+
+    **Use when:** You want to keep the UI structure visible during loading.
+
+  </Tab>
+
+  <Tab value="Partial Loading">
+    ### Partial Loading (Multiple States)
+
+    Track loading for different parts of the page:
+
+    ```jsx title="Multiple Loading States"
+    const [listings, setListings] = useState([]);
+    const [featured, setFeatured] = useState([]);
+    const [isListingsLoading, setIsListingsLoading] = useState(true);
+    const [isFeaturedLoading, setIsFeaturedLoading] = useState(true);
+
+    useEffect(() => {
+      const fetchListings = async () => {
+        const data = await getAllListings();
+        setListings(data);
+        setIsListingsLoading(false);
+      };
+
+      const fetchFeatured = async () => {
+        const data = await getFeaturedListings();
+        setFeatured(data);
+        setIsFeaturedLoading(false);
+      };
+
+      fetchListings();
+      fetchFeatured();
+    }, []);
+
+    return (
+      <div>
+        {isFeaturedLoading ? <Spinner /> : <FeaturedSection data={featured} />}
+        {isListingsLoading ? <Spinner /> : <ListingList data={listings} />}
+      </div>
+    );
+    ```
+
+  </Tab>
+
+  <Tab value="Skeleton Screens">
+    ### Skeleton Screens (Better UX)
+
+    Show placeholder shapes instead of a spinner:
+
+    ```jsx title="Skeleton Component"
+    function ListingCardSkeleton() {
+      return (
+        <div className="animate-pulse">
+          <div className="h-48 bg-gray-200 rounded-lg" />
+          <div className="h-4 bg-gray-200 rounded mt-2 w-3/4" />
+          <div className="h-4 bg-gray-200 rounded mt-2 w-1/2" />
+        </div>
+      );
+    }
+
+    function HomePage() {
+      // ... state
+
+      return (
+        <div>
+          <Filters {...props} />
+          {isLoading ? (
+            <div className="grid grid-cols-3 gap-4">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <ListingCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <ListingList listings={listings} />
+          )}
+        </div>
+      );
+    }
+    ```
+
+    **Benefits:** Users see the layout structure, feels faster!
+
+  </Tab>
+
+  <Tab value="Progress Bars">
+    ### Progress Bars (For Multi-Step)
+
+    Show progress for multi-step loading:
+
+    ```jsx title="Progress Bar"
+    function ProgressBar({ value, max = 100 }) {
+      const percentage = (value / max) * 100;
+
+      return (
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-blue-600 h-2 rounded-full transition-all"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      );
+    }
+
+    function HomePage() {
+      const [progress, setProgress] = useState(0);
+
+      useEffect(() => {
+        const fetchData = async () => {
+          setProgress(33);
+          const listings = await getAllListings();
+          
+          setProgress(66);
+          const featured = await getFeaturedListings();
+          
+          setProgress(100);
+          // Done!
+        };
+
+        fetchData();
+      }, []);
+
+      return (
+        <div>
+          {progress < 100 && (
+            <ProgressBar value={progress} />
+          )}
+          {/* content */}
+        </div>
+      );
+    }
+    ```
+
+  </Tab>
+</Tabs>
+
+## Loading State Best Practices
+
+<Accordions type="single">
+  <Accordion id="practice-1" title="1. Start Loading State as True">
+    ```jsx title="Initial Loading State"
+    // ✅ Good: Start as loading
+    const [isLoading, setIsLoading] = useState(true);
+
+    // ❌ Bad: Start as not loading
+    const [isLoading, setIsLoading] = useState(false);
+    ```
+
+    **Why:** Data fetch happens immediately on mount, so you're already in a loading state!
+
+  </Accordion>
+
+  <Accordion id="practice-2" title="2. Use Finally Block">
+    ```jsx title="Always Clear Loading"
+    try {
+      const data = await fetchData();
+      setData(data);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setIsLoading(false); // Always runs!
+    }
+    ```
+
+    **Why:** Loading must clear whether fetch succeeds or fails.
+
+  </Accordion>
+
+  <Accordion id="practice-3" title="3. Provide Meaningful Messages">
+    ```jsx title="Good Loading Messages"
+    // ✅ Good: Specific and friendly
+    <Spinner message="Finding the perfect stays for you..." />
+    <Spinner message="Loading your saved listings..." />
+    <Spinner message="Checking availability..." />
+
+    // ❌ Bad: Generic or missing
+    <Spinner message="Loading..." />
+    <Spinner />
+    ```
+
+  </Accordion>
+
+  <Accordion id="practice-4" title="4. Match Loading UI to Content">
+    ```jsx title="Contextual Loading"
+    // For full page
+    return <Spinner size="large" />;
+
+    // For inline content
+    return <Spinner size="small" />;
+
+    // For specific sections
+    return (
+      <div>
+        <Header />
+        {isLoading ? <Spinner size="medium" /> : <Content />}
+        <Footer />
+      </div>
+    );
+    ```
+
+  </Accordion>
+
+  <Accordion id="practice-5" title="5. Consider Minimum Loading Time">
+    ```jsx title="Prevent Flash of Loading State"
+    useEffect(() => {
+      const fetchData = async () => {
+        setIsLoading(true);
+        
+        const [data] = await Promise.all([
+          getAllListings(),
+          new Promise(resolve => setTimeout(resolve, 500)) // Minimum 500ms
+        ]);
+
+        setData(data);
+        setIsLoading(false);
+      };
+
+      fetchData();
+    }, []);
+    ```
+
+    **Why:** If data loads very fast (< 300ms), spinner flashes briefly which feels janky.
+
+  </Accordion>
+</Accordions>
+
+## Testing Your Loading State
+
+<Steps>
+  <Step>
+    ### Test Normal Loading
+
+    1. Refresh the page
+    2. You should see spinner for ~1.5 seconds
+    3. Then listings appear
+
+  </Step>
+
+  <Step>
+    ### Test Slow Network
+
+    In your browser DevTools:
+
+    1. Open Network tab
+    2. Change throttling to "Slow 3G"
+    3. Refresh page
+    4. Spinner should show longer
+
+  </Step>
+
+  <Step>
+    ### Test Fast Network
+
+    Update API to use zero delay:
+
+    ```jsx title="src/api/listings.js (Temporary)"
+    export const getAllListings = async (options = {}) => {
+      const response = await mockApiCall(mockListings, {
+        delayMs: 0, // No delay
+        ...options
+      });
+      return response.data;
+    };
+    ```
+
+    - Spinner may flash briefly or not show at all
+    - Consider adding minimum loading time
+
+  </Step>
+</Steps>
+
+## Key Takeaways
+
+<Callout type="success" title="Loading states improve UX!">
+  **Before:**
+
+  - ❌ Empty screen during load
+  - ❌ No feedback for user
+  - ❌ Looks broken
+
+  **After:**
+
+  - ✅ Clear loading indicator
+  - ✅ User knows something is happening
+  - ✅ Professional, polished feel
+
+  **What you learned:**
+
+  - Creating reusable Spinner components
+  - Adding isLoading state
+  - Conditional rendering patterns
+  - try/catch/finally for loading state
+  - UX best practices for loading
+</Callout>
+
+## What's Next?
+
+Loading states handle success, but what about **failures**? In the next lesson, you'll:
+
+- 🚨 Add error handling with try/catch
+- ⚠️ Create error UI components
+- 🔄 Add retry functionality
+- 💬 Show user-friendly error messages
+
+Let's make your app bulletproof! 🛡️
+

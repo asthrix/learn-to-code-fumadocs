@@ -1,0 +1,728 @@
+---
+title: "L2: Setting Up Mock API"
+description: "Create a mock API structure to simulate real backend data fetching"
+---
+
+
+# Lesson 2: Setting Up Mock API
+
+## What You'll Learn
+
+Before we can use `useEffect` to fetch data, we need something to fetch *from*. In this lesson, you'll:
+
+- Create a mock API that simulates a real backend
+- Learn about async/await for handling asynchronous operations
+- Structure API code for maintainability
+- Set up realistic data fetching patterns
+- Understand promises and async JavaScript
+
+## Why a Mock API?
+
+In real applications, your React frontend fetches data from a backend server (Node.js, Python, etc.). But for learning, we can simulate this with a **mock API** - JavaScript functions that:
+
+- Return data after a delay (simulating network latency)
+- Can simulate errors (network failures, 404s, etc.)
+- Don't require a real backend server
+- Use the same patterns as real API calls
+
+> **Real-World Connection:** The patterns you learn here work identically with real APIs. You'll just swap the mock functions for actual `fetch()` or Axios calls.
+
+## Project Structure
+
+Let's create a proper API structure:
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="api" defaultOpen>
+      <File name="index.js" />
+      <File name="listings.js" />
+      <File name="helpers.js" />
+      <Folder name="data">
+        <File name="listings.js" />
+      </Folder>
+    </Folder>
+    <Folder name="pages">
+      <File name="HomePage.jsx" />
+    </Folder>
+    <Folder name="components">
+      <File name="ListingCard.jsx" />
+    </Folder>
+  </Folder>
+</Files>
+
+**File purposes:**
+
+- **`api/data/listings.js`** - Mock database data
+- **`api/helpers.js`** - Utility functions (delay, random errors)
+- **`api/listings.js`** - Listing-specific API endpoints
+- **`api/index.js`** - Main API export (combines all endpoints)
+
+## Step 1: Create Mock Data
+
+Let's start with realistic listing data:
+
+<Steps>
+  <Step>
+    ### Create the Data File
+
+    ```jsx title="src/api/data/listings.js"
+    export const mockListings = [
+      {
+        id: 1,
+        title: "Beachfront Paradise Villa",
+        location: "Malibu, California",
+        pricePerNight: 450,
+        rating: 4.9,
+        totalReviews: 127,
+        imageUrl: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2",
+        images: [
+          "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2",
+          "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+          "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4"
+        ],
+        description: "Stunning oceanfront villa with private beach access",
+        host: "Sarah Chen",
+        maxGuests: 8,
+        bedrooms: 4,
+        bathrooms: 3,
+        amenities: ["WiFi", "Kitchen", "Pool", "Beach Access", "Parking"],
+        availableFrom: "2024-01-01",
+        availableUntil: "2024-12-31"
+      },
+      {
+        id: 2,
+        title: "Cozy Mountain Cabin",
+        location: "Aspen, Colorado",
+        pricePerNight: 280,
+        rating: 4.8,
+        totalReviews: 94,
+        imageUrl: "https://images.unsplash.com/photo-1542718610-a1d656d1884c",
+        images: [
+          "https://images.unsplash.com/photo-1542718610-a1d656d1884c",
+          "https://images.unsplash.com/photo-1518780664697-55e3ad937233",
+          "https://images.unsplash.com/photo-1506905925346-21bda4d32df4"
+        ],
+        description: "Rustic mountain retreat with breathtaking views",
+        host: "Mike Thompson",
+        maxGuests: 6,
+        bedrooms: 3,
+        bathrooms: 2,
+        amenities: ["WiFi", "Fireplace", "Hot Tub", "Mountain View", "Hiking"],
+        availableFrom: "2024-01-01",
+        availableUntil: "2024-12-31"
+      },
+      {
+        id: 3,
+        title: "Downtown Luxury Loft",
+        location: "New York, NY",
+        pricePerNight: 350,
+        rating: 4.7,
+        totalReviews: 203,
+        imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        images: [
+          "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+          "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
+          "https://images.unsplash.com/photo-1484154218962-a197022b5858"
+        ],
+        description: "Modern loft in the heart of Manhattan",
+        host: "Emily Rodriguez",
+        maxGuests: 4,
+        bedrooms: 2,
+        bathrooms: 2,
+        amenities: ["WiFi", "Kitchen", "Gym", "City View", "Doorman"],
+        availableFrom: "2024-01-01",
+        availableUntil: "2024-12-31"
+      },
+      {
+        id: 4,
+        title: "Lakeside Cottage Retreat",
+        location: "Lake Tahoe, Nevada",
+        pricePerNight: 220,
+        rating: 4.9,
+        totalReviews: 156,
+        imageUrl: "https://images.unsplash.com/photo-1499916078039-922301b0eb9b",
+        images: [
+          "https://images.unsplash.com/photo-1499916078039-922301b0eb9b",
+          "https://images.unsplash.com/photo-1506059612708-99d6c258160e",
+          "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5"
+        ],
+        description: "Peaceful lakefront cottage perfect for relaxation",
+        host: "David Park",
+        maxGuests: 5,
+        bedrooms: 2,
+        bathrooms: 1,
+        amenities: ["WiFi", "Kayaks", "Fire Pit", "Lake View", "Fishing"],
+        availableFrom: "2024-01-01",
+        availableUntil: "2024-12-31"
+      },
+      {
+        id: 5,
+        title: "Historic Charleston Home",
+        location: "Charleston, South Carolina",
+        pricePerNight: 195,
+        rating: 4.6,
+        totalReviews: 88,
+        imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750",
+        images: [
+          "https://images.unsplash.com/photo-1512917774080-9991f1c4c750",
+          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
+          "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3"
+        ],
+        description: "Beautiful historic home in downtown Charleston",
+        host: "Jennifer Lee",
+        maxGuests: 6,
+        bedrooms: 3,
+        bathrooms: 2,
+        amenities: ["WiFi", "Kitchen", "Garden", "Historic District", "Parking"],
+        availableFrom: "2024-01-01",
+        availableUntil: "2024-12-31"
+      },
+      {
+        id: 6,
+        title: "Desert Oasis Villa",
+        location: "Scottsdale, Arizona",
+        pricePerNight: 320,
+        rating: 4.8,
+        totalReviews: 112,
+        imageUrl: "https://images.unsplash.com/photo-1600585154526-990dced4db0d",
+        images: [
+          "https://images.unsplash.com/photo-1600585154526-990dced4db0d",
+          "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c",
+          "https://images.unsplash.com/photo-1600607687644-c7171b42498b"
+        ],
+        description: "Luxurious desert villa with pool and spa",
+        host: "Robert Martinez",
+        maxGuests: 7,
+        bedrooms: 4,
+        bathrooms: 3,
+        amenities: ["WiFi", "Pool", "Hot Tub", "Desert View", "BBQ"],
+        availableFrom: "2024-01-01",
+        availableUntil: "2024-12-31"
+      }
+    ];
+    ```
+
+    **Data structure notes:**
+
+    - Each listing has a unique `id` (for routing later)
+    - Multiple images for the carousel we'll build
+    - Realistic amenities and availability dates
+    - Host information for future features
+    - Price and rating data for filters
+
+  </Step>
+</Steps>
+
+## Step 2: Create Helper Functions
+
+Let's add utilities to simulate real network behavior:
+
+<Steps>
+  <Step>
+    ### Create the Helpers File
+
+    ```jsx title="src/api/helpers.js"
+    /**
+     * Simulates network delay
+     * @param {number} ms - Milliseconds to delay
+     * @returns {Promise} - Resolves after delay
+     */
+    export const delay = (ms) => {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    };
+
+    /**
+     * Randomly throws an error to simulate network failures
+     * @param {number} errorRate - Probability of error (0-1)
+     * @throws {Error} - Random network error
+     */
+    export const simulateError = (errorRate = 0.1) => {
+      if (Math.random() < errorRate) {
+        const errors = [
+          'Network request failed',
+          'Server timeout',
+          'Connection lost',
+          'Failed to fetch data'
+        ];
+        const randomError = errors[Math.floor(Math.random() * errors.length)];
+        throw new Error(randomError);
+      }
+    };
+
+    /**
+     * Simulates an API response with realistic behavior
+     * @param {any} data - Data to return
+     * @param {object} options - Configuration options
+     * @returns {Promise} - Resolves with data or rejects with error
+     */
+    export const mockApiCall = async (data, options = {}) => {
+      const {
+        delayMs = 1000,        // Default 1 second delay
+        errorRate = 0,         // Default no errors
+        shouldFail = false     // Force failure
+      } = options;
+
+      // Simulate network delay
+      await delay(delayMs);
+
+      // Simulate random errors
+      if (shouldFail || Math.random() < errorRate) {
+        simulateError(1);
+      }
+
+      // Return successful response
+      return {
+        data,
+        status: 200,
+        statusText: 'OK',
+        timestamp: new Date().toISOString()
+      };
+    };
+    ```
+
+    **What these functions do:**
+
+    - **`delay(ms)`** - Pauses execution to simulate network latency
+    - **`simulateError(rate)`** - Randomly throws errors (10% by default)
+    - **`mockApiCall(data, options)`** - Wraps data in realistic API response format
+
+    > **Real APIs:** When you switch to real APIs, you'll remove these helpers and use `fetch()` or Axios directly. The calling code stays the same!
+
+  </Step>
+</Steps>
+
+## Step 3: Create Listing API Functions
+
+Now let's create the actual API functions we'll call from our components:
+
+<Steps>
+  <Step>
+    ### Create the Listings API
+
+    ```jsx title="src/api/listings.js"
+    import { mockListings } from './data/listings';
+    import { mockApiCall } from './helpers';
+
+    /**
+     * Fetches all listings
+     * @param {object} options - Optional configuration
+     * @returns {Promise<Array>} - Array of listing objects
+     */
+    export const getAllListings = async (options = {}) => {
+      try {
+        const response = await mockApiCall(mockListings, {
+          delayMs: 1500,    // 1.5 second delay
+          errorRate: 0.05,  // 5% chance of error
+          ...options
+        });
+
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+        throw error;
+      }
+    };
+
+    /**
+     * Fetches a single listing by ID
+     * @param {number} id - Listing ID
+     * @param {object} options - Optional configuration
+     * @returns {Promise<object>} - Single listing object
+     */
+    export const getListingById = async (id, options = {}) => {
+      try {
+        const response = await mockApiCall(mockListings, {
+          delayMs: 1000,
+          ...options
+        });
+
+        const listing = response.data.find(l => l.id === parseInt(id));
+
+        if (!listing) {
+          throw new Error(`Listing with ID ${id} not found`);
+        }
+
+        return listing;
+      } catch (error) {
+        console.error(`Error fetching listing ${id}:`, error);
+        throw error;
+      }
+    };
+
+    /**
+     * Searches listings by query string
+     * @param {string} query - Search query
+     * @param {object} options - Optional configuration
+     * @returns {Promise<Array>} - Filtered listings
+     */
+    export const searchListings = async (query, options = {}) => {
+      try {
+        const response = await mockApiCall(mockListings, {
+          delayMs: 800,
+          ...options
+        });
+
+        if (!query) {
+          return response.data;
+        }
+
+        const lowerQuery = query.toLowerCase();
+        const filtered = response.data.filter(listing => {
+          return (
+            listing.title.toLowerCase().includes(lowerQuery) ||
+            listing.location.toLowerCase().includes(lowerQuery) ||
+            listing.description.toLowerCase().includes(lowerQuery)
+          );
+        });
+
+        return filtered;
+      } catch (error) {
+        console.error('Error searching listings:', error);
+        throw error;
+      }
+    };
+
+    /**
+     * Filters listings by criteria
+     * @param {object} filters - Filter criteria
+     * @returns {Promise<Array>} - Filtered listings
+     */
+    export const filterListings = async (filters = {}, options = {}) => {
+      try {
+        const response = await mockApiCall(mockListings, {
+          delayMs: 1000,
+          ...options
+        });
+
+        let filtered = response.data;
+
+        // Filter by max guests
+        if (filters.guests) {
+          filtered = filtered.filter(l => l.maxGuests >= filters.guests);
+        }
+
+        // Filter by price range
+        if (filters.minPrice || filters.maxPrice) {
+          filtered = filtered.filter(l => {
+            const price = l.pricePerNight;
+            const min = filters.minPrice || 0;
+            const max = filters.maxPrice || Infinity;
+            return price >= min && price <= max;
+          });
+        }
+
+        // Filter by minimum rating
+        if (filters.minRating) {
+          filtered = filtered.filter(l => l.rating >= filters.minRating);
+        }
+
+        return filtered;
+      } catch (error) {
+        console.error('Error filtering listings:', error);
+        throw error;
+      }
+    };
+    ```
+
+    **API functions explained:**
+
+    - **`getAllListings()`** - Returns all listings (our main use case)
+    - **`getListingById(id)`** - Returns one listing (for detail pages later)
+    - **`searchListings(query)`** - Filters by search term
+    - **`filterListings(filters)`** - Filters by guests, price, rating
+
+    > **Pattern:** Each function is `async`, uses `try/catch` for errors, and calls `mockApiCall` with the data.
+
+  </Step>
+</Steps>
+
+## Step 4: Create Main API Export
+
+Let's create a central export point for all API functions:
+
+<Steps>
+  <Step>
+    ### Create the API Index
+
+    ```jsx title="src/api/index.js"
+    // Import all API modules
+    import * as listingsApi from './listings';
+
+    // Re-export for convenient importing
+    export const api = {
+      // Listings endpoints
+      getAllListings: listingsApi.getAllListings,
+      getListingById: listingsApi.getListingById,
+      searchListings: listingsApi.searchListings,
+      filterListings: listingsApi.filterListings
+    };
+
+    // Also export individual functions
+    export * from './listings';
+    ```
+
+    **Why this structure?**
+
+    - **Organized:** API functions grouped by feature (listings, users, etc.)
+    - **Flexible:** Can import individual functions or the whole `api` object
+    - **Scalable:** Easy to add more API modules (bookings, reviews, etc.)
+
+    **Usage examples:**
+
+    ```jsx title="Two ways to import"
+    // Option 1: Named imports
+    import { getAllListings } from '@/api';
+
+    // Option 2: API object
+    import { api } from '@/api';
+    await api.getAllListings();
+    ```
+
+  </Step>
+</Steps>
+
+## Understanding Async/Await
+
+Before we use these API functions, let's understand **async/await**:
+
+<Tabs items={['The Problem', 'Promises', 'Async/Await', 'In React']}>
+  <Tab value="The Problem">
+    ### JavaScript is Single-Threaded
+
+    JavaScript can only do one thing at a time. But network requests take time:
+
+    ```jsx title="❌ This won't work"
+    const data = fetchData(); // Takes 2 seconds
+    console.log(data); // Runs immediately - data not ready yet!
+    ```
+
+    **Solution:** Asynchronous operations - start the request and continue later when it's done.
+  </Tab>
+
+  <Tab value="Promises">
+    ### Promises (The Old Way)
+
+    A Promise represents a future value:
+
+    ```jsx title="Promise Syntax"
+    fetchData()
+      .then(data => {
+        console.log(data); // Runs when data arrives
+      })
+      .catch(error => {
+        console.error(error); // Runs if error occurs
+      });
+    ```
+
+    **Problems:**
+
+    - Callback nesting ("callback hell")
+    - Harder to read with multiple steps
+    - Error handling is verbose
+  </Tab>
+
+  <Tab value="Async/Await">
+    ### Async/Await (The Modern Way)
+
+    Syntactic sugar that makes async code look synchronous:
+
+    ```jsx title="Async/Await Syntax"
+    async function loadData() {
+      try {
+        const data = await fetchData(); // Waits for data
+        console.log(data); // Runs after data arrives
+      } catch (error) {
+        console.error(error); // Runs if error occurs
+      }
+    }
+    ```
+
+    **Benefits:**
+
+    - ✅ Reads top-to-bottom like normal code
+    - ✅ Try/catch for error handling
+    - ✅ Easier to debug
+    - ✅ Can use normal control flow (if, loops, etc.)
+
+    **Key points:**
+
+    - `async` function always returns a Promise
+    - `await` pauses execution until Promise resolves
+    - Can only use `await` inside `async` functions
+  </Tab>
+
+  <Tab value="In React">
+    ### Using with useEffect
+
+    ```jsx title="Common Pattern with useEffect"
+    // [!code word:useEffect]
+    import { useEffect, useState } from 'react';
+    import { getAllListings } from '@/api';
+
+    function Component() {
+      const [data, setData] = useState([]);
+
+      useEffect(() => {
+        // Can't make useEffect callback async directly!
+        const fetchData = async () => {
+          const listings = await getAllListings();
+          setData(listings);
+        };
+
+        fetchData(); // Call the async function
+      }, []);
+
+      return <div>{data.length} listings</div>;
+    }
+    ```
+
+    **Why the wrapper function?**
+
+    ```jsx title="❌ This won't work"
+    useEffect(async () => {
+      // Can't make the effect callback async!
+      const data = await getAllListings();
+    }, []);
+    ```
+
+    **Reason:** useEffect expects either nothing returned or a cleanup function. Async functions always return a Promise, which confuses React.
+
+    **✅ Correct pattern:**
+
+    ```jsx title="✅ Wrapper Function Pattern"
+    useEffect(() => {
+      const loadData = async () => {
+        const data = await getAllListings();
+        setData(data);
+      };
+
+      loadData();
+    }, []);
+    ```
+
+  </Tab>
+</Tabs>
+
+## Testing Your Mock API
+
+Let's verify everything works:
+
+<Steps>
+  <Step>
+    ### Test in Browser Console
+
+    Open your browser console and try:
+
+    ```javascript title="Browser Console"
+    // Import the API
+    import { getAllListings } from './src/api/index.js';
+
+    // Fetch listings
+    const listings = await getAllListings();
+    console.log('Listings:', listings);
+    console.log('Count:', listings.length);
+    ```
+
+    **Expected output:**
+
+    - Delay of ~1.5 seconds
+    - Array of 6 listing objects
+    - Each listing has id, title, location, etc.
+
+  </Step>
+
+  <Step>
+    ### Test Individual Functions
+
+    ```javascript title="Test Different Functions"
+    // Get single listing
+    const listing = await getListingById(1);
+    console.log('Single listing:', listing);
+
+    // Search
+    const results = await searchListings('beach');
+    console.log('Beach listings:', results);
+
+    // Filter
+    const filtered = await filterListings({ guests: 6 });
+    console.log('Listings for 6+ guests:', filtered);
+    ```
+
+  </Step>
+
+  <Step>
+    ### Test Error Handling
+
+    ```javascript title="Test Error Scenarios"
+    try {
+      // This should throw 5% of the time
+      const listings = await getAllListings();
+      console.log('Success:', listings);
+    } catch (error) {
+      console.error('Error caught:', error.message);
+    }
+
+    // Force an error
+    try {
+      const listings = await getAllListings({ shouldFail: true });
+    } catch (error) {
+      console.log('Forced error:', error.message);
+    }
+    ```
+
+  </Step>
+</Steps>
+
+## API Configuration Options
+
+All API functions accept optional configuration:
+
+```jsx title="Configuration Examples"
+// Custom delay
+await getAllListings({ delayMs: 500 }); // Faster response
+
+// Higher error rate (for testing error handling)
+await getAllListings({ errorRate: 0.5 }); // 50% failure rate
+
+// Force failure (for testing error UI)
+await getAllListings({ shouldFail: true }); // Always fails
+
+// Instant response (for development)
+await getAllListings({ delayMs: 0 }); // No delay
+```
+
+> **Development Tip:** Use `delayMs: 0` during development to speed up testing, then add realistic delays for production.
+
+## Key Takeaways
+
+<Callout type="success" title="Mock API is ready!">
+  **What you've built:**
+
+  - ✅ Realistic mock data with 6 detailed listings
+  - ✅ Helper functions for delays and errors
+  - ✅ API functions for fetching, searching, filtering
+  - ✅ Organized, scalable API structure
+
+  **What you've learned:**
+
+  - How to structure API code
+  - Async/await syntax and patterns
+  - Promise-based error handling
+  - How to simulate network behavior
+
+  **Next Steps:**
+
+  In the next lesson, you'll use `useEffect` to call `getAllListings()` from your `HomePage` component and replace the static data with dynamically fetched data!
+</Callout>
+
+## What's Next?
+
+Now that you have a working mock API, you're ready to:
+
+- 🔌 Connect your `HomePage` to the API
+- 📡 Use `useEffect` to fetch listings on mount
+- 🔄 Replace static data with dynamic data
+- ⚡ See your app load data asynchronously
+
+Ready to fetch real data? Let's go! 🚀
+

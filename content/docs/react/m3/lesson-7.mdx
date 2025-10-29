@@ -1,0 +1,740 @@
+---
+title: "L7: Refactoring with Custom Hooks"
+description: "Extract reusable logic into custom hooks for cleaner, more maintainable code"
+---
+
+
+# Lesson 7: Refactoring with Custom Hooks
+
+## What You'll Learn
+
+Your HomePage works great, but it's getting crowded with state management, effects, and logic. Time to clean it up! In this lesson, you'll:
+
+- Understand custom hooks and why they matter
+- Extract data fetching logic into `useFetchListings` hook
+- Create reusable hooks for common patterns
+- Separate concerns for better maintainability
+- Follow React best practices for code organization
+
+## The Problem: Component Complexity
+
+Look at your HomePage now:
+
+```jsx title="src/pages/HomePage.jsx (Getting Crowded)"
+export function HomePage() {
+  // State (7 variables!)
+  const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ checkIn: null, checkOut: null });
+  const [guests, setGuests] = useState(1);
+
+  // Data fetching logic (20+ lines)
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchListings = async () => {
+      // ... lots of code ...
+    };
+    fetchListings();
+    return () => controller.abort();
+  }, []);
+
+  // Filtering logic (10+ lines)
+  const filteredListings = listings.filter(listing => {
+    // ... filtering code ...
+  });
+
+  // Conditional rendering (60+ lines)
+  if (error) return <ErrorMessage />;
+  if (isLoading) return <Spinner />;
+  return <div>{/* main UI */}</div>;
+}
+```
+
+**Problems:**
+
+- 😵 Too much code in one component (100+ lines)
+- 🔄 Data fetching logic not reusable
+- 🐛 Hard to test individual pieces
+- 📚 Difficult to understand at a glance
+
+**Solution:** Custom Hooks!
+
+## What Are Custom Hooks?
+
+**Custom hooks** are JavaScript functions that:
+
+- Start with "use" (e.g., `useFetchListings`)
+- Can call other hooks (useState, useEffect, etc.)
+- Return values and/or functions
+- Encapsulate reusable logic
+
+```jsx title="Custom Hook Example"
+// [!code word:useFetchListings]
+function useFetchListings() {
+  const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Fetch logic here
+  }, []);
+
+  return { listings, isLoading, error };
+}
+
+// Use it in component
+function HomePage() {
+  const { listings, isLoading, error } = useFetchListings();
+  // Component is now much simpler!
+}
+```
+
+> **Key Concept:** Custom hooks let you extract component logic into reusable functions. Think of them as "helper functions for React features."
+
+## Step 1: Create useFetchListings Hook
+
+<Steps>
+  <Step>
+    ### Create Hooks Directory
+
+    ```bash title="Terminal"
+    mkdir -p src/hooks
+    ```
+
+    **Project structure:**
+
+    <Files>
+      <Folder name="src" defaultOpen>
+        <Folder name="hooks" defaultOpen>
+          <File name="useFetchListings.js" />
+        </Folder>
+        <Folder name="pages">
+          <File name="HomePage.jsx" />
+        </Folder>
+        <Folder name="api">
+          <File name="index.js" />
+        </Folder>
+      </Folder>
+    </Files>
+
+  </Step>
+
+  <Step>
+    ### Extract Data Fetching Logic
+
+    ```jsx title="src/hooks/useFetchListings.js"
+    // [!code word:useFetchListings]
+    import { useState, useEffect } from 'react';
+    import { getAllListings } from '@/api';
+
+    /**
+     * Custom hook for fetching listings with loading and error states
+     * @returns {Object} - { listings, isLoading, error, refetch }
+     */
+    export function useFetchListings() {
+      const [listings, setListings] = useState([]);
+      const [isLoading, setIsLoading] = useState(true);
+      const [error, setError] = useState(null);
+
+      const fetchListings = async (signal) => {
+        setIsLoading(true);
+        setError(null);
+        
+        try {
+          const data = await getAllListings({ signal });
+          setListings(data);
+          console.log('Fetched listings:', data);
+        } catch (err) {
+          if (err.message !== 'Request cancelled') {
+            console.error('Failed to fetch listings:', err);
+            setError(err.message || 'Failed to load listings');
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        const controller = new AbortController();
+        fetchListings(controller.signal);
+
+        return () => {
+          controller.abort();
+        };
+      }, []);
+
+      // Expose refetch function for manual reload
+      const refetch = () => {
+        const controller = new AbortController();
+        fetchListings(controller.signal);
+      };
+
+      return { 
+        listings, 
+        isLoading, 
+        error,
+        refetch // Bonus: manual refetch capability
+      };
+    }
+    ```
+
+    **What this hook provides:**
+
+    - `listings` - The fetched data
+    - `isLoading` - Loading state boolean
+    - `error` - Error message or null
+    - `refetch` - Function to manually reload data
+
+  </Step>
+
+  <Step>
+    ### Update HomePage to Use Hook
+
+    ```jsx title="src/pages/HomePage.jsx (Much Cleaner!)"
+    // [!code word:useFetchListings]
+    import { useState } from 'react';
+    import { ListingList } from '@/components/ListingList';
+    import { ListingFilters } from '@/components/ListingFilters';
+    import { Spinner } from '@/components/Spinner';
+    import { ErrorMessage } from '@/components/ErrorMessage';
+    import { useFetchListings } from '@/hooks/useFetchListings'; // [!code ++]
+
+    export function HomePage() {
+      // Custom hook replaces all this state and useEffect!
+      const { listings, isLoading, error, refetch } = useFetchListings(); // [!code ++]
+
+      // Filter state
+      const [search, setSearch] = useState('');
+      const [dates, setDates] = useState({ checkIn: null, checkOut: null });
+      const [guests, setGuests] = useState(1);
+
+      // Filter listings
+      const filteredListings = listings.filter(listing => {
+        const matchesSearch = 
+          search === '' ||
+          listing.title.toLowerCase().includes(search.toLowerCase()) ||
+          listing.location.toLowerCase().includes(search.toLowerCase());
+
+        const matchesGuests = listing.maxGuests >= guests;
+        const matchesDates = true;
+
+        return matchesSearch && matchesGuests && matchesDates;
+      });
+
+      // Error state
+      if (error) {
+        return (
+          <div className="min-h-screen bg-gray-50">
+            <div className="container mx-auto px-4 py-8">
+              <h1 className="text-3xl font-bold mb-8">
+                Find Your Perfect Stay
+              </h1>
+              <ErrorMessage 
+                title="Unable to Load Listings"
+                message={error}
+                onRetry={refetch} // [!code highlight]
+              />
+            </div>
+          </div>
+        );
+      }
+
+      // Loading state
+      if (isLoading) {
+        return (
+          <div className="min-h-screen bg-gray-50">
+            <div className="container mx-auto px-4 py-8">
+              <h1 className="text-3xl font-bold mb-8">
+                Find Your Perfect Stay
+              </h1>
+              <Spinner 
+                size="large"
+                message="Loading amazing stays..."
+              />
+            </div>
+          </div>
+        );
+      }
+
+      // Main content
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-8">Find Your Perfect Stay</h1>
+            
+            <ListingFilters 
+              search={search}
+              onSearchChange={setSearch}
+              dates={dates}
+              onDatesChange={setDates}
+              guests={guests}
+              onGuestsChange={setGuests}
+            />
+
+            <div className="mt-8">
+              <p className="text-gray-600 mb-4">
+                Showing {filteredListings.length} of {listings.length} listings
+              </p>
+              
+              <ListingList listings={listings} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ```
+
+    **Benefits:**
+
+    - ✅ HomePage is 30% shorter
+    - ✅ Data fetching logic is reusable
+    - ✅ Easy to test the hook independently
+    - ✅ Clear separation of concerns
+
+  </Step>
+</Steps>
+
+## Step 2: Create useFilteredListings Hook
+
+Let's also extract the filtering logic:
+
+```jsx title="src/hooks/useFilteredListings.js"
+/**
+ * Custom hook for filtering listings
+ * @param {Array} listings - Array of listings to filter
+ * @param {Object} filters - Filter criteria
+ * @returns {Array} - Filtered listings
+ */
+export function useFilteredListings(listings, filters) {
+  const { search, guests, dates } = filters;
+
+  return listings.filter(listing => {
+    // Search filter
+    const matchesSearch = 
+      !search ||
+      listing.title.toLowerCase().includes(search.toLowerCase()) ||
+      listing.location.toLowerCase().includes(search.toLowerCase()) ||
+      listing.description.toLowerCase().includes(search.toLowerCase());
+
+    // Guests filter
+    const matchesGuests = listing.maxGuests >= guests;
+
+    // Date filter (simplified for now)
+    const matchesDates = true; // Would check availability dates
+
+    return matchesSearch && matchesGuests && matchesDates;
+  });
+}
+```
+
+**Use in HomePage:**
+
+```jsx title="src/pages/HomePage.jsx"
+import { useFilteredListings } from '@/hooks/useFilteredListings';
+
+export function HomePage() {
+  const { listings, isLoading, error, refetch } = useFetchListings();
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ checkIn: null, checkOut: null });
+  const [guests, setGuests] = useState(1);
+
+  // One line instead of 15!
+  const filteredListings = useFilteredListings(listings, { // [!code highlight]
+    search, // [!code highlight]
+    guests, // [!code highlight]
+    dates // [!code highlight]
+  }); // [!code highlight]
+
+  // ... rest of component
+}
+```
+
+## Custom Hook Patterns
+
+<Tabs items={['Data Fetching', 'Local Storage', 'Window Size', 'Toggle State']}>
+  <Tab value="Data Fetching">
+    ### Generic Data Fetching Hook
+
+    ```jsx title="src/hooks/useFetch.js"
+    // [!code word:useFetch]
+    import { useState, useEffect } from 'react';
+
+    export function useFetch(fetchFn, dependencies = []) {
+      const [data, setData] = useState(null);
+      const [isLoading, setIsLoading] = useState(true);
+      const [error, setError] = useState(null);
+
+      useEffect(() => {
+        const controller = new AbortController();
+
+        const loadData = async () => {
+          setIsLoading(true);
+          setError(null);
+
+          try {
+            const result = await fetchFn({ signal: controller.signal });
+            setData(result);
+          } catch (err) {
+            if (err.message !== 'Request cancelled') {
+              setError(err.message);
+            }
+          } finally {
+            setIsLoading(false);
+          }
+        };
+
+        loadData();
+
+        return () => controller.abort();
+      }, dependencies);
+
+      return { data, isLoading, error };
+    }
+    ```
+
+    **Usage:**
+
+    ```jsx
+    const { data: listings } = useFetch(getAllListings);
+    const { data: user } = useFetch(() => getUserById(userId), [userId]);
+    ```
+
+  </Tab>
+
+  <Tab value="Local Storage">
+    ### Local Storage Hook
+
+    ```jsx title="src/hooks/useLocalStorage.js"
+    // [!code word:useLocalStorage]
+    import { useState, useEffect } from 'react';
+
+    export function useLocalStorage(key, initialValue) {
+      // Get initial value from localStorage or use default
+      const [value, setValue] = useState(() => {
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : initialValue;
+      });
+
+      // Update localStorage when value changes
+      useEffect(() => {
+        localStorage.setItem(key, JSON.stringify(value));
+      }, [key, value]);
+
+      return [value, setValue];
+    }
+    ```
+
+    **Usage:**
+
+    ```jsx
+    // Persists across page reloads!
+    const [favorites, setFavorites] = useLocalStorage('favorites', []);
+    const [theme, setTheme] = useLocalStorage('theme', 'light');
+    ```
+
+  </Tab>
+
+  <Tab value="Window Size">
+    ### Window Size Hook
+
+    ```jsx title="src/hooks/useWindowSize.js"
+    // [!code word:useWindowSize]
+    import { useState, useEffect } from 'react';
+
+    export function useWindowSize() {
+      const [size, setSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+
+      useEffect(() => {
+        const handleResize = () => {
+          setSize({
+            width: window.innerWidth,
+            height: window.innerHeight
+          });
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+          window.removeEventListener('resize', handleResize);
+        };
+      }, []);
+
+      return size;
+    }
+    ```
+
+    **Usage:**
+
+    ```jsx
+    const { width, height } = useWindowSize();
+    const isMobile = width < 768;
+
+    return (
+      <div>
+        {isMobile ? <MobileNav /> : <DesktopNav />}
+      </div>
+    );
+    ```
+
+  </Tab>
+
+  <Tab value="Toggle State">
+    ### Toggle Hook
+
+    ```jsx title="src/hooks/useToggle.js"
+    // [!code word:useToggle]
+    import { useState } from 'react';
+
+    export function useToggle(initialValue = false) {
+      const [value, setValue] = useState(initialValue);
+
+      const toggle = () => setValue(v => !v);
+      const setTrue = () => setValue(true);
+      const setFalse = () => setValue(false);
+
+      return [value, toggle, setTrue, setFalse];
+    }
+    ```
+
+    **Usage:**
+
+    ```jsx
+    const [isOpen, toggle, open, close] = useToggle(false);
+
+    return (
+      <>
+        <button onClick={toggle}>Toggle Modal</button>
+        <Modal isOpen={isOpen} onClose={close}>
+          Content
+        </Modal>
+      </>
+    );
+    ```
+
+  </Tab>
+</Tabs>
+
+## Custom Hook Best Practices
+
+<Accordions type="single">
+  <Accordion id="practice-1" title="1. Always Start with 'use'">
+    **Why:** React's linter rules depend on this naming convention.
+
+    ```jsx
+    // ✅ Good
+    function useUser() { }
+    function useFetchData() { }
+    function useWindowSize() { }
+
+    // ❌ Bad - won't be recognized as hooks
+    function getUser() { }
+    function fetchData() { }
+    function windowSize() { }
+    ```
+
+  </Accordion>
+
+  <Accordion id="practice-2" title="2. Return Objects for Multiple Values">
+    **Why:** Easier to add new returns without breaking existing code.
+
+    ```jsx
+    // ✅ Good - can destructure what you need
+    function useFetchData() {
+      return { data, isLoading, error, refetch };
+    }
+
+    const { data, error } = useFetchData(); // Use only what you need
+
+    // ❌ Bad - order matters, can't skip values
+    function useFetchData() {
+      return [data, isLoading, error, refetch];
+    }
+
+    const [data, , , refetch] = useFetchData(); // Awkward to skip values
+    ```
+
+    **Exception:** For simple toggles or pairs, arrays are fine:
+
+    ```jsx
+    const [isOpen, setIsOpen] = useState(false); // Array is fine
+    ```
+
+  </Accordion>
+
+  <Accordion id="practice-3" title="3. Keep Hooks Focused">
+    One hook = one responsibility.
+
+    ```jsx
+    // ✅ Good - focused hooks
+    function useFetchListings() { /* only fetching */ }
+    function useFilterListings() { /* only filtering */ }
+    function useSortListings() { /* only sorting */ }
+
+    // ❌ Bad - doing too much
+    function useListingsEverything() {
+      // Fetching, filtering, sorting, pagination, etc.
+      // Too complex!
+    }
+    ```
+
+  </Accordion>
+
+  <Accordion id="practice-4" title="4. Document Your Hooks">
+    Add JSDoc comments:
+
+    ```jsx
+    /**
+     * Fetches listings from the API
+     * @returns {Object} Object containing listings, loading, and error state
+     * @returns {Array} returns.listings - Array of listing objects
+     * @returns {boolean} returns.isLoading - Loading state
+     * @returns {string|null} returns.error - Error message or null
+     * @returns {Function} returns.refetch - Function to manually refetch data
+     */
+    export function useFetchListings() {
+      // ...
+    }
+    ```
+
+  </Accordion>
+
+  <Accordion id="practice-5" title="5. Make Hooks Configurable">
+    Accept options for flexibility:
+
+    ```jsx
+    export function useFetchListings(options = {}) {
+      const {
+        autoFetch = true,  // Auto-fetch on mount?
+        cacheTime = 0,     // Cache duration in ms
+        onSuccess,         // Callback on success
+        onError            // Callback on error
+      } = options;
+
+      // Use the options...
+    }
+    ```
+
+    **Usage:**
+
+    ```jsx
+    const { listings } = useFetchListings({
+      autoFetch: false,
+      onSuccess: (data) => console.log('Loaded!', data)
+    });
+    ```
+
+  </Accordion>
+</Accordions>
+
+## Testing Custom Hooks
+
+Custom hooks are easier to test than components:
+
+```jsx title="__tests__/useFetchListings.test.js"
+import { renderHook, waitFor } from '@testing-library/react';
+import { useFetchListings } from '../hooks/useFetchListings';
+
+describe('useFetchListings', () => {
+  it('should fetch listings on mount', async () => {
+    const { result } = renderHook(() => useFetchListings());
+
+    // Initial state
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.listings).toEqual([]);
+
+    // Wait for fetch to complete
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    // Check data loaded
+    expect(result.current.listings.length).toBeGreaterThan(0);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('should handle errors', async () => {
+    // Mock API to fail
+    jest.spyOn(global, 'fetch').mockRejectedValue(new Error('Network error'));
+
+    const { result } = renderHook(() => useFetchListings());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.error).toBe('Network error');
+    expect(result.current.listings).toEqual([]);
+  });
+});
+```
+
+## Real-World Custom Hooks Library
+
+Here are some battle-tested custom hooks from popular libraries:
+
+**React Use** (`react-use` npm package):
+
+- `useAsync` - Async operation state
+- `useDebounce` - Debounced value
+- `useInterval` - Declarative intervals
+- `useLocalStorage` - Persistent state
+- `useToggle` - Boolean toggle
+- `usePrevious` - Previous value
+
+**Example:**
+
+```bash
+npm install react-use
+```
+
+```jsx
+import { useDebounce, useLocalStorage } from 'react-use';
+
+function SearchComponent() {
+  const [search, setSearch] = useState('');
+  const [favorites, setFavorites] = useLocalStorage('favorites', []);
+  const debouncedSearch = useDebounce(search, 500);
+
+  // debouncedSearch only updates 500ms after user stops typing
+}
+```
+
+## Key Takeaways
+
+<Callout type="success" title="Custom hooks rock!">
+  **What you learned:**
+
+  - ✅ Custom hooks extract reusable logic
+  - ✅ Start hook names with "use"
+  - ✅ Can call other hooks inside custom hooks
+  - ✅ Return objects for multiple values
+  - ✅ Keep hooks focused on one responsibility
+  - ✅ Much easier to test than components
+
+  **When to create a custom hook:**
+
+  - 🔄 Logic is used in multiple components
+  - 🧹 Component is getting too complex
+  - 🧪 Want to test logic separately
+  - 📦 Want to share logic across projects
+
+  **Next:** Build an image carousel component!
+</Callout>
+
+## What's Next?
+
+Your code is now clean and maintainable! In the next lesson, you'll apply your knowledge to build a real feature:
+
+- 🎠 Create an image carousel component
+- 🖼️ Handle multiple images per listing
+- ⬅️➡️ Add prev/next navigation
+- 🔄 Use useEffect for auto-play
+- ⏱️ Practice cleanup with timers
+
+Let's build something visual! 🚀
+
