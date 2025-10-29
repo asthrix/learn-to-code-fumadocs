@@ -1,0 +1,453 @@
+---
+title: "L2: Connect Redux to React"
+description: "Add the Provider component to make Redux available throughout the app"
+---
+
+# Connect Redux to React
+
+Now that we have a Redux store, we need to **connect it to React** so our components can access the state.
+
+## The Provider Component
+
+React Redux provides a `<Provider>` component that makes the Redux store available to all components in your app.
+
+**How it works:**
+
+```
+<Provider store={store}>     ← Makes store available
+  <App>                      ← Can access store
+    <HomePage>               ← Can access store
+      <ListingCard>          ← Can access store
+      </ListingCard>
+    </HomePage>
+  </App>
+</Provider>
+```
+
+Any component inside `<Provider>` can:
+- Read state using `useSelector()`
+- Dispatch actions using `useDispatch()`
+
+> **Think of Provider like Context Provider** - It uses React Context under the hood to pass the store down the component tree!
+
+## What We're Building
+
+We'll update `src/App.jsx` to:
+
+1. Import the `Provider` component
+2. Import our `store`
+3. Wrap the entire app with `<Provider>`
+
+## Current App Structure
+
+Currently, `App.jsx` looks like this:
+
+```jsx title="src/App.jsx"
+import { Router } from './components/Router';
+
+export function App() {
+  return <Router />;
+}
+```
+
+Simple and clean! The `<Router>` component handles all our routing.
+
+## Step 1: Import Provider and Store
+
+At the top of `src/App.jsx`, add these imports:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import { Router } from './components/Router';
+
+export function App() {
+  return <Router />;
+}
+```
+
+**What are we importing?**
+
+<Accordions>
+
+<Accordion title="Provider from 'react-redux'">
+
+The `Provider` component comes from the `react-redux` package:
+
+```jsx
+import { Provider } from 'react-redux';
+```
+
+**What does it do?**
+- Makes Redux store available to all nested components
+- Uses React Context API under the hood
+- Should wrap your entire app (at the root level)
+
+**Props it accepts:**
+```jsx
+<Provider 
+  store={store}           // Required: Your Redux store
+  context={MyContext}     // Optional: Custom context
+>
+  {children}
+</Provider>
+```
+
+Usually you only need to pass `store` prop!
+
+</Accordion>
+
+<Accordion title="store from './state/store'">
+
+This is the store we created in Lesson 1:
+
+```jsx
+import { store } from './state/store';
+```
+
+**What is it?**
+- The configured Redux store instance
+- Created with `configureStore()`
+- Contains all our reducers and middleware
+
+**Why import it here?**
+- We need to pass it to `<Provider store={store}>`
+- Makes store available throughout the app
+- Single source of truth for all state
+
+</Accordion>
+
+</Accordions>
+
+## Step 2: Wrap App with Provider
+
+Now wrap the `<Router>` component with `<Provider>`:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import { Router } from './components/Router';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <Router />
+    </Provider>
+  );
+}
+```
+
+**What changed?**
+
+<Tabs items={['Before', 'After', 'Structure']}>
+
+<Tab value="Before">
+
+```jsx
+export function App() {
+  return <Router />;
+}
+```
+
+Just rendering `<Router>` directly.
+
+</Tab>
+
+<Tab value="After">
+
+```jsx
+export function App() {
+  return (
+    <Provider store={store}>
+      <Router />
+    </Provider>
+  );
+}
+```
+
+Now `<Router>` (and all its children) are wrapped with `<Provider>`.
+
+</Tab>
+
+<Tab value="Structure">
+
+The component tree now looks like:
+
+```
+App
+ └─ Provider (provides Redux store)
+     └─ Router (can access store)
+         ├─ HomePage (can access store)
+         │   ├─ ListingFilters (can access store)
+         │   └─ ListingList (can access store)
+         │       └─ ListingCard (can access store)
+         ├─ ListingDetailsPage (can access store)
+         └─ NotFoundPage (can access store)
+```
+
+Every component can now use Redux hooks!
+
+</Tab>
+
+</Tabs>
+
+## Complete Code
+
+Here's the complete `App.jsx` file:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import { Router } from './components/Router';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <Router />
+    </Provider>
+  );
+}
+```
+
+Only **4 lines of changes** to connect Redux! 🎉
+
+## Verify Connection
+
+Let's verify Redux is connected properly. Open your browser's **Redux DevTools**:
+
+<Steps>
+
+<Step>
+
+### Install Redux DevTools Extension
+
+If you haven't already, install the Redux DevTools browser extension:
+
+- **Chrome:** [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools)
+- **Firefox:** [Redux DevTools](https://addons.mozilla.org/en-US/firefox/addon/reduxdevtools/)
+- **Edge:** Available in Edge Add-ons store
+
+</Step>
+
+<Step>
+
+### Open DevTools
+
+1. Open your app in the browser
+2. Open browser DevTools (F12 or Right-click → Inspect)
+3. Click the **Redux** tab
+
+You should see the Redux DevTools interface!
+
+</Step>
+
+<Step>
+
+### Check Initial State
+
+In the **State** tab, you should see an empty object:
+
+```json
+{
+  // Empty for now - we'll add slices next!
+}
+```
+
+This confirms:
+- ✅ Store is created
+- ✅ Provider is working
+- ✅ DevTools can communicate with Redux
+
+</Step>
+
+</Steps>
+
+## Understanding Provider Placement
+
+**Where should Provider go?**
+
+<Accordions>
+
+<Accordion title="At the Root (Recommended)">
+
+Place `Provider` at the root of your app:
+
+```jsx
+// src/App.jsx
+function App() {
+  return (
+    <Provider store={store}>
+      <Router />
+    </Provider>
+  );
+}
+```
+
+**Pros:**
+- ✅ All components can access Redux
+- ✅ Simple and clear
+- ✅ Works with code splitting
+- ✅ Standard pattern
+
+</Accordion>
+
+<Accordion title="In main.jsx (Alternative)">
+
+Some apps put Provider in `main.jsx`:
+
+```jsx
+// src/main.jsx
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import { App } from './App';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+```
+
+**Pros:**
+- ✅ Keeps App.jsx cleaner
+- ✅ Separates concerns
+
+**Cons:**
+- ❌ Harder to test App in isolation
+- ❌ Less flexible
+
+We use the first approach (in App.jsx) for this course!
+
+</Accordion>
+
+<Accordion title="Multiple Providers (Advanced)">
+
+You can have multiple providers for different stores:
+
+```jsx
+function App() {
+  return (
+    <GlobalProvider store={globalStore}>
+      <FeatureProvider store={featureStore}>
+        <Router />
+      </FeatureProvider>
+    </GlobalProvider>
+  );
+}
+```
+
+**Use case:**
+- Micro-frontends
+- Isolated modules
+- Testing different stores
+
+Most apps only need **one Provider** with **one store**!
+
+</Accordion>
+
+</Accordions>
+
+## Common Patterns
+
+### Provider with Other Providers
+
+Redux Provider works alongside other providers:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { store } from './state/store';
+import { Router } from './components/Router';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <BrowserRouter>
+        <ThemeProvider>
+          <Router />
+        </ThemeProvider>
+      </BrowserRouter>
+    </Provider>
+  );
+}
+```
+
+**Order matters!**
+- Redux Provider should be outermost (if state is used everywhere)
+- Or wrap only the parts that need Redux
+
+### Provider with Error Boundaries
+
+Wrap Provider with error boundary for better error handling:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { store } from './state/store';
+import { Router } from './components/Router';
+
+export function App() {
+  return (
+    <ErrorBoundary>
+      <Provider store={store}>
+        <Router />
+      </Provider>
+    </ErrorBoundary>
+  );
+}
+```
+
+## Testing the Connection
+
+To verify Redux is working, let's add a simple test component temporarily:
+
+```jsx title="src/App.jsx"
+import { Provider, useSelector } from 'react-redux';
+import { store } from './state/store';
+import { Router } from './components/Router';
+
+function ReduxTest() {
+  const state = useSelector((state) => state);
+  console.log('Redux state:', state);
+  return null;
+}
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <ReduxTest />
+      <Router />
+    </Provider>
+  );
+}
+```
+
+Check the console - you should see:
+
+```
+Redux state: {}
+```
+
+> **Remove `<ReduxTest />` after verifying!** We'll use proper Redux hooks in components soon.
+
+## What's Next?
+
+Perfect! Redux is now connected to React. In the next lesson, we'll:
+
+1. **Create a slice** - Define our listings state structure
+2. **Add reducers** - Write functions to update state
+3. **Define actions** - Create actions for state changes
+
+<Callout type="success">
+**✅ Lesson Complete!** Your entire app can now access the Redux store through Provider!
+</Callout>
+
+## Key Takeaways
+
+- ✅ `<Provider>` makes Redux store available to all components
+- ✅ Place Provider at the **root of your app**
+- ✅ Pass your store as a prop: `<Provider store={store}>`
+- ✅ All nested components can use `useSelector()` and `useDispatch()`
+- ✅ Redux DevTools automatically works with `configureStore()`
+- ✅ Provider uses React Context under the hood

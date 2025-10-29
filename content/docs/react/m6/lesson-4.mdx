@@ -1,0 +1,523 @@
+---
+title: "L4: Add Slice to Store"
+description: "Register the listings slice in the Redux store"
+---
+
+# Add Slice to Store
+
+Now that we have a listings slice, let's **register it in the store** so Redux knows about it!
+
+## Current Store Setup
+
+Currently, our store has an empty reducer object:
+
+```js title="src/state/store.js"
+import { configureStore } from '@reduxjs/toolkit';
+
+export const store = configureStore({
+  reducer: {
+    // Empty - no slices registered yet!
+  },
+});
+```
+
+## What We're Building
+
+We'll import the listings reducer and add it to the store's reducer configuration.
+
+## Step 1: Import Listings Reducer
+
+At the top of `src/state/store.js`, import the listings reducer:
+
+```js title="src/state/store.js"
+import { configureStore } from '@reduxjs/toolkit';
+import listingsReducer from './slices/listingsSlice';
+
+export const store = configureStore({
+  reducer: {
+    // Will add here next
+  },
+});
+```
+
+> **Note:** We import the **default export** (the reducer), not the named exports (the actions).
+
+## Step 2: Add to Reducer Object
+
+Add the listings reducer to the reducer configuration:
+
+```js title="src/state/store.js"
+import { configureStore } from '@reduxjs/toolkit';
+import listingsReducer from './slices/listingsSlice';
+
+export const store = configureStore({
+  reducer: {
+    listings: listingsReducer,
+  },
+});
+```
+
+**What's happening here?**
+
+<Accordions>
+
+<Accordion title="reducer Object Structure">
+
+The `reducer` object defines your state structure:
+
+```js
+reducer: {
+  listings: listingsReducer,  // state.listings
+  user: userReducer,           // state.user
+  cart: cartReducer,           // state.cart
+}
+```
+
+Each **key** becomes a **slice of state**:
+
+```js
+{
+  listings: { items: [], favorites: [], status: 'idle', error: null },
+  user: { profile: null, isAuthenticated: false },
+  cart: { items: [], total: 0 }
+}
+```
+
+The key name (`listings`) determines how you access state:
+
+```js
+const listings = useSelector(state => state.listings);
+const items = useSelector(state => state.listings.items);
+const favorites = useSelector(state => state.listings.favorites);
+```
+
+</Accordion>
+
+<Accordion title="Why 'listingsReducer'?">
+
+The imported reducer is a function that Redux calls internally:
+
+```js
+import listingsReducer from './slices/listingsSlice';
+//     ^^^^^^^^^^^^^^^^
+//     This is a FUNCTION that handles state updates
+```
+
+When an action is dispatched:
+
+```js
+dispatch(toggleFavorite(123));
+```
+
+Redux calls:
+
+```js
+const newState = listingsReducer(oldState, action);
+```
+
+**You never call this function directly** - Redux does it for you!
+
+</Accordion>
+
+<Accordion title="Single Reducer vs Multiple">
+
+**Single slice (current):**
+
+```js
+reducer: {
+  listings: listingsReducer,
+}
+```
+
+State structure:
+```js
+{
+  listings: { items: [], favorites: [] }
+}
+```
+
+**Multiple slices (future):**
+
+```js
+reducer: {
+  listings: listingsReducer,
+  user: userReducer,
+  cart: cartReducer,
+}
+```
+
+State structure:
+```js
+{
+  listings: { items: [], favorites: [] },
+  user: { profile: null },
+  cart: { items: [] }
+}
+```
+
+You can add as many slices as needed!
+
+</Accordion>
+
+</Accordions>
+
+## Complete Code
+
+Here's the complete updated store:
+
+```js title="src/state/store.js"
+import { configureStore } from '@reduxjs/toolkit';
+import listingsReducer from './slices/listingsSlice';
+
+export const store = configureStore({
+  reducer: {
+    listings: listingsReducer,
+  },
+});
+```
+
+Simple and clean! Only **2 new lines** to register a slice.
+
+## Verify in Redux DevTools
+
+Let's check that our slice is registered correctly:
+
+<Steps>
+
+<Step>
+
+### Open Redux DevTools
+
+1. Open your app in the browser
+2. Open browser DevTools (F12)
+3. Click the **Redux** tab
+
+</Step>
+
+<Step>
+
+### Check State Tab
+
+Click the **State** tab. You should now see:
+
+```json
+{
+  "listings": {
+    "items": [],
+    "favorites": [],
+    "status": "idle",
+    "error": null
+  }
+}
+```
+
+Perfect! Our listings slice is registered! 🎉
+
+</Step>
+
+<Step>
+
+### Test an Action
+
+In the Redux DevTools **Dispatch** section, manually dispatch an action:
+
+```json
+{
+  "type": "listings/toggleFavorite",
+  "payload": 123
+}
+```
+
+Click **Dispatch** and check the state again:
+
+```json
+{
+  "listings": {
+    "items": [],
+    "favorites": [123],  // ← 123 was added!
+    "status": "idle",
+    "error": null
+  }
+}
+```
+
+It works! Your reducer is handling actions! 🎉
+
+</Step>
+
+</Steps>
+
+## Understanding State Access
+
+Now that the slice is registered, here's how components access state:
+
+<Tabs items={['useSelector', 'Specific Fields', 'Multiple Slices']}>
+
+<Tab value="useSelector">
+
+**Access entire listings slice:**
+
+```jsx
+import { useSelector } from 'react-redux';
+
+function Component() {
+  const listings = useSelector((state) => state.listings);
+  
+  console.log(listings);
+  // {
+  //   items: [],
+  //   favorites: [],
+  //   status: 'idle',
+  //   error: null
+  // }
+}
+```
+
+The `useSelector` hook:
+- Takes a selector function: `(state) => state.listings`
+- Returns the selected value
+- Subscribes component to state changes
+- Re-renders when selected state changes
+
+</Tab>
+
+<Tab value="Specific Fields">
+
+**Access specific fields:**
+
+```jsx
+import { useSelector } from 'react-redux';
+
+function Component() {
+  const items = useSelector((state) => state.listings.items);
+  const favorites = useSelector((state) => state.listings.favorites);
+  const status = useSelector((state) => state.listings.status);
+  
+  console.log(items);      // []
+  console.log(favorites);  // []
+  console.log(status);     // 'idle'
+}
+```
+
+**Best practice:** Select only what you need!
+
+**Why?**
+- Component only re-renders when that specific field changes
+- Better performance
+- Clearer dependencies
+
+</Tab>
+
+<Tab value="Multiple Slices">
+
+**Access multiple slices (future):**
+
+```jsx
+import { useSelector } from 'react-redux';
+
+function Component() {
+  const listings = useSelector((state) => state.listings);
+  const user = useSelector((state) => state.user);
+  const cart = useSelector((state) => state.cart);
+  
+  // Use data from multiple slices
+  return (
+    <div>
+      <p>User: {user.name}</p>
+      <p>Listings: {listings.items.length}</p>
+      <p>Cart: {cart.items.length} items</p>
+    </div>
+  );
+}
+```
+
+Each `useSelector` subscribes to one slice of state.
+
+</Tab>
+
+</Tabs>
+
+## Common Patterns
+
+### Pattern 1: Select and Destructure
+
+```jsx
+function Component() {
+  const { items, favorites, status } = useSelector((state) => state.listings);
+  
+  return (
+    <div>
+      <p>Total: {items.length}</p>
+      <p>Favorites: {favorites.length}</p>
+      <p>Status: {status}</p>
+    </div>
+  );
+}
+```
+
+**Pros:**
+- Clean syntax
+- Easy to read
+
+**Cons:**
+- Re-renders when ANY field in `listings` changes
+- Less performant for large states
+
+### Pattern 2: Select Individual Fields
+
+```jsx
+function Component() {
+  const items = useSelector((state) => state.listings.items);
+  const favorites = useSelector((state) => state.listings.favorites);
+  
+  return (
+    <div>
+      <p>Total: {items.length}</p>
+      <p>Favorites: {favorites.length}</p>
+    </div>
+  );
+}
+```
+
+**Pros:**
+- Only re-renders when specific fields change
+- Better performance
+
+**Cons:**
+- More verbose
+- Multiple `useSelector` calls
+
+**Use Pattern 2 for performance-critical components!**
+
+### Pattern 3: Create Selector Function
+
+```jsx
+// In listingsSlice.js
+export const selectListings = (state) => state.listings;
+export const selectFavorites = (state) => state.listings.favorites;
+export const selectIsLoading = (state) => state.listings.status === 'loading';
+
+// In component
+import { selectFavorites, selectIsLoading } from '@/state/slices/listingsSlice';
+
+function Component() {
+  const favorites = useSelector(selectFavorites);
+  const isLoading = useSelector(selectIsLoading);
+  
+  // ...
+}
+```
+
+**Pros:**
+- Reusable selectors
+- DRY principle
+- Easy to test
+- Can compute derived state
+
+**Recommended for real apps!**
+
+## Redux State Tree
+
+With our slice registered, the state tree looks like:
+
+```
+Redux Store
+ └─ listings (from listingsReducer)
+     ├─ items: []
+     ├─ favorites: []
+     ├─ status: 'idle'
+     └─ error: null
+```
+
+As you add more slices:
+
+```
+Redux Store
+ ├─ listings (from listingsReducer)
+ │   ├─ items: []
+ │   ├─ favorites: []
+ │   ├─ status: 'idle'
+ │   └─ error: null
+ ├─ user (from userReducer)
+ │   ├─ profile: null
+ │   └─ isAuthenticated: false
+ └─ cart (from cartReducer)
+     ├─ items: []
+     └─ total: 0
+```
+
+Each slice is **isolated** but part of the same store!
+
+## Troubleshooting
+
+### Issue: "Cannot read property 'items' of undefined"
+
+**Problem:** Trying to access state before slice is registered
+
+```jsx
+const items = useSelector((state) => state.listings.items);
+// Error: Cannot read property 'items' of undefined
+```
+
+**Solution:** Make sure slice is added to store:
+
+```js
+// store.js
+reducer: {
+  listings: listingsReducer,  // ← Must be here!
+}
+```
+
+### Issue: "useSelector is not a function"
+
+**Problem:** Not importing from 'react-redux'
+
+```jsx
+import { useSelector } from 'redux';  // ❌ Wrong package!
+```
+
+**Solution:** Import from 'react-redux':
+
+```jsx
+import { useSelector } from 'react-redux';  // ✅ Correct!
+```
+
+### Issue: State not updating in DevTools
+
+**Problem:** Not dispatching actions correctly
+
+**Solution:** Make sure you're using `dispatch`:
+
+```jsx
+import { useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+
+function Component() {
+  const dispatch = useDispatch();
+  
+  const handleClick = () => {
+    dispatch(toggleFavorite(123));  // ✅ Correct!
+  };
+}
+```
+
+## What's Next?
+
+Perfect! The listings slice is now registered in the store. In the next lesson, we'll:
+
+1. **Create an async thunk** - Fetch listings from the API
+2. **Dispatch async actions** - Call the API with Redux
+3. **Handle loading states** - Track fetch status
+
+<Callout type="success">
+**✅ Lesson Complete!** Your listings slice is registered and visible in Redux DevTools!
+</Callout>
+
+## Key Takeaways
+
+- ✅ Register slices by adding them to `reducer` object
+- ✅ Key name determines state access: `state.listings`
+- ✅ Import the **default export** (reducer function)
+- ✅ Use **Redux DevTools** to verify registration
+- ✅ Select specific fields with `useSelector` for better performance
+- ✅ Create **selector functions** for reusable state access

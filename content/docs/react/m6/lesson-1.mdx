@@ -1,0 +1,458 @@
+---
+title: "L1: Setup Redux Store"
+description: "Install Redux Toolkit and configure the Redux store"
+---
+
+# Setup Redux Store
+
+Welcome to Module 6! In this module, we'll introduce **Redux Toolkit** - a powerful state management library that allows you to share state across your entire application.
+
+## Why Redux?
+
+So far, we've managed state locally within components using `useState`. This works great for simple apps, but as your application grows, you'll face challenges:
+
+**Problems with Local State:**
+
+<Accordions>
+
+<Accordion title="Prop Drilling">
+
+When state needs to be accessed by components deep in the tree, you must pass props through multiple levels:
+
+```jsx
+function App() {
+  const [user, setUser] = useState(null);
+  
+  return (
+    <Layout user={user}>
+      <Page user={user}>
+        <Section user={user}>
+          <Component user={user} />
+        </Section>
+      </Page>
+    </Layout>
+  );
+}
+```
+
+Every intermediate component must accept and pass the `user` prop, even if it doesn't use it.
+
+</Accordion>
+
+<Accordion title="Duplicate State">
+
+When multiple components need the same data, you might duplicate state or lift it to a common ancestor:
+
+```jsx
+function HomePage() {
+  const [favorites, setFavorites] = useState([]);
+  // Use favorites...
+}
+
+function FavoritesPage() {
+  const [favorites, setFavorites] = useState([]);
+  // Same state, different component!
+}
+```
+
+These two arrays are separate and can get out of sync.
+
+</Accordion>
+
+<Accordion title="Complex Updates">
+
+When one action needs to update multiple pieces of state:
+
+```jsx
+const handleSignOut = () => {
+  setUser(null);
+  setToken(null);
+  setFavorites([]);
+  setCart([]);
+  setNotifications([]);
+  // Scattered state updates...
+};
+```
+
+Related state updates are scattered across the component.
+
+</Accordion>
+
+</Accordions>
+
+**Redux Solutions:**
+
+- **Single source of truth** - One global store for all shared state
+- **Predictable updates** - State changes through pure functions
+- **Easy debugging** - Track every state change with DevTools
+- **No prop drilling** - Access state from any component
+
+## Redux Architecture
+
+Redux uses a **unidirectional data flow**:
+
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│  Component dispatches Action                │
+│         │                                   │
+│         ↓                                   │
+│  Store receives Action                      │
+│         │                                   │
+│         ↓                                   │
+│  Reducer updates State                      │
+│         │                                   │
+│         ↓                                   │
+│  Component re-renders with new State       │
+│         │                                   │
+│         └─────────────────────────────────────┘
+```
+
+**Key Concepts:**
+
+<Steps>
+
+<Step>
+
+### Store
+
+The **store** holds your entire application state in one JavaScript object:
+
+```jsx
+{
+  listings: {
+    items: [],
+    favorites: [],
+    status: 'idle'
+  },
+  user: {
+    profile: null,
+    isAuthenticated: false
+  }
+}
+```
+
+Think of it as a centralized database for your app's state.
+
+</Step>
+
+<Step>
+
+### Actions
+
+**Actions** are plain objects describing what happened:
+
+```jsx
+{ type: 'listings/toggleFavorite', payload: 123 }
+{ type: 'user/signIn', payload: { email, password } }
+```
+
+They tell Redux "something happened" without specifying how to update state.
+
+</Step>
+
+<Step>
+
+### Reducers
+
+**Reducers** are pure functions that specify how state changes:
+
+```jsx
+function listingsReducer(state, action) {
+  switch (action.type) {
+    case 'listings/toggleFavorite':
+      // Return new state
+      return { ...state, favorites: [...state.favorites, action.payload] };
+    default:
+      return state;
+  }
+}
+```
+
+Given current state + action → return new state.
+
+</Step>
+
+</Steps>
+
+## Redux Toolkit
+
+Redux Toolkit is the **official, recommended way** to write Redux code. It simplifies Redux significantly:
+
+**Traditional Redux:**
+```jsx
+// ~50 lines of boilerplate per feature
+const ADD_TODO = 'ADD_TODO';
+const addTodo = (text) => ({ type: ADD_TODO, payload: text });
+function todosReducer(state = [], action) {
+  switch (action.type) {
+    case ADD_TODO:
+      return [...state, { id: Date.now(), text: action.payload }];
+    default:
+      return state;
+  }
+}
+```
+
+**Redux Toolkit:**
+```jsx
+// ~10 lines, same functionality
+const todosSlice = createSlice({
+  name: 'todos',
+  initialState: [],
+  reducers: {
+    addTodo: (state, action) => {
+      state.push({ id: Date.now(), text: action.payload });
+    }
+  }
+});
+```
+
+Redux Toolkit includes:
+- ✅ `configureStore()` - Simplified store setup
+- ✅ `createSlice()` - Combines actions + reducers
+- ✅ `createAsyncThunk()` - Handle async logic
+- ✅ Immer built-in - Write "mutating" code safely
+- ✅ Redux DevTools - Pre-configured
+
+## What We're Building
+
+In this lesson, we'll:
+
+1. **Install Redux Toolkit** - Add the library to our project
+2. **Create the store** - Set up the Redux store
+3. **Configure the store** - Add basic configuration
+
+By the end, you'll have a working Redux store ready to hold application state!
+
+## Step 1: Install Redux Toolkit
+
+Redux Toolkit comes as two packages:
+
+- `@reduxjs/toolkit` - Redux Toolkit core
+- `react-redux` - React bindings for Redux
+
+Install both packages:
+
+```bash
+npm install @reduxjs/toolkit react-redux
+```
+
+> **What's the difference?**
+> - `@reduxjs/toolkit` provides Redux logic (store, slices, thunks)
+> - `react-redux` connects Redux to React (hooks like `useSelector`, `useDispatch`)
+
+## Step 2: Create Store File
+
+Create a new directory and file for our Redux store:
+
+```bash
+mkdir -p src/state
+touch src/state/store.js
+```
+
+This file will configure and export our Redux store.
+
+## Step 3: Configure Store
+
+Open `src/state/store.js` and add:
+
+```js title="src/state/store.js"
+import { configureStore } from '@reduxjs/toolkit';
+
+export const store = configureStore({
+  reducer: {
+    // Reducers will be added here
+  },
+});
+```
+
+**What's happening here?**
+
+<Accordions>
+
+<Accordion title="configureStore()">
+
+The `configureStore()` function creates a Redux store with good defaults:
+
+```js
+configureStore({
+  reducer: {},              // Your reducers
+  middleware: [...],        // Middleware (auto-configured)
+  devTools: true,          // Redux DevTools enabled
+  preloadedState: {},      // Initial state (optional)
+  enhancers: [],           // Store enhancers (optional)
+});
+```
+
+**Automatic features:**
+- Redux DevTools extension support
+- Redux Thunk middleware included
+- Serialization checks in development
+- Immutability checks in development
+
+</Accordion>
+
+<Accordion title="reducer Property">
+
+The `reducer` property accepts an object where each key becomes a **slice of state**:
+
+```js
+configureStore({
+  reducer: {
+    listings: listingsReducer,  // state.listings
+    user: userReducer,           // state.user
+    cart: cartReducer,           // state.cart
+  }
+});
+```
+
+Your Redux state will look like:
+
+```js
+{
+  listings: { /* listings state */ },
+  user: { /* user state */ },
+  cart: { /* cart state */ }
+}
+```
+
+Right now, our reducer object is empty - we'll add slices in the next lessons!
+
+</Accordion>
+
+<Accordion title="Why export store?">
+
+We export the store so we can:
+
+1. **Provide it to React** - Wrap our app with `<Provider store={store}>`
+2. **Access in tests** - Import store for testing
+3. **Use outside React** - Dispatch actions from utility functions
+
+```js
+// In App.jsx
+import { store } from './state/store';
+<Provider store={store}>
+  <App />
+</Provider>
+
+// In tests
+import { store } from './state/store';
+expect(store.getState().listings).toEqual([]);
+
+// Outside React
+import { store } from './state/store';
+store.dispatch(someAction());
+```
+
+</Accordion>
+
+</Accordions>
+
+## Understanding the Redux Store
+
+The store is an object with three main methods:
+
+<Tabs items={['getState', 'dispatch', 'subscribe']}>
+
+<Tab value="getState">
+
+**`getState()`** - Returns the current state:
+
+```js
+import { store } from './state/store';
+
+const currentState = store.getState();
+console.log(currentState);
+// {
+//   listings: { items: [], favorites: [] },
+//   user: { profile: null }
+// }
+```
+
+In React components, use `useSelector()` instead of calling `getState()` directly.
+
+</Tab>
+
+<Tab value="dispatch">
+
+**`dispatch(action)`** - Dispatches an action to update state:
+
+```js
+import { store } from './state/store';
+
+store.dispatch({ 
+  type: 'listings/toggleFavorite', 
+  payload: 123 
+});
+```
+
+In React components, use `useDispatch()` hook instead.
+
+</Tab>
+
+<Tab value="subscribe">
+
+**`subscribe(listener)`** - Listen for state changes:
+
+```js
+import { store } from './state/store';
+
+const unsubscribe = store.subscribe(() => {
+  console.log('State changed:', store.getState());
+});
+
+// Later: stop listening
+unsubscribe();
+```
+
+React Redux handles subscriptions automatically via `useSelector()`.
+
+</Tab>
+
+</Tabs>
+
+## Verify Setup
+
+Let's verify the store is configured correctly. Add a temporary log:
+
+```js title="src/state/store.js"
+import { configureStore } from '@reduxjs/toolkit';
+
+export const store = configureStore({
+  reducer: {
+    // Reducers will be added here
+  },
+});
+
+// Temporary: verify store works
+console.log('Redux store configured:', store.getState());
+```
+
+You should see an empty object logged when the app loads:
+
+```
+Redux store configured: {}
+```
+
+> **Note:** Remove this console.log after verifying - we'll access state properly through React hooks!
+
+## What's Next?
+
+Great! You've set up the Redux store. In the next lesson, we'll:
+
+1. **Connect Redux to React** - Add the `Provider` component
+2. **Make store available** - Wrap our app with Redux
+3. **Verify connection** - Ensure components can access the store
+
+<Callout type="success">
+**✅ Lesson Complete!** You've installed Redux Toolkit and configured the store. The foundation for global state management is ready!
+</Callout>
+
+## Key Takeaways
+
+- ✅ Redux provides a **single source of truth** for application state
+- ✅ Redux Toolkit **simplifies Redux** with less boilerplate
+- ✅ `configureStore()` creates a store with **good defaults**
+- ✅ The store has three methods: `getState()`, `dispatch()`, `subscribe()`
+- ✅ Empty reducer object is valid - we'll add slices next!
