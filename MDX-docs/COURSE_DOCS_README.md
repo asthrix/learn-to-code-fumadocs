@@ -10,9 +10,38 @@ platform.
 
 ## 📚 Documentation Index
 
-This package includes 5 comprehensive documents:
+This package includes 6 comprehensive documents:
 
-### 1. [MDX_COURSE_DOCUMENTATION.md](./MDX_COURSE_DOCUMENTATION.md)
+### 1. [CODE_BLOCK_COMPLETE_GUIDE.md](./CODE_BLOCK_COMPLETE_GUIDE.md) ⭐ NEW
+
+**~60 pages | Complete Code Block Reference**
+
+Your primary reference for all code block features and teaching patterns in Fumadocs.
+
+**Contents:**
+
+- Basic code block syntax with titles
+- Line highlighting (`// [!code highlight]`)
+- Word highlighting (`// [!code word:term]`)
+- Diff view (`// [!code ++]` and `// [!code --]`)
+- Focus annotations (`// [!code focus]`)
+- Blockquotes and callouts
+- Language-specific examples (JSX, TypeScript, Bash, JSON, etc.)
+- Common lesson patterns (before/after, step-by-step, mistakes, checkpoints)
+- Best practices for course content
+- Quick reference card and cheat sheets
+
+**Use this when:**
+
+- Writing any code examples in lessons
+- Need to highlight key concepts
+- Showing before/after refactoring
+- Teaching specific APIs or patterns
+- **Every time you create or edit a lesson with code examples**
+
+---
+
+### 2. [MDX_COURSE_DOCUMENTATION.md](./MDX_COURSE_DOCUMENTATION.md)
 
 **89 pages | Complete Course Generation Guide**
 

@@ -14,6 +14,10 @@ without errors.
 
 **Standard markdown code fences with `title` attribute:**
 
+### Code Block Syntax
+
+**Standard markdown code fences with `title` attribute:**
+
 ````mdx
 ```jsx title="src/components/Example.jsx"
 import React from 'react';
@@ -23,6 +27,110 @@ export function Example() {
 }
 ```
 ````
+
+**Features:**
+- Automatic syntax highlighting via Fumadocs (powered by Shiki)
+- Copy button automatically added
+- Optional file path as title
+- No custom wrapper components needed
+- Line highlighting support
+- Word highlighting support
+
+**Supported Languages:**
+`jsx`, `tsx`, `javascript`, `typescript`, `bash`, `shell`, `json`, `css`, `html`, `mdx`, `python`, `sql`, and many more.
+
+---
+
+### Advanced Code Features (Fumadocs/Shiki)
+
+#### 1. Line Highlighting
+
+Highlight specific lines using `// [!code highlight]` comment:
+
+````mdx
+```jsx title="src/App.jsx"
+function App() {
+  const [count, setCount] = useState(0); // [!code highlight]
+  
+  return <div>{count}</div>;
+}
+```
+````
+
+**Result:** The line with the comment will be highlighted.
+
+#### 2. Word Highlighting
+
+Highlight specific words using `// [!code word:term]`:
+
+````mdx
+```jsx title="config.js"
+// [!code word:config]
+const config = {
+  name: 'My App'
+};
+
+export default config;
+```
+````
+
+**Result:** All instances of "config" will be highlighted.
+
+#### 3. Line Additions/Deletions (Diff View)
+
+Show code changes with `// [!code ++]` and `// [!code --]`:
+
+````mdx
+```jsx title="Before and After"
+function Component() {
+  const [data, setData] = useState([]); // [!code --]
+  const [data, setData] = useState(null); // [!code ++]
+  
+  return <div>{data}</div>;
+}
+```
+````
+
+**Result:** Deleted lines shown in red, added lines in green.
+
+#### 4. Line Focus
+
+Focus attention on specific lines with `// [!code focus]`:
+
+````mdx
+```jsx title="Important Line"
+function App() {
+  const important = "This is key!"; // [!code focus]
+  const other = "Less important";
+  
+  return <div>{important}</div>;
+}
+```
+````
+
+**Result:** Focused line emphasized, others dimmed.
+
+#### 5. Blockquotes and Callouts
+
+Use `>` for notes and callouts:
+
+```mdx
+> **Note:** This is an important note about the code above.
+
+> **Warning:** Be careful when using this approach.
+
+> **Tip:** You can also do it this way for better performance.
+```
+
+**Styling variations:**
+
+```mdx
+> If you're looking for an equivalent with runtime syntax highlighting, see Dynamic Code Block.
+```
+
+Simple blockquotes render with left border and padding.
+
+---
 
 **Features:**
 - Automatic syntax highlighting via Fumadocs
