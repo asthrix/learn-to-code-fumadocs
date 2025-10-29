@@ -1,0 +1,580 @@
+---
+title: "L5: Filtering Listings Dynamically"
+description: "Implement real-time filtering logic using array methods and state"
+module: 2
+lesson: 5
+---
+
+
+
+# Lesson 5: Filtering Listings Dynamically
+
+<Badge variant="blue">Array Methods</Badge>
+<Badge variant="green">Filtering Logic</Badge>
+<Badge variant="purple">Real-time Updates</Badge>
+
+Now that HomePage has access to all filter values, it's time to implement the filtering logic! We'll filter listings in real-time as users interact with the filters.
+
+---
+
+## The Goal
+
+Filter listings based on:
+
+1. **Search** - Match location or title
+2. **Dates** - Check availability (we'll simulate this)
+3. **Guests** - Must accommodate guest count
+
+```jsx title="Filter Flow"
+All Listings (3) 
+    ↓ 
+Filter by Search 
+    ↓
+Filter by Guests
+    ↓
+Filtered Results (1-3)
+```
+
+---
+
+## Understanding Array.filter()
+
+The `filter()` method creates a new array with elements that pass a test:
+
+```jsx title="Array Filter Basics"
+const numbers = [1, 2, 3, 4, 5];
+
+// Keep only even numbers
+const evens = numbers.filter(num => num % 2 === 0);
+// Result: [2, 4]
+
+// Keep numbers greater than 3
+const large = numbers.filter(num => num > 3);
+// Result: [4, 5]
+
+// Chain multiple conditions
+const filtered = numbers.filter(num => num > 2 && num < 5);
+// Result: [3, 4]
+```
+
+**Key Points:**
+- Returns a new array (doesn't modify original)
+- Callback must return `true` (keep) or `false` (remove)
+- If all items fail, returns empty array `[]`
+
+---
+
+## Step-by-Step Implementation
+
+<Steps>
+  <Step>
+    ### Step 1: Create the Filtering Function
+    
+    Add a function in `HomePage` to filter listings:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    export function HomePage() {
+      const [listings, setListings] = useState([/* ... */]);
+      const [search, setSearch] = useState('');
+      const [checkIn, setCheckIn] = useState('');
+      const [checkOut, setCheckOut] = useState('');
+      const [guests, setGuests] = useState(1);
+      
+      // Filtering function
+      const getFilteredListings = () => { // [!code ++]
+        return listings.filter(listing => { // [!code ++]
+          // We'll add conditions here // [!code ++]
+          return true; // [!code ++]
+        }); // [!code ++]
+      }; // [!code ++]
+      
+      return (
+        // ... JSX
+      );
+    }
+    ```
+    
+    > **Starting Simple:** Returns all listings for now (always `true`).
+  </Step>
+  
+  <Step>
+    ### Step 2: Add Search Filter Logic
+    
+    Filter by search term (location or title):
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    const getFilteredListings = () => {
+      return listings.filter(listing => {
+        // Search filter
+        const matchesSearch = // [!code ++]
+          search === '' || // If search is empty, match all // [!code ++]
+          listing.location.toLowerCase().includes(search.toLowerCase()) || // [!code ++]
+          listing.title.toLowerCase().includes(search.toLowerCase()); // [!code ++]
+        
+        return matchesSearch; // [!code ++]
+      });
+    };
+    ```
+    
+    > **Case-Insensitive:** We use `.toLowerCase()` so "malibu" matches "Malibu".
+    >
+    > **Partial Matches:** `includes()` finds "Mal" in "Malibu".
+  </Step>
+  
+  <Step>
+    ### Step 3: Add Guest Count Filter
+    
+    Filter by number of guests:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    const getFilteredListings = () => {
+      return listings.filter(listing => {
+        // Search filter
+        const matchesSearch =
+          search === '' ||
+          listing.location.toLowerCase().includes(search.toLowerCase()) ||
+          listing.title.toLowerCase().includes(search.toLowerCase());
+        
+        // Guest filter
+        const matchesGuests = listing.guests >= guests; // [!code ++]
+        
+        return matchesSearch && matchesGuests; // [!code ++]
+      });
+    };
+    ```
+    
+    > **Logic:** Listing must accommodate at least the requested number of guests.
+  </Step>
+  
+  <Step>
+    ### Step 4: Add Date Filter (Simulated)
+    
+    Add basic date validation:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    const getFilteredListings = () => {
+      return listings.filter(listing => {
+        // Search filter
+        const matchesSearch =
+          search === '' ||
+          listing.location.toLowerCase().includes(search.toLowerCase()) ||
+          listing.title.toLowerCase().includes(search.toLowerCase());
+        
+        // Guest filter
+        const matchesGuests = listing.guests >= guests;
+        
+        // Date filter (basic validation)
+        const matchesDates = // [!code ++]
+          checkIn === '' || // If no date selected, match all // [!code ++]
+          checkOut === '' || // If no date selected, match all // [!code ++]
+          (checkIn && checkOut && checkIn < checkOut); // Validate date range // [!code ++]
+        
+        return matchesSearch && matchesGuests && matchesDates; // [!code ++]
+      });
+    };
+    ```
+    
+    > **Note:** In a real app, you'd check actual availability against a calendar. Here we just validate the date range makes sense.
+  </Step>
+  
+  <Step>
+    ### Step 5: Use Filtered Listings in Render
+    
+    Replace `listings` with `getFilteredListings()` in the JSX:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    export function HomePage() {
+      // ... state and getFilteredListings function
+      
+      const filteredListings = getFilteredListings(); // [!code ++]
+      
+      return (
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+          
+          <ListingFilters
+            search={search}
+            checkIn={checkIn}
+            checkOut={checkOut}
+            guests={guests}
+            onSearchChange={setSearch}
+            onCheckInChange={setCheckIn}
+            onCheckOutChange={setCheckOut}
+            onGuestsChange={setGuests}
+          />
+          
+          {/* Show results count */}
+          <p className="text-gray-600 mb-4"> // [!code ++]
+            Found {filteredListings.length} {filteredListings.length === 1 ? 'listing' : 'listings'} // [!code ++]
+          </p> // [!code ++]
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredListings.map(listing => ( // [!code highlight]
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+    > **Real-time Filtering:** As state updates, `getFilteredListings()` runs again, filtering the list dynamically.
+  </Step>
+  
+  <Step>
+    ### Step 6: Add Empty State
+    
+    Show a message when no listings match:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filteredListings.length === 0 ? ( // [!code ++]
+        <div className="col-span-full text-center py-12"> // [!code ++]
+          <p className="text-gray-500 text-lg mb-2">No listings found</p> // [!code ++]
+          <p className="text-gray-400">Try adjusting your filters</p> // [!code ++]
+        </div> // [!code ++]
+      ) : ( // [!code ++]
+        filteredListings.map(listing => (
+          <ListingCard key={listing.id} listing={listing} />
+        ))
+      )} // [!code ++]
+    </div>
+    ```
+    
+    > **Better UX:** Users know why they see no results.
+  </Step>
+  
+  <Step>
+    ### Step 7: Test the Filters
+    
+    Try each filter:
+    
+    **Search Test:**
+    - Type "Malibu" → Should show Beach House
+    - Type "cabin" → Should show Mountain Cabin
+    - Type "xyz" → Should show empty state
+    
+    **Guest Test:**
+    - Set guests to 5 → Should show Mountain Cabin (6 guests)
+    - Set guests to 1 → Should show all listings
+    
+    **Combined Test:**
+    - Search "beach" + 2 guests → Should show Beach House
+    - Search "cabin" + 7 guests → Should show empty state (cabin only fits 6)
+    
+    > **Real-time Updates!** No page refresh needed - everything updates instantly.
+  </Step>
+</Steps>
+
+---
+
+## Complete Filtering Code
+
+Here's the complete `HomePage` with all filtering logic:
+
+```jsx title="src/pages/HomePage.jsx"
+// [!code word:useState]
+import { useState } from 'react';
+import { ListingCard } from '../components/ListingCard';
+import { ListingFilters } from '../components/ListingFilters';
+
+export function HomePage() {
+  // Listings state
+  const [listings, setListings] = useState([
+    {
+      id: 1,
+      title: "Cozy Beach House",
+      price: 250,
+      location: "Malibu, CA",
+      image: "/images/beach-house.jpg",
+      guests: 4,
+      bedrooms: 2,
+      bathrooms: 2,
+    },
+    {
+      id: 2,
+      title: "Mountain Cabin",
+      price: 180,
+      location: "Aspen, CO",
+      image: "/images/cabin.jpg",
+      guests: 6,
+      bedrooms: 3,
+      bathrooms: 2,
+    },
+    {
+      id: 3,
+      title: "Downtown Loft",
+      price: 320,
+      location: "New York, NY",
+      image: "/images/loft.jpg",
+      guests: 2,
+      bedrooms: 1,
+      bathrooms: 1,
+    },
+  ]);
+  
+  // Filter state
+  const [search, setSearch] = useState('');
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests] = useState(1);
+  
+  // Filtering function
+  const getFilteredListings = () => { // [!code highlight]
+    return listings.filter(listing => {
+      // Search filter
+      const matchesSearch =
+        search === '' ||
+        listing.location.toLowerCase().includes(search.toLowerCase()) ||
+        listing.title.toLowerCase().includes(search.toLowerCase());
+      
+      // Guest filter
+      const matchesGuests = listing.guests >= guests;
+      
+      // Date filter (validation only)
+      const matchesDates =
+        checkIn === '' ||
+        checkOut === '' ||
+        (checkIn && checkOut && checkIn < checkOut);
+      
+      return matchesSearch && matchesGuests && matchesDates;
+    });
+  }; // [!code highlight]
+  
+  const filteredListings = getFilteredListings(); // [!code highlight]
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+      
+      <ListingFilters
+        search={search}
+        checkIn={checkIn}
+        checkOut={checkOut}
+        guests={guests}
+        onSearchChange={setSearch}
+        onCheckInChange={setCheckIn}
+        onCheckOutChange={setCheckOut}
+        onGuestsChange={setGuests}
+      />
+      
+      <p className="text-gray-600 mb-4">
+        Found {filteredListings.length} {filteredListings.length === 1 ? 'listing' : 'listings'}
+      </p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredListings.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-500 text-lg mb-2">No listings found</p>
+            <p className="text-gray-400">Try adjusting your filters</p>
+          </div>
+        ) : (
+          filteredListings.map(listing => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## Advanced Filtering Patterns
+
+### Pattern 1: Extract Filter Functions
+
+For better organization, separate each filter:
+
+```jsx
+const matchesSearch = (listing, search) => {
+  if (search === '') return true;
+  
+  const searchLower = search.toLowerCase();
+  return (
+    listing.location.toLowerCase().includes(searchLower) ||
+    listing.title.toLowerCase().includes(searchLower)
+  );
+};
+
+const matchesGuests = (listing, guests) => {
+  return listing.guests >= guests;
+};
+
+const getFilteredListings = () => {
+  return listings.filter(listing => {
+    return (
+      matchesSearch(listing, search) &&
+      matchesGuests(listing, guests)
+    );
+  });
+};
+```
+
+### Pattern 2: Filter with Reduce (Advanced)
+
+```jsx
+const getFilteredListings = () => {
+  return listings.reduce((acc, listing) => {
+    if (
+      matchesSearch(listing) &&
+      matchesGuests(listing) &&
+      matchesDates()
+    ) {
+      acc.push(listing);
+    }
+    return acc;
+  }, []);
+};
+```
+
+### Pattern 3: Multiple Filters with Array
+
+```jsx
+const filters = [
+  (listing) => matchesSearch(listing, search),
+  (listing) => matchesGuests(listing, guests),
+  (listing) => matchesDates(checkIn, checkOut),
+];
+
+const getFilteredListings = () => {
+  return listings.filter(listing => {
+    return filters.every(filterFn => filterFn(listing));
+  });
+};
+```
+
+---
+
+## Performance Optimization
+
+### Use useMemo for Expensive Filtering
+
+```jsx
+// [!code word:useMemo]
+import { useState, useMemo } from 'react';
+
+export function HomePage() {
+  // ... state
+  
+  const filteredListings = useMemo(() => { // [!code highlight]
+    return listings.filter(listing => {
+      // ... filtering logic
+    });
+  }, [listings, search, guests, checkIn, checkOut]); // [!code highlight]
+  
+  // filteredListings only recalculates when dependencies change
+}
+```
+
+> **When to use:** With large datasets (100+ items) or complex filtering logic.
+
+---
+
+## Filtering Edge Cases
+
+### Case 1: Trimming Whitespace
+
+```jsx
+const matchesSearch =
+  search.trim() === '' || // [!code highlight]
+  listing.location.toLowerCase().includes(search.trim().toLowerCase());
+```
+
+### Case 2: Multiple Search Terms
+
+```jsx
+const searchTerms = search.toLowerCase().split(' ').filter(term => term);
+
+const matchesSearch = searchTerms.every(term =>
+  listing.location.toLowerCase().includes(term) ||
+  listing.title.toLowerCase().includes(term)
+);
+```
+
+### Case 3: Price Range Filter (Bonus)
+
+```jsx
+const [minPrice, setMinPrice] = useState(0);
+const [maxPrice, setMaxPrice] = useState(1000);
+
+const matchesPrice = 
+  listing.price >= minPrice && 
+  listing.price <= maxPrice;
+```
+
+---
+
+## Checkpoint
+
+<Accordions>
+  <Accordion title="✅ What You Accomplished">
+    - Implemented real-time filtering with array.filter()
+    - Created search filter (case-insensitive, partial match)
+    - Added guest count filter
+    - Implemented date range validation
+    - Combined multiple filter conditions with AND logic
+    - Added empty state for no results
+    - Displayed results count
+    - Tested all filter combinations
+  </Accordion>
+  
+  <Accordion title="🧪 Practice Challenge">
+    Add a "Clear All Filters" button:
+    
+    ```jsx
+    const handleClearFilters = () => {
+      setSearch('');
+      setCheckIn('');
+      setCheckOut('');
+      setGuests(1);
+    };
+    
+    <button 
+      onClick={handleClearFilters}
+      className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+    >
+      Clear All Filters
+    </button>
+    ```
+  </Accordion>
+  
+  <Accordion title="❓ Common Questions">
+    **Q: Why use a function instead of storing filtered listings in state?**
+    
+    A: Because filtered listings are **derived** from existing state (listings + filters). Computing them on render is simpler and avoids sync issues.
+    
+    **Q: What if I have thousands of listings?**
+    
+    A: Use `useMemo` to cache results, implement pagination, or fetch filtered results from an API instead of client-side filtering.
+    
+    **Q: Can I filter by multiple fields in search?**
+    
+    A: Yes! Add more conditions with `||`:
+    ```jsx
+    listing.location.includes(search) ||
+    listing.title.includes(search) ||
+    listing.description.includes(search)
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## What's Next?
+
+Congratulations! You've built a fully functional filtering system with:
+- ✅ Multiple filter controls
+- ✅ Real-time updates
+- ✅ State management
+- ✅ Component communication
+
+In **Lesson 6**, we'll wrap up Module 2 with:
+- Module review and key concepts
+- Best practices recap
+- Common patterns summary
+- Preview of Module 3 (Effects & Data Fetching)
+
+You've mastered React state and interactivity! 🎉
+

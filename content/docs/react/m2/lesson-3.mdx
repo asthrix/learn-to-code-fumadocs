@@ -1,0 +1,622 @@
+---
+title: "L3: Adding State to Filters"
+description: "Make filters interactive with useState and controlled inputs"
+module: 2
+lesson: 3
+---
+
+
+# Lesson 3: Adding State to Filters
+
+<Badge variant="blue">State Management</Badge>
+<Badge variant="green">Controlled Inputs</Badge>
+<Badge variant="purple">Event Handlers</Badge>
+
+Our `ListingFilters` component looks great, but it's not interactive yet. In this lesson, we'll add **state** and **event handlers** to make the filters respond to user input.
+
+---
+
+## What Are Controlled Components?
+
+In React, a **controlled component** is an input element whose value is controlled by React state:
+
+```jsx title="Controlled vs Uncontrolled"
+// ❌ Uncontrolled: React doesn't know the value
+<input type="text" />
+
+// ✅ Controlled: React controls the value
+const [value, setValue] = useState('');
+<input 
+  type="text" 
+  value={value} // [!code highlight]
+  onChange={(e) => setValue(e.target.value)} // [!code highlight]
+/>
+```
+
+**Benefits of Controlled Components:**
+- React always knows the current value
+- Easy to validate or format input
+- Can reset or pre-fill values programmatically
+- Single source of truth (state)
+
+> **Rule of Thumb:** In React, always use controlled inputs for forms and user input.
+
+---
+
+## Understanding Event Handlers
+
+Event handlers are functions that run when users interact with your UI:
+
+```jsx title="Common Event Handlers"
+// Text input changes
+<input onChange={(e) => handleChange(e)} />
+
+// Button clicks
+<button onClick={() => handleClick()} />
+
+// Form submission
+<form onSubmit={(e) => handleSubmit(e)} />
+
+// Focus events
+<input onFocus={() => handleFocus()} />
+<input onBlur={() => handleBlur()} />
+```
+
+**Event Object (`e`):**
+- `e.target` → The element that triggered the event
+- `e.target.value` → Current value of input
+- `e.preventDefault()` → Prevent default behavior
+
+---
+
+## Step-by-Step Implementation
+
+<Steps>
+  <Step>
+    ### Step 1: Add useState Imports and State Variables
+    
+    Open `src/components/ListingFilters.jsx` and add state for all filters:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    import { useState } from 'react'; // [!code ++]
+    
+    export function ListingFilters() {
+      // State for search input
+      const [search, setSearch] = useState(''); // [!code ++]
+      
+      // State for date inputs
+      const [checkIn, setCheckIn] = useState(''); // [!code ++]
+      const [checkOut, setCheckOut] = useState(''); // [!code ++]
+      
+      // State for guest counter
+      const [guests, setGuests] = useState(1); // [!code ++]
+      
+      return (
+        // ... JSX
+      );
+    }
+    ```
+    
+    > **State Initialization:**
+    > - `search`: Empty string (no search query yet)
+    > - `checkIn` / `checkOut`: Empty strings (no dates selected)
+    > - `guests`: Number 1 (minimum guests)
+  </Step>
+  
+  <Step>
+    ### Step 2: Make Search Input Controlled
+    
+    Connect the search input to state:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    <div className="mb-4">
+      <label 
+        htmlFor="search" 
+        className="block text-sm font-medium text-gray-700 mb-2"
+      >
+        Search by location
+      </label>
+      <input
+        id="search"
+        type="text"
+        placeholder="e.g., Malibu, Beach House..."
+        value={search} // [!code ++]
+        onChange={(e) => setSearch(e.target.value)} // [!code ++]
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />
+    </div>
+    ```
+    
+    > **How It Works:**
+    > 1. User types in the input
+    > 2. `onChange` event fires
+    > 3. `setSearch` updates state with `e.target.value`
+    > 4. Component re-renders
+    > 5. Input displays new `value` from state
+  </Step>
+  
+  <Step>
+    ### Step 3: Make Date Inputs Controlled
+    
+    Connect check-in and check-out inputs to state:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    <div className="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label 
+          htmlFor="checkin" 
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Check-in
+        </label>
+        <input
+          id="checkin"
+          type="date"
+          value={checkIn} // [!code ++]
+          onChange={(e) => setCheckIn(e.target.value)} // [!code ++]
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+      
+      <div>
+        <label 
+          htmlFor="checkout" 
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Check-out
+        </label>
+        <input
+          id="checkout"
+          type="date"
+          value={checkOut} // [!code ++]
+          onChange={(e) => setCheckOut(e.target.value)} // [!code ++]
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+    </div>
+    ```
+    
+    > **Date Format:** The browser's date picker automatically formats dates as `YYYY-MM-DD` (e.g., "2024-12-25").
+  </Step>
+  
+  <Step>
+    ### Step 4: Add Guest Counter Event Handlers
+    
+    Create functions to handle increment and decrement:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    export function ListingFilters() {
+      const [search, setSearch] = useState('');
+      const [checkIn, setCheckIn] = useState('');
+      const [checkOut, setCheckOut] = useState('');
+      const [guests, setGuests] = useState(1);
+      
+      // Handle decrement guest count
+      const handleDecrement = () => { // [!code ++]
+        if (guests > 1) { // [!code ++]
+          setGuests(guests - 1); // [!code ++]
+        } // [!code ++]
+      }; // [!code ++]
+      
+      // Handle increment guest count
+      const handleIncrement = () => { // [!code ++]
+        setGuests(guests + 1); // [!code ++]
+      }; // [!code ++]
+      
+      return (
+        // ... JSX
+      );
+    }
+    ```
+    
+    > **Validation:** The decrement function checks if `guests > 1` to prevent going below 1 guest.
+  </Step>
+  
+  <Step>
+    ### Step 5: Connect Buttons to Event Handlers
+    
+    Wire up the guest counter buttons:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Number of guests
+      </label>
+      <div className="flex items-center gap-4">
+        <button
+          onClick={handleDecrement} // [!code ++]
+          className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold"
+        >
+          −
+        </button>
+        
+        <span className="text-lg font-semibold">{guests}</span> // [!code highlight]
+        
+        <button
+          onClick={handleIncrement} // [!code ++]
+          className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center font-bold"
+        >
+          +
+        </button>
+      </div>
+    </div>
+    ```
+    
+    > **Dynamic Display:** The guest count now displays `{guests}` from state instead of the hardcoded "1".
+  </Step>
+  
+  <Step>
+    ### Step 6: Add Debug Display (Optional)
+    
+    Temporarily display state values to see changes in real-time:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    export function ListingFilters() {
+      // ... state and handlers
+      
+      return (
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Filter Stays</h2>
+          
+          {/* Temporary Debug Display */}
+          <div className="bg-gray-100 p-4 rounded mb-4 text-sm"> // [!code ++]
+            <p><strong>Search:</strong> {search || '(empty)'}</p> // [!code ++]
+            <p><strong>Check-in:</strong> {checkIn || '(not set)'}</p> // [!code ++]
+            <p><strong>Check-out:</strong> {checkOut || '(not set)'}</p> // [!code ++]
+            <p><strong>Guests:</strong> {guests}</p> // [!code ++]
+          </div> // [!code ++]
+          
+          {/* Rest of the filters... */}
+        </div>
+      );
+    }
+    ```
+    
+    > **Debugging Tip:** This helps you verify that state is updating correctly. Remove it once everything works!
+  </Step>
+  
+  <Step>
+    ### Step 7: Test in Browser
+    
+    Save and test each filter:
+    
+    - ✅ Type in search box → See search value update
+    - ✅ Select check-in date → See date update
+    - ✅ Select check-out date → See date update
+    - ✅ Click + button → Guest count increases
+    - ✅ Click − button → Guest count decreases (stops at 1)
+    
+    > **Working!** Your filters are now fully interactive and controlled by React state.
+  </Step>
+</Steps>
+
+---
+
+## Complete ListingFilters Code
+
+Here's the complete, interactive component:
+
+```jsx title="src/components/ListingFilters.jsx"
+// [!code word:useState]
+import { useState } from 'react';
+
+export function ListingFilters() {
+  // State management
+  const [search, setSearch] = useState(''); // [!code highlight]
+  const [checkIn, setCheckIn] = useState(''); // [!code highlight]
+  const [checkOut, setCheckOut] = useState(''); // [!code highlight]
+  const [guests, setGuests] = useState(1); // [!code highlight]
+  
+  // Event handlers
+  const handleDecrement = () => { // [!code highlight]
+    if (guests > 1) {
+      setGuests(guests - 1);
+    }
+  };
+  
+  const handleIncrement = () => { // [!code highlight]
+    setGuests(guests + 1);
+  };
+  
+  return (
+    <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+      <h2 className="text-xl font-semibold mb-4">Filter Stays</h2>
+      
+      {/* Search Input */}
+      <div className="mb-4">
+        <label 
+          htmlFor="search" 
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Search by location
+        </label>
+        <input
+          id="search"
+          type="text"
+          placeholder="e.g., Malibu, Beach House..."
+          value={search} // [!code highlight]
+          onChange={(e) => setSearch(e.target.value)} // [!code highlight]
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+      
+      {/* Date Inputs */}
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label 
+            htmlFor="checkin" 
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Check-in
+          </label>
+          <input
+            id="checkin"
+            type="date"
+            value={checkIn} // [!code highlight]
+            onChange={(e) => setCheckIn(e.target.value)} // [!code highlight]
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        
+        <div>
+          <label 
+            htmlFor="checkout" 
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Check-out
+          </label>
+          <input
+            id="checkout"
+            type="date"
+            value={checkOut} // [!code highlight]
+            onChange={(e) => setCheckOut(e.target.value)} // [!code highlight]
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+      
+      {/* Guest Counter */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Number of guests
+        </label>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleDecrement} // [!code highlight]
+            className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold"
+          >
+            −
+          </button>
+          
+          <span className="text-lg font-semibold">{guests}</span>
+          
+          <button
+            onClick={handleIncrement} // [!code highlight]
+            className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center font-bold"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## Understanding the Data Flow
+
+Here's how controlled inputs work:
+
+```jsx title="Controlled Input Flow"
+// [!code word:value]
+// 1. Initial render: input shows '' (empty)
+const [search, setSearch] = useState('');
+
+// 2. User types 'M' in input
+<input 
+  value={search}              // Currently: ''
+  onChange={(e) => setSearch(e.target.value)}
+/>
+
+// 3. onChange fires with e.target.value = 'M'
+setSearch('M')
+
+// 4. State updates, component re-renders
+// search is now 'M'
+
+// 5. Input displays new value
+<input value={search} />  // Now shows 'M'
+```
+
+**This creates a feedback loop:**
+1. User input → Event
+2. Event → Update state
+3. State change → Re-render
+4. Re-render → Update input
+5. Repeat
+
+---
+
+## Event Handler Patterns
+
+### Pattern 1: Inline Arrow Function
+
+```jsx
+<input onChange={(e) => setSearch(e.target.value)} />
+```
+
+**Use when:** Simple, one-line updates
+
+### Pattern 2: Named Function
+
+```jsx
+const handleSearchChange = (e) => {
+  setSearch(e.target.value);
+};
+
+<input onChange={handleSearchChange} />
+```
+
+**Use when:** Need to add validation or logging
+
+### Pattern 3: Named Function with Logic
+
+```jsx
+const handleDecrement = () => {
+  if (guests > 1) { // [!code highlight]
+    setGuests(guests - 1);
+  }
+};
+
+<button onClick={handleDecrement}>−</button>
+```
+
+**Use when:** Need conditional logic or multiple operations
+
+---
+
+## Common Mistakes to Avoid
+
+### ❌ Mistake 1: Forgetting `value` Prop
+
+```jsx
+// Wrong: Input is uncontrolled
+<input onChange={(e) => setSearch(e.target.value)} />
+
+// Correct: Input is controlled
+<input 
+  value={search} // [!code ++]
+  onChange={(e) => setSearch(e.target.value)} 
+/>
+```
+
+### ❌ Mistake 2: Calling Function Instead of Passing It
+
+```jsx
+// Wrong: Calls handleIncrement immediately on render
+<button onClick={handleIncrement()}>+</button>
+
+// Correct: Passes function reference
+<button onClick={handleIncrement}>+</button>
+```
+
+### ❌ Mistake 3: Using Wrong Event Property
+
+```jsx
+// Wrong: e.value doesn't exist
+onChange={(e) => setSearch(e.value)}
+
+// Correct: e.target.value
+onChange={(e) => setSearch(e.target.value)}
+```
+
+### ❌ Mistake 4: Mutating State
+
+```jsx
+// Wrong: Mutating state directly
+const handleIncrement = () => {
+  guests = guests + 1; // ❌
+};
+
+// Correct: Using setter function
+const handleIncrement = () => {
+  setGuests(guests + 1); // ✅
+};
+```
+
+---
+
+## Advanced: Validation and Constraints
+
+You can add validation in event handlers:
+
+```jsx title="Input Validation Examples"
+// Limit guest count to max 10
+const handleIncrement = () => {
+  if (guests < 10) { // [!code highlight]
+    setGuests(guests + 1);
+  }
+};
+
+// Prevent check-out before check-in
+const handleCheckOutChange = (e) => {
+  const newCheckOut = e.target.value;
+  
+  if (checkIn && newCheckOut < checkIn) { // [!code highlight]
+    alert('Check-out must be after check-in');
+    return;
+  }
+  
+  setCheckOut(newCheckOut);
+};
+
+// Sanitize search input
+const handleSearchChange = (e) => {
+  const sanitized = e.target.value.trim(); // [!code highlight]
+  setSearch(sanitized);
+};
+```
+
+---
+
+## Checkpoint
+
+<Accordions>
+  <Accordion title="✅ What You Learned">
+    - What controlled components are and why they're important
+    - How to connect inputs to state with `value` and `onChange`
+    - Event handler syntax and common patterns
+    - How to access input values with `e.target.value`
+    - Creating increment/decrement functions
+    - Validating user input (min/max constraints)
+    - The data flow in controlled components
+  </Accordion>
+  
+  <Accordion title="🧪 Practice Challenge">
+    Add a "Clear Filters" button that resets all state:
+    
+    ```jsx
+    const handleClearFilters = () => {
+      setSearch('');
+      setCheckIn('');
+      setCheckOut('');
+      setGuests(1);
+    };
+    
+    <button onClick={handleClearFilters}>
+      Clear All Filters
+    </button>
+    ```
+  </Accordion>
+  
+  <Accordion title="❓ Common Questions">
+    **Q: Why use `e.target.value` instead of just `e`?**
+    
+    A: `e` is the entire event object. `e.target` is the DOM element, and `e.target.value` is the current input value.
+    
+    **Q: Do I need to use `e.preventDefault()`?**
+    
+    A: For buttons and inputs, usually no. For form submission (`onSubmit`), yes - to prevent page reload.
+    
+    **Q: Can I use refs instead of controlled components?**
+    
+    A: Yes, but controlled components are recommended. They give you more control and make React the single source of truth.
+  </Accordion>
+</Accordions>
+
+---
+
+## What's Next?
+
+Our filters are now interactive, but they only work **inside** the `ListingFilters` component. The `HomePage` doesn't know about the filter values!
+
+In **Lesson 4**, we'll learn **state lifting** - a crucial pattern for sharing state between components. We'll:
+- Move filter state to HomePage
+- Pass values down as props
+- Pass updater functions as callbacks
+- Enable HomePage to use filter values
+
+This is where React's component communication really shines! 🚀
+
