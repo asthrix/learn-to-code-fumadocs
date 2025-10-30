@@ -134,7 +134,7 @@ export function CourseModulesSection({
                                                 {lesson.title}
                                              </p>
                                           </div>
-                                          <span className='shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-secondary/80'>
+                                          <span className='shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-primary dark:text-secondary'>
                                              {lesson.duration}
                                           </span>
                                        </div>
@@ -199,7 +199,7 @@ export function CourseModulesSection({
                                        className={cn(
                                           "cursor-pointer select-none px-3 py-2 font-medium transition",
                                           isActive
-                                             ? "bg-primary/15 text-secondary/80 shadow-[0_18px_35px_-28px_hsl(var(--color-primary)/0.45)] hover:text-secondary"
+                                             ? "bg-primary/15 text-primary dark:text-secondary shadow-[0_18px_35px_-28px_hsl(var(--color-primary)/0.45)] hover:text-primary dark:hover:text-secondary"
                                              : "text-muted-foreground hover:bg-muted/40 hover:text-secondary"
                                        )}
                                     />

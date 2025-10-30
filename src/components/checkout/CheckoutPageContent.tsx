@@ -338,7 +338,7 @@ function Field({ label, htmlFor, required, children }: FieldProps) {
    return (
       <label
          htmlFor={htmlFor}
-         className='flex flex-col gap-2 text-sm font-medium text-white'
+         className='flex flex-col gap-2 text-sm font-medium text-foreground'
       >
          <span>
             {label}
@@ -418,7 +418,7 @@ function CheckoutSidebar({
    selectedPlan,
 }: CheckoutSidebarProps) {
    return (
-      <aside className='space-y-6 rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-[0_25px_70px_-45px_rgba(99,102,241,0.45)] backdrop-blur lg:sticky lg:top-8'>
+      <aside className='space-y-6 rounded-[28px] border border-border bg-card/50 p-6 shadow-[0_25px_70px_-45px_hsl(var(--color-primary)/0.45)] backdrop-blur lg:sticky lg:top-8'>
          <SummaryCard
             course={course}
             detail={detail}
@@ -477,7 +477,7 @@ function SummaryCard({ course, detail, selectedPlan }: SummaryCardProps) {
          {selectedPlan && (
             <p className='rounded-xl border border-secondary/40 bg-primary/10 px-3 py-2 text-xs text-muted-foreground'>
                Selected plan:{" "}
-               <span className='font-semibold text-white'>
+               <span className='font-semibold text-foreground'>
                   {selectedPlan.name}
                </span>{" "}
                · {selectedPlan.price}
@@ -588,15 +588,15 @@ function CheckoutConfirmation({
             <ShieldCheck className='h-7 w-7' />
          </div>
          <div className='space-y-3'>
-            <h2 className='text-xl font-semibold text-white'>You&apos;re in</h2>
-            <p className='text-sm text-white/60'>
+            <h2 className='text-xl font-semibold text-foreground'>You&apos;re in</h2>
+            <p className='text-sm text-muted-foreground'>
                Your onboarding email for {course.title} is on the way with
                workspace access and next steps.
             </p>
             {selectedPlan && (
-               <p className='text-sm text-white/60'>
+               <p className='text-sm text-muted-foreground'>
                   Plan confirmed:{" "}
-                  <span className='font-semibold text-white'>
+                  <span className='font-semibold text-foreground'>
                      {selectedPlan.name}
                   </span>{" "}
                   · {selectedPlan.price}
@@ -640,7 +640,7 @@ function CheckoutHero({
    ];
 
    return (
-      <header className='rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-[0_32px_100px_-55px_rgba(99,102,241,0.55)] backdrop-blur'>
+      <header className='rounded-[32px] border border-border bg-card/50 p-8 shadow-[0_32px_100px_-55px_hsl(var(--color-primary)/0.55)] backdrop-blur'>
          <div className='flex flex-wrap items-start justify-between gap-8'>
             <div className='space-y-5'>
                <Link
@@ -674,7 +674,7 @@ function CheckoutHero({
                         <p className='text-[0.6rem] uppercase tracking-[0.26em] text-muted-foreground'>
                            {metric.label}
                         </p>
-                        <p className='text-sm font-semibold text-white'>
+                        <p className='text-sm font-semibold text-foreground'>
                            {metric.value}
                         </p>
                      </div>
@@ -683,7 +683,7 @@ function CheckoutHero({
                {selectedPlan && !isConfirmed && (
                   <div className='rounded-xl border border-secondary/40 bg-primary/10 px-3 py-2 text-xs text-muted-foreground'>
                      Selected:{" "}
-                     <span className='font-semibold text-white'>
+                     <span className='font-semibold text-foreground'>
                         {selectedPlan.name}
                      </span>{" "}
                      · {selectedPlan.price}

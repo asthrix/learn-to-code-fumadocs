@@ -40,7 +40,7 @@ export function CourseTechnologySection({
 
    return (
       <section className='relative px-6 pb-24'>
-         <div className='pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_55%)] blur-lg dark:bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.32),_transparent_60%)]' />
+         <div className='pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.18),_transparent_55%)] blur-lg' />
          <div className='mx-auto max-w-6xl'>
             <div className='text-center'>
                <p className='inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground backdrop-blur-sm'>
@@ -71,10 +71,10 @@ export function CourseTechnologySection({
                   return (
                      <article
                         key={group.title}
-                        className={`group relative overflow-hidden rounded-3xl border border-slate-900/10 bg-white/70 p-[1px] transition duration-500 hover:-translate-y-2 hover:shadow-[0_45px_85px_-45px_rgba(56,189,248,0.45)] dark:border-white/10 dark:bg-slate-900/60 ${accent.border}`}
+                        className={`group relative overflow-hidden rounded-3xl border border-border bg-card/70 p-[1px] transition duration-500 hover:-translate-y-2 hover:shadow-[0_45px_85px_-45px_hsl(var(--color-primary)/0.45)] ${accent.border}`}
                      >
                         <span
-                           className={`pointer-events-none absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-100 dark:opacity-80 dark:group-hover:opacity-100 bg-gradient-to-br ${accent.glow}`}
+                           className={`pointer-events-none absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-100 bg-gradient-to-br ${accent.glow}`}
                         />
 
                         <div className='relative h-full rounded-[calc(1.5rem-1px)] bg-white/95 p-6 dark:bg-slate-950/75'>
