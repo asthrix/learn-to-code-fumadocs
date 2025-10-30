@@ -14,11 +14,11 @@ export default function ReactCoursePage() {
       <main className='relative flex flex-1 flex-col bg-slate-50 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-100'>
          <CourseDetailHeroSection hero={hero} />
          <CourseDifferentiatorsSection differentiators={differentiators} />
-         <CourseTechnologySection technology={technology} />
          <CourseModulesSection
             modules={modules}
             courseSlug={reactCourseDetail.slug}
          />
+         <CourseTechnologySection technology={technology} />
          <CoursePricingSection pricing={pricing} />
          <CourseTestimonialsSection testimonials={testimonials} />
       </main>

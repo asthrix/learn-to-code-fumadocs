@@ -126,10 +126,9 @@ export function CourseModulesSection({
                                        <div className='flex items-start justify-between gap-6 rounded-2xl border border-border bg-card/80 p-4 shadow-sm transition hover:border-primary/40 hover:shadow-[0_12px_35px_-20px_hsl(var(--color-primary)/0.45)]'>
                                           <div>
                                              <p className='text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground'>
-                                                Lesson{" "}
-                                                {String(
-                                                   lessonIndex + 1
-                                                ).padStart(2, "0")}
+                                                {lessonIndex === 0
+                                                   ? "Overview"
+                                                   : `Lesson ${String(lessonIndex).padStart(2, "0")}`}
                                              </p>
                                              <p className='mt-1 text-sm font-medium text-foreground'>
                                                 {lesson.title}
