@@ -4,7 +4,7 @@ export function HeroSection() {
    return (
       <section className='relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary via-primary/90 to-secondary overflow-hidden'>
          {/* Background Pattern */}
-         <div className='absolute inset-0 bg-black opacity-20'></div>
+         <div className='absolute inset-0 bg-background/20 dark:bg-foreground/10'></div>
          <div
             className='absolute inset-0'
             style={{
@@ -15,26 +15,26 @@ export function HeroSection() {
          ></div>
 
          {/* Floating Elements */}
-         <div className='absolute top-20 left-20 w-72 h-72 bg-primary-foreground/10 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob'></div>
-         <div className='absolute top-40 right-20 w-72 h-72 bg-secondary/20 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000'></div>
-         <div className='absolute -bottom-8 left-40 w-72 h-72 bg-accent/10 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000'></div>
+         <div className='absolute top-20 left-20 w-72 h-72 bg-primary-foreground/10 dark:bg-foreground/5 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-xl opacity-20 animate-blob'></div>
+         <div className='absolute top-40 right-20 w-72 h-72 bg-secondary/20 dark:bg-secondary/10 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-xl opacity-20 animate-blob animation-delay-2000'></div>
+         <div className='absolute -bottom-8 left-40 w-72 h-72 bg-accent/10 dark:bg-accent/5 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-xl opacity-20 animate-blob animation-delay-4000'></div>
 
          {/* Content */}
          <div className='relative z-10 text-center px-4 max-w-6xl mx-auto'>
             <div className='mb-8'>
-               <span className='inline-block px-4 py-2 bg-primary-foreground/20 text-primary-foreground text-sm font-medium rounded-full mb-4 backdrop-blur-sm'>
+               <span className='inline-block px-4 py-2 bg-primary-foreground/20 dark:bg-foreground/20 text-primary-foreground dark:text-foreground text-sm font-medium rounded-full mb-4 backdrop-blur-sm'>
                   🚀 Master Frontend Development
                </span>
             </div>
 
-            <h1 className='text-5xl md:text-7xl font-bold text-primary-foreground mb-6 leading-tight'>
+            <h1 className='text-5xl md:text-7xl font-bold text-primary-foreground dark:text-foreground mb-6 leading-tight'>
                Learn to Code the
-               <span className='block bg-gradient-to-r from-accent via-accent/80 to-secondary-foreground bg-clip-text text-transparent'>
+               <span className='block bg-gradient-to-r from-accent via-accent/80 to-secondary bg-clip-text text-transparent'>
                   Modern Web
                </span>
             </h1>
 
-            <p className='text-xl md:text-2xl text-primary-foreground/80 mb-8 max-w-4xl mx-auto leading-relaxed'>
+            <p className='text-xl md:text-2xl text-primary-foreground/80 dark:text-foreground/80 mb-8 max-w-4xl mx-auto leading-relaxed'>
                Master HTML, CSS, JavaScript, React, and Next.js through hands-on
                projects. Build real applications while learning industry best
                practices.
@@ -43,7 +43,7 @@ export function HeroSection() {
             <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
                <Link
                   href='/docs/html'
-                  className='inline-flex items-center px-8 py-4 bg-primary-foreground text-primary font-bold rounded-lg hover:bg-primary-foreground/90 transform hover:scale-105 transition-all duration-200 shadow-lg'
+                  className='inline-flex items-center px-8 py-4 bg-primary-foreground dark:bg-card text-primary dark:text-foreground font-bold rounded-lg hover:bg-primary-foreground/90 dark:hover:bg-card/90 transform hover:scale-105 transition-all duration-200 shadow-lg'
                >
                   Start Learning
                   <svg
@@ -63,7 +63,7 @@ export function HeroSection() {
 
                <Link
                   href='/courses'
-                  className='inline-flex items-center px-8 py-4 border-2 border-primary-foreground text-primary-foreground font-bold rounded-lg hover:bg-primary-foreground hover:text-primary transition-all duration-200'
+                  className='inline-flex items-center px-8 py-4 border-2 border-primary-foreground dark:border-border text-primary-foreground dark:text-foreground font-bold rounded-lg hover:bg-primary-foreground dark:hover:bg-card hover:text-primary dark:hover:text-foreground transition-all duration-200'
                >
                   Browse Courses
                   <svg
@@ -85,34 +85,34 @@ export function HeroSection() {
             {/* Stats */}
             <div className='grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto'>
                <div className='text-center'>
-                  <div className='text-3xl font-bold text-primary-foreground mb-2'>
+                  <div className='text-3xl font-bold text-primary-foreground dark:text-foreground mb-2'>
                      5
                   </div>
-                  <div className='text-primary-foreground/70 text-sm'>
+                  <div className='text-primary-foreground/70 dark:text-muted-foreground text-sm'>
                      Comprehensive Courses
                   </div>
                </div>
                <div className='text-center'>
-                  <div className='text-3xl font-bold text-primary-foreground mb-2'>
+                  <div className='text-3xl font-bold text-primary-foreground dark:text-foreground mb-2'>
                      100+
                   </div>
-                  <div className='text-primary-foreground/70 text-sm'>
+                  <div className='text-primary-foreground/70 dark:text-muted-foreground text-sm'>
                      Hands-on Lessons
                   </div>
                </div>
                <div className='text-center'>
-                  <div className='text-3xl font-bold text-primary-foreground mb-2'>
+                  <div className='text-3xl font-bold text-primary-foreground dark:text-foreground mb-2'>
                      5
                   </div>
-                  <div className='text-primary-foreground/70 text-sm'>
+                  <div className='text-primary-foreground/70 dark:text-muted-foreground text-sm'>
                      Real Projects
                   </div>
                </div>
                <div className='text-center'>
-                  <div className='text-3xl font-bold text-primary-foreground mb-2'>
+                  <div className='text-3xl font-bold text-primary-foreground dark:text-foreground mb-2'>
                      ∞
                   </div>
-                  <div className='text-primary-foreground/70 text-sm'>
+                  <div className='text-primary-foreground/70 dark:text-muted-foreground text-sm'>
                      Lifetime Access
                   </div>
                </div>
@@ -120,7 +120,7 @@ export function HeroSection() {
          </div>
 
          {/* Scroll Indicator */}
-         <div className='absolute bottom-8 left-1/2 transform -translate-x-1/2 text-primary-foreground animate-bounce'>
+         <div className='absolute bottom-8 left-1/2 transform -translate-x-1/2 text-primary-foreground dark:text-foreground animate-bounce'>
             <svg
                className='w-6 h-6'
                fill='none'

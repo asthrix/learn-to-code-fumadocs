@@ -123,8 +123,8 @@ export function CheckoutPageContent({
    };
 
    return (
-      <main className='relative flex flex-1 flex-col bg-[#080710] text-slate-100'>
-         <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.16),_transparent_70%)]' />
+      <main className='relative flex flex-1 flex-col bg-background text-foreground'>
+         <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.16),_transparent_70%)]' />
          <div className='relative mx-auto w-full max-w-5xl px-4 pb-20 pt-10 sm:px-6 lg:px-8'>
             <CheckoutHero
                course={course}
@@ -134,7 +134,7 @@ export function CheckoutPageContent({
             />
 
             <div className='mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]'>
-               <section className='rounded-[28px] border border-white/10 bg-white/5 p-8 shadow-[0_28px_80px_-50px_rgba(99,102,241,0.5)] backdrop-blur'>
+               <section className='rounded-[28px] border border-border bg-card/50 p-8 shadow-[0_28px_80px_-50px_hsl(var(--color-primary)/0.5)] backdrop-blur'>
                   {isConfirmed ? (
                      <CheckoutConfirmation
                         course={course}
@@ -223,7 +223,7 @@ function CheckoutForm({
                      name='fullName'
                      required
                      placeholder='Priya Sharma'
-                     className='block w-full rounded-xl border border-white/10 bg-[#0e0d17]/70 px-4 py-3 text-sm text-white transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/30'
+                     className='block w-full rounded-xl border border-border bg-card/70 px-4 py-3 text-sm text-foreground transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30'
                   />
                </Field>
                <Field label='Email' htmlFor='email' required>
@@ -234,7 +234,7 @@ function CheckoutForm({
                      autoComplete='email'
                      required
                      placeholder='you@example.com'
-                     className='block w-full rounded-xl border border-white/10 bg-[#0e0d17]/70 px-4 py-3 text-sm text-white transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/30'
+                     className='block w-full rounded-xl border border-border bg-card/70 px-4 py-3 text-sm text-foreground transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30'
                   />
                </Field>
             </div>
@@ -243,7 +243,7 @@ function CheckoutForm({
                   id='company'
                   name='company'
                   placeholder='Studio Orbit'
-                  className='block w-full rounded-xl border border-white/10 bg-[#0e0d17]/70 px-4 py-3 text-sm text-white transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/30'
+                  className='block w-full rounded-xl border border-border bg-card/70 px-4 py-3 text-sm text-foreground transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30'
                />
             </Field>
          </div>
@@ -260,7 +260,7 @@ function CheckoutForm({
                   inputMode='numeric'
                   required
                   placeholder='4242 4242 4242 4242'
-                  className='block w-full rounded-xl border border-white/10 bg-[#0e0d17]/70 px-4 py-3 text-sm text-white transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/30'
+                  className='block w-full rounded-xl border border-border bg-card/70 px-4 py-3 text-sm text-foreground transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30'
                />
             </Field>
             <div className='grid gap-4 sm:grid-cols-[2fr_1fr]'>
@@ -270,7 +270,7 @@ function CheckoutForm({
                      name='expiry'
                      required
                      placeholder='MM / YY'
-                     className='block w-full rounded-xl border border-white/10 bg-[#0e0d17]/70 px-4 py-3 text-sm text-white transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/30'
+                     className='block w-full rounded-xl border border-border bg-card/70 px-4 py-3 text-sm text-foreground transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30'
                   />
                </Field>
                <Field label='CVC' htmlFor='cvc' required>
@@ -280,15 +280,15 @@ function CheckoutForm({
                      inputMode='numeric'
                      required
                      placeholder='123'
-                     className='block w-full rounded-xl border border-white/10 bg-[#0e0d17]/70 px-4 py-3 text-sm text-white transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/30'
+                     className='block w-full rounded-xl border border-border bg-card/70 px-4 py-3 text-sm text-foreground transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30'
                   />
                </Field>
             </div>
          </div>
 
-         <div className='flex flex-col gap-4 rounded-2xl border border-indigo-400/35 bg-indigo-400/10 p-5 text-sm text-white/80'>
+         <div className='flex flex-col gap-4 rounded-2xl border border-primary/35 bg-primary/10 p-5 text-sm text-foreground/80'>
             <div className='flex items-start gap-3'>
-               <ShieldCheck className='mt-0.5 h-5 w-5 text-indigo-200' />
+               <ShieldCheck className='mt-0.5 h-5 w-5 text-secondary' />
                <p>
                   Switch or cancel within 14 days for a full refund. Our support
                   team replies within one business day if you need a hand.
@@ -297,7 +297,7 @@ function CheckoutForm({
             <Button
                type='submit'
                size='lg'
-               className='w-full justify-center rounded-full bg-indigo-400 text-[#080710] shadow-[0_20px_45px_-28px_rgba(99,102,241,0.85)] transition hover:bg-indigo-300'
+               className='w-full justify-center rounded-full bg-primary text-primary-foreground shadow-[0_20px_45px_-28px_hsl(var(--color-primary)/0.85)] transition hover:bg-primary/90'
                disabled={planOptions.length === 0 || isProcessing}
             >
                {isProcessing
@@ -342,7 +342,7 @@ function Field({ label, htmlFor, required, children }: FieldProps) {
       >
          <span>
             {label}
-            {required && <span className='ml-1 text-rose-300'>*</span>}
+            {required && <span className='ml-1 text-destructive'>*</span>}
          </span>
          {children}
       </label>
@@ -361,10 +361,10 @@ function PlanOption({ tier, slug, selected, onSelect }: PlanOptionProps) {
       <label
          htmlFor={`plan-${slug}`}
          className={cn(
-            "block cursor-pointer rounded-2xl border border-white/10 bg-[#0d0c18]/70 p-5 transition",
-            "hover:border-indigo-300/50 hover:shadow-[0_24px_60px_-40px_rgba(99,102,241,0.6)]",
+            "block cursor-pointer rounded-2xl border border-border bg-card/70 p-5 transition",
+            "hover:border-secondary/50 hover:shadow-[0_24px_60px_-40px_hsl(var(--color-primary)/0.6)]",
             selected &&
-               "border-indigo-300/70 bg-indigo-500/10 ring-2 ring-indigo-300/35"
+               "border-secondary/70 bg-primary/10 ring-2 ring-secondary/35"
          )}
       >
          <input
@@ -378,28 +378,28 @@ function PlanOption({ tier, slug, selected, onSelect }: PlanOptionProps) {
          />
          <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
             <div className='space-y-2'>
-               <p className='text-[0.65rem] uppercase tracking-[0.28em] text-white/55'>
+               <p className='text-[0.65rem] uppercase tracking-[0.28em] text-muted-foreground'>
                   {tier.cadence}
                </p>
-               <h3 className='text-lg font-semibold text-white'>{tier.name}</h3>
-               <p className='text-sm text-white/65'>{tier.description}</p>
-               <ul className='space-y-1.5 text-sm text-white/60'>
+               <h3 className='text-lg font-semibold text-foreground'>{tier.name}</h3>
+               <p className='text-sm text-foreground/65'>{tier.description}</p>
+               <ul className='space-y-1.5 text-sm text-muted-foreground'>
                   {tier.features.slice(0, 3).map((feature) => (
                      <li key={feature} className='flex items-start gap-2'>
-                        <CheckCircle2 className='mt-0.5 h-4 w-4 text-indigo-300' />
+                        <CheckCircle2 className='mt-0.5 h-4 w-4 text-secondary' />
                         <span>{feature}</span>
                      </li>
                   ))}
                   {tier.features.length > 3 && (
-                     <li className='text-xs uppercase tracking-[0.22em] text-white/45'>
+                     <li className='text-xs uppercase tracking-[0.22em] text-muted-foreground/45'>
                         + {tier.features.length - 3} more
                      </li>
                   )}
                </ul>
             </div>
-            <div className='flex flex-col items-end text-right text-white'>
+            <div className='flex flex-col items-end text-right text-foreground'>
                <span className='text-2xl font-semibold'>{tier.price}</span>
-               <span className='text-xs text-white/55'>Lifetime access</span>
+               <span className='text-xs text-muted-foreground'>Lifetime access</span>
             </div>
          </div>
       </label>
@@ -445,17 +445,17 @@ function SummaryCard({ course, detail, selectedPlan }: SummaryCardProps) {
    ];
 
    return (
-      <div className='space-y-4 rounded-2xl border border-white/10 bg-[#0b0a16]/70 p-5'>
+      <div className='space-y-4 rounded-2xl border border-border bg-popover/70 p-5'>
          <div className='flex items-center justify-between gap-3'>
             <div>
-               <p className='text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-white/55'>
+               <p className='text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground'>
                   Course overview
                </p>
-               <h3 className='text-lg font-semibold text-white'>
+               <h3 className='text-lg font-semibold text-foreground'>
                   {course.title}
                </h3>
             </div>
-            <span className='rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/70'>
+            <span className='rounded-full border border-border bg-card/50 px-3 py-1 text-xs font-medium text-muted-foreground'>
                Portfolio ready
             </span>
          </div>
@@ -463,19 +463,19 @@ function SummaryCard({ course, detail, selectedPlan }: SummaryCardProps) {
             {metrics.slice(0, 4).map((metric) => (
                <div
                   key={metric.label}
-                  className='rounded-xl border border-white/10 bg-white/5 px-3 py-2'
+                  className='rounded-xl border border-border bg-card/50 px-3 py-2'
                >
-                  <p className='text-[0.6rem] uppercase tracking-[0.26em] text-white/55'>
+                  <p className='text-[0.6rem] uppercase tracking-[0.26em] text-muted-foreground'>
                      {metric.label}
                   </p>
-                  <p className='text-sm font-medium text-white'>
+                  <p className='text-sm font-medium text-foreground'>
                      {metric.value}
                   </p>
                </div>
             ))}
          </div>
          {selectedPlan && (
-            <p className='rounded-xl border border-indigo-300/40 bg-indigo-400/10 px-3 py-2 text-xs text-white/70'>
+            <p className='rounded-xl border border-secondary/40 bg-primary/10 px-3 py-2 text-xs text-muted-foreground'>
                Selected plan:{" "}
                <span className='font-semibold text-white'>
                   {selectedPlan.name}
@@ -493,24 +493,24 @@ interface AnalogyListProps {
 
 function AnalogyList({ selectedPlan }: AnalogyListProps) {
    return (
-      <div className='space-y-4 rounded-2xl border border-white/10 bg-[#0b0a16]/70 p-5'>
-         <p className='text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-white/55'>
+      <div className='space-y-4 rounded-2xl border border-border bg-popover/70 p-5'>
+         <p className='text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground'>
             How it feels
          </p>
          <ul className='space-y-3'>
             {ANALOGY_PANELS.map(({ title, description, icon: Icon }) => (
                <li key={title} className='flex items-start gap-3'>
-                  <span className='mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/15 text-indigo-200'>
+                  <span className='mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-secondary'>
                      <Icon className='h-4 w-4' />
                   </span>
                   <div>
-                     <p className='text-sm font-semibold text-white'>{title}</p>
-                     <p className='text-xs text-white/60'>{description}</p>
+                     <p className='text-sm font-semibold text-foreground'>{title}</p>
+                     <p className='text-xs text-muted-foreground'>{description}</p>
                   </div>
                </li>
             ))}
          </ul>
-         <p className='text-xs text-white/60'>
+         <p className='text-xs text-muted-foreground'>
             {selectedPlan
                ? `${selectedPlan.name} keeps these systems active from day one so you stay oriented without overthinking.`
                : "Choose a plan to see how much guidance rides alongside each mission."}
@@ -521,25 +521,25 @@ function AnalogyList({ selectedPlan }: AnalogyListProps) {
 
 function Timeline() {
    return (
-      <div className='space-y-4 rounded-2xl border border-white/10 bg-[#0b0a16]/70 p-5'>
-         <p className='text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-white/55'>
+      <div className='space-y-4 rounded-2xl border border-border bg-popover/70 p-5'>
+         <p className='text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground'>
             Journey outline
          </p>
          <ol className='space-y-3'>
             {TIMELINE_STEPS.map(
                ({ title, caption, description, icon: Icon }) => (
                   <li key={title} className='flex gap-3'>
-                     <span className='mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-indigo-200'>
+                     <span className='mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-muted/50 text-secondary'>
                         <Icon className='h-4 w-4' />
                      </span>
                      <div className='space-y-1'>
-                        <div className='flex items-center gap-2 text-sm text-white'>
+                        <div className='flex items-center gap-2 text-sm text-foreground'>
                            <span className='font-semibold'>{title}</span>
-                           <span className='text-[0.6rem] uppercase tracking-[0.26em] text-white/55'>
+                           <span className='text-[0.6rem] uppercase tracking-[0.26em] text-muted-foreground'>
                               {caption}
                            </span>
                         </div>
-                        <p className='text-xs text-white/60'>{description}</p>
+                        <p className='text-xs text-muted-foreground'>{description}</p>
                      </div>
                   </li>
                )
@@ -551,21 +551,21 @@ function Timeline() {
 
 function GuaranteeCard() {
    return (
-      <div className='space-y-3 rounded-2xl border border-white/10 bg-[#0b0a16]/70 p-5 text-sm text-white/75'>
-         <p className='text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-white/55'>
+      <div className='space-y-3 rounded-2xl border border-border bg-popover/70 p-5 text-sm text-muted-foreground'>
+         <p className='text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground'>
             Trust signals
          </p>
          <ul className='space-y-2'>
             <li className='flex items-start gap-2'>
-               <ShieldCheck className='mt-0.5 h-4 w-4 text-indigo-200' />
+               <ShieldCheck className='mt-0.5 h-4 w-4 text-secondary' />
                <span>14-day full refund if the fit is off.</span>
             </li>
             <li className='flex items-start gap-2'>
-               <ShieldCheck className='mt-0.5 h-4 w-4 text-indigo-200' />
+               <ShieldCheck className='mt-0.5 h-4 w-4 text-secondary' />
                <span>Support replies within one business day.</span>
             </li>
             <li className='flex items-start gap-2'>
-               <ShieldCheck className='mt-0.5 h-4 w-4 text-indigo-200' />
+               <ShieldCheck className='mt-0.5 h-4 w-4 text-secondary' />
                <span>Lifetime updates and community events included.</span>
             </li>
          </ul>
@@ -584,7 +584,7 @@ function CheckoutConfirmation({
 }: CheckoutConfirmationProps) {
    return (
       <div className='space-y-6 text-center'>
-         <div className='mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-indigo-400/15 text-indigo-200'>
+         <div className='mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/15 text-secondary'>
             <ShieldCheck className='h-7 w-7' />
          </div>
          <div className='space-y-3'>
@@ -606,13 +606,13 @@ function CheckoutConfirmation({
          <div className='flex flex-col items-center gap-2'>
             <Link
                href={`/docs/${course.id}`}
-               className='inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-2 text-sm font-semibold text-white/80 transition hover:border-indigo-300/60 hover:text-indigo-200'
+               className='inline-flex items-center justify-center rounded-full border border-border bg-card/50 px-5 py-2 text-sm font-semibold text-foreground/80 transition hover:border-secondary/60 hover:text-secondary'
             >
                View course outline
             </Link>
             <Link
                href='/'
-               className='text-xs font-medium uppercase tracking-[0.26em] text-indigo-200 transition hover:text-indigo-100'
+               className='text-xs font-medium uppercase tracking-[0.26em] text-secondary transition hover:text-secondary/80'
             >
                Back to home
             </Link>
@@ -645,33 +645,33 @@ function CheckoutHero({
             <div className='space-y-5'>
                <Link
                   href={`/courses/${course.id}`}
-                  className='inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-white/65 transition hover:border-indigo-300/60 hover:text-indigo-200'
+                  className='inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground transition hover:border-secondary/60 hover:text-secondary'
                >
                   <ArrowLeft className='h-3.5 w-3.5' /> Back to courses
                </Link>
                <div className='space-y-3'>
-                  <span className='inline-flex items-center gap-2 rounded-full border border-indigo-300/40 bg-indigo-400/15 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-indigo-200'>
+                  <span className='inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-primary/15 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-secondary'>
                      StaySense checkout
                   </span>
-                  <h1 className='text-3xl font-semibold text-white sm:text-4xl'>
+                  <h1 className='text-3xl font-semibold text-foreground sm:text-4xl'>
                      A calm, guided path into the React studio
                   </h1>
-                  <p className='max-w-2xl text-sm text-white/70'>
+                  <p className='max-w-2xl text-sm text-muted-foreground'>
                      {description}
                   </p>
                </div>
             </div>
-            <div className='flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#0c0b17]/70 p-5 text-sm text-white/75'>
-               <p className='text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-white/55'>
+            <div className='flex flex-col gap-4 rounded-2xl border border-border bg-card/70 p-5 text-sm text-muted-foreground'>
+               <p className='text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground'>
                   Snapshot
                </p>
                <div className='grid gap-3 sm:grid-cols-2'>
                   {metrics.slice(0, 4).map((metric) => (
                      <div
                         key={metric.label}
-                        className='rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-center'
+                        className='rounded-xl border border-border bg-card/50 px-3 py-2 text-center'
                      >
-                        <p className='text-[0.6rem] uppercase tracking-[0.26em] text-white/55'>
+                        <p className='text-[0.6rem] uppercase tracking-[0.26em] text-muted-foreground'>
                            {metric.label}
                         </p>
                         <p className='text-sm font-semibold text-white'>
@@ -681,7 +681,7 @@ function CheckoutHero({
                   ))}
                </div>
                {selectedPlan && !isConfirmed && (
-                  <div className='rounded-xl border border-indigo-300/40 bg-indigo-400/10 px-3 py-2 text-xs text-white/70'>
+                  <div className='rounded-xl border border-secondary/40 bg-primary/10 px-3 py-2 text-xs text-muted-foreground'>
                      Selected:{" "}
                      <span className='font-semibold text-white'>
                         {selectedPlan.name}

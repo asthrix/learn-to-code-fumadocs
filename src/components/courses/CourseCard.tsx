@@ -33,7 +33,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
          case "coming-soon":
             return (
                <span
-                  className={`${baseClasses} border-indigo-500/40 bg-indigo-500/20 text-indigo-500`}
+                  className={`${baseClasses} border-primary/40 bg-primary/20 text-primary`}
                >
                   Coming Soon
                </span>
@@ -52,11 +52,11 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
    const getDifficultyClasses = () => {
       switch (course.difficulty) {
          case "beginner":
-            return "border-sky-600/40 bg-sky-600/15 text-sky-600";
+            return "border-primary/40 bg-primary/15 text-primary";
          case "intermediate":
             return "border-secondary/40 bg-secondary/15 text-secondary/70";
          case "advanced":
-            return "border-orange-400/40 bg-orange-400/15 text-orange-400";
+            return "border-destructive/40 bg-destructive/15 text-destructive";
       }
    };
 
