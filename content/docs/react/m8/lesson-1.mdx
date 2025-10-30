@@ -1,0 +1,684 @@
+---
+title: "L1: Install Vercel CLI"
+description: "Set up Vercel CLI and prepare for deployment"
+---
+
+# Install Vercel CLI
+
+Let's set up the tools you need to deploy your React application! 🛠️
+
+## Why Vercel CLI?
+
+**The Vercel CLI is your deployment tool:**
+
+```
+Without CLI:
+  Manual uploads
+  Error-prone process
+  No automation
+  Time-consuming
+
+With CLI:
+  One command deployment
+  Automatic optimization
+  Easy rollbacks
+  Fast updates
+```
+
+**What the CLI does:**
+
+```
+vercel
+  ↓
+Authenticates your account
+  ↓
+Analyzes your project
+  ↓
+Builds optimized bundle
+  ↓
+Uploads to Vercel servers
+  ↓
+Returns live URL
+```
+
+## Create Vercel Account
+
+Before installing the CLI, you need a Vercel account.
+
+<Steps>
+
+<Step>
+
+**Visit Vercel:**
+
+Go to [vercel.com](https://vercel.com)
+
+</Step>
+
+<Step>
+
+**Sign up (recommended methods):**
+
+**Option 1: GitHub (Recommended)**
+- Click "Sign Up"
+- Choose "Continue with GitHub"
+- Authorize Vercel
+- ✅ Enables automatic deployments from Git
+
+**Option 2: GitLab**
+- Similar to GitHub
+- Great if you use GitLab
+
+**Option 3: Bitbucket**
+- For Bitbucket users
+
+**Option 4: Email**
+- Simple email registration
+- Manual deployment only
+
+</Step>
+
+<Step>
+
+**Choose Hobby plan:**
+
+When prompted, select the **Hobby** plan (it's free!)
+
+**What you get:**
+- Unlimited deployments
+- Automatic HTTPS
+- 100 GB bandwidth/month
+- Serverless functions
+- Edge network
+- Analytics
+
+Perfect for personal projects and learning! 🎉
+
+</Step>
+
+<Step>
+
+**Verify account:**
+
+Check your email and verify your account if required.
+
+</Step>
+
+</Steps>
+
+## Install Vercel CLI
+
+Now install the Vercel command-line tool.
+
+<Tabs items={['npm', 'yarn', 'pnpm']}>
+
+<Tab value="npm">
+
+```bash title="Terminal"
+npm install -g vercel
+```
+
+**What this does:**
+- `-g` flag installs globally (available everywhere)
+- `vercel` package is the official CLI
+- Installation takes ~30 seconds
+
+</Tab>
+
+<Tab value="yarn">
+
+```bash title="Terminal"
+yarn global add vercel
+```
+
+**Note:** Make sure your Yarn global bin is in your PATH.
+
+</Tab>
+
+<Tab value="pnpm">
+
+```bash title="Terminal"
+pnpm add -g vercel
+```
+
+**Note:** pnpm global installs may require PATH configuration.
+
+</Tab>
+
+</Tabs>
+
+**Installation output:**
+
+```bash
+npm install -g vercel
+
+added 150 packages in 12s
+
+✔ Installed vercel@latest
+```
+
+## Verify Installation
+
+Check that Vercel CLI is installed correctly:
+
+```bash title="Terminal"
+vercel --version
+```
+
+**Expected output:**
+
+```bash
+Vercel CLI 33.0.1
+```
+
+<Callout type="success">
+**Success!** If you see a version number, the CLI is installed correctly.
+</Callout>
+
+<Callout type="error">
+**Error: "command not found"?** 
+
+Try these solutions:
+
+1. Close and reopen your terminal
+2. Check if npm global bin is in PATH:
+   ```bash
+   npm config get prefix
+   ```
+   Add `[prefix]/bin` to your PATH
+3. Try installing with `sudo` (macOS/Linux):
+   ```bash
+   sudo npm install -g vercel
+   ```
+4. On Windows, run terminal as Administrator
+</Callout>
+
+## Authenticate with Vercel
+
+Link your local CLI to your Vercel account:
+
+```bash title="Terminal"
+vercel login
+```
+
+**What happens:**
+
+<Steps>
+
+<Step>
+
+**Choose authentication method:**
+
+```bash
+Vercel CLI 33.0.1
+? Log in to Vercel:
+  > Continue with GitHub
+    Continue with GitLab  
+    Continue with Bitbucket
+    Continue with Email
+```
+
+Choose the same method you used to create your account.
+
+</Step>
+
+<Step>
+
+**Browser opens:**
+
+Your default browser will open with a verification page.
+
+</Step>
+
+<Step>
+
+**Authorize CLI:**
+
+Click "Authorize" or "Confirm" in the browser.
+
+</Step>
+
+<Step>
+
+**Success message:**
+
+```bash
+> Success! GitHub authentication complete for user@example.com
+Congratulations! You are now logged in. In order to deploy something, run `vercel`.
+```
+
+</Step>
+
+</Steps>
+
+## Understanding Vercel CLI Commands
+
+Here are the most common commands you'll use:
+
+<Accordions>
+
+<Accordion title="vercel - Deploy Current Project">
+
+**Basic deployment:**
+
+```bash
+vercel
+```
+
+**What it does:**
+- Analyzes your project
+- Asks configuration questions (first time)
+- Builds production bundle
+- Uploads to Vercel
+- Returns deployment URL
+
+**Alias:** `vc` (shorthand for `vercel`)
+
+</Accordion>
+
+<Accordion title="vercel --prod - Deploy to Production">
+
+**Production deployment:**
+
+```bash
+vercel --prod
+```
+
+**Difference from basic `vercel`:**
+- Basic: Creates preview deployment
+- `--prod`: Updates production URL
+- Use `--prod` after testing preview
+
+**When to use:**
+- After testing preview deployment
+- When ready for users to see changes
+- For important updates
+
+</Accordion>
+
+<Accordion title="vercel login - Authenticate Account">
+
+**Login command:**
+
+```bash
+vercel login
+```
+
+**When to use:**
+- First time setup
+- After logging out
+- Switching accounts
+- New computer/terminal
+
+</Accordion>
+
+<Accordion title="vercel logout - Remove Credentials">
+
+**Logout command:**
+
+```bash
+vercel logout
+```
+
+**When to use:**
+- Switching Vercel accounts
+- Shared computer
+- Security purposes
+
+</Accordion>
+
+<Accordion title="vercel ls - List Projects">
+
+**List deployments:**
+
+```bash
+vercel ls
+```
+
+**Shows:**
+- All your deployed projects
+- Project names
+- URLs
+- Status (ready, building, error)
+
+**Example output:**
+
+```bash
+booking-app       https://booking-app.vercel.app       Ready
+portfolio         https://portfolio-me.vercel.app      Ready
+test-project      https://test.vercel.app              Building
+```
+
+</Accordion>
+
+<Accordion title="vercel env - Manage Environment Variables">
+
+**Environment variable commands:**
+
+```bash
+# Add new variable
+vercel env add
+
+# List all variables  
+vercel env ls
+
+# Remove variable
+vercel env rm
+```
+
+**Use for:**
+- API keys
+- Database URLs
+- Authentication secrets
+- Feature flags
+
+</Accordion>
+
+<Accordion title="vercel inspect - View Deployment Details">
+
+**Inspect deployment:**
+
+```bash
+vercel inspect [url]
+```
+
+**Shows:**
+- Build logs
+- Function logs
+- Error messages
+- Performance metrics
+- Request headers
+
+**Example:**
+
+```bash
+vercel inspect https://booking-app-abc123.vercel.app
+```
+
+</Accordion>
+
+<Accordion title="vercel help - Get Help">
+
+**Help command:**
+
+```bash
+vercel help
+
+# Or for specific command
+vercel deploy --help
+```
+
+**Shows:**
+- All available commands
+- Command options
+- Usage examples
+- Documentation links
+
+</Accordion>
+
+</Accordions>
+
+## Prepare Your Project
+
+Before deploying, let's make sure your project is ready.
+
+<Steps>
+
+<Step>
+
+**Navigate to project directory:**
+
+```bash title="Terminal"
+cd /path/to/your/react-project
+```
+
+Make sure you're in the root directory (where `package.json` is).
+
+</Step>
+
+<Step>
+
+**Verify project builds:**
+
+Test that your project builds successfully:
+
+```bash title="Terminal"
+npm run build
+```
+
+**Expected output:**
+
+```bash
+vite v5.0.0 building for production...
+✓ 1234 modules transformed.
+dist/index.html                   0.45 kB
+dist/assets/index-abc123.css     45.21 kB
+dist/assets/index-xyz789.js     380.54 kB
+
+✓ built in 5.23s
+```
+
+<Callout type="success">
+**Build successful!** Your project is ready to deploy.
+</Callout>
+
+<Callout type="error">
+**Build errors?** Fix them before deploying:
+
+1. Check for syntax errors
+2. Fix missing imports
+3. Resolve TypeScript errors
+4. Update dependencies if needed
+5. Run `npm install` to ensure all packages are installed
+</Callout>
+
+</Step>
+
+<Step>
+
+**Check package.json scripts:**
+
+Ensure your `package.json` has correct build scripts:
+
+```json title="package.json"
+{
+  "name": "booking-app",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  }
+}
+```
+
+**Vercel looks for:**
+- `build` script (required)
+- `dev` script (optional)
+
+</Step>
+
+<Step>
+
+**Create .gitignore (if needed):**
+
+Ensure you're not committing unnecessary files:
+
+```txt title=".gitignore"
+node_modules
+dist
+.env
+.env.local
+.DS_Store
+```
+
+**Why it matters:**
+- `node_modules`: 100,000+ files, not needed
+- `dist`: Build output, generated by Vercel
+- `.env`: Contains secrets, security risk
+- `.DS_Store`: macOS metadata
+
+</Step>
+
+</Steps>
+
+## Common Setup Issues
+
+<Accordions>
+
+<Accordion title="npm install -g fails">
+
+**Problem:** Permission errors during global install
+
+**macOS/Linux solution:**
+
+```bash
+# Option 1: Use sudo (not ideal)
+sudo npm install -g vercel
+
+# Option 2: Fix npm permissions (better)
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.profile
+source ~/.profile
+
+# Now install without sudo
+npm install -g vercel
+```
+
+**Windows solution:**
+- Run PowerShell or CMD as Administrator
+- Then run: `npm install -g vercel`
+
+</Accordion>
+
+<Accordion title="vercel command not found">
+
+**Problem:** CLI installed but command not available
+
+**Solution 1: Restart terminal**
+
+Close and reopen your terminal.
+
+**Solution 2: Check PATH**
+
+```bash
+# Find npm global bin location
+npm config get prefix
+
+# Example output: /usr/local
+# CLI is at: /usr/local/bin/vercel
+```
+
+Add this to your PATH if missing.
+
+**Solution 3: Use npx**
+
+If global install doesn't work, use npx:
+
+```bash
+npx vercel
+```
+
+This downloads and runs Vercel each time (slower but works).
+
+</Accordion>
+
+<Accordion title="Login browser doesn't open">
+
+**Problem:** `vercel login` doesn't open browser
+
+**Solution 1: Manual URL**
+
+```bash
+vercel login
+
+> Vercel CLI 33.0.1
+> We sent an email to user@example.com.
+> Please follow the steps in the email.
+```
+
+Check your email for login link.
+
+**Solution 2: Use different method**
+
+```bash
+vercel login --email user@example.com
+```
+
+**Solution 3: Open browser manually**
+
+If a URL appears in terminal, copy and paste it into your browser.
+
+</Accordion>
+
+<Accordion title="Build succeeds locally, fails on Vercel">
+
+**Problem:** `npm run build` works locally but fails during deployment
+
+**Common causes:**
+
+1. **Missing dependencies:**
+
+   ```bash
+   # Make sure all dependencies are in package.json
+   npm install
+   ```
+
+2. **Different Node version:**
+
+   Specify Node version in `package.json`:
+
+   ```json
+   {
+     "engines": {
+       "node": ">=18.0.0"
+     }
+   }
+   ```
+
+3. **Environment variables:**
+
+   Variables in `.env.local` aren't on Vercel yet (we'll add them in Lesson 2)
+
+4. **Case-sensitive imports:**
+
+   ```jsx
+   // ❌ Works on macOS, fails on Linux (Vercel)
+   import Button from './Button';  // File is button.jsx
+
+   // ✅ Match exact filename
+   import Button from './button';  // Correct
+   ```
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+<Callout type="success">
+**Setup complete!** You now have:
+
+✅ Vercel account created
+
+✅ Vercel CLI installed and authenticated
+
+✅ Project verified and ready to deploy
+
+✅ Understanding of CLI commands
+</Callout>
+
+In the next lesson, you'll deploy your application to production with a single command! 🚀
+
+## Key Takeaways
+
+- ✅ **Vercel CLI** is the official deployment tool
+- ✅ **Global installation** makes CLI available everywhere
+- ✅ **Authentication** links CLI to your account
+- ✅ **Project preparation** ensures successful deployment
+- ✅ **Build verification** catches errors early
+- ✅ **Free tier** is generous for learning and personal projects
+- ✅ **One command** (`vercel`) deploys your entire application
+- ✅ **PATH issues** are common but easy to fix
+
+Ready to deploy? Let's go! →
