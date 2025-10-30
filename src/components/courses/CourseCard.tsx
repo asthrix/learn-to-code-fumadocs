@@ -25,7 +25,7 @@ export function CourseCard({ course, showProgress = true }: CourseCardProps) {
          case "available":
             return (
                <span
-                  className={`${baseClasses} border-emerald-600/40 bg-emerald-600/15 text-emerald-600`}
+                  className={`${baseClasses} border-primary/40 bg-primary/15 text-primary`}
                >
                   Available
                </span>

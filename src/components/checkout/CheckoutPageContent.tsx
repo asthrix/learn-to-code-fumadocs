@@ -690,7 +690,7 @@ function CheckoutHero({
                   </div>
                )}
                {isConfirmed && (
-                  <div className='rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-200'>
+                  <div className='rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-secondary'>
                      Checkout confirmed. Check your inbox for the onboarding
                      email.
                   </div>

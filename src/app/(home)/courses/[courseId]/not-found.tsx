@@ -42,7 +42,7 @@ export default function CourseNotFound() {
    const displayName = matchedCourse?.title ?? toTitleCase(fallbackSlug);
 
    return (
-      <main className='relative overflow-hidden flex  flex-col bg-slate-50 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-100'>
+      <main className='relative overflow-hidden flex  flex-col bg-background text-foreground transition-colors'>
          <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--color-primary)/0.16),_transparent_58%)]' />
          <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,_transparent,_hsl(var(--color-primary)/0.08)_30%,_transparent_70%)]' />
          <div className='pointer-events-none absolute -left-32 top-24 h-72 w-72 rounded-full bg-primary/25 blur-[120px]' />

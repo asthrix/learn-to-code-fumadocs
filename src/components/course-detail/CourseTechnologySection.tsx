@@ -43,21 +43,21 @@ export function CourseTechnologySection({
          <div className='pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_55%)] blur-lg dark:bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.32),_transparent_60%)]' />
          <div className='mx-auto max-w-6xl'>
             <div className='text-center'>
-               <p className='inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/80 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-slate-600 backdrop-blur-sm dark:border-white/15 dark:bg-white/10 dark:text-slate-300'>
+               <p className='inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground backdrop-blur-sm'>
                   Tooling stack
                </p>
-               <h2 className='mt-6 text-3xl font-semibold text-slate-900 dark:text-slate-100 sm:text-4xl'>
+               <h2 className='mt-6 text-3xl font-semibold text-foreground sm:text-4xl'>
                   Master workflows across the React delivery pipeline
                </h2>
-               <p className='mt-4 text-sm text-slate-600 dark:text-slate-300 sm:text-base'>
+               <p className='mt-4 text-sm text-muted-foreground sm:text-base'>
                   Each technology group ends with labs that plug into your TaskFlow Pro repository so nothing stays theoretical.
                </p>
 
-               <div className='mt-6 flex flex-wrap justify-center gap-3 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400'>
-                  <span className='inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/70 px-3 py-1 dark:border-white/10 dark:bg-white/10'>
+               <div className='mt-6 flex flex-wrap justify-center gap-3 text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground'>
+                  <span className='inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1'>
                      {totalStacks} curated stacks
                   </span>
-                  <span className='inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/70 px-3 py-1 dark:border-white/10 dark:bg-white/10'>
+                  <span className='inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1'>
                      {totalTools} production tools
                   </span>
                </div>
@@ -80,19 +80,19 @@ export function CourseTechnologySection({
                         <div className='relative h-full rounded-[calc(1.5rem-1px)] bg-white/95 p-6 dark:bg-slate-950/75'>
                            <div className='flex items-start justify-between gap-4'>
                               <span
-                                 className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl text-base font-semibold shadow-[0_18px_40px_-22px_rgba(56,189,248,0.45)] ${accent.icon}`}
+                                 className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl text-base font-semibold shadow-[0_18px_40px_-22px_hsl(var(--color-primary)/0.45)] ${accent.icon}`}
                               >
                                  <Icon className='h-5 w-5' />
                               </span>
-                              <span className='rounded-full border border-slate-900/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.32em] text-slate-500 dark:border-white/10 dark:bg-white/10 dark:text-slate-300'>
+                              <span className='rounded-full border border-border bg-card/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.32em] text-muted-foreground'>
                                  {group.items.length} tools
                               </span>
                            </div>
 
-                           <h3 className='mt-6 text-lg font-semibold text-slate-900 dark:text-slate-100'>
+                           <h3 className='mt-6 text-lg font-semibold text-foreground'>
                               {group.title}
                            </h3>
-                           <p className='mt-3 text-sm text-slate-600 dark:text-slate-300'>
+                           <p className='mt-3 text-sm text-muted-foreground'>
                               Accelerate your {group.title} mastery with guided labs that bake these tools into the TaskFlow Pro delivery cadence.
                            </p>
 
