@@ -9,6 +9,7 @@ import { Banner } from "@/components/banner";
 import { Accordions, Accordion } from "@/components/accordion";
 import { Files, Folder, File } from "@/components/files";
 import { Steps, Step } from "@/components/steps";
+import Link from "next/link";
 // import { CodeBlock, Pre } from "@/components/codeblock";
 
 const customComponents = {
@@ -25,6 +26,7 @@ const customComponents = {
    CodeBlock,
    Pre,
    Callout,
+   Link,
 }; // use this function to get MDX components, you will need it for rendering MDX
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
    return {

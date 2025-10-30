@@ -1,0 +1,583 @@
+---
+title: "L1: Setup Zustand Store"
+description: "Install Zustand and create your first store"
+---
+
+# Setup Zustand Store
+
+Let's set up Zustand for global state management! 🐻
+
+## What is Zustand?
+
+Zustand (German for "state") is a **small, fast, and scalable** state management solution for React. It's:
+
+- ✅ **Tiny** - Only 1KB! 8x smaller than Redux Toolkit
+- ✅ **Simple** - No boilerplate, no Provider, just hooks
+- ✅ **Fast** - Optimized rendering by default
+- ✅ **Flexible** - Use it however you want
+
+## Why Zustand?
+
+<Tabs items={['vs Local State', 'vs Redux', 'vs Context']}>
+
+<Tab value="vs Local State">
+
+**Problem with `useState`:**
+
+```jsx
+// HomePage.jsx
+const [listings, setListings] = useState([]);
+
+// ListingCard.jsx
+// ❌ Can't access listings here without prop drilling!
+
+// FavoritesPage.jsx
+// ❌ Can't access listings here either!
+```
+
+**With Zustand:**
+
+```jsx
+// store.js
+const useListingsStore = create((set) => ({
+  listings: [],
+  setListings: (listings) => set({ listings })
+}));
+
+// HomePage.jsx, ListingCard.jsx, FavoritesPage.jsx
+const listings = useListingsStore((state) => state.listings);
+// ✅ Works everywhere! No prop drilling!
+```
+
+</Tab>
+
+<Tab value="vs Redux">
+
+**Redux Toolkit requires:**
+- Store configuration file
+- Slice files with reducers
+- Provider wrapper component
+- useSelector and useDispatch hooks
+- Understanding actions, reducers, dispatch
+
+**Zustand requires:**
+- One store file
+- Just use the hook
+
+**Example comparison:**
+
+```js
+// Redux Toolkit (3 files, ~30 lines)
+// store.js
+import { configureStore } from '@reduxjs/toolkit';
+export const store = configureStore({ reducer: { counter: counterReducer }});
+
+// counterSlice.js  
+import { createSlice } from '@reduxjs/toolkit';
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { value: 0 },
+  reducers: { increment: (state) => { state.value += 1; }}
+});
+
+// App.jsx
+<Provider store={store}><App /></Provider>
+
+// Zustand (1 file, ~5 lines)
+import { create } from 'zustand';
+const useStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 }))
+}));
+
+// App.jsx
+// Nothing needed! Just use useStore()
+```
+
+**90% less code!** 🎉
+
+</Tab>
+
+<Tab value="vs Context">
+
+**Context API requires:**
+- Creating context
+- Provider wrapper
+- Context consumer hook
+- Verbose setup
+
+**Zustand:**
+- Just create a hook
+- Use it anywhere
+
+**Context:**
+```jsx
+const ThemeContext = createContext();
+<ThemeContext.Provider value={theme}>
+  <App />
+</ThemeContext.Provider>
+const theme = useContext(ThemeContext);
+```
+
+**Zustand:**
+```jsx
+const useTheme = create((set) => ({ theme: 'light' }));
+const theme = useTheme((state) => state.theme);
+```
+
+**Much simpler!**
+
+</Tab>
+
+</Tabs>
+
+## Step 1: Install Zustand
+
+Install Zustand package:
+
+```bash
+npm install zustand
+```
+
+That's it! No other dependencies needed. ✨
+
+<Callout type="info">
+**Bundle size:** Zustand adds only ~1KB to your bundle! Redux Toolkit adds ~8KB.
+</Callout>
+
+## Step 2: Understand Zustand Concepts
+
+Before creating a store, let's understand the key concepts:
+
+<Accordions>
+
+<Accordion title="Store">
+
+A **store** is a hook that holds your state and actions:
+
+```js
+const useStore = create((set) => ({
+  // State
+  count: 0,
+  
+  // Actions
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 })),
+  reset: () => set({ count: 0 })
+}));
+```
+
+**Key points:**
+- Created with `create()` function
+- Returns a React hook
+- Contains both state and actions
+- No separate reducers needed
+
+</Accordion>
+
+<Accordion title="set Function">
+
+The `set` function updates state:
+
+```js
+// Simple update
+set({ count: 5 })
+
+// Update based on previous state
+set((state) => ({ count: state.count + 1 }))
+
+// Update multiple values
+set({ count: 0, name: 'John' })
+
+// Merge with existing state (default behavior)
+set({ count: 5 })  // Other state values remain unchanged
+```
+
+**set() automatically merges!** You don't need spread operators for shallow updates.
+
+</Accordion>
+
+<Accordion title="get Function">
+
+The `get` function reads current state (optional, for advanced use):
+
+```js
+const useStore = create((set, get) => ({
+  count: 0,
+  increment: () => {
+    const currentCount = get().count;
+    console.log('Current:', currentCount);
+    set({ count: currentCount + 1 });
+  }
+}));
+```
+
+**Useful for:**
+- Reading state in actions
+- Conditional logic based on current state
+- Computing derived values
+
+</Accordion>
+
+<Accordion title="No Provider Needed!">
+
+Unlike Redux or Context API, Zustand doesn't need a Provider:
+
+**Redux:**
+```jsx
+import { Provider } from 'react-redux';
+<Provider store={store}>
+  <App />
+</Provider>
+```
+
+**Zustand:**
+```jsx
+// Nothing needed! Just use the hook!
+<App />
+```
+
+**Why?** The store is created as a module singleton - it exists outside React's component tree!
+
+</Accordion>
+
+</Accordions>
+
+## Step 3: Create Your First Store
+
+Let's create a simple counter store to learn the basics:
+
+```bash
+touch src/state/useCounterStore.js
+```
+
+Add this code:
+
+```js title="src/state/useCounterStore.js"
+import { create } from 'zustand';
+
+const useCounterStore = create((set) => ({
+  // Initial state
+  count: 0,
+  
+  // Actions
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 })),
+  reset: () => set({ count: 0 })
+}));
+
+export default useCounterStore;
+```
+
+**That's a complete store!** No reducers, no actions, no dispatch - just state and functions. ✨
+
+## Step 4: Use the Store
+
+Use it in any component:
+
+```jsx title="src/components/Counter.jsx"
+import useCounterStore from '@/state/useCounterStore';
+
+function Counter() {
+  // Select state
+  const count = useCounterStore((state) => state.count);
+  
+  // Select actions
+  const increment = useCounterStore((state) => state.increment);
+  const decrement = useCounterStore((state) => state.decrement);
+  const reset = useCounterStore((state) => state.reset);
+  
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={increment}>+1</button>
+      <button onClick={decrement}>-1</button>
+      <button onClick={reset}>Reset</button>
+    </div>
+  );
+}
+
+export default Counter;
+```
+
+**No Provider, no dispatch, just hooks!** 🎉
+
+## Understanding Selectors
+
+The function you pass to `useCounterStore()` is called a **selector**:
+
+```js
+// Select single value
+const count = useCounterStore((state) => state.count);
+
+// Select multiple values
+const { count, increment } = useCounterStore((state) => ({
+  count: state.count,
+  increment: state.increment
+}));
+
+// Select everything (not recommended - causes unnecessary re-renders)
+const store = useCounterStore();
+```
+
+<Accordions>
+
+<Accordion title="Why Use Selectors?">
+
+Selectors control when components re-render:
+
+```jsx
+// ✅ Good - only re-renders when count changes
+const count = useCounterStore((state) => state.count);
+
+// ❌ Bad - re-renders when ANY state changes
+const store = useCounterStore();
+const count = store.count;
+```
+
+**Zustand compares selector results** to determine if re-render is needed!
+
+</Accordion>
+
+<Accordion title="Selector Best Practices">
+
+**1. Select only what you need:**
+
+```js
+// ✅ Good
+const count = useCounterStore((state) => state.count);
+
+// ❌ Bad (re-renders unnecessarily)
+const everything = useCounterStore();
+```
+
+**2. Select multiple values efficiently:**
+
+```js
+// ✅ Good - one selector
+const { count, name } = useCounterStore((state) => ({
+  count: state.count,
+  name: state.name
+}));
+
+// ❌ Bad - multiple selectors (slightly less efficient)
+const count = useCounterStore((state) => state.count);
+const name = useCounterStore((state) => state.name);
+```
+
+**3. Memoize computed selectors:**
+
+```js
+import { create } from 'zustand';
+
+const useStore = create((set) => ({
+  items: [1, 2, 3],
+  // Don't compute here
+  // Instead, compute in component with useMemo
+}));
+
+// In component
+const items = useStore((state) => state.items);
+const doubled = useMemo(() => items.map(x => x * 2), [items]);
+```
+
+</Accordion>
+
+</Accordions>
+
+## Zustand Architecture
+
+Here's how Zustand works:
+
+```
+┌─────────────────────────────────────┐
+│         Zustand Store               │
+│                                     │
+│  State: { count: 0, name: 'John' } │
+│                                     │
+│  Actions:                           │
+│    - increment()                    │
+│    - decrement()                    │
+│    - setName(name)                  │
+│                                     │
+└─────────────────────────────────────┘
+            ↑         ↓
+         useStore()  set()
+            ↑         ↓
+┌─────────────────────────────────────┐
+│        React Components             │
+│                                     │
+│  Component A → reads count          │
+│  Component B → calls increment      │
+│  Component C → reads name           │
+│                                     │
+└─────────────────────────────────────┘
+```
+
+**Flow:**
+1. Components call `useStore(selector)` to read state
+2. Components call actions to update state
+3. Actions call `set()` to update store
+4. Store notifies subscribed components
+5. Only components using changed values re-render
+
+## Comparison with Redux
+
+<Tabs items={['Store Creation', 'Reading State', 'Updating State', 'Async Actions']}>
+
+<Tab value="Store Creation">
+
+**Redux Toolkit:**
+```js
+// store.js
+import { configureStore } from '@reduxjs/toolkit';
+import counterReducer from './counterSlice';
+
+export const store = configureStore({
+  reducer: {
+    counter: counterReducer
+  }
+});
+
+// counterSlice.js
+import { createSlice } from '@reduxjs/toolkit';
+
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { value: 0 },
+  reducers: {
+    increment: (state) => { state.value += 1; },
+    decrement: (state) => { state.value -= 1; }
+  }
+});
+
+export const { increment, decrement } = counterSlice.actions;
+export default counterSlice.reducer;
+
+// App.jsx
+import { Provider } from 'react-redux';
+<Provider store={store}><App /></Provider>
+```
+
+**Zustand:**
+```js
+// useCounterStore.js
+import { create } from 'zustand';
+
+const useCounterStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 }))
+}));
+
+export default useCounterStore;
+
+// App.jsx
+// Nothing needed!
+<App />
+```
+
+**70% less code!** ✨
+
+</Tab>
+
+<Tab value="Reading State">
+
+**Redux Toolkit:**
+```jsx
+import { useSelector } from 'react-redux';
+
+const count = useSelector((state) => state.counter.value);
+```
+
+**Zustand:**
+```jsx
+import useCounterStore from '@/state/useCounterStore';
+
+const count = useCounterStore((state) => state.count);
+```
+
+**Very similar!** Both use selectors.
+
+</Tab>
+
+<Tab value="Updating State">
+
+**Redux Toolkit:**
+```jsx
+import { useDispatch } from 'react-redux';
+import { increment } from '@/state/counterSlice';
+
+const dispatch = useDispatch();
+dispatch(increment());
+```
+
+**Zustand:**
+```jsx
+import useCounterStore from '@/state/useCounterStore';
+
+const increment = useCounterStore((state) => state.increment);
+increment();
+```
+
+**No dispatch needed!** Actions are just functions.
+
+</Tab>
+
+<Tab value="Async Actions">
+
+**Redux Toolkit:**
+```js
+import { createAsyncThunk } from '@reduxjs/toolkit';
+
+export const fetchUser = createAsyncThunk(
+  'user/fetch',
+  async (userId) => {
+    const response = await api.getUser(userId);
+    return response.data;
+  }
+);
+
+// Then handle in extraReducers...
+```
+
+**Zustand:**
+```js
+const useUserStore = create((set) => ({
+  user: null,
+  isLoading: false,
+  fetchUser: async (userId) => {
+    set({ isLoading: true });
+    const response = await api.getUser(userId);
+    set({ user: response.data, isLoading: false });
+  }
+}));
+```
+
+**Just write async functions!** No special thunks needed.
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+Perfect! You've set up Zustand. In the next lesson, we'll:
+
+1. **Create Listings Store** - Build the real store for our app
+2. **Define state shape** - items, favorites, status, error
+3. **Add actions** - toggleFavorite, setItems, etc.
+
+<Callout type="success">
+**✅ Lesson Complete!** You've learned Zustand basics and created your first store!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Zustand is tiny** - Only 1KB vs 8KB for Redux Toolkit
+- ✅ **No Provider needed** - Store exists outside React tree
+- ✅ **Just hooks** - Use `useStore(selector)` anywhere
+- ✅ **Simple API** - `create()` and `set()` are all you need
+- ✅ **Automatic optimization** - Selectors control re-renders
+- ✅ **90% less code** than Redux Toolkit
+- ✅ **Perfect for** small-medium apps and rapid development

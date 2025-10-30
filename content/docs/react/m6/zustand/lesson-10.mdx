@@ -1,0 +1,456 @@
+---
+title: "L10: Update Router Configuration"
+description: "Configure React Router for complete navigation"
+---
+
+# Update Router Configuration
+
+Let's ensure our router is properly configured! 🛣️
+
+## Current Router Setup
+
+We already have our basic router setup in `App.jsx`:
+
+```jsx title="src/App.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="app">
+        <Navbar />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+## Add 404 Page
+
+Let's add a NotFound page for invalid routes:
+
+```jsx title="src/pages/NotFoundPage.jsx"
+import { Link } from 'react-router-dom';
+
+function NotFoundPage() {
+  return (
+    <div className="not-found-page">
+      <div className="not-found-content">
+        <h1 className="not-found-title">404</h1>
+        <h2 className="not-found-subtitle">Page Not Found</h2>
+        <p className="not-found-text">
+          The page you're looking for doesn't exist.
+        </p>
+        <Link to="/" className="button-primary">
+          Go Home
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export default NotFoundPage;
+```
+
+## Update Router with 404 Route
+
+```jsx title="src/App.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="app">
+        <Navbar />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            {/* 404 catch-all route */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+## Style the 404 Page
+
+```css title="src/app/global.css"
+/* 404 Page */
+.not-found-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.not-found-content {
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.not-found-title {
+  font-size: 6rem;
+  font-weight: 900;
+  color: #0369a1;
+  margin-bottom: 0.5rem;
+}
+
+.not-found-subtitle {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.not-found-text {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+```
+
+## Understanding React Router
+
+<Accordions>
+
+<Accordion title="Route Matching">
+
+**How routes are matched:**
+
+```jsx
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  {/* Matches: /, /favorites, /anything */}
+  
+  <Route path="/favorites" element={<FavoritesPage />} />
+  {/* Matches: /favorites */}
+  
+  <Route path="*" element={<NotFoundPage />} />
+  {/* Matches: anything not matched above */}
+</Routes>
+```
+
+**Order matters!**
+
+```jsx
+// ✅ Good: Specific routes first, catch-all last
+<Route path="/" element={<HomePage />} />
+<Route path="/favorites" element={<FavoritesPage />} />
+<Route path="*" element={<NotFoundPage />} />
+
+// ❌ Bad: Catch-all first catches everything!
+<Route path="*" element={<NotFoundPage />} />
+<Route path="/" element={<HomePage />} />  {/* Never reached! */}
+```
+
+</Accordion>
+
+<Accordion title="Nested Routes (Optional)">
+
+**You can nest routes for layouts:**
+
+```jsx
+// Example: Layout with nested routes
+<Routes>
+  <Route path="/" element={<Layout />}>
+    <Route index element={<HomePage />} />
+    <Route path="favorites" element={<FavoritesPage />} />
+    <Route path="listing/:id" element={<ListingDetailPage />} />
+  </Route>
+</Routes>
+
+// Layout component
+function Layout() {
+  return (
+    <div>
+      <Navbar />
+      <main>
+        <Outlet />  {/* Renders child routes */}
+      </main>
+    </div>
+  );
+}
+```
+
+**For now, our flat structure is simpler!**
+
+</Accordion>
+
+<Accordion title="Navigation Methods">
+
+**Three ways to navigate:**
+
+**1. Link component (preferred for navigation):**
+```jsx
+import { Link } from 'react-router-dom';
+
+<Link to="/favorites">Go to Favorites</Link>
+```
+
+**2. useNavigate hook (for programmatic navigation):**
+```jsx
+import { useNavigate } from 'react-router-dom';
+
+function MyComponent() {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    navigate('/favorites');
+  };
+  
+  return <button onClick={handleClick}>Go to Favorites</button>;
+}
+```
+
+**3. Anchor tag (for external links only):**
+```jsx
+<a href="https://external-site.com">External Link</a>
+```
+
+**Never use `<a href="/favorites">` for internal links!** It causes full page reload. ❌
+
+</Accordion>
+
+</Accordions>
+
+## Testing Routes
+
+**Test all routes:**
+
+1. Go to `/` → HomePage shows ✅
+2. Go to `/favorites` → FavoritesPage shows ✅
+3. Go to `/invalid-route` → NotFoundPage shows ✅
+4. Click "Go Home" → Navigates to HomePage ✅
+5. Use navbar links → Navigation works ✅
+6. Use browser back/forward → Navigation works ✅
+
+## Router with Zustand Benefits
+
+<Tabs items={['State Persists', 'URL Independence', 'Easy Navigation']}>
+
+<Tab value="State Persists">
+
+**Zustand state persists across route changes:**
+
+```
+1. User on HomePage (/)
+   favorites = [1, 2, 3]
+
+2. User navigates to FavoritesPage (/favorites)
+   favorites = [1, 2, 3]  (same!)
+
+3. User navigates to invalid route (/xyz)
+   NotFoundPage shows
+   favorites = [1, 2, 3]  (still there!)
+
+4. User clicks "Go Home"
+   HomePage shows
+   favorites = [1, 2, 3]  (persists!)
+```
+
+**State doesn't reset!** Unlike component state. ✨
+
+</Tab>
+
+<Tab value="URL Independence">
+
+**Zustand store is independent of URL:**
+
+```jsx
+// Redux often ties state to URL:
+// state.router.location.pathname = '/favorites'
+
+// Zustand doesn't care about URL:
+const favorites = useListingsStore((state) => state.favorites);
+// Works on ANY page! ✅
+```
+
+**Benefits:**
+- Same code works on all pages
+- State doesn't depend on route
+- Easier to refactor routes
+
+</Tab>
+
+<Tab value="Easy Navigation">
+
+**Navigate without worrying about state:**
+
+```jsx
+// ❌ With local state, need to pass data:
+<Link 
+  to="/favorites"
+  state={{ favorites: favorites }}  // Pass data
+>
+  Favorites
+</Link>
+
+// ✅ With Zustand, just navigate:
+<Link to="/favorites">
+  Favorites
+</Link>
+// FavoritesPage reads from store automatically!
+```
+
+**Simpler routing!**
+
+</Tab>
+
+</Tabs>
+
+## Add Transitions (Optional)
+
+You can add page transitions for smoother UX:
+
+```css title="src/app/global.css"
+/* Page Transitions */
+.main-content {
+  flex: 1;
+  padding-top: 2rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+```
+
+**Pages will fade in when navigating!** ✨
+
+## Common Router Patterns
+
+<Tabs items={['Programmatic Navigation', 'Navigate on Action', 'Redirect']}>
+
+<Tab value="Programmatic Navigation">
+
+**Navigate after an action:**
+
+```jsx
+import { useNavigate } from 'react-router-dom';
+
+function LoginForm() {
+  const navigate = useNavigate();
+  
+  const handleLogin = async () => {
+    await loginUser();
+    navigate('/');  // Go to homepage after login
+  };
+  
+  return <button onClick={handleLogin}>Login</button>;
+}
+```
+
+**Use case:** Navigate after form submission, login, etc.
+
+</Tab>
+
+<Tab value="Navigate on Action">
+
+**Navigate when condition met:**
+
+```jsx
+import { useNavigate } from 'react-router-dom';
+import useListingsStore from '@/state/useListingsStore';
+
+function AddToFavoritesButton({ listingId }) {
+  const navigate = useNavigate();
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  const handleClick = () => {
+    toggleFavorite(listingId);
+    navigate('/favorites');  // Go to favorites page
+  };
+  
+  return (
+    <button onClick={handleClick}>
+      Add to Favorites & View
+    </button>
+  );
+}
+```
+
+**Use case:** Action + navigation combined.
+
+</Tab>
+
+<Tab value="Redirect">
+
+**Redirect based on condition:**
+
+```jsx
+import { Navigate } from 'react-router-dom';
+
+function ProtectedPage() {
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  
+  if (!isLoggedIn) {
+    return <Navigate to="/login" />;  // Redirect if not logged in
+  }
+  
+  return <div>Protected Content</div>;
+}
+```
+
+**Use case:** Authentication, authorization.
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+Router is complete! We now have:
+- ✅ HomePage route (/)
+- ✅ FavoritesPage route (/favorites)
+- ✅ NotFound route (*) for invalid URLs
+- ✅ Navbar navigation working
+- ✅ State persisting across routes
+
+In the next lesson:
+1. **Final polish** - Ensure ListingCard has favorite button
+2. **Complete testing** - Verify entire flow works
+3. **Module review** - Recap everything we built
+
+<Callout type="success">
+**✅ Lesson Complete!** Router is configured with all routes!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Three routes** - Home, Favorites, NotFound
+- ✅ **Catch-all route** - `path="*"` catches invalid URLs
+- ✅ **Route order matters** - Specific routes before catch-all
+- ✅ **State persists** - Zustand store survives navigation
+- ✅ **Link for internal** - Never use `<a>` for internal links
+- ✅ **useNavigate for programmatic** - Navigate from code
+- ✅ **Independent state** - Store doesn't depend on URL
+- ✅ **Simple setup** - No nested routes needed (yet!)

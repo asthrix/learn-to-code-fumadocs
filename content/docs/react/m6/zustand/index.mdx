@@ -1,0 +1,323 @@
+---
+title: "Zustand Path"
+description: "Learn state management with Zustand - the simple and lightweight solution"
+---
+
+# Zustand Path
+
+Welcome to the Zustand learning path! 🐻
+
+## What You'll Learn
+
+Zustand is a **small, fast, and scalable** state management solution that makes React state management delightful:
+
+- ✅ **Minimal Boiler plate** - 90% less code than Redux
+- ✅ **No Provider Needed** - Direct hook-based API
+- ✅ **Tiny Bundle** - Only 1KB (gzipped!)
+- ✅ **Fast** - Optimized rendering by default
+- ✅ **Flexible** - Use it however you want
+- ✅ **TypeScript Ready** - Excellent type inference
+
+## Course Structure
+
+This path contains **13 focused lessons** covering:
+
+### Phase 1: Zustand Basics (Lessons 1-3)
+1. **Setup Zustand Store** - Install and create store
+2. **Create Listings Store** - Define state and actions
+3. **Connect Zustand to Components** - Use store in components
+
+### Phase 2: Async Operations (Lesson 4)
+4. **Async Actions in Zustand** - Handle API calls
+
+### Phase 3: Component Integration (Lesson 5)
+5. **Refactor HomePage** - Use Zustand for state
+
+### Phase 4: Favorites Feature (Lessons 6-12)
+6. **Favorites Setup** - Test the toggle action
+7. **Favorites Page** - Display favorited listings
+8. **Navbar Component** - Add navigation
+9. **Add Navbar to App** - Integrate layout
+10. **Update Router** - Configure routes
+11. **Favorite Button Component** - Create toggle button
+12. **Add to ListingCard** - Complete integration
+
+### Phase 5: Review (Lesson 13)
+13. **Module Review** - Complete Zustand patterns review
+
+## Why Zustand?
+
+<Accordions>
+
+<Accordion title="Incredibly Simple">
+
+Zustand makes state management **effortless**:
+
+```js
+// Create a store (no Provider needed!)
+import { create } from 'zustand';
+
+const useStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 }))
+}));
+
+// Use in component
+function Counter() {
+  const count = useStore((state) => state.count);
+  const increment = useStore((state) => state.increment);
+  return <button onClick={increment}>{count}</button>;
+}
+```
+
+**That's it!** No reducers, actions, dispatch, or Provider! ✨
+
+</Accordion>
+
+<Accordion title="Tiny Bundle Size">
+
+Zustand is **incredibly lightweight**:
+
+| Library | Bundle Size (gzipped) |
+|---------|----------------------|
+| Zustand | **1KB** 🎉 |
+| Redux Toolkit | 8KB |
+| MobX | 16KB |
+| Recoil | 14KB |
+
+**Perfect for performance-critical apps!**
+
+</Accordion>
+
+<Accordion title="No Boilerplate">
+
+Compare Redux Toolkit vs Zustand:
+
+**Redux Toolkit (3 files):**
+```js
+// store.js
+import { configureStore } from '@reduxjs/toolkit';
+import counterReducer from './counterSlice';
+export const store = configureStore({ reducer: { counter: counterReducer }});
+
+// counterSlice.js
+import { createSlice } from '@reduxjs/toolkit';
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { value: 0 },
+  reducers: {
+    increment: (state) => { state.value += 1; }
+  }
+});
+export const { increment } = counterSlice.actions;
+export default counterSlice.reducer;
+
+// App.jsx
+import { Provider } from 'react-redux';
+<Provider store={store}><App /></Provider>
+```
+
+**Zustand (1 file):**
+```js
+// store.js
+import { create } from 'zustand';
+export const useStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 }))
+}));
+
+// App.jsx
+// Nothing needed! Just use the hook!
+```
+
+**90% less code!** 🚀
+
+</Accordion>
+
+<Accordion title="Perfect For">
+
+**Choose Zustand if you:**
+
+- 🚀 Building small to medium applications
+- 👤 Working solo or in a small team
+- ⚡ Need fast performance
+- 📦 Want minimal bundle size
+- 🎨 Prefer simple, flexible APIs
+- 🏃 Building MVPs or prototypes
+- 💡 Want quick setup and iteration
+
+**Bundle size:** ~1KB (gzipped)
+**Learning curve:** Gentle and intuitive
+
+</Accordion>
+
+</Accordions>
+
+## Zustand vs Redux Toolkit
+
+<Tabs items={['API Simplicity', 'Setup', 'Performance', 'Use Cases']}>
+
+<Tab value="API Simplicity">
+
+### Zustand: Hook-Based
+
+```js
+// Create store
+const useStore = create((set) => ({
+  items: [],
+  addItem: (item) => set((state) => ({ items: [...state.items, item] }))
+}));
+
+// Use in component
+const items = useStore((state) => state.items);
+const addItem = useStore((state) => state.addItem);
+```
+
+**Direct and intuitive!**
+
+### Redux Toolkit: Action-Based
+
+```js
+// Create slice
+const slice = createSlice({
+  name: 'items',
+  initialState: { items: [] },
+  reducers: {
+    addItem: (state, action) => { state.items.push(action.payload); }
+  }
+});
+
+// Use in component
+const items = useSelector((state) => state.items.items);
+const dispatch = useDispatch();
+dispatch(addItem(item));
+```
+
+**More structure, more concepts**
+
+</Tab>
+
+<Tab value="Setup">
+
+### Zustand Setup
+
+```bash
+# Install
+npm install zustand
+
+# Create store (1 file)
+import { create } from 'zustand';
+const useStore = create((set) => ({ /* state */ }));
+
+# Use anywhere (no Provider!)
+const data = useStore((state) => state.data);
+```
+
+**3 steps, done!** ✨
+
+### Redux Toolkit Setup
+
+```bash
+# Install
+npm install @reduxjs/toolkit react-redux
+
+# Create store (2-3 files)
+# 1. Configure store
+# 2. Create slices
+# 3. Add Provider
+
+# Use with Provider
+<Provider store={store}>
+  <App />
+</Provider>
+```
+
+**More setup required**
+
+</Tab>
+
+<Tab value="Performance">
+
+### Bundle Sizes
+
+- **Zustand:** 1KB (tiny!)
+- **Redux Toolkit:** 8KB (reasonable)
+
+### Render Optimization
+
+**Both are fast**, but Zustand has advantages:
+
+```js
+// Zustand - automatic optimization
+const name = useStore((state) => state.user.name);
+// Only re-renders when name changes!
+
+// Redux - manual optimization needed
+const name = useSelector((state) => state.user.name);
+// Same optimization, more setup
+```
+
+</Tab>
+
+<Tab value="Use Cases">
+
+### Best for Zustand
+
+- ✅ Small to medium apps (< 50 components using state)
+- ✅ Quick prototypes and MVPs
+- ✅ Performance-critical applications
+- ✅ Simple state logic
+- ✅ Solo developers or small teams
+
+### Best for Redux Toolkit
+
+- ✅ Large-scale applications (100+ components)
+- ✅ Complex state logic with middleware
+- ✅ Team projects with many developers
+- ✅ Enterprise applications
+- ✅ Need for time-travel debugging
+
+**Both are excellent choices!**
+
+</Tab>
+
+</Tabs>
+
+## What You'll Build
+
+By the end of this path, you'll have built the same **Favorites System** as Redux:
+
+```
+✅ Global state management with Zustand
+✅ Async data fetching with actions
+✅ Favorites toggle functionality
+✅ Dedicated favorites page
+✅ Navigation with counter badge
+✅ Reusable favorite button component
+✅ Complete UI integration
+```
+
+**Same features, simpler code!** 🎉
+
+## Prerequisites
+
+Before starting this path, you should have completed:
+
+- ✅ Module 5: Hooks & Performance
+- ✅ Understanding of `useEffect` and `useState`
+- ✅ Familiarity with async/await
+- ✅ React Router basics
+
+## Time Commitment
+
+**Duration:** 4-5 hours
+**Difficulty:** Advanced
+**Lessons:** 13
+
+## Ready to Start?
+
+Let's begin with Lesson 1: Setup Zustand Store!
+
+<Callout type="success">
+**Fun fact:** "Zustand" is German for "state" - fitting for a state management library! 🐻🇩🇪
+</Callout>

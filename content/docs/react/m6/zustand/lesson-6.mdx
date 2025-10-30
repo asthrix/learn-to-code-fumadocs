@@ -1,0 +1,757 @@
+---
+title: "L6: Favorites Feature Setup"
+description: "Test and understand the favorites functionality in Zustand"
+---
+
+# Favorites Feature Setup
+
+Let's test and understand how favorites work! ❤️
+
+## What We Already Have
+
+Our store already has favorites functionality:
+
+```js title="src/state/useListingsStore.js"
+const useListingsStore = create((set) => ({
+  // State
+  favorites: [],  // Array of listing IDs
+  
+  // Action
+  toggleFavorite: (id) => set((state) => ({
+    favorites: state.favorites.includes(id)
+      ? state.favorites.filter(favId => favId !== id)  // Remove
+      : [...state.favorites, id]                        // Add
+  })),
+}));
+```
+
+**Let's test it and understand how it works!** 🧪
+
+## Step 1: Create Test Component
+
+Let's create a simple test to verify favorites work:
+
+```jsx title="src/components/FavoritesTest.jsx"
+import useListingsStore from '@/state/useListingsStore';
+
+function FavoritesTest() {
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  return (
+    <div style={{ padding: '2rem', border: '2px solid #0369a1', margin: '1rem' }}>
+      <h2>Favorites Test</h2>
+      <p><strong>Current favorites:</strong> {JSON.stringify(favorites)}</p>
+      
+      <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+        <button onClick={() => toggleFavorite('1')}>
+          Toggle Listing 1
+        </button>
+        <button onClick={() => toggleFavorite('5')}>
+          Toggle Listing 5
+        </button>
+        <button onClick={() => toggleFavorite('9')}>
+          Toggle Listing 9
+        </button>
+      </div>
+      
+      <div style={{ marginTop: '1rem' }}>
+        <p>Is Listing 1 favorited? {favorites.includes('1') ? '✅ Yes' : '❌ No'}</p>
+        <p>Is Listing 5 favorited? {favorites.includes('5') ? '✅ Yes' : '❌ No'}</p>
+        <p>Is Listing 9 favorited? {favorites.includes('9') ? '✅ Yes' : '❌ No'}</p>
+      </div>
+      
+      <p style={{ marginTop: '1rem' }}>
+        <strong>Total favorites:</strong> {favorites.length}
+      </p>
+    </div>
+  );
+}
+
+export default FavoritesTest;
+```
+
+## Step 2: Add to HomePage
+
+Temporarily add this test component to `HomePage`:
+
+```jsx title="src/pages/HomePage.jsx"
+import FavoritesTest from '@/components/FavoritesTest';
+
+function HomePage() {
+  // ... existing code ...
+  
+  return (
+    <div className="home-page">
+      {/* Add test component */}
+      <FavoritesTest />
+      
+      {/* Rest of HomePage */}
+      <header className="page-header">
+        <h1>Discover Amazing Places</h1>
+        {/* ... */}
+      </header>
+      {/* ... */}
+    </div>
+  );
+}
+```
+
+## Step 3: Test the Functionality
+
+**Try these actions:**
+
+1. Click "Toggle Listing 1" → Array becomes `["1"]`
+2. Click "Toggle Listing 5" → Array becomes `["1", "5"]`
+3. Click "Toggle Listing 9" → Array becomes `["1", "5", "9"]`
+4. Click "Toggle Listing 1" again → Array becomes `["5", "9"]`
+
+**It works!** ✅
+
+## Understanding toggleFavorite
+
+Let's break down how this action works:
+
+<Accordions>
+
+<Accordion title="The Toggle Logic">
+
+```js
+toggleFavorite: (id) => set((state) => ({
+  favorites: state.favorites.includes(id)
+    ? state.favorites.filter(favId => favId !== id)  // Remove
+    : [...state.favorites, id]                        // Add
+}))
+```
+
+**Step by step:**
+
+```js
+// 1. Check if ID is already in favorites
+state.favorites.includes(id)
+
+// 2a. If YES (already favorited) → Remove it
+state.favorites.filter(favId => favId !== id)
+// Example: [1, 5, 9].filter(favId => favId !== 5)
+// Result: [1, 9]
+
+// 2b. If NO (not favorited) → Add it
+[...state.favorites, id]
+// Example: [...[1, 9], 5]
+// Result: [1, 9, 5]
+```
+
+**Visual example:**
+
+```
+Initial: favorites = []
+
+toggleFavorite(1)
+→ includes(1)? No
+→ [...[], 1]
+→ favorites = [1]
+
+toggleFavorite(5)
+→ includes(5)? No
+→ [...[1], 5]
+→ favorites = [1, 5]
+
+toggleFavorite(1)
+→ includes(1)? Yes
+→ [1, 5].filter(id => id !== 1)
+→ favorites = [5]
+```
+
+</Accordion>
+
+<Accordion title="Why Use IDs?">
+
+**We store IDs, not full listing objects:**
+
+```js
+// ✅ Good: Store IDs
+favorites: [1, 5, 9]
+
+// ❌ Bad: Store full objects
+favorites: [
+  { id: 1, title: 'Beach House', price: 250, images: [...] },
+  { id: 5, title: 'City Loft', price: 150, images: [...] },
+  { id: 9, title: 'Mountain Cabin', price: 100, images: [...] }
+]
+```
+
+**Reasons:**
+
+**1. Memory efficiency:**
+```js
+// IDs: ~30 bytes
+[1, 5, 9]
+
+// Full objects: ~5000+ bytes
+[{...}, {...}, {...}]
+```
+
+**2. Single source of truth:**
+```js
+// Items array is the source of truth
+items: [{ id: 1, title: 'Beach House', price: 250 }]
+favorites: [1]
+
+// Update price
+items[0].price = 300
+
+// Favorite automatically shows new price! ✅
+const favoritedItems = items.filter(item => favorites.includes(item.id))
+// Result: [{ id: 1, title: 'Beach House', price: 300 }]
+```
+
+**3. Easy checking:**
+```js
+// Check if favorited
+favorites.includes(listingId)  // O(n) lookup, fast for small arrays
+
+// Get favorited items
+items.filter(item => favorites.includes(item.id))
+```
+
+</Accordion>
+
+<Accordion title="Immutable Updates">
+
+**Why use filter() and spread instead of mutating?**
+
+```js
+// ❌ Bad: Mutation (Zustand won't detect change)
+toggleFavorite: (id) => {
+  const state = get();
+  if (state.favorites.includes(id)) {
+    const index = state.favorites.indexOf(id);
+    state.favorites.splice(index, 1);  // Mutates array!
+  } else {
+    state.favorites.push(id);  // Mutates array!
+  }
+  set({ favorites: state.favorites });  // Same reference, no re-render! ❌
+}
+
+// ✅ Good: Immutable (creates new array)
+toggleFavorite: (id) => set((state) => ({
+  favorites: state.favorites.includes(id)
+    ? state.favorites.filter(favId => favId !== id)  // New array
+    : [...state.favorites, id]                        // New array
+}))
+```
+
+**Why immutability matters:**
+
+```js
+// Zustand compares by reference
+const oldArray = [1, 2, 3];
+const newArray = [1, 2, 3];
+
+oldArray === newArray  // false (different references)
+
+// Mutation keeps same reference
+const arr = [1, 2, 3];
+arr.push(4);  // Still the same reference! ❌
+
+// New array creates new reference
+const arr2 = [...arr, 5];  // New reference! ✅
+```
+
+**Immutable operations:**
+- `filter()` → new array
+- `map()` → new array
+- `[...array, item]` → new array
+- `array.slice()` → new array
+
+**Mutable operations (avoid):**
+- `push()` → same array
+- `pop()` → same array
+- `splice()` → same array
+- `sort()` → same array
+
+</Accordion>
+
+</Accordions>
+
+## How Components Re-Render
+
+<Tabs items={['Selector Specificity', 'Multiple Components', 'Performance']}>
+
+<Tab value="Selector Specificity">
+
+**Only components that SELECT favorites re-render:**
+
+```jsx
+// Component A: Selects favorites
+function FavoriteButton() {
+  const favorites = useListingsStore((state) => state.favorites);
+  // Re-renders when favorites change ✅
+  
+  return <div>{favorites.length} favorites</div>;
+}
+
+// Component B: Selects items
+function ListingsList() {
+  const items = useListingsStore((state) => state.items);
+  // Does NOT re-render when favorites change ❌
+  // Only re-renders when items change
+  
+  return <div>{items.length} items</div>;
+}
+
+// Component C: Selects nothing
+function StaticComponent() {
+  // Never re-renders from store changes ❌
+  
+  return <div>Static content</div>;
+}
+```
+
+**When you toggle a favorite:**
+- Component A: ✅ Re-renders (uses favorites)
+- Component B: ❌ Doesn't re-render (uses items)
+- Component C: ❌ Doesn't re-render (uses nothing)
+
+**Automatic optimization!** 🚀
+
+</Tab>
+
+<Tab value="Multiple Components">
+
+**All components share the same state:**
+
+```jsx
+// Component 1
+function FavoriteButton({ listingId }) {
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  return (
+    <button onClick={() => toggleFavorite(listingId)}>
+      {favorites.includes(listingId) ? '❤️' : '🤍'}
+    </button>
+  );
+}
+
+// Component 2
+function FavoriteCount() {
+  const favorites = useListingsStore((state) => state.favorites);
+  
+  return <span>{favorites.length} favorites</span>;
+}
+
+// Component 3
+function FavoritesList() {
+  const favorites = useListingsStore((state) => state.favorites);
+  const items = useListingsStore((state) => state.items);
+  
+  const favoritedItems = items.filter(item => 
+    favorites.includes(item.id)
+  );
+  
+  return <div>{favoritedItems.map(/* ... */)}</div>;
+}
+```
+
+**When you click the button in Component 1:**
+1. `toggleFavorite(5)` is called
+2. Store updates: `favorites = [1, 5, 9]`
+3. ALL three components re-render (they all use favorites)
+4. Button shows ❤️ (favorited)
+5. Count shows "3 favorites"
+6. List shows all 3 favorited items
+
+**All components stay in sync automatically!** ✨
+
+</Tab>
+
+<Tab value="Performance">
+
+**How efficient is this?**
+
+```jsx
+// ❌ Inefficient: Re-renders on any state change
+const state = useListingsStore();
+
+// ✅ Efficient: Only re-renders when favorites change
+const favorites = useListingsStore((state) => state.favorites);
+
+// ✅ Even more efficient: Only re-renders when count changes
+const count = useListingsStore((state) => state.favorites.length);
+```
+
+**Comparison:**
+
+```jsx
+// Scenario: 100 components using the store
+
+// Bad: All select entire state
+// toggleFavorite() → 100 re-renders ❌
+
+// Good: All select favorites
+// toggleFavorite() → 100 re-renders (but necessary!)
+
+// Best: Mix of specific selectors
+// - 10 components select favorites → 10 re-renders
+// - 90 components select items → 0 re-renders
+// toggleFavorite() → only 10 re-renders ✅
+```
+
+**Rule:** Select only what you need!
+
+</Tab>
+
+</Tabs>
+
+## Getting Favorited Listings
+
+Now let's add a selector to get the actual favorited listings:
+
+```js title="src/state/useListingsStore.js"
+const useListingsStore = create((set, get) => ({
+  // ... existing state and actions ...
+  
+  // Computed selector for favorited listings
+  getFavoritedItems: () => {
+    const { items, favorites } = get();
+    return items.filter((item) => favorites.includes(item.id));
+  },
+}));
+```
+
+**Usage:**
+
+```jsx
+// In any component
+const getFavoritedItems = useListingsStore((state) => state.getFavoritedItems);
+const favoritedItems = getFavoritedItems();
+
+return (
+  <div>
+    <h2>Your Favorites ({favoritedItems.length})</h2>
+    {favoritedItems.map((item) => (
+      <ListingCard key={item.id} listing={item} />
+    ))}
+  </div>
+);
+```
+
+## Add to ListingCard
+
+Let's add a favorite button to `ListingCard`:
+
+```jsx title="src/components/ListingCard.jsx"
+import useListingsStore from '@/state/useListingsStore';
+
+function ListingCard({ listing }) {
+  // Select favorites and action
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  // Check if this listing is favorited
+  const isFavorited = favorites.includes(listing.id);
+  
+  return (
+    <div className="listing-card">
+      <div className="listing-image">
+        <img 
+          src={listing.media?.[0]?.url || '/placeholder.jpg'} 
+          alt={listing.media?.[0]?.alt || listing.name}
+        />
+        
+        {/* Favorite Button */}
+        <button
+          className={`favorite-button ${isFavorited ? 'favorited' : ''}`}
+          onClick={() => toggleFavorite(listing.id)}
+          aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          {isFavorited ? '❤️' : '🤍'}
+        </button>
+      </div>
+      
+      <div className="listing-content">
+        <h3>{listing.name}</h3>
+        <p className="listing-description">{listing.description}</p>
+        
+        <div className="listing-details">
+          <span className="price">${listing.price}/night</span>
+          <span className="guests">👥 {listing.maxGuests} guests</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ListingCard;
+```
+
+## Styling the Favorite Button
+
+Add CSS for the favorite button:
+
+```css title="src/app/global.css"
+.listing-card {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.listing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.listing-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.listing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Favorite Button */
+.favorite-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.favorite-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.favorite-button.favorited {
+  background: #fee;
+  animation: heartbeat 0.3s ease;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.listing-content {
+  padding: 1rem;
+}
+
+.listing-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+}
+
+.listing-description {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.listing-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.price {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #0369a1;
+}
+
+.guests {
+  color: #666;
+  font-size: 0.9rem;
+}
+```
+
+## Test It Out!
+
+Now when you view your listings:
+
+1. Each card has a favorite button (🤍)
+2. Click the button → it turns red (❤️)
+3. Favorites array updates: `[1, 5, 9]`
+4. Click again → it turns white (🤍)
+5. Favorites array updates: `[5, 9]`
+6. Button animates with heartbeat effect! 💓
+
+**All cards share the same favorites state!** ✨
+
+## Understanding the Flow
+
+<Accordions>
+
+<Accordion title="Complete Data Flow">
+
+```
+1. User clicks favorite button on Listing 5
+   ↓
+2. onClick={() => toggleFavorite(listing.id)} is called
+   ↓
+3. Store updates: favorites = [...favorites, 5]
+   ↓
+4. All components selecting favorites re-render:
+   - ListingCard (button changes to ❤️)
+   - FavoriteCount (shows "3 favorites")
+   - FavoritesList (shows listing 5)
+   ↓
+5. UI updates everywhere simultaneously
+```
+
+**One action, many updates!** That's the power of global state.
+
+</Accordion>
+
+<Accordion title="Why This is Better Than Local State">
+
+**With local state (❌ Bad):**
+
+```jsx
+function ListingCard({ listing }) {
+  const [isFavorited, setIsFavorited] = useState(false);
+  
+  // Problem 1: Each card has separate state
+  // Problem 2: No way to share with FavoritesPage
+  // Problem 3: Lost on page refresh
+  // Problem 4: Can't show count in navbar
+  
+  return (
+    <button onClick={() => setIsFavorited(!isFavorited)}>
+      {isFavorited ? '❤️' : '🤍'}
+    </button>
+  );
+}
+```
+
+**With Zustand (✅ Good):**
+
+```jsx
+function ListingCard({ listing }) {
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  const isFavorited = favorites.includes(listing.id);
+  
+  // ✅ Shared across all components
+  // ✅ Available in FavoritesPage
+  // ✅ Can persist to localStorage
+  // ✅ Can show count in navbar
+  
+  return (
+    <button onClick={() => toggleFavorite(listing.id)}>
+      {isFavorited ? '❤️' : '🤍'}
+    </button>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="Comparison with Redux">
+
+**Redux approach:**
+
+```jsx
+// Import multiple things
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+
+function ListingCard({ listing }) {
+  // Get dispatch
+  const dispatch = useDispatch();
+  
+  // Select state (nested path)
+  const favorites = useSelector((state) => state.listings.favorites);
+  
+  // Check if favorited
+  const isFavorited = favorites.includes(listing.id);
+  
+  // Need to wrap in dispatch
+  const handleClick = () => {
+    dispatch(toggleFavorite(listing.id));
+  };
+  
+  return <button onClick={handleClick}>{/* ... */}</button>;
+}
+```
+
+**Zustand approach:**
+
+```jsx
+// Import one thing
+import useListingsStore from '@/state/useListingsStore';
+
+function ListingCard({ listing }) {
+  // Select state (simple)
+  const favorites = useListingsStore((state) => state.favorites);
+  
+  // Select action (simple)
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  // Check if favorited
+  const isFavorited = favorites.includes(listing.id);
+  
+  // Just call it directly
+  return (
+    <button onClick={() => toggleFavorite(listing.id)}>
+      {/* ... */}
+    </button>
+  );
+}
+```
+
+**Zustand is simpler!** No Provider, no dispatch, no nested paths.
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+Perfect! Favorites are working. In the next lesson:
+
+1. **Create FavoritesPage** - Display favorited listings
+2. **Handle empty state** - When no favorites yet
+3. **Add remove functionality** - Unfavorite from list
+4. **Reuse ListingCard** - Same component, different context
+
+<Callout type="success">
+**✅ Lesson Complete!** Favorites functionality is working!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **toggleFavorite works** - Add/remove listings from favorites
+- ✅ **ID-based storage** - Efficient and simple
+- ✅ **Immutable updates** - Creates new arrays for re-renders
+- ✅ **Selective re-renders** - Only components using favorites re-render
+- ✅ **Shared state** - All components see same favorites
+- ✅ **ListingCard enhanced** - Favorite button with animation
+- ✅ **Better than local state** - Global, persistent, shareable
+- ✅ **Simpler than Redux** - No dispatch, no Provider, just hooks

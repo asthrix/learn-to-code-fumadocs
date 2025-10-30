@@ -1,8 +1,6 @@
 ---
 title: "Module 6: State Management"
-description:
-   "Scale your app with Redux Toolkit for global state management and the
-   favorites feature."
+description: "Master global state management with Redux Toolkit or Zustand"
 module: 6
 totalSteps: 15
 duration: "4-5 hours"
@@ -10,22 +8,208 @@ difficulty: "advanced"
 prerequisites: ["module-5"]
 ---
 
-# Module 6 - State Management
+import { Button } from "@/components/ui/button";
 
-Level up with Redux Toolkit! Learn to manage complex global state and build a
-favorites system. 🌟
+# Module 6: State Management
 
-## Coming Soon
+Learn to manage global state in React! Choose your path: **Redux Toolkit** (industry standard) or **Zustand** (modern & lightweight). 🌟
 
-You'll learn:
+## Choose Your Path
 
--  Redux Toolkit fundamentals
--  Store configuration
--  Slices and reducers
--  Async thunks
--  Redux DevTools
--  Favorites feature implementation
+<Tabs items={['Redux Toolkit', 'Zustand', 'Comparison']}>
 
-<div className='mt-6'>
-   <Badge variant='primary'>Module 6 lessons coming soon</Badge>
-</div>
+<Tab value="Redux Toolkit">
+
+### Redux Toolkit Path
+
+**15 comprehensive lessons** covering:
+
+**Fundamentals (L1-L5):**
+- ✅ Setup Redux Toolkit
+- ✅ Create store and slices
+- ✅ Connect components with useSelector/useDispatch
+- ✅ Async thunks for API calls
+- ✅ Redux DevTools integration
+
+**Features (L6-L10):**
+- ✅ Refactor HomePage with Redux
+- ✅ Favorites slice implementation
+- ✅ Create Favorites page
+- ✅ Build Navbar with badge
+- ✅ Integrate Navbar into app
+
+**Polish (L11-L15):**
+- ✅ Router configuration
+- ✅ Extract FavoriteButton component
+- ✅ Complete ListingCard integration
+- ✅ Testing Redux store
+- ✅ Module review
+
+**Duration:** 4-5 hours  
+**Difficulty:** Advanced  
+**Best for:** Enterprise apps, large teams, complex state
+
+  <Link href="/docs/react/m6/redux">
+   <Button asChild>
+      Start Redux Path →
+   </Button>
+  </Link>
+
+</Tab>
+
+<Tab value="Zustand">
+
+### Zustand Path
+
+**13 focused lessons** covering:
+
+**Core Concepts (L1-L4):**
+- ✅ Setup Zustand (1KB!)
+- ✅ Create store with hooks
+- ✅ Connect components
+- ✅ Async actions
+
+**Features (L5-L8):**
+- ✅ Refactor HomePage with Zustand
+- ✅ Favorites setup
+- ✅ Create Favorites page
+- ✅ Build Navbar with badge
+
+**Integration (L9-L13):**
+- ✅ Add Navbar to app
+- ✅ Router configuration
+- ✅ Extract FavoriteButton component
+- ✅ Complete ListingCard integration
+- ✅ Module review
+
+**Duration:** 3-4 hours  
+**Difficulty:** Intermediate  
+**Best for:** Small-medium apps, rapid prototyping, modern React
+
+  <Link href="/docs/react/m6/zustand">
+   <Button asChild>
+      Start Zustand Path →
+   </Button>
+   </Link>
+
+</Tab>
+
+<Tab value="Comparison">
+
+### Redux vs Zustand
+
+| Feature | Redux Toolkit | Zustand |
+|---------|--------------|---------|
+| **Bundle Size** | ~13KB | ~1KB ✨ |
+| **Setup Complexity** | Moderate | Minimal |
+| **Boilerplate** | Some | Almost none |
+| **Learning Curve** | Steeper | Gentle |
+| **DevTools** | Built-in | Via middleware |
+| **TypeScript** | Excellent | Excellent |
+| **Middleware** | Rich ecosystem | Basic |
+| **Community** | Huge | Growing |
+| **Best For** | Enterprise apps | Small-medium apps |
+| **Time-travel Debug** | Yes ✅ | Limited |
+| **Industry Standard** | Yes ✅ | Emerging |
+
+#### When to Choose Redux Toolkit
+
+✅ Large enterprise applications  
+✅ Multiple teams working together  
+✅ Need time-travel debugging  
+✅ Complex state requirements  
+✅ Extensive middleware needed  
+✅ Team already knows Redux  
+
+**Example projects:** Banking apps, E-commerce platforms, Social media apps
+
+#### When to Choose Zustand
+
+✅ Small to medium applications  
+✅ Rapid prototyping and MVPs  
+✅ Modern React patterns preferred  
+✅ Bundle size matters  
+✅ Simple state management needs  
+✅ Learning state management  
+
+**Example projects:** Personal projects, Startups, Portfolio sites, Small business apps
+
+</Tab>
+
+</Tabs>
+
+## What You'll Build
+
+Both paths build the **same complete application** with:
+
+- 🌐 **Global state management** - Share data across components
+- 📡 **API integration** - Fetch listings from Noroff API
+- 🔍 **Filtering system** - Search, price, and guest filters
+- ❤️ **Favorites feature** - Add/remove/display favorite listings
+- 🧭 **Navigation** - React Router with persistent navbar
+- 📱 **Responsive design** - Works on all screen sizes
+- ♿ **Accessibility** - WCAG compliant, keyboard navigation
+- ⚡ **Performance** - Optimized re-renders, lazy loading
+
+## Prerequisites
+
+Before starting Module 6, you should:
+
+- ✅ Complete **Module 5** (API Integration)
+- ✅ Understand React hooks (useState, useEffect)
+- ✅ Know component composition
+- ✅ Be familiar with async/await
+- ✅ Have React Router basics
+
+## Learning Outcomes
+
+By the end of this module, you will:
+
+- ✅ **Master global state management** - Choose and implement either Redux or Zustand
+- ✅ **Handle async data** - Fetch and manage data from APIs
+- ✅ **Build complex features** - Implement filtering, favorites, and navigation
+- ✅ **Optimize performance** - Use selectors and memoization
+- ✅ **Create reusable components** - Extract common UI patterns
+- ✅ **Ensure accessibility** - Build inclusive user interfaces
+- ✅ **Compare solutions** - Understand trade-offs between state libraries
+
+## Module Structure
+
+Both paths follow similar structure:
+
+1. **Setup** - Install and configure state library
+2. **Core concepts** - Understand fundamentals
+3. **Connect components** - Use state in UI
+4. **Async actions** - Fetch data from API
+5. **Features** - Build filtering and favorites
+6. **Navigation** - Add routing and navbar
+7. **Polish** - Extract components and optimize
+8. **Review** - Recap and best practices
+
+## Ready to Start?
+
+Choose your path above and begin your state management journey!
+
+<Callout type="info">
+**Not sure which to choose?** Start with **Zustand** if you're learning state management for the first time, or pick **Redux Toolkit** if you're preparing for enterprise work.
+</Callout>
+
+<Callout type="tip">
+**Pro tip:** You can complete both paths to compare approaches and deepen your understanding!
+</Callout>
+
+
+<Card className="flex justify-center">
+   <Link href="/docs/react/m6/redux">
+      <Button className="mx-2" asChild>
+         Start Redux Path →
+      </Button>
+   </Link>
+   <Link href="/docs/react/m6/zustand">
+      <Button variant="secondary" className="mx-2" asChild>
+         Start Zustand Path →
+      </Button>
+   </Link>
+</Card>
+
+   

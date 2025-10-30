@@ -1,0 +1,587 @@
+---
+title: "L7: Create Favorites Page"
+description: "Build a dedicated page to display all favorited listings"
+---
+
+# Create Favorites Page
+
+Let's build a page to show all favorited listings! ⭐
+
+## What We're Building
+
+A `FavoritesPage` that:
+- Shows all favorited listings
+- Displays empty state when no favorites
+- Reuses `ListingCard` component
+- Updates in real-time when favorites change
+
+## Step 1: Create the Page Component
+
+```jsx title="src/pages/FavoritesPage.jsx"
+import useListingsStore from '@/state/useListingsStore';
+import ListingCard from '@/components/ListingCard';
+
+function FavoritesPage() {
+  // Select items and favorites
+  const items = useListingsStore((state) => state.items);
+  const favorites = useListingsStore((state) => state.favorites);
+  
+  // Get favorited listings
+  const favoritedListings = items.filter((item) => 
+    favorites.includes(item.id)
+  );
+  
+  return (
+    <div className="favorites-page">
+      <header className="page-header">
+        <h1>My Favorites</h1>
+        <p>
+          {favoritedListings.length === 0
+            ? 'You haven\'t added any favorites yet'
+            : `${favoritedListings.length} ${favoritedListings.length === 1 ? 'place' : 'places'} saved`
+          }
+        </p>
+      </header>
+      
+      {favoritedListings.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon">❤️</div>
+          <h2>No Favorites Yet</h2>
+          <p>
+            Start exploring and click the ❤️ button on listings you love!
+          </p>
+          <a href="/" className="button-primary">
+            Explore Listings
+          </a>
+        </div>
+      ) : (
+        <div className="listings-grid">
+          {favoritedListings.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default FavoritesPage;
+```
+
+## Understanding the Component
+
+<Accordions>
+
+<Accordion title="Filtering Favorited Items">
+
+**How we get favorited listings:**
+
+```jsx
+// 1. Get all items
+const items = useListingsStore((state) => state.items);
+// items = [
+//   { id: '1', name: 'Beach House', ... },
+//   { id: '5', name: 'City Loft', ... },
+//   { id: '9', name: 'Mountain Cabin', ... },
+//   { id: '12', name: 'Lake View', ... },
+// ]
+
+// 2. Get favorites array (IDs only)
+const favorites = useListingsStore((state) => state.favorites);
+// favorites = ['1', '5', '9']
+
+// 3. Filter items to only favorited ones
+const favoritedListings = items.filter((item) => 
+  favorites.includes(item.id)
+);
+// favoritedListings = [
+//   { id: '1', name: 'Beach House', ... },
+//   { id: '5', name: 'City Loft', ... },
+//   { id: '9', name: 'Mountain Cabin', ... },
+// ]
+```
+
+**Why this works:**
+- `favorites.includes(item.id)` checks if listing ID is in favorites
+- `filter()` keeps only items that pass the test
+- Result: Full listing objects, but only favorited ones!
+
+</Accordion>
+
+<Accordion title="Empty State Handling">
+
+**Conditional rendering:**
+
+```jsx
+{favoritedListings.length === 0 ? (
+  // Show empty state
+  <EmptyState />
+) : (
+  // Show listings
+  <ListingsGrid />
+)}
+```
+
+**Why important?**
+
+```jsx
+// ❌ Bad: Shows nothing, confusing UI
+function FavoritesPage() {
+  const favoritedListings = getFavoritedListings();
+  
+  return (
+    <div>
+      <h1>Favorites</h1>
+      {favoritedListings.map(/* ... */)}
+      {/* If empty, shows blank page! */}
+    </div>
+  );
+}
+
+// ✅ Good: Clear message when empty
+function FavoritesPage() {
+  const favoritedListings = getFavoritedListings();
+  
+  if (favoritedListings.length === 0) {
+    return <EmptyState message="No favorites yet" />;
+  }
+  
+  return <ListingsGrid listings={favoritedListings} />;
+}
+```
+
+**Good UX = Clear feedback!**
+
+</Accordion>
+
+<Accordion title="Component Reusability">
+
+**We reuse `ListingCard`:**
+
+```jsx
+// In HomePage
+<ListingCard listing={listing} />
+
+// In FavoritesPage (same component!)
+<ListingCard listing={listing} />
+```
+
+**How does ListingCard know if favorited?**
+
+```jsx
+function ListingCard({ listing }) {
+  // It checks the store directly!
+  const favorites = useListingsStore((state) => state.favorites);
+  const isFavorited = favorites.includes(listing.id);
+  
+  // Works everywhere! ✅
+  return (
+    <button className={isFavorited ? 'favorited' : ''}>
+      {isFavorited ? '❤️' : '🤍'}
+    </button>
+  );
+}
+```
+
+**No props needed!** Component is self-sufficient.
+
+</Accordion>
+
+</Accordions>
+
+## Better: Use Computed Selector
+
+Instead of filtering in the component, let's use the store's `getFavoritedItems`:
+
+```jsx title="src/pages/FavoritesPage.jsx (Improved)"
+import useListingsStore from '@/state/useListingsStore';
+import ListingCard from '@/components/ListingCard';
+
+function FavoritesPage() {
+  // Use computed selector from store
+  const getFavoritedItems = useListingsStore((state) => state.getFavoritedItems);
+  const favoritedListings = getFavoritedItems();
+  
+  return (
+    <div className="favorites-page">
+      <header className="page-header">
+        <h1>My Favorites</h1>
+        <p>
+          {favoritedListings.length === 0
+            ? 'You haven\'t added any favorites yet'
+            : `${favoritedListings.length} ${favoritedListings.length === 1 ? 'place' : 'places'} saved`
+          }
+        </p>
+      </header>
+      
+      {favoritedListings.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon">❤️</div>
+          <h2>No Favorites Yet</h2>
+          <p>
+            Start exploring and click the ❤️ button on listings you love!
+          </p>
+          <a href="/" className="button-primary">
+            Explore Listings
+          </a>
+        </div>
+      ) : (
+        <div className="listings-grid">
+          {favoritedListings.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default FavoritesPage;
+```
+
+## Comparison: Component Filter vs Store Selector
+
+<Tabs items={['Component Filtering', 'Store Selector', 'When to Use Each']}>
+
+<Tab value="Component Filtering">
+
+**Filter in component:**
+
+```jsx
+function FavoritesPage() {
+  const items = useListingsStore((state) => state.items);
+  const favorites = useListingsStore((state) => state.favorites);
+  
+  // Filter here
+  const favoritedListings = items.filter((item) =>
+    favorites.includes(item.id)
+  );
+  
+  return <div>{/* use favoritedListings */}</div>;
+}
+```
+
+**Pros:**
+- Simple and direct
+- All logic visible in component
+
+**Cons:**
+- Repeated if used in multiple components
+- Re-calculates on every render
+- Component has more responsibilities
+
+</Tab>
+
+<Tab value="Store Selector">
+
+**Filter in store:**
+
+```js
+// In store
+const useListingsStore = create((set, get) => ({
+  items: [],
+  favorites: [],
+  
+  getFavoritedItems: () => {
+    const { items, favorites } = get();
+    return items.filter((item) => favorites.includes(item.id));
+  },
+}));
+```
+
+```jsx
+// In component
+function FavoritesPage() {
+  const getFavoritedItems = useListingsStore((state) => state.getFavoritedItems);
+  const favoritedListings = getFavoritedItems();
+  
+  return <div>{/* use favoritedListings */}</div>;
+}
+```
+
+**Pros:**
+- Reusable across components
+- Logic centralized in store
+- Component stays simple
+
+**Cons:**
+- Still re-calculates on every render
+- Need to remember to use the selector
+
+</Tab>
+
+<Tab value="When to Use Each">
+
+**Use component filtering when:**
+- Only needed in one place
+- Simple, one-off logic
+- Component-specific requirements
+
+```jsx
+// Example: Filter by search (component-specific)
+const filtered = items.filter(item =>
+  item.name.includes(searchQuery)
+);
+```
+
+**Use store selector when:**
+- Needed in multiple components
+- Core business logic
+- Complex calculations
+
+```jsx
+// Example: Get favorited items (used everywhere)
+const getFavoritedItems = useListingsStore((state) => state.getFavoritedItems);
+```
+
+**Best practice:** Start with component filtering, move to store when you need it elsewhere!
+
+</Tab>
+
+</Tabs>
+
+## Step 2: Add Styling
+
+```css title="src/app/global.css"
+.favorites-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.page-header p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-icon {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.empty-state h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.button-primary {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: #0369a1;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.button-primary:hover {
+  background: #075985;
+}
+```
+
+## Step 3: Add to Router
+
+Update your router to include the FavoritesPage:
+
+```jsx title="src/App.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+## Test the Flow
+
+**Try this sequence:**
+
+1. Go to `HomePage` (/)
+2. Click favorite button on 3 listings → ❤️ ❤️ ❤️
+3. Navigate to `/favorites`
+4. See your 3 favorited listings! ✅
+5. Click favorite button on one listing → 🤍
+6. It disappears from favorites page! ✅
+7. Go back to HomePage
+8. That listing shows 🤍 (not favorited)
+
+**Everything stays in sync!** 🎉
+
+## Real-Time Updates
+
+<Accordions>
+
+<Accordion title="How Real-Time Updates Work">
+
+**The flow:**
+
+```
+1. User is on FavoritesPage
+   FavoritesPage renders 3 listings
+   
+2. User clicks favorite button on Listing 5
+   ↓
+3. toggleFavorite(5) is called
+   ↓
+4. Store updates: favorites = [1, 9] (removed 5)
+   ↓
+5. FavoritesPage re-renders (it selects favorites)
+   ↓
+6. getFavoritedItems() recalculates
+   Result: Now only 2 listings (1 and 9)
+   ↓
+7. UI updates: Listing 5 disappears!
+```
+
+**No manual refresh needed!** Store updates → Component re-renders → UI updates.
+
+</Accordion>
+
+<Accordion title="Why This is Better Than Separate State">
+
+**Problem with separate state per page:**
+
+```jsx
+// ❌ Bad: Each page has own state
+function HomePage() {
+  const [favorites, setFavorites] = useState([]);
+  // Can only update favorites on this page
+}
+
+function FavoritesPage() {
+  const [favorites, setFavorites] = useState([]);
+  // Separate state! Out of sync with HomePage! ❌
+}
+```
+
+**Solution with Zustand:**
+
+```jsx
+// ✅ Good: Shared store
+function HomePage() {
+  const favorites = useListingsStore((state) => state.favorites);
+  // Same favorites as FavoritesPage! ✅
+}
+
+function FavoritesPage() {
+  const favorites = useListingsStore((state) => state.favorites);
+  // Same favorites as HomePage! ✅
+}
+```
+
+**One source of truth = Always in sync!**
+
+</Accordion>
+
+<Accordion title="Comparison with Redux">
+
+**Redux approach:**
+
+```jsx
+// FavoritesPage with Redux
+import { useSelector } from 'react-redux';
+
+function FavoritesPage() {
+  // Select from nested path
+  const items = useSelector((state) => state.listings.items);
+  const favorites = useSelector((state) => state.listings.favorites);
+  
+  // Filter manually
+  const favoritedListings = items.filter((item) =>
+    favorites.includes(item.id)
+  );
+  
+  return <div>{/* ... */}</div>;
+}
+```
+
+**Zustand approach:**
+
+```jsx
+// FavoritesPage with Zustand
+import useListingsStore from '@/state/useListingsStore';
+
+function FavoritesPage() {
+  // Call selector function
+  const getFavoritedItems = useListingsStore((state) => state.getFavoritedItems);
+  const favoritedListings = getFavoritedItems();
+  
+  return <div>{/* ... */}</div>;
+}
+```
+
+**Differences:**
+- Redux: Two selectors + manual filtering
+- Zustand: One selector call
+- Redux: Nested state path (`state.listings.items`)
+- Zustand: Flat access (`state.items`)
+- Redux: Need to import `useSelector`
+- Zustand: Just import store hook
+
+**Zustand is simpler!** ✨
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+Perfect! FavoritesPage is complete. In the next lesson:
+
+1. **Create Navbar** - Navigation with favorites count
+2. **Add logo** - Branding
+3. **Active link highlighting** - Show current page
+4. **Responsive design** - Mobile-friendly
+
+<Callout type="success">
+**✅ Lesson Complete!** FavoritesPage displays favorited listings with empty state handling!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Reused ListingCard** - Same component in HomePage and FavoritesPage
+- ✅ **Empty state** - Clear feedback when no favorites
+- ✅ **Real-time updates** - Removing favorite updates UI immediately
+- ✅ **Shared data** - No duplicate fetching or state
+- ✅ **Computed selector** - getFavoritedItems() centralizes logic
+- ✅ **Loading states** - Handles fetch lifecycle properly
+- ✅ **Consistent UX** - Same patterns as HomePage
+- ✅ **Simpler than Redux** - Less boilerplate, same functionality

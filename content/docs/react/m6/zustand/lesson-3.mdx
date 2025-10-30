@@ -1,0 +1,646 @@
+---
+title: "L3: Connect Zustand to Components"
+description: "Learn how to use the store in React components with hooks"
+---
+
+# Connect Zustand to Components
+
+Let's connect our store to components! 🔌
+
+## The Beauty of Zustand
+
+With Redux, you need:
+1. **Provider** wrapping your app
+2. **useSelector** to read state
+3. **useDispatch** to get dispatch function
+4. **dispatch(action())** to update state
+
+With Zustand:
+1. **Just use the hook!** That's it. ✨
+
+## Basic Usage
+
+Our store **IS** a React hook:
+
+```js
+// This is the store
+const useListingsStore = create((set) => ({...}));
+
+// This is also a hook you can use directly!
+const items = useListingsStore((state) => state.items);
+```
+
+**No Provider needed!** 🎉
+
+## Step 1: Import the Store
+
+```jsx title="src/pages/HomePage.jsx"
+import useListingsStore from '@/state/useListingsStore';
+
+function HomePage() {
+  // Use the store here...
+}
+```
+
+## Step 2: Select State
+
+Use the store hook with a **selector function**:
+
+```jsx title="src/pages/HomePage.jsx"
+import useListingsStore from '@/state/useListingsStore';
+
+function HomePage() {
+  // Select what you need
+  const items = useListingsStore((state) => state.items);
+  const status = useListingsStore((state) => state.status);
+  const error = useListingsStore((state) => state.error);
+  
+  return (
+    <div>
+      <h1>Listings</h1>
+      {status === 'loading' && <p>Loading...</p>}
+      {status === 'failed' && <p>Error: {error}</p>}
+      {status === 'succeeded' && <ul>{items.map(...)}</ul>}
+    </div>
+  );
+}
+```
+
+## Understanding Selectors
+
+<Tabs items={['What is a Selector?', 'Why Use Them?', 'Selector Patterns']}>
+
+<Tab value="What is a Selector?">
+
+**Selector:** A function that picks data from the store
+
+```js
+// This is a selector function
+(state) => state.items
+
+// Full store state:
+{
+  items: [...],
+  favorites: [...],
+  status: 'succeeded',
+  error: null
+}
+
+// Selector returns just:
+[...] // items array
+```
+
+**Think of it as a filter** that extracts exactly what you need.
+
+</Tab>
+
+<Tab value="Why Use Them?">
+
+**Re-render optimization!**
+
+```jsx
+// ❌ Bad: Component re-renders on ANY state change
+const state = useListingsStore();
+const items = state.items;
+
+// Someone toggles favorite
+toggleFavorite(5)
+// favorites array changed → Component re-renders ❌
+// But we don't use favorites! Wasted render!
+
+// ✅ Good: Component only re-renders when items changes
+const items = useListingsStore((state) => state.items);
+
+// Someone toggles favorite
+toggleFavorite(5)
+// favorites changed, but items didn't
+// Component doesn't re-render! ✅
+```
+
+**Selectors = Performance optimization!** 🚀
+
+</Tab>
+
+<Tab value="Selector Patterns">
+
+**Pattern 1: Select single field**
+
+```jsx
+const items = useListingsStore((state) => state.items);
+```
+
+**Pattern 2: Select multiple fields**
+
+```jsx
+// Option A: Multiple calls (preferred for optimization)
+const items = useListingsStore((state) => state.items);
+const status = useListingsStore((state) => state.status);
+
+// Option B: Select object (re-renders when ANY field changes)
+const { items, status } = useListingsStore((state) => ({
+  items: state.items,
+  status: state.status
+}));
+```
+
+**Pattern 3: Select action**
+
+```jsx
+const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+```
+
+**Pattern 4: Derived data**
+
+```jsx
+// Get only favorited items
+const favoritedItems = useListingsStore((state) =>
+  state.items.filter(item => state.favorites.includes(item.id))
+);
+```
+
+</Tab>
+
+</Tabs>
+
+## Step 3: Select Actions
+
+Actions work the same way:
+
+```jsx title="src/pages/HomePage.jsx"
+function HomePage() {
+  // Select state
+  const items = useListingsStore((state) => state.items);
+  const status = useListingsStore((state) => state.status);
+  
+  // Select actions
+  const setItems = useListingsStore((state) => state.setItems);
+  const setStatus = useListingsStore((state) => state.setStatus);
+  const setError = useListingsStore((state) => state.setError);
+  
+  // Use actions directly (no dispatch!)
+  const handleFetch = async () => {
+    setStatus('loading');
+    try {
+      const response = await fetch('/api/listings');
+      const data = await response.json();
+      setItems(data);
+      setStatus('succeeded');
+    } catch (err) {
+      setError(err.message);
+      setStatus('failed');
+    }
+  };
+  
+  return <div>...</div>;
+}
+```
+
+## Comparison with Redux
+
+<Tabs items={['Zustand (This)', 'Redux Toolkit']}>
+
+<Tab value="Zustand (This)">
+
+**Simple and direct:**
+
+```jsx
+import useListingsStore from '@/state/useListingsStore';
+
+function HomePage() {
+  // Select state
+  const items = useListingsStore((state) => state.items);
+  
+  // Select action
+  const setItems = useListingsStore((state) => state.setItems);
+  
+  // Call action directly
+  setItems(newData);  // ✅ Just call it!
+  
+  return <div>{items.map(...)}</div>;
+}
+```
+
+**No Provider, no dispatch, no imports!** 🎉
+
+</Tab>
+
+<Tab value="Redux Toolkit">
+
+**More setup required:**
+
+```jsx
+import { useSelector, useDispatch } from 'react-redux';
+import { setItems } from '@/state/slices/listingsSlice';
+
+function HomePage() {
+  // Select state
+  const items = useSelector((state) => state.listings.items);
+  
+  // Get dispatch function
+  const dispatch = useDispatch();
+  
+  // Dispatch action
+  dispatch(setItems(newData));  // Need dispatch wrapper
+  
+  return <div>{items.map(...)}</div>;
+}
+```
+
+**Plus need Provider in App.jsx:**
+
+```jsx
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+
+<Provider store={store}>
+  <App />
+</Provider>
+```
+
+</Tab>
+
+</Tabs>
+
+## Real Example: ListingCard
+
+Let's use the store in `ListingCard` for favorites:
+
+```jsx title="src/components/ListingCard.jsx"
+import useListingsStore from '@/state/useListingsStore';
+
+function ListingCard({ listing }) {
+  // Select favorites array
+  const favorites = useListingsStore((state) => state.favorites);
+  
+  // Select toggleFavorite action
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  // Check if this listing is favorited
+  const isFavorited = favorites.includes(listing.id);
+  
+  return (
+    <div className="listing-card">
+      <img src={listing.images[0]} alt={listing.title} />
+      <h3>{listing.title}</h3>
+      <p>${listing.price}/night</p>
+      
+      <button 
+        onClick={() => toggleFavorite(listing.id)}
+        className={isFavorited ? 'favorited' : ''}
+      >
+        {isFavorited ? '❤️ Favorited' : '🤍 Favorite'}
+      </button>
+    </div>
+  );
+}
+
+export default ListingCard;
+```
+
+**Look how simple!** 
+
+1. Select what you need (`favorites`, `toggleFavorite`)
+2. Use it (`favorites.includes()`, `toggleFavorite()`)
+3. Done! ✅
+
+## Understanding Re-renders
+
+<Accordions>
+
+<Accordion title="When Does Component Re-render?">
+
+**A component re-renders when selected data changes:**
+
+```jsx
+function MyComponent() {
+  const items = useListingsStore((state) => state.items);
+  // Component re-renders when items array changes
+  
+  const status = useListingsStore((state) => state.status);
+  // Component re-renders when status changes
+  
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  // Component NEVER re-renders from this
+  // (functions don't change)
+}
+```
+
+**Changes to OTHER parts of the store don't cause re-renders!**
+
+```jsx
+function ListingCard() {
+  const items = useListingsStore((state) => state.items);
+  
+  // In another component, user toggles favorite:
+  toggleFavorite(5);
+  // favorites array changed
+  // But items didn't change
+  // ListingCard doesn't re-render! ✅
+}
+```
+
+**This is automatic optimization!** 🚀
+
+</Accordion>
+
+<Accordion title="Selecting Multiple Fields">
+
+**Bad: Select entire state**
+
+```jsx
+// ❌ Re-renders on EVERY state change
+const state = useListingsStore();
+const items = state.items;
+```
+
+**Good: Select specific fields**
+
+```jsx
+// ✅ Only re-renders when items changes
+const items = useListingsStore((state) => state.items);
+
+// ✅ Only re-renders when status changes
+const status = useListingsStore((state) => state.status);
+```
+
+**When you need multiple fields:**
+
+```jsx
+// Option A: Multiple selectors (best)
+const items = useListingsStore((state) => state.items);
+const status = useListingsStore((state) => state.status);
+// Re-renders only when items OR status changes
+
+// Option B: Object selector with shallow equality
+import { shallow } from 'zustand/shallow';
+
+const { items, status } = useListingsStore(
+  (state) => ({ items: state.items, status: state.status }),
+  shallow
+);
+// Re-renders only when items OR status changes
+```
+
+</Accordion>
+
+<Accordion title="Selecting Actions is Free">
+
+**Actions don't cause re-renders:**
+
+```jsx
+// This NEVER triggers re-renders
+const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+const setItems = useListingsStore((state) => state.setItems);
+const setStatus = useListingsStore((state) => state.setStatus);
+```
+
+**Why?** Functions are **stable** - they don't change!
+
+**Tip:** Select all actions you need without worrying about performance.
+
+</Accordion>
+
+</Accordions>
+
+## Common Patterns
+
+<Tabs items={['Pattern 1', 'Pattern 2', 'Pattern 3', 'Pattern 4']}>
+
+<Tab value="Pattern 1">
+
+**Pattern: Select only what you need**
+
+```jsx
+function ListingList() {
+  // ✅ Only items - re-renders when items change
+  const items = useListingsStore((state) => state.items);
+  
+  return (
+    <div>
+      {items.map(item => (
+        <ListingCard key={item.id} listing={item} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Best for:** Components that use a single piece of state
+
+</Tab>
+
+<Tab value="Pattern 2">
+
+**Pattern: Select state and actions together**
+
+```jsx
+function FavoriteButton({ listingId }) {
+  // Select state
+  const favorites = useListingsStore((state) => state.favorites);
+  
+  // Select action
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  const isFavorited = favorites.includes(listingId);
+  
+  return (
+    <button onClick={() => toggleFavorite(listingId)}>
+      {isFavorited ? '❤️' : '🤍'}
+    </button>
+  );
+}
+```
+
+**Best for:** Interactive components that read and update state
+
+</Tab>
+
+<Tab value="Pattern 3">
+
+**Pattern: Derived/computed data**
+
+```jsx
+function FavoritesCount() {
+  // Compute count from favorites array
+  const count = useListingsStore((state) => state.favorites.length);
+  
+  return <span>Favorites: {count}</span>;
+}
+```
+
+**Best for:** Displaying computed values
+
+</Tab>
+
+<Tab value="Pattern 4">
+
+**Pattern: Complex selector**
+
+```jsx
+function FavoritesList() {
+  // Get all favorited listings in one selector
+  const favoritedListings = useListingsStore((state) =>
+    state.items.filter(item => state.favorites.includes(item.id))
+  );
+  
+  return (
+    <div>
+      {favoritedListings.map(listing => (
+        <ListingCard key={listing.id} listing={listing} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Best for:** Complex data transformations
+
+**Warning:** This re-renders when items OR favorites changes!
+
+</Tab>
+
+</Tabs>
+
+## Store Anywhere Pattern
+
+One of Zustand's best features: **use the store anywhere!**
+
+```jsx
+// ✅ In components
+function MyComponent() {
+  const items = useListingsStore((state) => state.items);
+}
+
+// ✅ In custom hooks
+function useListingsData() {
+  const items = useListingsStore((state) => state.items);
+  const status = useListingsStore((state) => state.status);
+  return { items, status };
+}
+
+// ✅ In event handlers
+const handleClick = () => {
+  const currentItems = useListingsStore.getState().items;
+  console.log(currentItems);
+};
+
+// ✅ Outside components (getState)
+import useListingsStore from '@/state/useListingsStore';
+
+export function saveToLocalStorage() {
+  const favorites = useListingsStore.getState().favorites;
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+```
+
+**Redux requires:** Store must be passed through Provider → Can only access via hooks inside components
+
+**Zustand allows:** Access the store from anywhere! 🚀
+
+## The getState() Method
+
+<Accordions>
+
+<Accordion title="What is getState()?">
+
+**Access store outside React components:**
+
+```js
+// In a component (use hook)
+const items = useListingsStore((state) => state.items);
+
+// Outside a component (use getState)
+const items = useListingsStore.getState().items;
+```
+
+**Use cases:**
+
+```js
+// In a utility function
+export function exportFavorites() {
+  const favorites = useListingsStore.getState().favorites;
+  return JSON.stringify(favorites);
+}
+
+// In an event handler
+window.addEventListener('beforeunload', () => {
+  const favorites = useListingsStore.getState().favorites;
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+});
+
+// In middleware or service
+class AnalyticsService {
+  trackFavoriteCount() {
+    const count = useListingsStore.getState().favorites.length;
+    this.send('favorite_count', count);
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="getState() vs Hook">
+
+**Use hook in components:**
+
+```jsx
+function MyComponent() {
+  // ✅ Hook - re-renders when items change
+  const items = useListingsStore((state) => state.items);
+  
+  return <div>{items.length} items</div>;
+}
+```
+
+**Use getState() outside components:**
+
+```js
+// ✅ getState - one-time read, no re-renders
+function logCurrentState() {
+  const state = useListingsStore.getState();
+  console.log(state);
+}
+```
+
+**Key difference:**
+
+- **Hook:** Subscribe to changes → re-renders
+- **getState():** One-time read → no subscription
+
+</Accordion>
+
+</Accordions>
+
+## Quick Reference
+
+| Task | Code |
+|------|------|
+| Select state | `const items = useListingsStore((state) => state.items)` |
+| Select action | `const setItems = useListingsStore((state) => state.setItems)` |
+| Call action | `setItems(newData)` ← No dispatch! |
+| Select multiple | Multiple `useListingsStore()` calls |
+| Get state outside component | `useListingsStore.getState().items` |
+| Computed value | `const count = useListingsStore((state) => state.items.length)` |
+
+## What's Next?
+
+Perfect! You know how to connect components to Zustand. In the next lesson:
+
+1. **Async actions** - Fetch data from API
+2. **Loading states** - Handle status and error
+3. **Side effects** - Where to put async logic
+4. **Compare with Redux thunks**
+
+<Callout type="success">
+**✅ Lesson Complete!** You can now use Zustand in components!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Store is a hook** - Use directly in components
+- ✅ **No Provider needed** - Just import and use
+- ✅ **Selectors optimize** - Component only re-renders when selected data changes
+- ✅ **Actions are just functions** - Call directly, no dispatch
+- ✅ **Use anywhere** - Components, hooks, utilities, anywhere!
+- ✅ **getState()** - Access store outside components
+- ✅ **Super simple** - Redux-like power with 90% less code

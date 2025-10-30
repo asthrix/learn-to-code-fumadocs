@@ -1,0 +1,911 @@
+---
+title: "L5: Refactor HomePage with Zustand"
+description: "Replace useFetch with Zustand store for complete state management"
+---
+
+# Refactor HomePage with Zustand
+
+Let's integrate Zustand into our HomePage! 🏠
+
+## Current Situation
+
+Right now, `HomePage` uses `useFetch` hook:
+
+```jsx title="src/pages/HomePage.jsx (Current)"
+import useFetch from '@/hooks/useFetch';
+import ListingCard from '@/components/ListingCard';
+
+function HomePage() {
+  const { data, isLoading, isError } = useFetch(
+    'https://v2.api.noroff.dev/holidaze/venues?_owner=true&_bookings=true'
+  );
+  
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading listings</div>;
+  
+  return (
+    <div className="home-page">
+      <h1>Holiday Listings</h1>
+      <div className="listings-grid">
+        {data?.data?.map((listing) => (
+          <ListingCard key={listing.id} listing={listing} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default HomePage;
+```
+
+## The Problem
+
+<Accordions>
+
+<Accordion title="Problem 1: No Global State">
+
+```jsx
+// HomePage fetches data
+const { data } = useFetch('...');
+
+// But FavoritesPage would need to fetch AGAIN
+// No shared state! ❌
+```
+
+**With Zustand:**
+```jsx
+// HomePage fetches and stores
+const fetchListings = useListingsStore((state) => state.fetchListings);
+useEffect(() => { fetchListings(); }, []);
+
+// FavoritesPage uses same data!
+const items = useListingsStore((state) => state.items);
+// No re-fetch needed! ✅
+```
+
+</Accordion>
+
+<Accordion title="Problem 2: No Favorites Integration">
+
+```jsx
+// useFetch only provides data
+const { data } = useFetch('...');
+
+// Where do favorites go? ❌
+// Need separate state management!
+```
+
+**With Zustand:**
+```jsx
+// Store has BOTH data and favorites
+const items = useListingsStore((state) => state.items);
+const favorites = useListingsStore((state) => state.favorites);
+const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+
+// Everything in one place! ✅
+```
+
+</Accordion>
+
+<Accordion title="Problem 3: Can't Add Filtering">
+
+```jsx
+// useFetch gives raw data
+const { data } = useFetch('...');
+
+// How to filter by search? By price? ❌
+// Need local state, more complexity!
+```
+
+**With Zustand:**
+```jsx
+// Store can have filtering logic
+const useListingsStore = create((set, get) => ({
+  items: [],
+  searchQuery: '',
+  maxPrice: null,
+  
+  getFilteredItems: () => {
+    const { items, searchQuery, maxPrice } = get();
+    return items.filter(item => {
+      if (searchQuery && !item.title.includes(searchQuery)) return false;
+      if (maxPrice && item.price > maxPrice) return false;
+      return true;
+    });
+  },
+}));
+
+// Easy to use!
+const filteredItems = useListingsStore((state) => state.getFilteredItems());
+```
+
+</Accordion>
+
+</Accordions>
+
+## Step 1: Update the Store
+
+First, let's add filtering to our store:
+
+```js title="src/state/useListingsStore.js"
+import { create } from 'zustand';
+
+const useListingsStore = create((set, get) => ({
+  // State
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+  
+  // Filter state
+  searchQuery: '',
+  maxPrice: null,
+  maxGuests: null,
+  
+  // Actions
+  setItems: (items) => set({ items }),
+  setStatus: (status) => set({ status }),
+  setError: (error) => set({ error }),
+  
+  toggleFavorite: (id) => set((state) => ({
+    favorites: state.favorites.includes(id)
+      ? state.favorites.filter(favId => favId !== id)
+      : [...state.favorites, id]
+  })),
+  
+  // Filter actions
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  setMaxPrice: (price) => set({ maxPrice: price }),
+  setMaxGuests: (guests) => set({ maxGuests: guests }),
+  clearFilters: () => set({ searchQuery: '', maxPrice: null, maxGuests: null }),
+  
+  // Async action
+  fetchListings: async () => {
+    set({ status: 'loading', error: null });
+    
+    try {
+      const response = await fetch(
+        'https://v2.api.noroff.dev/holidaze/venues?_owner=true&_bookings=true'
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch listings');
+      }
+      
+      const result = await response.json();
+      
+      set({
+        items: result.data,
+        status: 'succeeded'
+      });
+    } catch (error) {
+      set({
+        error: error.message,
+        status: 'failed'
+      });
+    }
+  },
+  
+  // Computed selector
+  getFilteredItems: () => {
+    const { items, searchQuery, maxPrice, maxGuests } = get();
+    
+    return items.filter((item) => {
+      // Filter by search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesTitle = item.name?.toLowerCase().includes(query);
+        const matchesDescription = item.description?.toLowerCase().includes(query);
+        if (!matchesTitle && !matchesDescription) return false;
+      }
+      
+      // Filter by max price
+      if (maxPrice && item.price > maxPrice) {
+        return false;
+      }
+      
+      // Filter by max guests
+      if (maxGuests && item.maxGuests < maxGuests) {
+        return false;
+      }
+      
+      return true;
+    });
+  },
+}));
+
+export default useListingsStore;
+```
+
+## Step 2: Refactor HomePage
+
+Now let's update `HomePage` to use Zustand:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useEffect, useState } from 'react';
+import useListingsStore from '@/state/useListingsStore';
+import ListingCard from '@/components/ListingCard';
+
+function HomePage() {
+  // Select state
+  const status = useListingsStore((state) => state.status);
+  const error = useListingsStore((state) => state.error);
+  const searchQuery = useListingsStore((state) => state.searchQuery);
+  const maxPrice = useListingsStore((state) => state.maxPrice);
+  const maxGuests = useListingsStore((state) => state.maxGuests);
+  
+  // Select actions
+  const fetchListings = useListingsStore((state) => state.fetchListings);
+  const getFilteredItems = useListingsStore((state) => state.getFilteredItems);
+  const setSearchQuery = useListingsStore((state) => state.setSearchQuery);
+  const setMaxPrice = useListingsStore((state) => state.setMaxPrice);
+  const setMaxGuests = useListingsStore((state) => state.setMaxGuests);
+  const clearFilters = useListingsStore((state) => state.clearFilters);
+  
+  // Local state for form inputs
+  const [localSearch, setLocalSearch] = useState('');
+  const [localPrice, setLocalPrice] = useState('');
+  const [localGuests, setLocalGuests] = useState('');
+  
+  // Get filtered items
+  const filteredItems = getFilteredItems();
+  
+  // Fetch on mount
+  useEffect(() => {
+    if (status === 'idle') {
+      fetchListings();
+    }
+  }, [status, fetchListings]);
+  
+  // Handle filter submission
+  const handleFilter = (e) => {
+    e.preventDefault();
+    setSearchQuery(localSearch);
+    setMaxPrice(localPrice ? Number(localPrice) : null);
+    setMaxGuests(localGuests ? Number(localGuests) : null);
+  };
+  
+  // Handle clear filters
+  const handleClearFilters = () => {
+    clearFilters();
+    setLocalSearch('');
+    setLocalPrice('');
+    setLocalGuests('');
+  };
+  
+  // Loading state
+  if (status === 'loading') {
+    return (
+      <div className="home-page">
+        <div className="loading">
+          <div className="spinner"></div>
+          <p>Loading amazing places...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Error state
+  if (status === 'failed') {
+    return (
+      <div className="home-page">
+        <div className="error">
+          <h2>Oops! Something went wrong</h2>
+          <p>{error}</p>
+          <button onClick={fetchListings} className="retry-button">
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  // Success state
+  return (
+    <div className="home-page">
+      <header className="page-header">
+        <h1>Discover Amazing Places</h1>
+        <p>Find your perfect holiday venue</p>
+      </header>
+      
+      {/* Filter Form */}
+      <form onSubmit={handleFilter} className="filter-form">
+        <div className="filter-group">
+          <label htmlFor="search">Search</label>
+          <input
+            id="search"
+            type="text"
+            placeholder="Search by name or description..."
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+          />
+        </div>
+        
+        <div className="filter-group">
+          <label htmlFor="maxPrice">Max Price (per night)</label>
+          <input
+            id="maxPrice"
+            type="number"
+            placeholder="e.g., 200"
+            value={localPrice}
+            onChange={(e) => setLocalPrice(e.target.value)}
+          />
+        </div>
+        
+        <div className="filter-group">
+          <label htmlFor="maxGuests">Min Guests</label>
+          <input
+            id="maxGuests"
+            type="number"
+            placeholder="e.g., 4"
+            value={localGuests}
+            onChange={(e) => setLocalGuests(e.target.value)}
+          />
+        </div>
+        
+        <div className="filter-actions">
+          <button type="submit" className="button-primary">
+            Apply Filters
+          </button>
+          <button
+            type="button"
+            onClick={handleClearFilters}
+            className="button-secondary"
+          >
+            Clear
+          </button>
+        </div>
+      </form>
+      
+      {/* Active filters display */}
+      {(searchQuery || maxPrice || maxGuests) && (
+        <div className="active-filters">
+          <h3>Active Filters:</h3>
+          <div className="filter-tags">
+            {searchQuery && (
+              <span className="filter-tag">
+                Search: "{searchQuery}"
+              </span>
+            )}
+            {maxPrice && (
+              <span className="filter-tag">
+                Max Price: ${maxPrice}
+              </span>
+            )}
+            {maxGuests && (
+              <span className="filter-tag">
+                Min Guests: {maxGuests}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Results */}
+      <div className="listings-section">
+        <h2>
+          {filteredItems.length} {filteredItems.length === 1 ? 'Place' : 'Places'} Found
+        </h2>
+        
+        {filteredItems.length === 0 ? (
+          <div className="no-results">
+            <p>No listings match your filters.</p>
+            <button onClick={handleClearFilters} className="button-secondary">
+              Clear Filters
+            </button>
+          </div>
+        ) : (
+          <div className="listings-grid">
+            {filteredItems.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default HomePage;
+```
+
+## What Changed?
+
+<Tabs items={['Before (useFetch)', 'After (Zustand)', 'Key Differences']}>
+
+<Tab value="Before (useFetch)">
+
+```jsx
+function HomePage() {
+  const { data, isLoading, isError } = useFetch('...');
+  
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error</div>;
+  
+  return (
+    <div>
+      {data?.data?.map((listing) => (
+        <ListingCard key={listing.id} listing={listing} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Issues:**
+- ❌ No global state
+- ❌ No filtering
+- ❌ No favorites integration
+- ❌ Basic error handling
+- ❌ Will re-fetch every time
+
+</Tab>
+
+<Tab value="After (Zustand)">
+
+```jsx
+function HomePage() {
+  const status = useListingsStore((state) => state.status);
+  const fetchListings = useListingsStore((state) => state.fetchListings);
+  const getFilteredItems = useListingsStore((state) => state.getFilteredItems);
+  const filteredItems = getFilteredItems();
+  
+  useEffect(() => {
+    if (status === 'idle') fetchListings();
+  }, [status, fetchListings]);
+  
+  if (status === 'loading') return <Loading />;
+  if (status === 'failed') return <Error />;
+  
+  return (
+    <div>
+      <FilterForm />
+      {filteredItems.map((listing) => (
+        <ListingCard key={listing.id} listing={listing} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Benefits:**
+- ✅ Global state (shared across pages!)
+- ✅ Filtering (search, price, guests)
+- ✅ Favorites integration ready
+- ✅ Better error handling
+- ✅ Fetches once, reuses data
+
+</Tab>
+
+<Tab value="Key Differences">
+
+| Feature | useFetch | Zustand |
+|---------|----------|---------|
+| **State scope** | Component-local | Global |
+| **Data sharing** | Can't share | Shared everywhere |
+| **Filtering** | Need local state | Built into store |
+| **Favorites** | Need separate state | Same store |
+| **Re-fetch** | Every mount | Once, then cached |
+| **Loading states** | Basic | Comprehensive |
+| **Error handling** | Basic boolean | Error messages |
+| **Complexity** | Simple start | More powerful |
+
+**Bottom line:** Zustand is better for **real applications** with multiple features!
+
+</Tab>
+
+</Tabs>
+
+## Understanding getFilteredItems
+
+<Accordions>
+
+<Accordion title="Why a Function Instead of State?">
+
+**Option 1: Store filtered items in state (❌ Bad)**
+```js
+const useListingsStore = create((set) => ({
+  items: [],
+  filteredItems: [],  // Duplicate data!
+  
+  setSearchQuery: (query) => {
+    set((state) => ({
+      searchQuery: query,
+      // Need to recalculate filtered items here
+      filteredItems: state.items.filter(/* ... */)
+    }));
+  },
+  
+  setMaxPrice: (price) => {
+    set((state) => ({
+      maxPrice: price,
+      // Need to recalculate AGAIN here
+      filteredItems: state.items.filter(/* ... */)
+    }));
+  },
+  
+  // Duplication everywhere! ❌
+}));
+```
+
+**Option 2: Compute on demand (✅ Good)**
+```js
+const useListingsStore = create((set, get) => ({
+  items: [],
+  // No filteredItems state
+  
+  getFilteredItems: () => {
+    const { items, searchQuery, maxPrice } = get();
+    // Compute when called
+    return items.filter(/* ... */);
+  },
+  
+  // Actions are simple!
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  setMaxPrice: (price) => set({ maxPrice: price }),
+}));
+```
+
+**Benefits:**
+- No duplicate data
+- Actions stay simple
+- Always up-to-date
+- One source of truth
+
+</Accordion>
+
+<Accordion title="How get() Works">
+
+**The `get` parameter:**
+
+```js
+create((set, get) => ({  // get is second parameter
+  items: [1, 2, 3],
+  count: 0,
+  
+  // Use get() to read current state
+  getTotal: () => {
+    const state = get();
+    return state.items.length + state.count;
+  },
+  
+  // Or destructure what you need
+  getFirst: () => {
+    const { items } = get();
+    return items[0];
+  },
+}))
+```
+
+**When to use `get()`:**
+- In computed selectors
+- When you need to read state inside an action
+- For complex calculations
+
+**When NOT to use:**
+- Use `set((state) => ...)` when updating state
+- Component selectors use `useStore((state) => ...)`
+
+</Accordion>
+
+<Accordion title="Filter Logic Explained">
+
+```js
+getFilteredItems: () => {
+  const { items, searchQuery, maxPrice, maxGuests } = get();
+  
+  return items.filter((item) => {
+    // Test 1: Search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesTitle = item.name?.toLowerCase().includes(query);
+      const matchesDescription = item.description?.toLowerCase().includes(query);
+      if (!matchesTitle && !matchesDescription) return false;
+    }
+    
+    // Test 2: Max price
+    if (maxPrice && item.price > maxPrice) {
+      return false;
+    }
+    
+    // Test 3: Min guests
+    if (maxGuests && item.maxGuests < maxGuests) {
+      return false;
+    }
+    
+    // Passed all tests!
+    return true;
+  });
+}
+```
+
+**How it works:**
+1. Get current filter values
+2. For each item, run tests
+3. If item fails any test, exclude it
+4. Return items that passed all tests
+
+**Example:**
+```js
+// State:
+items: [
+  { id: 1, name: 'Beach House', price: 200, maxGuests: 6 },
+  { id: 2, name: 'City Loft', price: 150, maxGuests: 2 },
+  { id: 3, name: 'Mountain Cabin', price: 100, maxGuests: 4 },
+]
+searchQuery: 'house'
+maxPrice: 180
+maxGuests: 3
+
+// Results:
+// Item 1: ✅ matches "house", ❌ price too high → EXCLUDED
+// Item 2: ❌ doesn't match "house" → EXCLUDED
+// Item 3: ❌ doesn't match "house" → EXCLUDED
+// Result: []
+```
+
+</Accordion>
+
+</Accordions>
+
+## Local State vs Store State
+
+<Tabs items={['Why Local State?', 'Form Pattern']}>
+
+<Tab value="Why Local State?">
+
+**Notice we use BOTH:**
+
+```jsx
+// Local state for form inputs
+const [localSearch, setLocalSearch] = useState('');
+
+// Store state for active filters
+const searchQuery = useListingsStore((state) => state.searchQuery);
+```
+
+**Why not put everything in store?**
+
+```jsx
+// ❌ Bad: Every keystroke updates store
+<input
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+/>
+// Problem: Re-filters on EVERY keystroke!
+// Type "beach" → 5 filter operations! ❌
+```
+
+```jsx
+// ✅ Good: Local state, update store on submit
+<input
+  value={localSearch}
+  onChange={(e) => setLocalSearch(e.target.value)}
+/>
+// Problem solved: Filter only on submit! ✅
+```
+
+**Rule of thumb:**
+- **Form inputs**: Local state (fast, controlled)
+- **Active filters**: Store state (shared, persistent)
+
+</Tab>
+
+<Tab value="Form Pattern">
+
+**The pattern:**
+
+```jsx
+function MyForm() {
+  // Store state (active filters)
+  const searchQuery = useStore((state) => state.searchQuery);
+  const setSearchQuery = useStore((state) => state.setSearchQuery);
+  
+  // Local state (form input)
+  const [localSearch, setLocalSearch] = useState('');
+  
+  // On submit: Copy local → store
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSearchQuery(localSearch);  // Update store
+  };
+  
+  // On clear: Reset both
+  const handleClear = () => {
+    setLocalSearch('');  // Clear local
+    setSearchQuery('');  // Clear store
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        value={localSearch}  // Use local
+        onChange={(e) => setLocalSearch(e.target.value)}
+      />
+      <button type="submit">Apply</button>
+      <button type="button" onClick={handleClear}>Clear</button>
+    </form>
+  );
+}
+```
+
+**Flow:**
+1. User types → local state updates
+2. User clicks "Apply" → store state updates
+3. Store state updates → filter recalculates
+4. Filter results → UI updates
+
+**Perfect balance!** ⚖️
+
+</Tab>
+
+</Tabs>
+
+## Step 3: Add Styling (Optional)
+
+Add some CSS to make it look nice:
+
+```css title="src/app/global.css (add these)"
+.home-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.page-header p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Filter Form */
+.filter-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.filter-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.filter-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+/* Active Filters */
+.active-filters {
+  background: #f0f9ff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.active-filters h3 {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.filter-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  background: #0369a1;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.9rem;
+}
+
+/* Listings Grid */
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* Loading & Error States */
+.loading,
+.error,
+.no-results {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #0369a1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.button-primary,
+.button-secondary,
+.retry-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.button-primary {
+  background: #0369a1;
+  color: white;
+}
+
+.button-primary:hover {
+  background: #075985;
+}
+
+.button-secondary {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.button-secondary:hover {
+  background: #d1d5db;
+}
+```
+
+## What's Next?
+
+Perfect! HomePage is now powered by Zustand. In the next lesson:
+
+1. **Test favorites** - Try toggleFavorite action
+2. **Understand favorites flow** - How state updates work
+3. **Prepare for FavoritesPage** - Set up the foundation
+4. **Zustand DevTools** - Debug state changes
+
+<Callout type="success">
+**✅ Lesson Complete!** HomePage now uses Zustand with filtering!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Replaced useFetch** - Zustand provides better state management
+- ✅ **Added filtering** - Search, price, guests filters
+- ✅ **Computed selectors** - getFilteredItems() calculates on demand
+- ✅ **Local + store state** - Form inputs local, filters in store
+- ✅ **Better UX** - Loading states, error handling, empty states
+- ✅ **Shared state** - Data available to other pages (FavoritesPage!)
+- ✅ **Fetch once** - Data cached, no redundant requests
+- ✅ **Scalable** - Easy to add more filters or features

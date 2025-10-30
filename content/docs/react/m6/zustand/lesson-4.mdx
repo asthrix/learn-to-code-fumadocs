@@ -1,0 +1,726 @@
+---
+title: "L4: Async Actions in Zustand"
+description: "Learn how to handle async operations and API calls"
+---
+
+# Async Actions in Zustand
+
+Let's fetch data from an API! 🌐
+
+## The Zustand Way
+
+In Redux, you need:
+- **createAsyncThunk** for async logic
+- **extraReducers** to handle pending/fulfilled/rejected
+- **Lots of boilerplate!**
+
+In Zustand:
+- **Just write async functions!** That's it. ✨
+
+## Step 1: Add Async Action
+
+Update our store with a `fetchListings` action:
+
+```js title="src/state/useListingsStore.js"
+import { create } from 'zustand';
+
+const useListingsStore = create((set) => ({
+  // State
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+  
+  // Sync actions
+  setItems: (items) => set({ items }),
+  setStatus: (status) => set({ status }),
+  setError: (error) => set({ error }),
+  toggleFavorite: (id) => set((state) => ({
+    favorites: state.favorites.includes(id)
+      ? state.favorites.filter(favId => favId !== id)
+      : [...state.favorites, id]
+  })),
+  
+  // Async action
+  fetchListings: async () => {
+    set({ status: 'loading', error: null });
+    
+    try {
+      const response = await fetch(
+        'https://v2.api.noroff.dev/holidaze/venues?_owner=true&_bookings=true'
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch listings');
+      }
+      
+      const result = await response.json();
+      
+      set({
+        items: result.data,
+        status: 'succeeded'
+      });
+    } catch (error) {
+      set({
+        error: error.message,
+        status: 'failed'
+      });
+    }
+  },
+}));
+
+export default useListingsStore;
+```
+
+**That's it!** Just a regular async function. 🎉
+
+## Understanding the Async Action
+
+<Accordions>
+
+<Accordion title="Step-by-Step Breakdown">
+
+```js
+fetchListings: async () => {
+  // 1. Set loading state
+  set({ status: 'loading', error: null });
+  
+  try {
+    // 2. Fetch data
+    const response = await fetch('...');
+    
+    // 3. Check response
+    if (!response.ok) {
+      throw new Error('Failed to fetch listings');
+    }
+    
+    // 4. Parse JSON
+    const result = await response.json();
+    
+    // 5. Update store with data
+    set({
+      items: result.data,
+      status: 'succeeded'
+    });
+  } catch (error) {
+    // 6. Handle errors
+    set({
+      error: error.message,
+      status: 'failed'
+    });
+  }
+}
+```
+
+**Key points:**
+
+1. **Start:** Set status to 'loading'
+2. **Try:** Fetch and parse data
+3. **Success:** Set items and status to 'succeeded'
+4. **Error:** Set error message and status to 'failed'
+
+</Accordion>
+
+<Accordion title="Why async () => { ... }?">
+
+**The pattern:**
+
+```js
+// This is the action
+fetchListings: async () => {
+  set({ status: 'loading' });
+  const data = await fetch('...');
+  set({ items: data });
+}
+```
+
+**Why `async ()`?**
+
+1. **It's just JavaScript!** 
+   - Not special Zustand syntax
+   - Regular async function
+
+2. **set() is available in scope:**
+   ```js
+   create((set) => ({  // set function provided here
+     fetchListings: async () => {
+       set({ ... });  // Use it here!
+     }
+   }))
+   ```
+
+3. **Can be called from anywhere:**
+   ```js
+   const fetchListings = useListingsStore((state) => state.fetchListings);
+   fetchListings();  // Just call it!
+   ```
+
+**No special wrapper needed!** Unlike Redux's `createAsyncThunk`.
+
+</Accordion>
+
+<Accordion title="Accessing State Inside Action">
+
+**Need to read current state?** Use the second parameter:
+
+```js
+fetchListings: async (/* no params needed */) => {
+  set({ status: 'loading' });
+  // ...
+}
+
+// If you need state:
+addListing: async (newListing) => {
+  // Use set with function to access state
+  set((state) => ({
+    items: [...state.items, newListing]
+  }));
+}
+```
+
+**Or use `get` parameter:**
+
+```js
+create((set, get) => ({
+  items: [],
+  
+  addListing: async (newListing) => {
+    const currentItems = get().items;  // Read current state
+    set({ items: [...currentItems, newListing] });
+  }
+}))
+```
+
+</Accordion>
+
+</Accordions>
+
+## Step 2: Use in Component
+
+Now use `fetchListings` in `HomePage`:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useEffect } from 'react';
+import useListingsStore from '@/state/useListingsStore';
+import ListingCard from '@/components/ListingCard';
+
+function HomePage() {
+  // Select state
+  const items = useListingsStore((state) => state.items);
+  const status = useListingsStore((state) => state.status);
+  const error = useListingsStore((state) => state.error);
+  
+  // Select async action
+  const fetchListings = useListingsStore((state) => state.fetchListings);
+  
+  // Fetch on mount
+  useEffect(() => {
+    fetchListings();
+  }, [fetchListings]);
+  
+  // Loading state
+  if (status === 'loading') {
+    return <div className="loading">Loading listings...</div>;
+  }
+  
+  // Error state
+  if (status === 'failed') {
+    return (
+      <div className="error">
+        <h2>Error</h2>
+        <p>{error}</p>
+        <button onClick={fetchListings}>Try Again</button>
+      </div>
+    );
+  }
+  
+  // Success state
+  return (
+    <div className="home-page">
+      <h1>Holiday Listings</h1>
+      <div className="listings-grid">
+        {items.map((listing) => (
+          <ListingCard key={listing.id} listing={listing} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default HomePage;
+```
+
+**Look how clean!** 
+
+1. Select what you need
+2. Call `fetchListings()` in useEffect
+3. Render based on status
+4. Done! ✅
+
+## Comparison with Redux
+
+<Tabs items={['Zustand (This)', 'Redux Toolkit']}>
+
+<Tab value="Zustand (This)">
+
+**1 file, simple async function:**
+
+```js title="src/state/useListingsStore.js"
+import { create } from 'zustand';
+
+const useListingsStore = create((set) => ({
+  items: [],
+  status: 'idle',
+  error: null,
+  
+  // Just an async function!
+  fetchListings: async () => {
+    set({ status: 'loading', error: null });
+    
+    try {
+      const response = await fetch('...');
+      const result = await response.json();
+      set({ items: result.data, status: 'succeeded' });
+    } catch (error) {
+      set({ error: error.message, status: 'failed' });
+    }
+  },
+}));
+
+export default useListingsStore;
+```
+
+**Usage:**
+
+```jsx
+const fetchListings = useListingsStore((state) => state.fetchListings);
+fetchListings();  // Just call it!
+```
+
+**Total: ~30 lines of code** ✨
+
+</Tab>
+
+<Tab value="Redux Toolkit">
+
+**Multiple files, special syntax:**
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+// Need createAsyncThunk
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async () => {
+    const response = await fetch('...');
+    const result = await response.json();
+    return result.data;
+  }
+);
+
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState: {
+    items: [],
+    status: 'idle',
+    error: null
+  },
+  reducers: {},
+  // Need extraReducers
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchListings.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchListings.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.items = action.payload;
+      })
+      .addCase(fetchListings.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      });
+  }
+});
+
+export default listingsSlice.reducer;
+```
+
+**Usage:**
+
+```jsx
+import { useDispatch } from 'react-redux';
+import { fetchListings } from '@/state/slices/listingsSlice';
+
+const dispatch = useDispatch();
+dispatch(fetchListings());  // Need dispatch wrapper
+```
+
+**Total: ~60 lines of code** with special syntax!
+
+</Tab>
+
+</Tabs>
+
+## Pattern: Async Action with Parameters
+
+What if you need to pass parameters?
+
+```js title="src/state/useListingsStore.js"
+const useListingsStore = create((set) => ({
+  items: [],
+  status: 'idle',
+  
+  // With parameters
+  fetchListingById: async (id) => {
+    set({ status: 'loading' });
+    
+    try {
+      const response = await fetch(
+        `https://v2.api.noroff.dev/holidaze/venues/${id}`
+      );
+      const result = await response.json();
+      
+      set({
+        currentListing: result.data,
+        status: 'succeeded'
+      });
+    } catch (error) {
+      set({ error: error.message, status: 'failed' });
+    }
+  },
+  
+  // With multiple parameters
+  searchListings: async (query, filters) => {
+    set({ status: 'loading' });
+    
+    try {
+      const url = new URL('https://v2.api.noroff.dev/holidaze/venues');
+      url.searchParams.append('q', query);
+      if (filters.maxPrice) {
+        url.searchParams.append('maxPrice', filters.maxPrice);
+      }
+      
+      const response = await fetch(url);
+      const result = await response.json();
+      
+      set({ items: result.data, status: 'succeeded' });
+    } catch (error) {
+      set({ error: error.message, status: 'failed' });
+    }
+  },
+}));
+```
+
+**Usage:**
+
+```jsx
+const fetchListingById = useListingsStore((state) => state.fetchListingById);
+const searchListings = useListingsStore((state) => state.searchListings);
+
+// Call with parameters
+fetchListingById('123');
+searchListings('beach', { maxPrice: 200 });
+```
+
+**Just pass parameters like any function!** 🎉
+
+## Pattern: Optimistic Updates
+
+Update UI immediately, then sync with server:
+
+```js
+const useListingsStore = create((set, get) => ({
+  items: [],
+  
+  // Optimistic toggle favorite
+  toggleFavorite: async (id) => {
+    // 1. Update UI immediately
+    set((state) => ({
+      favorites: state.favorites.includes(id)
+        ? state.favorites.filter(fav => fav !== id)
+        : [...state.favorites, id]
+    }));
+    
+    // 2. Sync with server
+    try {
+      await fetch(`/api/favorites/${id}`, { method: 'POST' });
+      // Server updated! ✅
+    } catch (error) {
+      // 3. Revert on error
+      set((state) => ({
+        favorites: state.favorites.includes(id)
+          ? state.favorites.filter(fav => fav !== id)
+          : [...state.favorites, id]
+      }));
+      console.error('Failed to sync favorite:', error);
+    }
+  },
+}));
+```
+
+**Benefits:**
+
+- UI updates instantly (feels fast! ⚡)
+- Server syncs in background
+- Reverts if server fails
+
+## Pattern: Abort Controller
+
+Cancel fetch if component unmounts:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useEffect } from 'react';
+import useListingsStore from '@/state/useListingsStore';
+
+function HomePage() {
+  const fetchListings = useListingsStore((state) => state.fetchListings);
+  
+  useEffect(() => {
+    const abortController = new AbortController();
+    
+    fetchListings(abortController.signal);
+    
+    // Cleanup: abort fetch if unmount
+    return () => abortController.abort();
+  }, [fetchListings]);
+  
+  // ...
+}
+```
+
+**Update store to accept signal:**
+
+```js title="src/state/useListingsStore.js"
+const useListingsStore = create((set) => ({
+  fetchListings: async (signal) => {
+    set({ status: 'loading' });
+    
+    try {
+      const response = await fetch('...', { signal });
+      const result = await response.json();
+      set({ items: result.data, status: 'succeeded' });
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        // Fetch was cancelled, don't update state
+        return;
+      }
+      set({ error: error.message, status: 'failed' });
+    }
+  },
+}));
+```
+
+**Prevents memory leaks!** 🛡️
+
+## Common Patterns
+
+<Tabs items={['Sequential Requests', 'Parallel Requests', 'Dependent Requests']}>
+
+<Tab value="Sequential Requests">
+
+**Execute one after another:**
+
+```js
+const useListingsStore = create((set) => ({
+  loadUserData: async (userId) => {
+    set({ status: 'loading' });
+    
+    try {
+      // 1. Fetch user
+      const userResponse = await fetch(`/api/users/${userId}`);
+      const user = await userResponse.json();
+      set({ user });
+      
+      // 2. Then fetch their listings
+      const listingsResponse = await fetch(`/api/users/${userId}/listings`);
+      const listings = await listingsResponse.json();
+      set({ items: listings.data });
+      
+      // 3. Then fetch their favorites
+      const favoritesResponse = await fetch(`/api/users/${userId}/favorites`);
+      const favorites = await favoritesResponse.json();
+      set({ favorites: favorites.data });
+      
+      set({ status: 'succeeded' });
+    } catch (error) {
+      set({ error: error.message, status: 'failed' });
+    }
+  },
+}));
+```
+
+**Use when:** Second request needs data from first
+
+</Tab>
+
+<Tab value="Parallel Requests">
+
+**Execute simultaneously:**
+
+```js
+const useListingsStore = create((set) => ({
+  loadAllData: async () => {
+    set({ status: 'loading' });
+    
+    try {
+      // Fetch all at once!
+      const [listingsRes, categoriesRes, reviewsRes] = await Promise.all([
+        fetch('/api/listings'),
+        fetch('/api/categories'),
+        fetch('/api/reviews')
+      ]);
+      
+      const listings = await listingsRes.json();
+      const categories = await categoriesRes.json();
+      const reviews = await reviewsRes.json();
+      
+      set({
+        items: listings.data,
+        categories: categories.data,
+        reviews: reviews.data,
+        status: 'succeeded'
+      });
+    } catch (error) {
+      set({ error: error.message, status: 'failed' });
+    }
+  },
+}));
+```
+
+**Use when:** Requests are independent
+
+**Faster!** All requests happen at once ⚡
+
+</Tab>
+
+<Tab value="Dependent Requests">
+
+**Second request uses data from first:**
+
+```js
+const useListingsStore = create((set) => ({
+  loadListingWithReviews: async (listingId) => {
+    set({ status: 'loading' });
+    
+    try {
+      // 1. Fetch listing
+      const listingRes = await fetch(`/api/listings/${listingId}`);
+      const listing = await listingRes.json();
+      set({ currentListing: listing.data });
+      
+      // 2. Use listing data to fetch reviews
+      const ownerId = listing.data.owner.id;
+      const reviewsRes = await fetch(`/api/users/${ownerId}/reviews`);
+      const reviews = await reviewsRes.json();
+      set({ reviews: reviews.data });
+      
+      set({ status: 'succeeded' });
+    } catch (error) {
+      set({ error: error.message, status: 'failed' });
+    }
+  },
+}));
+```
+
+**Use when:** Need data from first response for second request
+
+</Tab>
+
+</Tabs>
+
+## Handling Loading States
+
+<Accordions>
+
+<Accordion title="Global Loading State">
+
+**One status for entire store:**
+
+```js
+const useListingsStore = create((set) => ({
+  status: 'idle',
+  
+  fetchListings: async () => {
+    set({ status: 'loading' });
+    // ...
+    set({ status: 'succeeded' });
+  },
+}));
+```
+
+**Usage:**
+
+```jsx
+const status = useListingsStore((state) => state.status);
+
+if (status === 'loading') return <Spinner />;
+if (status === 'failed') return <Error />;
+return <Content />;
+```
+
+</Accordion>
+
+<Accordion title="Per-Action Loading State">
+
+**Separate loading state for each action:**
+
+```js
+const useListingsStore = create((set) => ({
+  isLoadingListings: false,
+  isLoadingFavorites: false,
+  
+  fetchListings: async () => {
+    set({ isLoadingListings: true });
+    // ...
+    set({ isLoadingListings: false });
+  },
+  
+  fetchFavorites: async () => {
+    set({ isLoadingFavorites: true });
+    // ...
+    set({ isLoadingFavorites: false });
+  },
+}));
+```
+
+**Usage:**
+
+```jsx
+const isLoadingListings = useListingsStore((state) => state.isLoadingListings);
+const isLoadingFavorites = useListingsStore((state) => state.isLoadingFavorites);
+
+{isLoadingListings && <Spinner />}
+{isLoadingFavorites && <Badge>Loading...</Badge>}
+```
+
+**Better when:** Multiple async operations can happen simultaneously
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+Perfect! You can now handle async operations. In the next lesson:
+
+1. **Refactor HomePage** - Remove useFetch, use Zustand
+2. **Add filtering** - Filter by search, price, guests
+3. **Handle all states** - Loading, error, empty, success
+4. **Complete integration**
+
+<Callout type="success">
+**✅ Lesson Complete!** You can now handle async operations in Zustand!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Just async functions** - No createAsyncThunk, no special syntax
+- ✅ **Call set() from anywhere** - In try/catch blocks, after await, etc.
+- ✅ **Pass parameters** - Just like regular functions
+- ✅ **Handle loading/error** - Use status and error state
+- ✅ **Optimistic updates** - Update UI first, sync later
+- ✅ **Abort controller** - Cancel fetches on unmount
+- ✅ **90% less code** than Redux async thunks
+- ✅ **Same power** - Everything Redux can do, way simpler!

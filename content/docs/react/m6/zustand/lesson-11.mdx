@@ -1,0 +1,567 @@
+---
+title: "L11: Create Favorite Button Component"
+description: "Build a reusable favorite button component"
+---
+
+# Create Favorite Button Component
+
+Let's create a dedicated FavoriteButton component! 🎯
+
+## Why a Separate Component?
+
+**Current situation:** ListingCard has inline favorite button code.
+
+**Better approach:** Extract to reusable component!
+
+**Benefits:**
+- Reusable in different contexts
+- Easier to test
+- Simpler to maintain
+- Can add animations/features in one place
+
+## Step 1: Create the Component
+
+```jsx title="src/components/FavoriteButton.jsx"
+import useListingsStore from '@/state/useListingsStore';
+
+function FavoriteButton({ listingId, size = 'medium', className = '' }) {
+  // Select favorites and action
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  // Check if favorited
+  const isFavorited = favorites.includes(listingId);
+  
+  // Handle click
+  const handleClick = (e) => {
+    e.preventDefault();  // Prevent parent click events
+    e.stopPropagation();  // Stop event bubbling
+    toggleFavorite(listingId);
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      className={`favorite-button favorite-button--${size} ${isFavorited ? 'favorited' : ''} ${className}`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+      title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      {isFavorited ? '❤️' : '🤍'}
+    </button>
+  );
+}
+
+export default FavoriteButton;
+```
+
+## Understanding the Component
+
+<Accordions>
+
+<Accordion title="Props">
+
+**listingId (required):**
+```jsx
+<FavoriteButton listingId="123" />
+```
+The ID of the listing to favorite/unfavorite.
+
+**size (optional, default 'medium'):**
+```jsx
+<FavoriteButton listingId="123" size="small" />
+<FavoriteButton listingId="123" size="medium" />
+<FavoriteButton listingId="123" size="large" />
+```
+Controls button size.
+
+**className (optional):**
+```jsx
+<FavoriteButton listingId="123" className="custom-style" />
+```
+Add custom CSS classes.
+
+</Accordion>
+
+<Accordion title="Event Handling">
+
+**Why preventDefault() and stopPropagation()?**
+
+```jsx
+const handleClick = (e) => {
+  e.preventDefault();    // Prevent default button behavior
+  e.stopPropagation();   // Stop event from bubbling up
+  toggleFavorite(listingId);
+};
+```
+
+**Why needed?**
+
+```jsx
+// Imagine button inside a clickable card:
+<div onClick={() => navigate(`/listing/${id}`)}>  {/* Click opens detail */}
+  <FavoriteButton listingId={id} />  {/* Click favorites */}
+</div>
+
+// Without stopPropagation():
+// Click favorite → favorites AND navigates ❌
+
+// With stopPropagation():
+// Click favorite → only favorites ✅
+```
+
+**Prevents unwanted behavior!**
+
+</Accordion>
+
+<Accordion title="Accessibility">
+
+**aria-label and title:**
+
+```jsx
+<button
+  aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+  title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+>
+```
+
+**Why important?**
+
+- **aria-label:** Screen readers announce this text
+- **title:** Tooltip on hover
+- **Dynamic text:** Updates based on state
+
+**Good for accessibility!** ♿
+
+</Accordion>
+
+</Accordions>
+
+## Step 2: Add Styling
+
+```css title="src/app/global.css"
+/* Favorite Button */
+.favorite-button {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+  z-index: 10;
+  position: relative;
+}
+
+.favorite-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.favorite-button:active {
+  transform: scale(0.95);
+}
+
+.favorite-button.favorited {
+  background: #fee;
+  animation: heartbeat 0.3s ease;
+}
+
+/* Button Sizes */
+.favorite-button--small {
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+}
+
+.favorite-button--medium {
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+}
+
+.favorite-button--large {
+  width: 48px;
+  height: 48px;
+  font-size: 1.8rem;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.2); }
+  50% { transform: scale(1.1); }
+  75% { transform: scale(1.15); }
+}
+```
+
+## Step 3: Use in ListingCard
+
+Now update `ListingCard` to use the new component:
+
+```jsx title="src/components/ListingCard.jsx"
+import { Link } from 'react-router-dom';
+import FavoriteButton from '@/components/FavoriteButton';
+
+function ListingCard({ listing }) {
+  return (
+    <div className="listing-card">
+      <div className="listing-image">
+        <img 
+          src={listing.media?.[0]?.url || '/placeholder.jpg'} 
+          alt={listing.media?.[0]?.alt || listing.name}
+        />
+        
+        {/* Use FavoriteButton component */}
+        <FavoriteButton 
+          listingId={listing.id}
+          size="medium"
+          className="listing-card__favorite"
+        />
+      </div>
+      
+      <div className="listing-content">
+        <h3>{listing.name}</h3>
+        <p className="listing-description">
+          {listing.description}
+        </p>
+        
+        <div className="listing-details">
+          <span className="price">${listing.price}/night</span>
+          <span className="guests">👥 {listing.maxGuests} guests</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ListingCard;
+```
+
+## Update Card Styling
+
+```css title="src/app/global.css"
+/* Listing Card Updates */
+.listing-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.listing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Position favorite button */
+.listing-card__favorite {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+```
+
+## Component Benefits
+
+<Tabs items={['Reusability', 'Maintainability', 'Testing']}>
+
+<Tab value="Reusability">
+
+**Use anywhere:**
+
+```jsx
+// In ListingCard
+<FavoriteButton listingId={listing.id} size="medium" />
+
+// In ListingDetail page (large button)
+<FavoriteButton listingId={listing.id} size="large" />
+
+// In CompactListingRow (small button)
+<FavoriteButton listingId={listing.id} size="small" />
+
+// Custom styling
+<FavoriteButton 
+  listingId={listing.id}
+  className="custom-favorite-btn"
+/>
+```
+
+**One component, many uses!** ✨
+
+</Tab>
+
+<Tab value="Maintainability">
+
+**Update once, affects everywhere:**
+
+```jsx
+// Want to change animation? Update FavoriteButton.jsx
+// Want to add sound effect? Update FavoriteButton.jsx
+// Want to add confirmation? Update FavoriteButton.jsx
+
+// All usages update automatically!
+```
+
+**Single source of truth!**
+
+</Tab>
+
+<Tab value="Testing">
+
+**Easy to test in isolation:**
+
+```jsx
+// Test FavoriteButton
+describe('FavoriteButton', () => {
+  it('shows white heart when not favorited', () => {
+    useListingsStore.setState({ favorites: [] });
+    render(<FavoriteButton listingId="123" />);
+    expect(screen.getByText('🤍')).toBeInTheDocument();
+  });
+  
+  it('shows red heart when favorited', () => {
+    useListingsStore.setState({ favorites: ['123'] });
+    render(<FavoriteButton listingId="123" />);
+    expect(screen.getByText('❤️')).toBeInTheDocument();
+  });
+  
+  it('toggles favorite on click', () => {
+    const toggleFavorite = jest.fn();
+    useListingsStore.setState({
+      favorites: [],
+      toggleFavorite
+    });
+    
+    render(<FavoriteButton listingId="123" />);
+    fireEvent.click(screen.getByRole('button'));
+    
+    expect(toggleFavorite).toHaveBeenCalledWith('123');
+  });
+});
+```
+
+**Testable component!**
+
+</Tab>
+
+</Tabs>
+
+## Advanced Features (Optional)
+
+### Add Loading State
+
+```jsx title="src/components/FavoriteButton.jsx (Enhanced)"
+import { useState } from 'react';
+import useListingsStore from '@/state/useListingsStore';
+
+function FavoriteButton({ listingId, size = 'medium', className = '' }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  const isFavorited = favorites.includes(listingId);
+  
+  const handleClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsLoading(true);
+    
+    try {
+      toggleFavorite(listingId);
+      
+      // Optional: Sync with server
+      // await fetch(`/api/favorites/${listingId}`, { method: 'POST' });
+      
+      // Add small delay for animation
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      disabled={isLoading}
+      className={`favorite-button favorite-button--${size} ${isFavorited ? 'favorited' : ''} ${className}`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      {isLoading ? '⏳' : isFavorited ? '❤️' : '🤍'}
+    </button>
+  );
+}
+
+export default FavoriteButton;
+```
+
+### Add Sound Effect (Optional)
+
+```jsx title="src/components/FavoriteButton.jsx (With Sound)"
+import useListingsStore from '@/state/useListingsStore';
+
+function FavoriteButton({ listingId, size = 'medium', className = '' }) {
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  const isFavorited = favorites.includes(listingId);
+  
+  const handleClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Play sound (optional)
+    const audio = new Audio('/sounds/favorite.mp3');
+    audio.play().catch(() => {
+      // Ignore error if sound fails
+    });
+    
+    toggleFavorite(listingId);
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      className={`favorite-button favorite-button--${size} ${isFavorited ? 'favorited' : ''} ${className}`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      {isFavorited ? '❤️' : '🤍'}
+    </button>
+  );
+}
+
+export default FavoriteButton;
+```
+
+## Comparison with Inline Code
+
+<Tabs items={['Before (Inline)', 'After (Component)', 'Benefits']}>
+
+<Tab value="Before (Inline)">
+
+**Inline in ListingCard:**
+
+```jsx
+function ListingCard({ listing }) {
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  const isFavorited = favorites.includes(listing.id);
+  
+  return (
+    <div className="listing-card">
+      <button
+        onClick={() => toggleFavorite(listing.id)}
+        className={`favorite-button ${isFavorited ? 'favorited' : ''}`}
+      >
+        {isFavorited ? '❤️' : '🤍'}
+      </button>
+      {/* ... rest of card ... */}
+    </div>
+  );
+}
+```
+
+**Issues:**
+- Can't reuse in other components
+- ListingCard has too many responsibilities
+- Hard to test button separately
+
+</Tab>
+
+<Tab value="After (Component)">
+
+**Extracted component:**
+
+```jsx
+// FavoriteButton.jsx
+function FavoriteButton({ listingId }) {
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  const isFavorited = favorites.includes(listingId);
+  
+  return (
+    <button onClick={() => toggleFavorite(listingId)}>
+      {isFavorited ? '❤️' : '🤍'}
+    </button>
+  );
+}
+
+// ListingCard.jsx
+function ListingCard({ listing }) {
+  return (
+    <div className="listing-card">
+      <FavoriteButton listingId={listing.id} />
+      {/* ... rest of card ... */}
+    </div>
+  );
+}
+```
+
+**Benefits:**
+- Reusable everywhere
+- ListingCard is simpler
+- Easy to test
+- Easy to enhance
+
+</Tab>
+
+<Tab value="Benefits">
+
+**Why extract components?**
+
+**Single Responsibility:**
+- ListingCard → Display listing info
+- FavoriteButton → Handle favoriting
+
+**Reusability:**
+```jsx
+<FavoriteButton listingId="123" />  // In card
+<FavoriteButton listingId="123" size="large" />  // In detail page
+<FavoriteButton listingId="123" size="small" />  // In compact view
+```
+
+**Maintainability:**
+- Change button: Edit one file
+- All usages update automatically
+
+**Testability:**
+- Test button independently
+- Mock store easily
+
+**Composition:**
+- Mix and match components
+- Build complex UIs from simple parts
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+FavoriteButton component is complete! Now we have:
+- ✅ Reusable favorite button
+- ✅ Multiple sizes (small, medium, large)
+- ✅ Proper accessibility
+- ✅ Animations and effects
+- ✅ Clean separation of concerns
+
+In the next lesson:
+1. **Final integration** - Ensure button works everywhere
+2. **Complete testing** - Verify all functionality
+3. **Module review** - Recap everything
+
+<Callout type="success">
+**✅ Lesson Complete!** FavoriteButton is a reusable, accessible component!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Extracted component** - Separated concerns from ListingCard
+- ✅ **Reusable** - Works in any component, any context
+- ✅ **Configurable** - Props for size, className
+- ✅ **Event handling** - preventDefault and stopPropagation
+- ✅ **Accessibility** - aria-label and title attributes
+- ✅ **Animations** - Heartbeat effect on favorite
+- ✅ **Single responsibility** - Just handles favoriting
+- ✅ **Easy to enhance** - Can add loading, sound, confirmation
