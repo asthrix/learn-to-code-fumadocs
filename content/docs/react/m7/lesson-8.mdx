@@ -1,0 +1,861 @@
+---
+title: "L8: Add SignInForm to SignInPage"
+description: "Integrate the form into the sign-in page"
+---
+
+# Add SignInForm to SignInPage
+
+Let's integrate our beautiful form into the sign-in page! 🎨
+
+## Remove Placeholder
+
+Replace the placeholder with the actual form:
+
+```jsx title="src/pages/SignInPage.jsx"
+import SignInForm from '@/components/SignInForm';  // ← New import
+
+function SignInPage() {
+  return (
+    <div className="sign-in-page">
+      <div className="sign-in-container">
+        {/* Logo/Brand */}
+        <div className="sign-in-header">
+          <h1 className="brand-logo">🏖️ Holidaze</h1>
+          <p className="brand-tagline">Your next adventure awaits</p>
+        </div>
+
+        {/* Sign-in form */}
+        <div className="sign-in-form-container">
+          <h2 className="sign-in-title">Sign in to your account</h2>
+          <p className="sign-in-subtitle">
+            Welcome back! Please enter your details.
+          </p>
+          
+          <SignInForm />  {/* ← Replaced placeholder */}
+        </div>
+
+        {/* Footer */}
+        <div className="sign-in-footer">
+          <p className="footer-text">
+            Don't have an account?{' '}
+            <a href="/register" className="footer-link">
+              Sign up
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SignInPage;
+```
+
+## Update Styling
+
+Remove placeholder styles and adjust spacing:
+
+```css title="src/app/global.css"
+/* Remove this (was temporary): */
+/* .form-placeholder { ... } */
+
+/* Adjust form container spacing */
+.sign-in-form-container {
+  margin-bottom: 2rem;
+}
+
+.sign-in-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+.sign-in-subtitle {
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 0 0 2rem 0;  /* Space before form */
+}
+```
+
+## Test Complete Sign-In Page
+
+<Steps>
+
+<Step>
+
+**Start dev server and visit page:**
+
+```bash
+npm run dev
+```
+
+Navigate to: `http://localhost:5173/sign-in`
+
+</Step>
+
+<Step>
+
+**Check visual appearance:**
+
+Should see:
+- ✅ Gradient background
+- ✅ White card centered
+- ✅ Brand logo and tagline
+- ✅ "Sign in to your account" title
+- ✅ Email and password fields
+- ✅ Blue "Sign In" button
+- ✅ "Sign up" link at bottom
+
+</Step>
+
+<Step>
+
+**Test form validation:**
+
+1. Click "Sign In" with empty fields
+2. Should see error messages
+3. Fill email with invalid format
+4. Should see "Invalid email" error
+5. Fill both correctly
+6. Should remove errors
+
+✅ **Validation working!**
+
+</Step>
+
+<Step>
+
+**Test submission:**
+
+1. Fill valid credentials
+2. Click "Sign In"
+3. Button should disable and show "Signing in..."
+4. Check console for logged data
+5. Button re-enables after submission
+
+✅ **Submission working!**
+
+</Step>
+
+<Step>
+
+**Test responsive design:**
+
+1. Resize browser to mobile width (< 480px)
+2. Card should remain centered
+3. Padding should reduce slightly
+4. Text sizes should adjust
+
+✅ **Responsive working!**
+
+</Step>
+
+</Steps>
+
+## Add Optional Features
+
+Enhance the sign-in experience:
+
+<Tabs items={['Remember Me', 'Forgot Password', 'Show/Hide Password', 'Social Sign-In']}>
+
+<Tab value="Remember Me">
+
+**Add checkbox to remember user:**
+
+```jsx title="src/components/SignInForm.jsx"
+function SignInForm() {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(signInSchema),
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="sign-in-form">
+      {/* Email field */}
+      {/* Password field */}
+
+      {/* Remember Me */}
+      <div className="form-extras">
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            {...register('rememberMe')}
+            className="checkbox-input"
+          />
+          <span className="checkbox-text">Remember me</span>
+        </label>
+        
+        <a href="/forgot-password" className="forgot-link">
+          Forgot password?
+        </a>
+      </div>
+
+      {/* Submit button */}
+    </form>
+  );
+}
+```
+
+**Update schema:**
+
+```jsx title="src/schemas/signInSchema.js"
+export const signInSchema = z.object({
+  email: z.string().min(1, 'Email is required').email('Invalid email'),
+  password: z.string().min(1, 'Password is required').min(8, 'Too short'),
+  rememberMe: z.boolean().optional(),  // ← New field
+});
+```
+
+**Add styles:**
+
+```css title="src/app/global.css"
+.form-extras {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -0.5rem;  /* Pull up slightly */
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-input {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: #3b82f6;  /* Blue checkmark */
+}
+
+.checkbox-text {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.forgot-link {
+  font-size: 0.875rem;
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+```
+
+</Tab>
+
+<Tab value="Forgot Password">
+
+**Add link below form:**
+
+```jsx title="src/components/SignInForm.jsx"
+function SignInForm() {
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="sign-in-form">
+      {/* Form fields */}
+      
+      <button type="submit">Sign In</button>
+      
+      {/* Forgot password link */}
+      <p className="alternative-action">
+        Forgot your password?{' '}
+        <a href="/reset-password" className="alternative-link">
+          Reset it here
+        </a>
+      </p>
+    </form>
+  );
+}
+```
+
+**Add styles:**
+
+```css title="src/app/global.css"
+.alternative-action {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 1rem 0 0 0;
+}
+
+.alternative-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.alternative-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+```
+
+</Tab>
+
+<Tab value="Show/Hide Password">
+
+**Add toggle to reveal password:**
+
+```jsx title="src/components/SignInForm.jsx"
+import { useState } from 'react';
+
+function SignInForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="sign-in-form">
+      {/* Email field */}
+
+      {/* Password field with toggle */}
+      <div className="form-field">
+        <label htmlFor="password" className="form-label">
+          Password
+        </label>
+        <div className="password-input-wrapper">
+          <input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            {...register('password')}
+            className={`form-input ${errors.password ? 'form-input-error' : ''}`}
+            placeholder="••••••••"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="password-toggle"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? '🙈' : '👁️'}
+          </button>
+        </div>
+        {errors.password && (
+          <p className="form-error">{errors.password.message}</p>
+        )}
+      </div>
+
+      {/* Submit button */}
+    </form>
+  );
+}
+```
+
+**Add styles:**
+
+```css title="src/app/global.css"
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .form-input {
+  padding-right: 3rem;  /* Space for button */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.password-toggle:hover {
+  opacity: 1;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+```
+
+</Tab>
+
+<Tab value="Social Sign-In">
+
+**Add social authentication buttons:**
+
+```jsx title="src/components/SignInForm.jsx"
+function SignInForm() {
+  const handleSocialSignIn = (provider) => {
+    console.log(`Sign in with ${provider}`);
+    // TODO: Implement social auth
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="sign-in-form">
+      {/* Regular form fields */}
+
+      {/* Divider */}
+      <div className="divider">
+        <span className="divider-text">Or continue with</span>
+      </div>
+
+      {/* Social buttons */}
+      <div className="social-buttons">
+        <button
+          type="button"
+          onClick={() => handleSocialSignIn('Google')}
+          className="social-button"
+        >
+          <img src="/icons/google.svg" alt="" className="social-icon" />
+          Google
+        </button>
+        
+        <button
+          type="button"
+          onClick={() => handleSocialSignIn('GitHub')}
+          className="social-button"
+        >
+          <img src="/icons/github.svg" alt="" className="social-icon" />
+          GitHub
+        </button>
+      </div>
+    </form>
+  );
+}
+```
+
+**Add styles:**
+
+```css title="src/app/global.css"
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.divider-text {
+  position: relative;
+  padding: 0 1rem;
+  background: white;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.social-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.social-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.social-button:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.social-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Common Integration Issues
+
+<Accordions>
+
+<Accordion title="Form Not Showing">
+
+**Problem:** Page loads but no form visible
+
+**Check these:**
+
+```jsx
+// 1. Import component
+import SignInForm from '@/components/SignInForm';  // ✅
+
+// 2. Component rendered
+<SignInForm />  // ✅ Self-closing tag
+
+// 3. No typos
+<SignInForm />  // ✅ Correct capitalization
+
+// 4. File exists
+src/components/SignInForm.jsx  // ✅ Check file structure
+```
+
+**Check browser console for errors:**
+
+```
+Cannot find module '@/components/SignInForm'
+  → Check file exists and path alias works
+
+SignInForm is not a function
+  → Check export: export default SignInForm
+
+Element type is invalid
+  → Check import: import SignInForm from '...'
+```
+
+</Accordion>
+
+<Accordion title="Validation Not Working">
+
+**Problem:** Form submits without validation
+
+**Common causes:**
+
+```jsx
+// 1. Missing resolver
+useForm({
+  // ❌ No resolver - validation won't work
+});
+
+// ✅ Fix: Add resolver
+useForm({
+  resolver: zodResolver(signInSchema),
+});
+
+// 2. Wrong handleSubmit usage
+<form onSubmit={onSubmit}>  {/* ❌ Direct call */}
+
+// ✅ Fix: Wrap with handleSubmit
+<form onSubmit={handleSubmit(onSubmit)}>
+
+// 3. Missing register
+<input name="email" />  {/* ❌ Not registered */}
+
+// ✅ Fix: Add register
+<input {...register('email')} />
+```
+
+</Accordion>
+
+<Accordion title="Styling Issues">
+
+**Problem:** Form looks broken or unstyled
+
+**Check CSS order:**
+
+```css
+/* Base styles first */
+.sign-in-form { }
+.form-field { }
+.form-input { }
+
+/* States after */
+.form-input:focus { }
+.form-input-error { }
+
+/* Responsive last */
+@media (max-width: 480px) { }
+```
+
+**CSS specificity:**
+
+```css
+/* ❌ Too generic (might conflict) */
+input { }
+label { }
+
+/* ✅ Specific classes */
+.form-input { }
+.form-label { }
+```
+
+**Check class names:**
+
+```jsx
+// ❌ Typo in class name
+<input className="form-imput" />
+
+// ✅ Correct spelling
+<input className="form-input" />
+```
+
+</Accordion>
+
+</Accordions>
+
+## Accessibility Improvements
+
+<Tabs items={['Labels & IDs', 'ARIA Attributes', 'Keyboard Navigation', 'Error Announcements']}>
+
+<Tab value="Labels & IDs">
+
+**Every input needs a label:**
+
+```jsx
+// ✅ Good: Label with htmlFor
+<label htmlFor="email">Email</label>
+<input id="email" {...register('email')} />
+
+// ❌ Bad: No connection
+<label>Email</label>
+<input {...register('email')} />
+```
+
+**Why this matters:**
+
+```
+With htmlFor:
+  → Click label → Focuses input
+  → Screen reader announces: "Email, edit text"
+
+Without htmlFor:
+  → Click label → Nothing happens
+  → Screen reader announces: "Edit text" (no context)
+```
+
+**Label patterns:**
+
+```jsx
+// Pattern 1: Wrapping (implicit)
+<label>
+  Email
+  <input {...register('email')} />
+</label>
+
+// Pattern 2: For attribute (explicit, recommended)
+<label htmlFor="email">Email</label>
+<input id="email" {...register('email')} />
+```
+
+</Tab>
+
+<Tab value="ARIA Attributes">
+
+**Describe errors to screen readers:**
+
+```jsx
+<input
+  id="email"
+  {...register('email')}
+  aria-invalid={errors.email ? 'true' : 'false'}
+  aria-describedby={errors.email ? 'email-error' : undefined}
+/>
+
+{errors.email && (
+  <p id="email-error" className="form-error" role="alert">
+    {errors.email.message}
+  </p>
+)}
+```
+
+**What each does:**
+
+```jsx
+aria-invalid="true"
+// Tells screen reader: "This field has an error"
+
+aria-describedby="email-error"
+// Connects error message to input
+// Screen reader announces: "Email, invalid, {error message}"
+
+role="alert"
+// Announces error immediately when it appears
+```
+
+**Button states:**
+
+```jsx
+<button
+  type="submit"
+  disabled={isSubmitting}
+  aria-busy={isSubmitting}
+>
+  {isSubmitting ? 'Signing in...' : 'Sign In'}
+</button>
+```
+
+`aria-busy` tells screen readers: "This button is busy"
+
+</Tab>
+
+<Tab value="Keyboard Navigation">
+
+**Tab order should be logical:**
+
+```
+1. Email input
+2. Password input
+3. Remember me checkbox
+4. Forgot password link
+5. Sign in button
+6. Sign up link
+```
+
+**Test keyboard navigation:**
+
+```bash
+Tab → Moves to next element
+Shift+Tab → Moves to previous element
+Enter → Submits form (when on button)
+Space → Checks checkbox
+```
+
+**Skip links for screen readers:**
+
+```jsx
+<a href="#main-content" className="skip-link">
+  Skip to sign in form
+</a>
+
+<main id="main-content">
+  <SignInForm />
+</main>
+```
+
+**CSS for skip link:**
+
+```css
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+```
+
+Appears when focused, skips to form!
+
+</Tab>
+
+<Tab value="Error Announcements">
+
+**Live regions for dynamic errors:**
+
+```jsx
+function SignInForm() {
+  const { formState: { errors } } = useForm();
+
+  return (
+    <>
+      {/* Error summary (announced on submit) */}
+      {Object.keys(errors).length > 0 && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="error-summary"
+        >
+          <p>Please fix the following errors:</p>
+          <ul>
+            {Object.entries(errors).map(([field, error]) => (
+              <li key={field}>{error.message}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Form */}
+      <form>...</form>
+    </>
+  );
+}
+```
+
+**ARIA live regions:**
+
+```jsx
+role="alert"          // Polite announcement
+aria-live="assertive" // Immediate announcement
+aria-live="polite"    // Wait for break in speech
+```
+
+**Error styling:**
+
+```css
+.error-summary {
+  padding: 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.error-summary p {
+  color: #991b1b;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.error-summary ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #dc2626;
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+In Lesson 9, we'll:
+1. Implement the sign-in logic in `onSubmit`
+2. Make API call to authentication endpoint
+3. Handle success and error responses
+4. Update AuthContext with user data
+
+<Callout type="success">
+**✅ Lesson Complete!** Sign-in page is now fully functional (UI-wise)!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Import component** before using it
+- ✅ **Remove placeholder** when adding real form
+- ✅ **Test validation** after integration
+- ✅ **Optional features** enhance UX (remember me, show password)
+- ✅ **Social sign-in** provides alternatives
+- ✅ **Accessibility** makes form usable by everyone
+- ✅ **ARIA attributes** help screen readers
+- ✅ **Keyboard navigation** must work smoothly
+- ✅ **Error announcements** keep users informed
+- ✅ **Visual consistency** with design system

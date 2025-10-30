@@ -1,0 +1,868 @@
+---
+title: "L11: Add Token to Requests (Interceptors)"
+description: "Automatically attach authentication tokens to API calls"
+---
+
+# Add Token to Requests (Interceptors)
+
+Let's automatically add the authentication token to every API request! 🔐
+
+## Why Request Interceptors?
+
+**Without interceptors (manual approach):**
+
+```jsx
+// ❌ Add token to every request manually
+const getVenues = async () => {
+  const response = await api.get('/holidaze/venues', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+const createVenue = async (data) => {
+  const response = await api.post('/holidaze/venues', data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// Repeat for every request... tedious!
+```
+
+**With interceptors (automatic):**
+
+```jsx
+// ✅ Token added automatically
+const getVenues = async () => {
+  const response = await api.get('/holidaze/venues');
+  // Token included automatically!
+};
+
+const createVenue = async (data) => {
+  const response = await api.post('/holidaze/venues', data);
+  // Token included automatically!
+};
+```
+
+**Benefits:**
+
+- ✅ **DRY:** Write token logic once
+- ✅ **Consistent:** Never forget to add token
+- ✅ **Maintainable:** Easy to update
+- ✅ **Clean:** API calls stay simple
+
+## Understanding Interceptors
+
+**Interceptor flow:**
+
+```
+Your code:
+  api.get('/venues')
+    ↓
+Request Interceptor:
+  Add Authorization header
+  Add any other headers
+    ↓
+Axios sends request:
+  GET /venues
+  Headers: { Authorization: "Bearer ..." }
+    ↓
+Server responds:
+  200 OK
+  { data: [...] }
+    ↓
+Response Interceptor:
+  Process response
+  Handle errors
+    ↓
+Your code receives:
+  response.data
+```
+
+**Two types of interceptors:**
+
+```jsx
+// 1. Request Interceptor (BEFORE sending)
+api.interceptors.request.use(
+  config => {
+    // Modify request before sending
+    return config;
+  },
+  error => {
+    // Handle request error
+    return Promise.reject(error);
+  }
+);
+
+// 2. Response Interceptor (AFTER receiving)
+api.interceptors.response.use(
+  response => {
+    // Process successful response
+    return response;
+  },
+  error => {
+    // Handle response error
+    return Promise.reject(error);
+  }
+);
+```
+
+## Create Token Store
+
+First, create a module to store and access the token:
+
+```jsx title="src/lib/tokenStore.js"
+// Singleton pattern to store token in memory
+let currentToken = null;
+
+export const tokenStore = {
+  getToken: () => currentToken,
+  
+  setToken: (token) => {
+    currentToken = token;
+  },
+  
+  clearToken: () => {
+    currentToken = null;
+  },
+};
+```
+
+## Update API Client with Interceptors
+
+Add request and response interceptors:
+
+```jsx title="src/lib/api.js"
+import axios from 'axios';
+import { tokenStore } from './tokenStore';
+
+const api = axios.create({
+  baseURL: 'https://v2.api.noroff.dev',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
+});
+
+// REQUEST INTERCEPTOR: Add token to every request
+api.interceptors.request.use(
+  (config) => {
+    const token = tokenStore.getToken();
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// RESPONSE INTERCEPTOR: Handle errors
+api.interceptors.response.use(
+  (response) => {
+    // Pass through successful responses
+    return response;
+  },
+  (error) => {
+    // Log errors for debugging
+    console.error('API Error:', error.response?.data || error.message);
+    
+    // Pass error to calling code
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+```
+
+## Update AuthContext to Use Token Store
+
+Sync token store with AuthContext state:
+
+```jsx title="src/contexts/AuthContext.jsx"
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '@/lib/api';
+import { tokenStore } from '@/lib/tokenStore';
+
+const AuthContext = createContext(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // Sync token with tokenStore whenever it changes
+  useEffect(() => {
+    if (token) {
+      tokenStore.setToken(token);
+    } else {
+      tokenStore.clearToken();
+    }
+  }, [token]);
+
+  // Fetch token on mount
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const response = await api.get('/auth/refresh');
+        const { accessToken, data } = response.data;
+        setToken(accessToken);
+        setUser(data);
+      } catch (error) {
+        console.log('No valid session');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchToken();
+  }, []);
+
+  // Sign in
+  const signIn = async (email, password) => {
+    try {
+      const response = await api.post('/auth/login', {
+        email,
+        password,
+      });
+
+      const { accessToken, data } = response.data;
+      setToken(accessToken);
+      setUser(data);
+      navigate('/');
+
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.errors?.[0]?.message 
+        || 'Invalid email or password';
+      return { success: false, error: message };
+    }
+  };
+
+  // Sign out
+  const signOut = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      setToken(null);
+      navigate('/sign-in');
+    }
+  };
+
+  const value = { user, token, isLoading, signIn, signOut };
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+```
+
+## Test Token Attachment
+
+Create a test API call to verify token is included:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import api from '@/lib/api';
+
+function HomePage() {
+  const { user } = useAuth();
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      fetchVenues();
+    }
+  }, [user]);
+
+  const fetchVenues = async () => {
+    setLoading(true);
+    try {
+      // Token automatically included via interceptor!
+      const response = await api.get('/holidaze/venues');
+      setVenues(response.data.data);
+    } catch (error) {
+      console.error('Failed to fetch venues:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="home-page">
+      <h1>Welcome {user ? user.name : 'Guest'}!</h1>
+      
+      {loading && <p>Loading venues...</p>}
+      
+      {venues.length > 0 && (
+        <div className="venues-grid">
+          {venues.map(venue => (
+            <div key={venue.id} className="venue-card">
+              <h3>{venue.name}</h3>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default HomePage;
+```
+
+## Understanding the Code
+
+<Tabs items={['Request Flow', 'Token Store Pattern', 'Interceptor Execution', 'Error Handling']}>
+
+<Tab value="Request Flow">
+
+**Complete request flow with interceptor:**
+
+```
+1. Component makes API call
+   api.get('/venues')
+
+2. Request interceptor runs
+   - Gets token from tokenStore
+   - Adds Authorization header
+   - Returns modified config
+
+3. Axios sends request
+   GET /venues
+   Headers: {
+     Authorization: "Bearer eyJhbGc..."
+   }
+
+4. Server processes request
+   - Validates token
+   - Returns data or error
+
+5. Response interceptor runs
+   - Logs any errors
+   - Returns response or error
+
+6. Component receives response
+   response.data
+```
+
+**Without vs with interceptor:**
+
+```jsx
+// ❌ Without interceptor
+const getVenues = async (token) => {
+  const response = await api.get('/venues', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+};
+
+// Component must pass token
+const HomePage = () => {
+  const { token } = useAuth();
+  const venues = await getVenues(token);
+};
+
+// ✅ With interceptor
+const getVenues = async () => {
+  const response = await api.get('/venues');
+  // Token added automatically!
+};
+
+// Component doesn't need token
+const HomePage = () => {
+  const venues = await getVenues();
+};
+```
+
+</Tab>
+
+<Tab value="Token Store Pattern">
+
+**Why separate token store?**
+
+```jsx
+// Problem: Interceptor needs token
+api.interceptors.request.use(config => {
+  const token = ???;  // Where to get token?
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// Solution 1: Import from context? ❌
+import { useAuth } from '@/contexts/AuthContext';
+// Can't use hooks outside components!
+
+// Solution 2: Pass token to every function? ❌
+api.get('/venues', token);
+// Defeats purpose of interceptor
+
+// Solution 3: Token store ✅
+import { tokenStore } from './tokenStore';
+const token = tokenStore.getToken();
+// Works anywhere!
+```
+
+**Token store benefits:**
+
+```jsx
+// Singleton pattern
+let currentToken = null;
+
+export const tokenStore = {
+  getToken: () => currentToken,
+  setToken: (token) => { currentToken = token; },
+  clearToken: () => { currentToken = null; },
+};
+
+// Benefits:
+// 1. Accessible anywhere (no hooks needed)
+// 2. Single source of truth
+// 3. Synchronous access (no async needed)
+// 4. Memory-only (secure)
+```
+
+**Syncing with React state:**
+
+```jsx
+// In AuthContext
+useEffect(() => {
+  if (token) {
+    tokenStore.setToken(token);  // Sync to store
+  } else {
+    tokenStore.clearToken();
+  }
+}, [token]);
+
+// Now both are synchronized:
+// - React state: for components
+// - Token store: for interceptor
+```
+
+</Tab>
+
+<Tab value="Interceptor Execution">
+
+**Request interceptor anatomy:**
+
+```jsx
+api.interceptors.request.use(
+  // Success handler (runs before request)
+  (config) => {
+    // config: Axios request configuration object
+    // {
+    //   url: '/venues',
+    //   method: 'get',
+    //   headers: { ... },
+    //   baseURL: 'https://...',
+    //   ...
+    // }
+
+    // Modify config
+    const token = tokenStore.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Must return config
+    return config;
+  },
+  
+  // Error handler (runs if request setup fails)
+  (error) => {
+    // Rare: Usually network or setup errors
+    console.error('Request setup error:', error);
+    return Promise.reject(error);
+  }
+);
+```
+
+**What you can modify:**
+
+```jsx
+config.headers.Authorization = 'Bearer ...';  // Add auth
+config.headers['X-Custom'] = 'value';         // Custom headers
+config.timeout = 5000;                        // Set timeout
+config.params = { ...config.params, v: 2 };   // Add query params
+config.baseURL = 'https://different-api.com'; // Change base URL
+
+// Must return modified config!
+return config;
+```
+
+**Multiple interceptors:**
+
+```jsx
+// Interceptor 1: Add auth token
+api.interceptors.request.use(config => {
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// Interceptor 2: Add API version
+api.interceptors.request.use(config => {
+  config.headers['X-API-Version'] = '2.0';
+  return config;
+});
+
+// Both run in order!
+// Final headers: { Authorization: "...", X-API-Version: "2.0" }
+```
+
+**Removing interceptors:**
+
+```jsx
+const interceptor = api.interceptors.request.use(config => config);
+
+// Later, remove it
+api.interceptors.request.eject(interceptor);
+```
+
+</Tab>
+
+<Tab value="Error Handling">
+
+**Response interceptor for errors:**
+
+```jsx
+api.interceptors.response.use(
+  // Success handler (status 2xx)
+  (response) => {
+    // Log successful requests (optional)
+    console.log('API success:', response.config.url);
+    return response;
+  },
+  
+  // Error handler (status outside 2xx)
+  async (error) => {
+    // Extract error info
+    const status = error.response?.status;
+    const url = error.config?.url;
+    
+    console.error(`API error ${status} on ${url}`);
+
+    // Handle specific errors
+    if (status === 401) {
+      console.log('Unauthorized - token invalid or expired');
+      // Will handle token refresh in Lesson 12
+    }
+    
+    if (status === 403) {
+      console.log('Forbidden - insufficient permissions');
+    }
+    
+    if (status === 404) {
+      console.log('Not found');
+    }
+    
+    if (status >= 500) {
+      console.log('Server error');
+    }
+
+    // Pass error to calling code
+    return Promise.reject(error);
+  }
+);
+```
+
+**Error object structure:**
+
+```jsx
+error = {
+  message: 'Request failed with status code 401',
+  name: 'AxiosError',
+  config: {
+    url: '/venues',
+    method: 'get',
+    // ... request config
+  },
+  request: XMLHttpRequest { ... },
+  response: {
+    data: {
+      errors: [{ message: 'Invalid token' }]
+    },
+    status: 401,
+    statusText: 'Unauthorized',
+    headers: { ... }
+  }
+};
+```
+
+**Handling in component:**
+
+```jsx
+const fetchVenues = async () => {
+  try {
+    const response = await api.get('/venues');
+    setVenues(response.data);
+  } catch (error) {
+    // Error already logged by interceptor
+    
+    // Show user-friendly message
+    if (error.response?.status === 401) {
+      setError('Please sign in to continue');
+    } else if (error.response?.status === 500) {
+      setError('Server error. Please try again later.');
+    } else {
+      setError('Something went wrong');
+    }
+  }
+};
+```
+
+</Tab>
+
+</Tabs>
+
+## Testing Token Attachment
+
+<Steps>
+
+<Step>
+
+**Sign in to get token:**
+
+1. Navigate to `/sign-in`
+2. Enter credentials
+3. Sign in successfully
+
+</Step>
+
+<Step>
+
+**Open Network tab:**
+
+1. DevTools → Network
+2. Filter: XHR
+
+</Step>
+
+<Step>
+
+**Make an API request:**
+
+```jsx
+// Add this to HomePage or any component
+const testAPI = async () => {
+  const response = await api.get('/holidaze/venues');
+  console.log('Venues:', response.data);
+};
+
+// Call on button click
+<button onClick={testAPI}>Test API</button>
+```
+
+</Step>
+
+<Step>
+
+**Check request headers:**
+
+Click on request → Headers tab
+
+Should see:
+
+```
+Request Headers:
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  Content-Type: application/json
+```
+
+✅ **Token automatically included!**
+
+</Step>
+
+<Step>
+
+**Test without token:**
+
+1. Sign out
+2. Try same API request
+3. Should see:
+   - No Authorization header
+   - OR 401 Unauthorized error
+
+✅ **Token only sent when available!**
+
+</Step>
+
+</Steps>
+
+## Common Use Cases
+
+<Accordions>
+
+<Accordion title="Protected API Endpoints">
+
+**Endpoints requiring authentication:**
+
+```jsx
+// These automatically include token
+const getMyVenues = () => api.get('/holidaze/venues/mine');
+const createVenue = (data) => api.post('/holidaze/venues', data);
+const updateVenue = (id, data) => api.put(`/holidaze/venues/${id}`, data);
+const deleteVenue = (id) => api.delete(`/holidaze/venues/${id}`);
+
+// No need to manually add token!
+```
+
+**Public vs protected:**
+
+```jsx
+// Public (no token needed)
+const getPublicVenues = () => api.get('/holidaze/venues');
+// Token sent but server ignores it if not needed
+
+// Protected (token required)
+const getMyBookings = () => api.get('/holidaze/bookings/mine');
+// Token sent and validated by server
+```
+
+</Accordion>
+
+<Accordion title="Multiple API Clients">
+
+**Different APIs, different interceptors:**
+
+```jsx title="src/lib/holidazeApi.js"
+import axios from 'axios';
+import { tokenStore } from './tokenStore';
+
+const holidazeApi = axios.create({
+  baseURL: 'https://v2.api.noroff.dev/holidaze',
+  withCredentials: true,
+});
+
+holidazeApi.interceptors.request.use(config => {
+  const token = tokenStore.getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default holidazeApi;
+```
+
+```jsx title="src/lib/externalApi.js"
+import axios from 'axios';
+
+const externalApi = axios.create({
+  baseURL: 'https://external-api.com',
+  headers: {
+    'X-API-Key': import.meta.env.VITE_EXTERNAL_API_KEY,
+  },
+});
+
+// Different auth method
+externalApi.interceptors.request.use(config => {
+  config.headers['X-API-Key'] = import.meta.env.VITE_EXTERNAL_API_KEY;
+  return config;
+});
+
+export default externalApi;
+```
+
+**Usage:**
+
+```jsx
+import holidazeApi from '@/lib/holidazeApi';
+import externalApi from '@/lib/externalApi';
+
+// Holidaze API (JWT token)
+const venues = await holidazeApi.get('/venues');
+
+// External API (API key)
+const data = await externalApi.get('/data');
+```
+
+</Accordion>
+
+<Accordion title="Request Logging">
+
+**Log all requests for debugging:**
+
+```jsx
+api.interceptors.request.use(config => {
+  console.log('→ API Request:', {
+    method: config.method?.toUpperCase(),
+    url: config.url,
+    data: config.data,
+    params: config.params,
+  });
+  return config;
+});
+
+api.interceptors.response.use(
+  response => {
+    console.log('← API Response:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data,
+    });
+    return response;
+  },
+  error => {
+    console.error('✖ API Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.response?.data?.errors?.[0]?.message,
+    });
+    return Promise.reject(error);
+  }
+);
+```
+
+**Console output:**
+
+```
+→ API Request: { method: 'GET', url: '/venues', ... }
+← API Response: { url: '/venues', status: 200, data: [...] }
+
+→ API Request: { method: 'POST', url: '/bookings', ... }
+✖ API Error: { url: '/bookings', status: 401, message: 'Invalid token' }
+```
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+In Lesson 12, we'll:
+1. Add response interceptor for 401 errors
+2. Automatically refresh expired tokens
+3. Retry failed requests with new token
+4. Handle token refresh failures
+
+<Callout type="success">
+**✅ Lesson Complete!** Token automatically attached to all requests!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Request interceptors** modify requests before sending
+- ✅ **Response interceptors** process responses after receiving
+- ✅ **Token store** provides synchronous access to token
+- ✅ **Automatic token attachment** eliminates repetitive code
+- ✅ **Interceptors run for all requests** on same Axios instance
+- ✅ **Multiple interceptors** can be chained
+- ✅ **Error logging** in interceptor helps debugging
+- ✅ **Config object** is mutable in request interceptor
+- ✅ **Must return config** from request interceptor
+- ✅ **Authorization header** standard format: `Bearer ${token}`

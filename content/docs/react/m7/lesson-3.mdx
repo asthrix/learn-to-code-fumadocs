@@ -1,0 +1,673 @@
+---
+title: "L3: Fetch Access Token on Mount"
+description: "Check for existing user session when app loads"
+---
+
+# Fetch Access Token on Mount
+
+Let's make the app check for an existing user session when it loads! This allows users to stay signed in even after closing the browser. 🔄
+
+## The Problem
+
+Currently, when the app loads:
+- `user` is `null`
+- `token` is `null`
+- `isLoading` is `true`
+
+But what if the user was previously signed in? They shouldn't have to sign in again every time!
+
+## Solution: Token Refresh on Mount
+
+When the app loads, we'll:
+1. Call a refresh token API endpoint
+2. If valid token exists → Get user data
+3. If no token → User stays signed out
+4. Set `isLoading` to `false` either way
+
+This is called "session restoration" or "token refresh."
+
+## Understanding Token Refresh
+
+<Accordions>
+
+<Accordion title="Access vs Refresh Tokens">
+
+**Two-token system:**
+
+**Access Token:**
+- Short-lived (15 minutes)
+- Sent with every API request
+- Stored in memory (JavaScript variable)
+- If stolen, expires quickly
+
+**Refresh Token:**
+- Long-lived (7-30 days)
+- Only used to get new access tokens
+- Stored in HTTP-only cookie (secure)
+- Can't be accessed by JavaScript (XSS protection)
+
+**Why two tokens?**
+
+```
+Access Token:
+  → Used frequently
+  → Short-lived = less risk if stolen
+  → Expires every 15 min
+
+Refresh Token:
+  → Used rarely (only when access expires)
+  → Long-lived = better UX
+  → Secure storage = hard to steal
+```
+
+**Flow:**
+
+```
+1. Sign in → Get both tokens
+2. Access token in memory, refresh token in cookie
+3. Use access token for requests
+4. When access expires → Use refresh to get new access
+5. Continue using app (seamless!)
+```
+
+</Accordion>
+
+<Accordion title="Why Check on Mount?">
+
+**User closes browser:**
+
+```
+1. User signs in → Has tokens
+2. User closes browser tab
+3. JavaScript memory cleared (access token lost!)
+4. But refresh token still in cookie ✅
+5. User reopens app
+6. We use refresh token to get new access token
+7. User still signed in! 🎉
+```
+
+**Without token refresh:**
+
+```jsx
+// ❌ User has to sign in every time
+User closes browser
+  → Memory cleared
+  → No session check
+  → Shows sign-in page
+  → User annoyed 😤
+```
+
+**With token refresh:**
+
+```jsx
+// ✅ User stays signed in
+User closes browser
+  → Memory cleared
+  → On mount: Check refresh token
+  → Get new access token
+  → Restore session
+  → User happy 😊
+```
+
+</Accordion>
+
+<Accordion title="Security Considerations">
+
+**Why refresh tokens are secure:**
+
+**1. HTTP-only cookies:**
+```javascript
+// ❌ JavaScript can't access
+document.cookie  // Refresh token not here!
+
+// ✅ Browser sends automatically
+fetch('/api/auth/refresh')
+// Cookie sent automatically by browser
+```
+
+**2. Short-lived access tokens:**
+```javascript
+// If access token stolen:
+- Valid for 15 minutes only
+- After that, attacker needs refresh token
+- But refresh token in secure cookie
+- Attacker can't get it from JavaScript
+```
+
+**3. Refresh rotation:**
+```javascript
+// When refreshing:
+- Old refresh token invalidated
+- New refresh token issued
+- Even if old token intercepted, it's useless
+```
+
+**Best practice:** Never store tokens in localStorage or sessionStorage (vulnerable to XSS attacks).
+
+</Accordion>
+
+</Accordions>
+
+## Add Token Fetch Logic
+
+Update `AuthProvider` to fetch the token when component mounts:
+
+```jsx title="src/components/AuthProvider.jsx"
+import { createContext, useContext, useState, useEffect } from 'react';
+import api from '@/api';
+
+const AuthContext = createContext(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  
+  return context;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch token on mount
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        // Call refresh endpoint (sends cookie automatically)
+        const response = await api.get('/auth/refresh');
+        
+        // Extract token and user from response
+        const { accessToken, user: userData } = response.data;
+        
+        // Update state
+        setToken(accessToken);
+        setUser(userData);
+      } catch (error) {
+        // No valid token - user not signed in
+        console.log('No valid session:', error.message);
+      } finally {
+        // Always set loading to false (whether success or error)
+        setIsLoading(false);
+      }
+    };
+
+    fetchToken();
+  }, []);  // Empty dependency array = run once on mount
+
+  const signIn = async (email, password) => {
+    // TODO: Implement in later lesson
+    console.log('signIn called:', email);
+  };
+
+  const signOut = () => {
+    setUser(null);
+    setToken(null);
+  };
+
+  const value = {
+    user,
+    token,
+    isLoading,
+    signIn,
+    signOut,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+```
+
+## Understanding the Code
+
+<Tabs items={['useEffect Pattern', 'Try-Catch-Finally', 'API Call', 'State Updates']}>
+
+<Tab value="useEffect Pattern">
+
+**Run once on mount:**
+
+```jsx
+useEffect(() => {
+  const fetchToken = async () => {
+    // Async logic here
+  };
+  
+  fetchToken();
+}, []);  // Empty array = run once
+```
+
+**Why this pattern?**
+
+**1. Async function inside useEffect:**
+```jsx
+// ❌ Can't do this:
+useEffect(async () => {
+  // ERROR: useEffect can't be async
+}, []);
+
+// ✅ Do this instead:
+useEffect(() => {
+  const fetchData = async () => {
+    // Async logic
+  };
+  fetchData();
+}, []);
+```
+
+**2. Empty dependency array:**
+```jsx
+useEffect(() => {
+  // Run once when component mounts
+}, []);  // No dependencies
+```
+
+**When it runs:**
+```
+AuthProvider mounts
+  ↓
+useEffect runs
+  ↓
+fetchToken() called
+  ↓
+API call made
+  ↓
+State updated
+```
+
+**Only runs once!** Not on every render.
+
+</Tab>
+
+<Tab value="Try-Catch-Finally">
+
+**Three blocks explained:**
+
+```jsx
+try {
+  // Try to fetch token
+  const response = await api.get('/auth/refresh');
+  setToken(response.data.accessToken);
+  setUser(response.data.user);
+} catch (error) {
+  // If API call fails (no token, network error, etc.)
+  console.log('No valid session:', error.message);
+} finally {
+  // Always runs (whether success or error)
+  setIsLoading(false);
+}
+```
+
+**Flow scenarios:**
+
+**Scenario 1: Valid token exists**
+```
+try block:
+  → API call succeeds
+  → setToken(...)
+  → setUser(...)
+finally block:
+  → setIsLoading(false)
+
+Result: User signed in ✅
+```
+
+**Scenario 2: No valid token**
+```
+try block:
+  → API call fails (401 Unauthorized)
+  → Jump to catch block
+catch block:
+  → Log error
+  → Don't update token/user (stay null)
+finally block:
+  → setIsLoading(false)
+
+Result: User not signed in ✅
+```
+
+**Why `finally` is crucial:**
+
+```jsx
+// Without finally:
+try {
+  // If this fails, isLoading stays true forever!
+  await api.get('/auth/refresh');
+  setIsLoading(false);  // Never reached if error
+} catch (error) {
+  // isLoading still true! App stuck in loading state
+}
+
+// With finally:
+try {
+  await api.get('/auth/refresh');
+} catch (error) {
+  // Error handled
+} finally {
+  setIsLoading(false);  // ✅ ALWAYS runs
+}
+```
+
+</Tab>
+
+<Tab value="API Call">
+
+**Refresh token endpoint:**
+
+```jsx
+const response = await api.get('/auth/refresh');
+```
+
+**What happens:**
+
+**1. Browser sends request:**
+```http
+GET /auth/refresh HTTP/1.1
+Cookie: refreshToken=abc123xyz  ← Sent automatically
+```
+
+**2. Server verifies refresh token:**
+```javascript
+// Server-side
+const refreshToken = req.cookies.refreshToken;
+if (isValid(refreshToken)) {
+  // Generate new access token
+  const accessToken = generateAccessToken(user);
+  res.json({ accessToken, user });
+}
+```
+
+**3. Response received:**
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "123",
+    "name": "John Doe",
+    "email": "john@example.com"
+  }
+}
+```
+
+**4. Update state:**
+```jsx
+const { accessToken, user: userData } = response.data;
+setToken(accessToken);
+setUser(userData);
+```
+
+**Key point:** Refresh token sent automatically in cookie. We don't handle it in JavaScript!
+
+</Tab>
+
+<Tab value="State Updates">
+
+**Two possible outcomes:**
+
+**Success (valid token):**
+```jsx
+// Before
+user: null
+token: null
+isLoading: true
+
+// After successful fetch
+user: { id, name, email }
+token: "eyJhbGciOiJI..."
+isLoading: false
+```
+
+**Failure (no token):**
+```jsx
+// Before
+user: null
+token: null
+isLoading: true
+
+// After failed fetch
+user: null  ← Still null
+token: null  ← Still null
+isLoading: false  ← Changed!
+```
+
+**Why keep user/token null on failure?**
+
+```jsx
+// Don't create fake user:
+catch (error) {
+  setUser({ error: true });  // ❌ Wrong!
+}
+
+// Keep null (represents "not signed in"):
+catch (error) {
+  // Do nothing - let user/token stay null ✅
+}
+```
+
+**`null` means:** No user data available (either not signed in or session expired).
+
+</Tab>
+
+</Tabs>
+
+## Testing the Token Fetch
+
+<Steps>
+
+<Step>
+
+**Open browser DevTools (Network tab)**
+
+</Step>
+
+<Step>
+
+**Refresh the page**
+
+You should see:
+```
+Request: GET /auth/refresh
+Status: 401 Unauthorized (no token yet)
+```
+
+This is expected! We haven't signed in yet.
+
+</Step>
+
+<Step>
+
+**Check console**
+
+You should see:
+```
+No valid session: Request failed with status code 401
+```
+
+This confirms the try-catch is working.
+
+</Step>
+
+<Step>
+
+**Check React DevTools**
+
+AuthProvider state should be:
+```javascript
+user: null
+token: null
+isLoading: false  ← Changed from true!
+```
+
+</Step>
+
+</Steps>
+
+## Loading State Flow
+
+```
+App Starts
+  ↓
+isLoading: true
+  ↓
+AuthProvider mounts
+  ↓
+useEffect runs
+  ↓
+fetchToken() called
+  ↓
+API call made
+  ↓
+Response received (or error)
+  ↓
+isLoading: false
+  ↓
+App ready!
+```
+
+**Timeline:**
+```
+0ms: App starts (isLoading: true)
+100ms: API call sent
+300ms: Response received
+301ms: State updated (isLoading: false)
+302ms: Components re-render with final state
+```
+
+## Why This Matters
+
+**User experience:**
+
+```
+Without token fetch:
+  1. User closes browser
+  2. Reopens app
+  3. Shows sign-in page
+  4. User annoyed: "I just signed in!" 😤
+
+With token fetch:
+  1. User closes browser
+  2. Reopens app
+  3. Checks for refresh token
+  4. Restores session
+  5. User happy: "Still signed in!" 😊
+```
+
+**Real-world example:**
+
+Think of Gmail, Twitter, Facebook - you stay signed in across browser sessions. This is how they do it!
+
+## Common Issues
+
+<Tabs items={['Network Error', 'Wrong Endpoint', 'Infinite Loading']}>
+
+<Tab value="Network Error">
+
+**Problem:** API call fails with network error
+
+```jsx
+// Error in console
+No valid session: Network Error
+```
+
+**Causes:**
+1. Backend not running
+2. Wrong API URL
+3. CORS not configured
+
+**Solution:** Check your `api` configuration:
+
+```jsx title="src/api/index.js"
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:3000',  // Check this!
+  withCredentials: true,  // Required for cookies
+});
+
+export default api;
+```
+
+</Tab>
+
+<Tab value="Wrong Endpoint">
+
+**Problem:** 404 Not Found
+
+```jsx
+// Error in console
+No valid session: Request failed with status code 404
+```
+
+**Cause:** Endpoint doesn't exist on backend
+
+**Solution:** Verify backend has `/auth/refresh` endpoint:
+
+```javascript
+// Backend (Express example)
+app.get('/auth/refresh', (req, res) => {
+  // Refresh token logic
+});
+```
+
+</Tab>
+
+<Tab value="Infinite Loading">
+
+**Problem:** App stuck in loading state
+
+```jsx
+// isLoading never becomes false
+isLoading: true  ← Forever!
+```
+
+**Cause:** Missing `finally` block
+
+```jsx
+// ❌ Bug:
+try {
+  await api.get('/auth/refresh');
+  setIsLoading(false);  // Only runs if success
+} catch (error) {
+  // isLoading stays true!
+}
+
+// ✅ Fix:
+try {
+  await api.get('/auth/refresh');
+} catch (error) {
+  // Handle error
+} finally {
+  setIsLoading(false);  // Always runs ✅
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+In Lesson 4, we'll:
+1. Use the `isLoading` state to show/hide UI
+2. Hide Navbar when user is not signed in
+3. Show loading state while checking session
+4. Improve user experience during app initialization
+
+<Callout type="success">
+**✅ Lesson Complete!** Your app now checks for existing sessions on mount!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Token refresh** restores sessions across browser sessions
+- ✅ **useEffect with empty array** runs once on mount
+- ✅ **Try-catch-finally** handles success, error, and cleanup
+- ✅ **isLoading state** prevents showing incorrect UI
+- ✅ **Refresh tokens** stored in HTTP-only cookies (secure)
+- ✅ **Access tokens** stored in memory (temporary)
+- ✅ **Session restoration** provides seamless user experience

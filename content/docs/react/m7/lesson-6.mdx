@@ -1,0 +1,697 @@
+---
+title: "L6: Add SignInPage to Router"
+description: "Configure routing for authentication"
+---
+
+# Add SignInPage to Router
+
+Now let's make the sign-in page accessible through React Router! 🛤️
+
+## Why Add a Route?
+
+**Benefits of `/sign-in` route:**
+- ✅ Clean URL (sharable, bookmarkable)
+- ✅ Browser history works (back/forward buttons)
+- ✅ Easy to redirect users
+- ✅ SEO-friendly (if needed)
+- ✅ Professional standard
+
+**User experience:**
+
+```
+Before: No way to access sign-in page
+After:  User can visit yourdomain.com/sign-in
+```
+
+## Update Router Configuration
+
+Add the sign-in route to your existing router:
+
+```jsx title="src/App.jsx"
+import { Routes, Route } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import SignInPage from '@/pages/SignInPage';  // ← New import
+import { useAuth } from '@/contexts/AuthContext';
+
+function AppContent() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app">
+      {user && <Navbar />}
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/sign-in" element={<SignInPage />} />  {/* ← New route */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;
+```
+
+## Understanding Route Order
+
+<Accordions>
+
+<Accordion title="Why Route Order Matters">
+
+**React Router checks routes top-to-bottom:**
+
+```jsx
+<Routes>
+  <Route path="/" />           {/* Checked first */}
+  <Route path="/favorites" />  {/* Checked second */}
+  <Route path="/sign-in" />    {/* Checked third */}
+  <Route path="*" />           {/* Checked last (catch-all) */}
+</Routes>
+```
+
+**Best practice order:**
+
+1. **Exact paths first:** `/`, `/favorites`, `/sign-in`
+2. **Dynamic paths next:** `/venues/:id`, `/user/:username`
+3. **Catch-all last:** `*` (404 page)
+
+**Example with dynamic routes:**
+
+```jsx
+<Routes>
+  {/* 1. Exact static paths */}
+  <Route path="/" element={<HomePage />} />
+  <Route path="/sign-in" element={<SignInPage />} />
+  
+  {/* 2. Dynamic paths */}
+  <Route path="/venues/:id" element={<VenuePage />} />
+  <Route path="/user/:username" element={<ProfilePage />} />
+  
+  {/* 3. Catch-all */}
+  <Route path="*" element={<NotFoundPage />} />
+</Routes>
+```
+
+**Why this order?**
+
+```
+URL: /sign-in
+
+Wrong order:
+  path="*" matches first → 404 page ❌
+
+Correct order:
+  path="/sign-in" matches → SignInPage ✅
+```
+
+</Accordion>
+
+<Accordion title="Catch-All Route (404 Page)">
+
+**The `*` wildcard matches anything:**
+
+```jsx
+<Route path="*" element={<NotFoundPage />} />
+```
+
+**How it works:**
+
+```
+User visits:
+  /            → HomePage (matches first)
+  /favorites   → FavoritesPage (matches second)
+  /sign-in     → SignInPage (matches third)
+  /unknown     → NotFoundPage (no match, falls to *)
+  /random/path → NotFoundPage (no match, falls to *)
+```
+
+**Must be last:**
+
+```jsx
+// ❌ Wrong: Catch-all first
+<Route path="*" element={<NotFoundPage />} />
+<Route path="/" element={<HomePage />} />
+// Everything goes to 404!
+
+// ✅ Correct: Catch-all last
+<Route path="/" element={<HomePage />} />
+<Route path="*" element={<NotFoundPage />} />
+// Specific routes match first
+```
+
+</Accordion>
+
+<Accordion title="Public vs Protected Routes (Preview)">
+
+**Current: All routes are public**
+
+```jsx
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/favorites" element={<FavoritesPage />} />
+  <Route path="/sign-in" element={<SignInPage />} />
+</Routes>
+```
+
+Anyone can visit any page (no authentication required).
+
+**Later: Some routes will be protected**
+
+```jsx
+<Routes>
+  {/* Public: Anyone can access */}
+  <Route path="/" element={<HomePage />} />
+  <Route path="/sign-in" element={<SignInPage />} />
+  
+  {/* Protected: Requires sign-in */}
+  <Route 
+    path="/favorites" 
+    element={<Protected><FavoritesPage /></Protected>} 
+  />
+</Routes>
+```
+
+**We'll implement this in Lesson 13-14!**
+
+For now, focus on basic routing.
+
+</Accordion>
+
+</Accordions>
+
+## Test the Route
+
+<Steps>
+
+<Step>
+
+**Start your development server:**
+
+```bash
+npm run dev
+```
+
+</Step>
+
+<Step>
+
+**Visit the sign-in page:**
+
+Open browser and navigate to:
+```
+http://localhost:5173/sign-in
+```
+
+You should see your beautiful sign-in page! 🎉
+
+</Step>
+
+<Step>
+
+**Test navigation:**
+
+Try these URLs manually:
+- `http://localhost:5173/` → HomePage
+- `http://localhost:5173/sign-in` → SignInPage
+- `http://localhost:5173/favorites` → FavoritesPage
+- `http://localhost:5173/unknown` → NotFoundPage (404)
+
+</Step>
+
+<Step>
+
+**Check browser history:**
+
+1. Visit `/`
+2. Visit `/sign-in`
+3. Click browser back button
+4. Should return to `/`
+
+✅ **History works!**
+
+</Step>
+
+</Steps>
+
+## Add Navigation Links
+
+Make it easy to get to sign-in page:
+
+<Tabs items={['Option 1: Navbar Link', 'Option 2: Home Page Button', 'Option 3: Redirect Logic']}>
+
+<Tab value="Option 1: Navbar Link">
+
+**Add sign-in link to Navbar:**
+
+```jsx title="src/components/Navbar.jsx"
+import { Link } from 'react-router-dom';
+
+function Navbar() {
+  return (
+    <nav className="navbar">
+      <Link to="/" className="nav-brand">
+        🏖️ Holidaze
+      </Link>
+      
+      <div className="nav-links">
+        <Link to="/">Home</Link>
+        <Link to="/favorites">Favorites</Link>
+        <Link to="/sign-in" className="nav-link-primary">
+          Sign In
+        </Link>
+      </div>
+    </nav>
+  );
+}
+```
+
+**Add styling:**
+
+```css title="src/app/global.css"
+.nav-link-primary {
+  background: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.nav-link-primary:hover {
+  background: #2563eb;
+  text-decoration: none;
+}
+```
+
+**Result:** Sign-in link always visible in navbar!
+
+</Tab>
+
+<Tab value="Option 2: Home Page Button">
+
+**Add prominent button on homepage:**
+
+```jsx title="src/pages/HomePage.jsx"
+import { useNavigate } from 'react-router-dom';
+
+function HomePage() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="home-page">
+      <div className="hero-section">
+        <h1>Welcome to Holidaze</h1>
+        <p>Find your perfect vacation rental</p>
+        
+        <button 
+          onClick={() => navigate('/sign-in')}
+          className="cta-button"
+        >
+          Get Started
+        </button>
+      </div>
+      
+      {/* Rest of homepage */}
+    </div>
+  );
+}
+```
+
+**Button styling:**
+
+```css title="src/app/global.css"
+.cta-button {
+  background: #3b82f6;
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cta-button:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+```
+
+**Result:** Big, obvious call-to-action!
+
+</Tab>
+
+<Tab value="Option 3: Redirect Logic">
+
+**Automatically redirect when needed:**
+
+```jsx title="src/components/ProtectedComponent.jsx"
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+
+function ProtectedComponent() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      // User not signed in, redirect to sign-in page
+      navigate('/sign-in');
+    }
+  }, [user, navigate]);
+
+  if (!user) {
+    return null; // Or loading spinner
+  }
+
+  return (
+    <div>
+      {/* Protected content */}
+    </div>
+  );
+}
+```
+
+**When to use:**
+- Protecting specific features
+- After sign-out
+- When session expires
+
+**Better approach (coming in L13-14):**
+
+We'll create a proper `<Protected>` wrapper component!
+
+</Tab>
+
+</Tabs>
+
+## Common Routing Patterns
+
+<Tabs items={['Nested Routes', 'Route Parameters', 'Query Strings', 'Programmatic Navigation']}>
+
+<Tab value="Nested Routes">
+
+**For complex page structures:**
+
+```jsx
+<Routes>
+  {/* Top-level routes */}
+  <Route path="/" element={<HomePage />} />
+  
+  {/* Nested routes (layout) */}
+  <Route path="/dashboard" element={<DashboardLayout />}>
+    <Route index element={<DashboardHome />} />
+    <Route path="settings" element={<Settings />} />
+    <Route path="profile" element={<Profile />} />
+  </Route>
+</Routes>
+```
+
+**URLs created:**
+- `/dashboard` → DashboardHome
+- `/dashboard/settings` → Settings
+- `/dashboard/profile` → Profile
+
+All share `DashboardLayout` wrapper!
+
+**Example layout:**
+
+```jsx
+function DashboardLayout() {
+  return (
+    <div className="dashboard">
+      <Sidebar />
+      <main>
+        <Outlet />  {/* Nested route renders here */}
+      </main>
+    </div>
+  );
+}
+```
+
+</Tab>
+
+<Tab value="Route Parameters">
+
+**For dynamic content:**
+
+```jsx
+<Routes>
+  <Route path="/venues/:id" element={<VenuePage />} />
+  <Route path="/user/:username" element={<ProfilePage />} />
+</Routes>
+```
+
+**Access parameters:**
+
+```jsx
+import { useParams } from 'react-router-dom';
+
+function VenuePage() {
+  const { id } = useParams();
+  
+  // URL: /venues/123
+  // id = "123"
+  
+  return <div>Viewing venue {id}</div>;
+}
+```
+
+**Multiple parameters:**
+
+```jsx
+<Route path="/cities/:country/:city" element={<CityPage />} />
+
+// URL: /cities/norway/oslo
+// country = "norway"
+// city = "oslo"
+```
+
+</Tab>
+
+<Tab value="Query Strings">
+
+**For filters, search, pagination:**
+
+```jsx
+// URL: /search?query=beach&guests=4&page=2
+```
+
+**Access query parameters:**
+
+```jsx
+import { useSearchParams } from 'react-router-dom';
+
+function SearchPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const query = searchParams.get('query');      // "beach"
+  const guests = searchParams.get('guests');    // "4"
+  const page = searchParams.get('page');        // "2"
+  
+  return <div>Searching for: {query}</div>;
+}
+```
+
+**Update query parameters:**
+
+```jsx
+// Add/update parameter
+setSearchParams({ query: 'mountains', guests: '2' });
+// URL becomes: /search?query=mountains&guests=2
+
+// Keep existing, add new
+setSearchParams(prev => {
+  prev.set('page', '3');
+  return prev;
+});
+// URL becomes: /search?query=mountains&guests=2&page=3
+```
+
+</Tab>
+
+<Tab value="Programmatic Navigation">
+
+**Navigate with code (not just links):**
+
+```jsx
+import { useNavigate } from 'react-router-dom';
+
+function MyComponent() {
+  const navigate = useNavigate();
+  
+  const handleSuccess = () => {
+    // After successful action, go somewhere
+    navigate('/dashboard');
+  };
+  
+  const handleCancel = () => {
+    // Go back one step in history
+    navigate(-1);
+  };
+  
+  const handleError = () => {
+    // Replace current history entry (can't go back)
+    navigate('/error', { replace: true });
+  };
+  
+  return (
+    <div>
+      <button onClick={handleSuccess}>Finish</button>
+      <button onClick={handleCancel}>Cancel</button>
+    </div>
+  );
+}
+```
+
+**Use cases:**
+- After form submission → redirect
+- After sign-in → go to dashboard
+- After sign-out → go to home
+- Cancel button → go back
+- Error handling → redirect to error page
+
+</Tab>
+
+</Tabs>
+
+## Troubleshooting Routes
+
+<Accordions>
+
+<Accordion title="404 Page Always Shows">
+
+**Problem:** Every route shows NotFoundPage
+
+**Cause:** Catch-all route is first
+
+```jsx
+// ❌ Wrong order
+<Routes>
+  <Route path="*" element={<NotFoundPage />} />
+  <Route path="/sign-in" element={<SignInPage />} />
+</Routes>
+```
+
+**Solution:** Move catch-all to end
+
+```jsx
+// ✅ Correct order
+<Routes>
+  <Route path="/sign-in" element={<SignInPage />} />
+  <Route path="*" element={<NotFoundPage />} />
+</Routes>
+```
+
+</Accordion>
+
+<Accordion title="Route Not Matching">
+
+**Problem:** Route defined but page doesn't load
+
+**Check these:**
+
+```jsx
+// 1. Import component
+import SignInPage from '@/pages/SignInPage';  // ✅
+
+// 2. Route path matches URL
+<Route path="/sign-in" element={<SignInPage />} />
+// Visit: http://localhost:5173/sign-in
+
+// 3. No typos
+<Route path="/signin" />   // ❌ No hyphen
+<Route path="/sign-in" />  // ✅ Has hyphen
+
+// 4. Case sensitivity (usually lowercase)
+<Route path="/SignIn" />   // ❌ May not match
+<Route path="/sign-in" />  // ✅ Standard
+```
+
+</Accordion>
+
+<Accordion title="Blank Page on Route">
+
+**Problem:** Route works but page is empty
+
+**Common causes:**
+
+```jsx
+// 1. Component doesn't return anything
+function SignInPage() {
+  // Missing return!
+}
+
+// ✅ Fix: Return JSX
+function SignInPage() {
+  return <div>Content</div>;
+}
+
+// 2. Component returns null/undefined
+function SignInPage() {
+  if (someCondition) return null;
+  // Missing default return!
+}
+
+// ✅ Fix: Always return something
+function SignInPage() {
+  if (someCondition) return <div>Loading...</div>;
+  return <div>Content</div>;
+}
+
+// 3. CSS issue (element invisible)
+// Check: width: 0, height: 0, display: none, opacity: 0
+```
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+In Lesson 7, we'll:
+1. Create SignInForm component with React Hook Form
+2. Add Zod schema validation
+3. Build beautiful form fields
+4. Handle form state and errors
+
+<Callout type="success">
+**✅ Lesson Complete!** Sign-in page is now accessible via `/sign-in` route!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Routes map URLs to components** (`/sign-in` → `SignInPage`)
+- ✅ **Route order matters** (specific before catch-all)
+- ✅ **Catch-all `*` route** handles 404 errors
+- ✅ **Import component** before adding to Routes
+- ✅ **Test navigation** with browser URL bar and history
+- ✅ **Add links** to make routes accessible
+- ✅ **Use `navigate()`** for programmatic navigation
+- ✅ **Protected routes** coming in later lessons

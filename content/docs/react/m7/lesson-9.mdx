@@ -1,0 +1,824 @@
+---
+title: "L9: Handle Form Submission"
+description: "Implement sign-in logic with API calls"
+---
+
+# Handle Form Submission
+
+Let's implement the actual sign-in logic! 🚀
+
+## What Happens When User Signs In?
+
+**Sign-in flow:**
+
+```
+User submits form
+  ↓
+Validate data (Zod)
+  ↓
+Send to API (/auth/login)
+  ↓
+Receive response
+  ↓
+Success: Get tokens + user data
+  ↓
+Store in AuthContext
+  ↓
+Redirect to dashboard
+```
+
+## Create API Client
+
+First, set up Axios for API calls:
+
+```bash
+npm install axios
+```
+
+Create API configuration:
+
+```jsx title="src/lib/api.js"
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://v2.api.noroff.dev',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true, // Important for cookies
+});
+
+export default api;
+```
+
+## Implement signIn in AuthContext
+
+Add the sign-in function to AuthProvider:
+
+```jsx title="src/contexts/AuthContext.jsx"
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '@/lib/api';
+
+const AuthContext = createContext(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // Fetch token on mount (from Lesson 3)
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const response = await api.get('/auth/refresh');
+        const { accessToken, user: userData } = response.data;
+        setToken(accessToken);
+        setUser(userData);
+      } catch (error) {
+        console.log('No valid session');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchToken();
+  }, []);
+
+  // Sign in function (NEW)
+  const signIn = async (email, password) => {
+    try {
+      // Make API call
+      const response = await api.post('/auth/login', {
+        email,
+        password,
+      });
+
+      // Extract data from response
+      const { accessToken, data } = response.data;
+
+      // Update state
+      setToken(accessToken);
+      setUser(data);
+
+      // Redirect to home
+      navigate('/');
+
+      return { success: true };
+    } catch (error) {
+      // Handle errors
+      const message = error.response?.data?.errors?.[0]?.message 
+        || 'Invalid email or password';
+      
+      return { success: false, error: message };
+    }
+  };
+
+  // Sign out function
+  const signOut = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      setToken(null);
+      navigate('/sign-in');
+    }
+  };
+
+  const value = { user, token, isLoading, signIn, signOut };
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+```
+
+## Update SignInForm
+
+Connect the form to the sign-in function:
+
+```jsx title="src/components/SignInForm.jsx"
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { signInSchema } from '@/schemas/signInSchema';
+import { useAuth } from '@/contexts/AuthContext';
+
+function SignInForm() {
+  const { signIn } = useAuth();  // ← Get signIn from context
+  const [apiError, setApiError] = useState('');  // ← API error state
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(signInSchema),
+  });
+
+  const onSubmit = async (data) => {
+    // Clear previous API errors
+    setApiError('');
+
+    // Call signIn from AuthContext
+    const result = await signIn(data.email, data.password);
+
+    // Handle errors
+    if (!result.success) {
+      setApiError(result.error);
+    }
+    // Success is handled in AuthContext (navigate to /)
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="sign-in-form">
+      {/* API Error Message */}
+      {apiError && (
+        <div className="api-error" role="alert">
+          <p>{apiError}</p>
+        </div>
+      )}
+
+      {/* Email Field */}
+      <div className="form-field">
+        <label htmlFor="email" className="form-label">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          {...register('email')}
+          className={`form-input ${errors.email ? 'form-input-error' : ''}`}
+          placeholder="you@example.com"
+        />
+        {errors.email && (
+          <p className="form-error">{errors.email.message}</p>
+        )}
+      </div>
+
+      {/* Password Field */}
+      <div className="form-field">
+        <label htmlFor="password" className="form-label">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          {...register('password')}
+          className={`form-input ${errors.password ? 'form-input-error' : ''}`}
+          placeholder="••••••••"
+        />
+        {errors.password && (
+          <p className="form-error">{errors.password.message}</p>
+        )}
+      </div>
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="submit-button"
+      >
+        {isSubmitting ? 'Signing in...' : 'Sign In'}
+      </button>
+    </form>
+  );
+}
+
+export default SignInForm;
+```
+
+## Add API Error Styling
+
+Style the API error message:
+
+```css title="src/app/global.css"
+/* API Error (server-side errors) */
+.api-error {
+  padding: 0.875rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.api-error p {
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.api-error p::before {
+  content: '❌';
+  font-size: 1rem;
+}
+```
+
+## Understanding the Code
+
+<Tabs items={['signIn Function', 'Error Handling', 'Response Structure', 'State Updates']}>
+
+<Tab value="signIn Function">
+
+**Breaking down the signIn function:**
+
+```jsx
+const signIn = async (email, password) => {
+  try {
+    // 1. Make API call
+    const response = await api.post('/auth/login', {
+      email,
+      password,
+    });
+
+    // 2. Extract data
+    const { accessToken, data } = response.data;
+
+    // 3. Update state
+    setToken(accessToken);
+    setUser(data);
+
+    // 4. Redirect
+    navigate('/');
+
+    // 5. Return success
+    return { success: true };
+  } catch (error) {
+    // 6. Handle errors
+    return { success: false, error: 'Error message' };
+  }
+};
+```
+
+**Step-by-step:**
+
+```
+1. POST request to /auth/login
+   Body: { email, password }
+
+2. API responds (if successful):
+   {
+     data: {
+       accessToken: "eyJhbGc...",
+       data: { id: 123, name: "John", email: "..." }
+     }
+   }
+
+3. Store accessToken and user data in state
+   → Other components can now access them
+
+4. Navigate to home page
+   → User sees authenticated UI
+
+5. Return success indicator
+   → Form knows sign-in worked
+```
+
+**Why async/await?**
+
+```jsx
+// ❌ Without async/await (harder to read)
+function signIn(email, password) {
+  return api.post('/auth/login', { email, password })
+    .then(response => {
+      setToken(response.data.accessToken);
+      setUser(response.data.data);
+      navigate('/');
+      return { success: true };
+    })
+    .catch(error => {
+      return { success: false, error: 'Error' };
+    });
+}
+
+// ✅ With async/await (cleaner)
+async function signIn(email, password) {
+  try {
+    const response = await api.post('/auth/login', { email, password });
+    setToken(response.data.accessToken);
+    setUser(response.data.data);
+    navigate('/');
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Error' };
+  }
+}
+```
+
+</Tab>
+
+<Tab value="Error Handling">
+
+**Two types of errors:**
+
+**1. Validation errors (client-side):**
+
+```jsx
+// Handled by Zod before API call
+email: 'bad-email'  → "Invalid email"
+password: '123'     → "Too short"
+
+// API call never happens
+```
+
+**2. API errors (server-side):**
+
+```jsx
+// Handled in catch block
+try {
+  await api.post('/auth/login', { email, password });
+} catch (error) {
+  // Wrong credentials
+  // Network error
+  // Server down
+  // Rate limit exceeded
+}
+```
+
+**Extracting error message:**
+
+```jsx
+const message = error.response?.data?.errors?.[0]?.message 
+  || 'Invalid email or password';
+```
+
+**What this does:**
+
+```
+1. Try: error.response.data.errors[0].message
+   → Noroff API error format
+
+2. If any part undefined, use fallback:
+   → 'Invalid email or password'
+```
+
+**API response examples:**
+
+```jsx
+// Success response
+{
+  data: {
+    accessToken: "...",
+    data: { ... }
+  }
+}
+
+// Error response (401 Unauthorized)
+{
+  errors: [
+    { message: "Invalid email or password" }
+  ],
+  status: "Unauthorized",
+  statusCode: 401
+}
+
+// Error response (Network)
+{
+  message: "Network Error",
+  name: "Error",
+  stack: "..."
+}
+```
+
+**Handling different errors:**
+
+```jsx
+catch (error) {
+  // API responded with error
+  if (error.response) {
+    const apiMessage = error.response.data.errors?.[0]?.message;
+    return { success: false, error: apiMessage || 'Server error' };
+  }
+  
+  // Request was made but no response
+  if (error.request) {
+    return { success: false, error: 'Network error. Please try again.' };
+  }
+  
+  // Something else went wrong
+  return { success: false, error: 'An unexpected error occurred' };
+}
+```
+
+</Tab>
+
+<Tab value="Response Structure">
+
+**API response format:**
+
+```jsx
+// Successful login
+{
+  data: {
+    accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    data: {
+      name: "John Doe",
+      email: "john@example.com",
+      bio: "Developer",
+      avatar: {
+        url: "https://...",
+        alt: "Profile picture"
+      },
+      banner: {
+        url: "https://...",
+        alt: "Banner image"
+      }
+    }
+  }
+}
+```
+
+**Destructuring response:**
+
+```jsx
+const response = await api.post('/auth/login', { email, password });
+
+// Option 1: Destructure from response.data
+const { accessToken, data } = response.data;
+// accessToken = "eyJ..."
+// data = { name: "John", email: "...", ... }
+
+// Option 2: Access directly
+const token = response.data.accessToken;
+const userData = response.data.data;
+```
+
+**Why `response.data.data`?**
+
+```
+Axios response structure:
+{
+  data: {              ← response.data (what API sent)
+    accessToken: "...",
+    data: { ... }      ← response.data.data (user object)
+  },
+  status: 200,
+  statusText: "OK",
+  headers: { ... },
+  config: { ... }
+}
+```
+
+**Nested `data` is API convention:**
+
+```jsx
+// API returns:
+{
+  data: {           ← Envelope
+    data: { ... }   ← Actual data
+  }
+}
+
+// Some APIs use different names:
+{
+  data: {
+    user: { ... }
+  }
+}
+
+// Adjust destructuring accordingly:
+const { accessToken, user } = response.data;
+```
+
+</Tab>
+
+<Tab value="State Updates">
+
+**State update order matters:**
+
+```jsx
+// ✅ Correct order
+setToken(accessToken);  // 1. Set token first
+setUser(userData);      // 2. Set user second
+navigate('/');          // 3. Navigate last
+
+// ❌ Wrong order
+navigate('/');          // Navigate before state updates
+setToken(accessToken);  // Token not available yet
+setUser(userData);      // User not available yet
+```
+
+**Why order matters:**
+
+```
+Correct order:
+  setToken → State updated
+  setUser → State updated
+  navigate → New page sees updated state ✅
+
+Wrong order:
+  navigate → New page loads
+  setToken → State updates (too late)
+  setUser → State updates (too late)
+  New page sees old state ❌
+```
+
+**Batched updates:**
+
+React batches state updates in event handlers:
+
+```jsx
+setToken(accessToken);  // Queued
+setUser(userData);      // Queued
+// Both update together (one re-render)
+```
+
+**State updates are asynchronous:**
+
+```jsx
+setToken(accessToken);
+console.log(token);  // ❌ Still old value!
+
+// To use new value, access it directly:
+console.log(accessToken);  // ✅ New value
+
+// Or use effect:
+useEffect(() => {
+  console.log(token);  // Runs after state updates
+}, [token]);
+```
+
+**Updating parent state from child:**
+
+```jsx
+// AuthContext (parent)
+const signIn = async (email, password) => {
+  setToken(accessToken);  // Updates provider state
+  setUser(userData);
+};
+
+// SignInForm (child)
+const onSubmit = async (data) => {
+  await signIn(data.email, data.password);
+  // Parent state updated!
+};
+
+// Other components (siblings)
+function Navbar() {
+  const { user } = useAuth();  // Gets updated user
+  // Re-renders automatically when user changes
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Testing Sign-In
+
+<Steps>
+
+<Step>
+
+**Test with valid credentials:**
+
+```jsx
+// If you have Noroff API account:
+Email: your-email@stud.noroff.no
+Password: your-password
+
+// Test account (if provided):
+Email: test@test.com
+Password: testpassword123
+```
+
+1. Fill form with valid credentials
+2. Click "Sign In"
+3. Should see:
+   - Button shows "Signing in..."
+   - Page redirects to `/`
+   - Navbar appears
+   - No errors
+
+✅ **Successful sign-in!**
+
+</Step>
+
+<Step>
+
+**Test with invalid credentials:**
+
+1. Enter email: `wrong@example.com`
+2. Enter password: `wrongpassword`
+3. Click "Sign In"
+4. Should see:
+   - Red error box appears
+   - Error message: "Invalid email or password"
+   - Still on sign-in page
+   - Form still functional
+
+✅ **Error handling working!**
+
+</Step>
+
+<Step>
+
+**Test network error:**
+
+1. Turn off internet/API
+2. Fill form
+3. Click "Sign In"
+4. Should see error message
+
+✅ **Network error handled!**
+
+</Step>
+
+<Step>
+
+**Check React DevTools:**
+
+1. Open React DevTools
+2. Find AuthContext.Provider
+3. Check state:
+   - `user`: Should have user data
+   - `token`: Should have JWT token
+   - `isLoading`: Should be `false`
+
+✅ **State updated correctly!**
+
+</Step>
+
+<Step>
+
+**Test persistence (after refresh):**
+
+1. Sign in successfully
+2. Refresh page (F5)
+3. Should:
+   - Stay signed in
+   - Navbar still visible
+   - User data preserved
+
+✅ **Session persists!**
+
+(This works because of token refresh in Lesson 3)
+
+</Step>
+
+</Steps>
+
+## Common Issues
+
+<Accordions>
+
+<Accordion title="CORS Error">
+
+**Problem:** Browser blocks request
+
+```
+Access to XMLHttpRequest at 'https://api.example.com' 
+from origin 'http://localhost:5173' has been blocked by CORS policy
+```
+
+**Cause:** API doesn't allow your origin
+
+**Solution:**
+
+```jsx title="src/lib/api.js"
+const api = axios.create({
+  baseURL: 'https://v2.api.noroff.dev',
+  withCredentials: true,  // ← Important for cookies
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+```
+
+API must also set CORS headers (server-side).
+
+</Accordion>
+
+<Accordion title="401 Unauthorized">
+
+**Problem:** API rejects credentials
+
+```
+POST /auth/login 401 (Unauthorized)
+```
+
+**Check these:**
+
+```jsx
+// 1. Correct endpoint
+api.post('/auth/login', ...)  // ✅
+api.post('/login', ...)       // ❌ Wrong path
+
+// 2. Correct payload format
+{ email: "...", password: "..." }  // ✅
+{ username: "...", pwd: "..." }    // ❌ Wrong fields
+
+// 3. Valid credentials
+Email: registered@example.com  // ✅
+Password: correctpassword      // ✅
+```
+
+</Accordion>
+
+<Accordion title="State Not Updating">
+
+**Problem:** User signs in but UI doesn't update
+
+**Check these:**
+
+```jsx
+// 1. Context provider wraps app
+<AuthProvider>
+  <App />
+</AuthProvider>
+
+// 2. Using useAuth hook
+const { user } = useAuth();  // ✅
+const user = null;           // ❌ Not using context
+
+// 3. Conditional rendering checks user
+{user && <Navbar />}  // ✅
+{true && <Navbar />}  // ❌ Always shows
+
+// 4. State updates before navigate
+setUser(userData);
+navigate('/');  // ✅ State set first
+
+navigate('/');
+setUser(userData);  // ❌ Too late
+```
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+In Lesson 10, we'll:
+1. Test the complete authentication flow
+2. Add loading states during sign-in
+3. Handle edge cases
+4. Improve user experience
+
+<Callout type="success">
+**✅ Lesson Complete!** Sign-in functionality is now fully implemented!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **API client** configured with Axios
+- ✅ **signIn function** makes API call and updates state
+- ✅ **Error handling** distinguishes validation vs API errors
+- ✅ **Response destructuring** extracts token and user data
+- ✅ **State updates** happen before navigation
+- ✅ **Return value** indicates success/failure
+- ✅ **API errors** displayed to user
+- ✅ **CORS** handled with `withCredentials`
+- ✅ **Try-catch** handles all errors gracefully
+- ✅ **Navigate** redirects after successful sign-in

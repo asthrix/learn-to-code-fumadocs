@@ -1,0 +1,435 @@
+---
+title: "L2: Add AuthProvider to App"
+description: "Wrap the entire application with AuthProvider"
+---
+
+# Add AuthProvider to App
+
+Now that we have the `AuthProvider` component, let's wrap our entire application with it so all components can access authentication state! 🎯
+
+## Why Wrap the App?
+
+The `AuthProvider` needs to wrap the **entire application** because:
+
+1. **Global access** - Any component can use `useAuth()`
+2. **Router access** - Routes can check authentication
+3. **Navbar access** - Show/hide based on auth state
+4. **API access** - Add tokens to all requests
+
+**Rule:** The provider must wrap everything that needs auth.
+
+## Current App Structure
+
+```jsx title="src/App.jsx" 
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import Navbar from '@/components/Navbar';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="app">
+        <Navbar />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+**Problem:** No authentication context available yet!
+
+## Add AuthProvider
+
+Update `App.jsx` to wrap everything with `AuthProvider`:
+
+```jsx title="src/App.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from '@/components/AuthProvider';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import Navbar from '@/components/Navbar';
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="app">
+          <Navbar />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/favorites" element={<FavoritesPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </main>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;
+```
+
+## Understanding the Wrapping Order
+
+<Accordions>
+
+<Accordion title="Component Hierarchy">
+
+**Wrapping order matters!**
+
+```
+AuthProvider
+  └── BrowserRouter
+      └── App Layout
+          ├── Navbar
+          └── Routes
+              ├── HomePage
+              ├── FavoritesPage
+              └── NotFoundPage
+```
+
+**Why this order?**
+
+1. **AuthProvider outermost** - Provides auth to everything
+2. **BrowserRouter inside** - Routing needs auth context
+3. **App layout** - Can access both auth and routing
+4. **Components** - Can access auth and routing
+
+**What each component can access:**
+
+```jsx
+// Navbar
+const { user, signOut } = useAuth();  // ✅ Has auth
+const navigate = useNavigate();       // ✅ Has routing
+
+// HomePage
+const { user } = useAuth();           // ✅ Has auth
+const navigate = useNavigate();       // ✅ Has routing
+```
+
+</Accordion>
+
+<Accordion title="Why AuthProvider Outside BrowserRouter?">
+
+**Could we do this?**
+
+```jsx
+// ❌ Alternative (not recommended)
+<BrowserRouter>
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+</BrowserRouter>
+```
+
+**Why not?**
+
+If `AuthProvider` needs to redirect (like after sign out), it would need `useNavigate()`. But `useNavigate()` only works inside `<BrowserRouter>`.
+
+**Better approach:**
+
+```jsx
+// ✅ Recommended
+<AuthProvider>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+</AuthProvider>
+```
+
+Now `AuthProvider` wraps the router, and any child component can use both `useAuth()` and `useNavigate()`.
+
+**Real-world example:**
+
+```jsx
+function SignOutButton() {
+  const { signOut } = useAuth();       // From AuthProvider
+  const navigate = useNavigate();      // From BrowserRouter
+  
+  const handleSignOut = () => {
+    signOut();
+    navigate('/sign-in');  // Redirect after sign out
+  };
+  
+  return <button onClick={handleSignOut}>Sign Out</button>;
+}
+```
+
+Both hooks work because the component is inside both providers!
+
+</Accordion>
+
+<Accordion title="Provider Composition Pattern">
+
+**Multiple providers:**
+
+When you have multiple context providers, wrap them in logical order:
+
+```jsx
+// Good: Outer to inner
+<ThemeProvider>          // 1. Theme (most global)
+  <AuthProvider>         // 2. Auth (affects routing)
+    <BrowserRouter>      // 3. Routing
+      <StoreProvider>    // 4. State (uses auth & routing)
+        <App />
+      </StoreProvider>
+    </BrowserRouter>
+  </AuthProvider>
+</ThemeProvider>
+```
+
+**Our case (simpler):**
+
+```jsx
+<AuthProvider>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+</AuthProvider>
+```
+
+We already have Zustand/Redux for state, so we only need:
+- `AuthProvider` for authentication
+- `BrowserRouter` for routing
+
+</Accordion>
+
+</Accordions>
+
+## Test the Integration
+
+Let's verify the AuthProvider is working:
+
+<Steps>
+
+<Step>
+
+**Test useAuth hook in Navbar:**
+
+Temporarily add this to Navbar to test:
+
+```jsx title="src/components/Navbar.jsx"
+import { useAuth } from '@/components/AuthProvider';
+
+function Navbar() {
+  const { user, isLoading } = useAuth();
+  
+  console.log('Auth state:', { user, isLoading });
+  
+  // ... rest of component
+}
+```
+
+</Step>
+
+<Step>
+
+**Check browser console:**
+
+You should see:
+```
+Auth state: { user: null, isLoading: true }
+```
+
+This confirms:
+- ✅ `useAuth()` hook works
+- ✅ AuthProvider is providing context
+- ✅ Initial state is correct
+
+</Step>
+
+<Step>
+
+**Remove test code:**
+
+Remove the console.log once verified:
+
+```jsx title="src/components/Navbar.jsx"
+import { useAuth } from '@/components/AuthProvider';
+
+function Navbar() {
+  const { user, isLoading } = useAuth();
+  
+  // ... rest of component (no console.log)
+}
+```
+
+</Step>
+
+</Steps>
+
+## Common Mistakes
+
+<Tabs items={['Wrong Order', 'Missing Provider', 'Multiple Providers']}>
+
+<Tab value="Wrong Order">
+
+**❌ Wrong: BrowserRouter outside AuthProvider**
+
+```jsx
+<BrowserRouter>
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+</BrowserRouter>
+```
+
+**Problem:** AuthProvider can't use `useNavigate()` for redirects.
+
+**✅ Correct: AuthProvider outside BrowserRouter**
+
+```jsx
+<AuthProvider>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+</AuthProvider>
+```
+
+**Result:** Any component can use both auth and navigation!
+
+</Tab>
+
+<Tab value="Missing Provider">
+
+**❌ Wrong: useAuth without provider**
+
+```jsx
+// App.jsx (no AuthProvider!)
+<BrowserRouter>
+  <App />
+</BrowserRouter>
+
+// Navbar.jsx
+function Navbar() {
+  const auth = useAuth();  // ❌ ERROR!
+}
+```
+
+**Error:**
+```
+Error: useAuth must be used within an AuthProvider
+```
+
+**✅ Correct: Always wrap with provider**
+
+```jsx
+<AuthProvider>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+</AuthProvider>
+```
+
+</Tab>
+
+<Tab value="Multiple Providers">
+
+**❌ Wrong: Multiple AuthProviders**
+
+```jsx
+<AuthProvider>
+  <BrowserRouter>
+    <AuthProvider>  {/* ❌ Duplicate! */}
+      <App />
+    </AuthProvider>
+  </BrowserRouter>
+</AuthProvider>
+```
+
+**Problem:** Inner AuthProvider creates separate context. Components might use wrong one.
+
+**✅ Correct: Single AuthProvider**
+
+```jsx
+<AuthProvider>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+</AuthProvider>
+```
+
+**Rule:** One AuthProvider wrapping everything.
+
+</Tab>
+
+</Tabs>
+
+## What Components Can Access Now
+
+With AuthProvider wrapping the app, these components can now use auth:
+
+```jsx
+// ✅ Navbar
+const { user, signOut } = useAuth();
+
+// ✅ HomePage
+const { user, isLoading } = useAuth();
+
+// ✅ FavoritesPage
+const { user, token } = useAuth();
+
+// ✅ Any component inside App
+const auth = useAuth();  // Works anywhere!
+```
+
+## Visual Representation
+
+```
+┌─────────────────────────────────────────┐
+│ AuthProvider                            │
+│ • Provides: user, token, isLoading      │
+│ • Provides: signIn, signOut             │
+│                                         │
+│  ┌────────────────────────────────────┐ │
+│  │ BrowserRouter                      │ │
+│  │ • Provides: navigation             │ │
+│  │ • Provides: useNavigate, Link      │ │
+│  │                                    │ │
+│  │  ┌──────────────────────────────┐ │ │
+│  │  │ App                          │ │ │
+│  │  │                              │ │ │
+│  │  │  Navbar → uses auth ✅       │ │ │
+│  │  │                              │ │ │
+│  │  │  Routes                      │ │ │
+│  │  │    HomePage → uses auth ✅   │ │ │
+│  │  │    FavoritesPage → uses auth✅│ │ │
+│  │  └──────────────────────────────┘ │ │
+│  └────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+## What's Next?
+
+In Lesson 3, we'll:
+1. Fetch the access token when app loads
+2. Check if user has existing session
+3. Set `isLoading` to `false` after check
+4. Handle token fetch errors
+
+<Callout type="success">
+**✅ Lesson Complete!** AuthProvider now wraps your entire application!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **AuthProvider wraps app** - Provides auth to all components
+- ✅ **Order matters** - AuthProvider outside BrowserRouter
+- ✅ **Global access** - Any component can use `useAuth()`
+- ✅ **Test integration** - Console.log confirms it works
+- ✅ **One provider** - Don't create multiple AuthProviders
+- ✅ **Ready for next step** - Foundation in place for token fetching

@@ -1,0 +1,702 @@
+---
+title: "L5: Create SignInPage Component"
+description: "Build the sign-in page layout"
+---
+
+# Create SignInPage Component
+
+Let's create a dedicated page where users can sign in to your application! 🔐
+
+## Why a Dedicated Sign-In Page?
+
+**Benefits:**
+- ✅ Clean, focused interface
+- ✅ No distractions during authentication
+- ✅ Professional appearance
+- ✅ Easy to add features (register, forgot password)
+- ✅ Consistent with modern web apps
+
+**User flow:**
+
+```
+User not signed in
+  → Visits app
+  → Redirected to /sign-in
+  → Enters credentials
+  → Signs in
+  → Redirected to /
+  → Can use app
+```
+
+## Create SignInPage Component
+
+Create a new page for the sign-in functionality:
+
+```jsx title="src/pages/SignInPage.jsx"
+function SignInPage() {
+  return (
+    <div className="sign-in-page">
+      <div className="sign-in-container">
+        {/* Logo/Brand */}
+        <div className="sign-in-header">
+          <h1 className="brand-logo">🏖️ Holidaze</h1>
+          <p className="brand-tagline">Your next adventure awaits</p>
+        </div>
+
+        {/* Sign-in form will go here in next lesson */}
+        <div className="sign-in-form-container">
+          <h2 className="sign-in-title">Sign in to your account</h2>
+          <p className="sign-in-subtitle">
+            Welcome back! Please enter your details.
+          </p>
+          
+          {/* Placeholder for form */}
+          <div className="form-placeholder">
+            Form will be added in next lesson
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="sign-in-footer">
+          <p className="footer-text">
+            Don't have an account?{' '}
+            <a href="/register" className="footer-link">
+              Sign up
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SignInPage;
+```
+
+## Add Styling
+
+Create beautiful, modern styling for the sign-in page:
+
+```css title="src/app/global.css"
+/* Sign-In Page Layout */
+.sign-in-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+}
+
+.sign-in-container {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 2.5rem;
+}
+
+/* Header Section */
+.sign-in-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.brand-logo {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.brand-tagline {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Form Container */
+.sign-in-form-container {
+  margin-bottom: 2rem;
+}
+
+.sign-in-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+.sign-in-subtitle {
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 0 0 2rem 0;
+}
+
+/* Placeholder (temporary) */
+.form-placeholder {
+  padding: 3rem 1rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+  text-align: center;
+  color: #6b7280;
+  border: 2px dashed #d1d5db;
+}
+
+/* Footer Section */
+.sign-in-footer {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.footer-text {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.footer-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .sign-in-container {
+    padding: 2rem 1.5rem;
+  }
+  
+  .brand-logo {
+    font-size: 2rem;
+  }
+  
+  .sign-in-title {
+    font-size: 1.25rem;
+  }
+}
+```
+
+## Understanding the Layout
+
+<Tabs items={['Page Structure', 'Styling Choices', 'Responsive Design', 'Accessibility']}>
+
+<Tab value="Page Structure">
+
+**Three-section layout:**
+
+```
+┌─────────────────────────────────┐
+│ Header                          │
+│   • Logo                        │
+│   • Tagline                     │
+├─────────────────────────────────┤
+│ Form Container                  │
+│   • Title                       │
+│   • Subtitle                    │
+│   • Form (next lesson)          │
+├─────────────────────────────────┤
+│ Footer                          │
+│   • Sign-up link                │
+└─────────────────────────────────┘
+```
+
+**Why this structure?**
+
+1. **Header:** Branding and context
+2. **Form:** Primary action (sign in)
+3. **Footer:** Secondary action (sign up)
+
+**Visual hierarchy:**
+
+```
+Brand Logo (largest)
+  ↓
+Sign in to your account (medium)
+  ↓
+Form fields (interactive)
+  ↓
+Don't have account? (small)
+```
+
+</Tab>
+
+<Tab value="Styling Choices">
+
+**Gradient background:**
+
+```css
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+```
+
+**Why gradient?**
+- Modern, professional look
+- Draws attention to white card
+- Reduces visual noise
+- Popular in SaaS apps
+
+**Card design:**
+
+```css
+background: white;
+border-radius: 16px;
+box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+```
+
+**Benefits:**
+- Elevated appearance (depth)
+- Focused attention on form
+- Clean, minimal aesthetic
+- Easy to read (white background)
+
+**Spacing rhythm:**
+
+```css
+padding: 2.5rem;        /* Outer padding */
+margin-bottom: 2rem;    /* Section spacing */
+```
+
+Uses consistent 0.5rem increments for harmony.
+
+</Tab>
+
+<Tab value="Responsive Design">
+
+**Mobile-first approach:**
+
+```css
+/* Base (mobile) */
+.sign-in-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem;
+}
+
+/* Small screens */
+@media (max-width: 480px) {
+  .sign-in-container {
+    padding: 2rem 1.5rem;  /* Reduce padding */
+  }
+  
+  .brand-logo {
+    font-size: 2rem;  /* Smaller text */
+  }
+}
+```
+
+**Breakpoint strategy:**
+
+```
+< 480px:  Mobile phones
+  → Reduce padding
+  → Smaller text
+  → More compact
+
+480px-768px: Tablets
+  → Default styling
+  → Comfortable spacing
+
+> 768px: Desktop
+  → Same as tablet
+  → Centered with max-width
+```
+
+**Full-height centering:**
+
+```css
+.sign-in-page {
+  min-height: 100vh;  /* Full viewport */
+  display: flex;
+  align-items: center;  /* Vertical center */
+  justify-content: center;  /* Horizontal center */
+}
+```
+
+Works on all screen sizes!
+
+</Tab>
+
+<Tab value="Accessibility">
+
+**Semantic HTML:**
+
+```jsx
+<h1 className="brand-logo">      {/* Main heading */}
+<h2 className="sign-in-title">   {/* Section heading */}
+<p className="brand-tagline">    {/* Description */}
+```
+
+**Proper heading hierarchy:**
+
+```
+h1: Brand name (most important)
+h2: "Sign in to your account" (section)
+p: Supporting text
+```
+
+**Link accessibility:**
+
+```jsx
+<a href="/register" className="footer-link">
+  Sign up  {/* Clear link text */}
+</a>
+```
+
+**Color contrast:**
+
+```css
+/* Text on white background */
+color: #1f2937;  /* Almost black - 16:1 ratio */
+color: #6b7280;  /* Gray - 7:1 ratio */
+color: #3b82f6;  /* Blue - 4.5:1 ratio */
+```
+
+All meet WCAG AAA standards!
+
+**Focus states:**
+
+```css
+.footer-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+```
+
+Visual feedback for interactions.
+
+</Tab>
+
+</Tabs>
+
+## Page Sections Explained
+
+<Accordions>
+
+<Accordion title="Header Section (Brand Identity)">
+
+**Purpose:** Establish trust and context
+
+```jsx
+<div className="sign-in-header">
+  <h1 className="brand-logo">🏖️ Holidaze</h1>
+  <p className="brand-tagline">Your next adventure awaits</p>
+</div>
+```
+
+**Why important?**
+
+1. **Recognition:** User knows they're in right place
+2. **Trust:** Professional branding builds confidence
+3. **Context:** Tagline reinforces value proposition
+
+**Best practices:**
+
+```jsx
+// ✅ Good: Clear brand identity
+<h1>🏖️ Holidaze</h1>
+<p>Your next adventure awaits</p>
+
+// ❌ Bad: Generic or missing
+<h1>Sign In</h1>
+// No context or personality
+```
+
+</Accordion>
+
+<Accordion title="Form Container (Primary Action)">
+
+**Purpose:** Guide user to main action
+
+```jsx
+<div className="sign-in-form-container">
+  <h2>Sign in to your account</h2>
+  <p>Welcome back! Please enter your details.</p>
+  
+  {/* Form here */}
+</div>
+```
+
+**Title considerations:**
+
+```jsx
+// ✅ Good options:
+"Sign in to your account"     // Clear, direct
+"Welcome back"                // Friendly
+"Sign in to continue"         // Action-oriented
+
+// ❌ Avoid:
+"Login"                       // Too technical
+"Authentication Required"     // Too formal
+"Enter Credentials"           // Too robotic
+```
+
+**Subtitle purpose:**
+
+- Sets friendly tone
+- Provides encouragement
+- Reduces form anxiety
+
+</Accordion>
+
+<Accordion title="Footer Section (Secondary Actions)">
+
+**Purpose:** Offer alternatives without distraction
+
+```jsx
+<div className="sign-in-footer">
+  <p>
+    Don't have an account?{' '}
+    <a href="/register">Sign up</a>
+  </p>
+</div>
+```
+
+**Why at bottom?**
+
+1. **Hierarchy:** Sign in is primary action
+2. **Don't distract:** New users see sign-in first
+3. **Convention:** Users expect links at bottom
+
+**Common patterns:**
+
+```jsx
+// Account creation
+"Don't have an account? Sign up"
+
+// Password recovery
+"Forgot your password? Reset it"
+
+// Help
+"Need help? Contact support"
+
+// Terms
+"By signing in, you agree to our Terms"
+```
+
+</Accordion>
+
+</Accordions>
+
+## Testing the Page
+
+<Steps>
+
+<Step>
+
+**Check file created:**
+
+```
+src/
+└── pages/
+    └── SignInPage.jsx  ← New file
+```
+
+</Step>
+
+<Step>
+
+**Verify imports:**
+
+No imports needed yet! Pure component with styling.
+
+</Step>
+
+<Step>
+
+**Check styling:**
+
+Ensure CSS added to `global.css`:
+- `.sign-in-page`
+- `.sign-in-container`
+- `.sign-in-header`
+- All other classes
+
+</Step>
+
+</Steps>
+
+## Visual Design Principles
+
+<Tabs items={['Whitespace', 'Typography', 'Color Palette', 'Shadow & Depth']}>
+
+<Tab value="Whitespace">
+
+**Breathing room:**
+
+```css
+padding: 2.5rem;           /* Container padding */
+margin-bottom: 2rem;       /* Section spacing */
+margin: 0 0 0.5rem 0;     /* Element spacing */
+```
+
+**Why important?**
+
+```
+Too cramped:
+┌─────┐
+│Text │ ← Hard to read
+│Form │
+│Link │
+└─────┘
+
+Good spacing:
+┌─────────┐
+│ Text    │
+│         │ ← Easy to scan
+│ Form    │
+│         │
+│ Link    │
+└─────────┘
+```
+
+**Golden ratio:**
+
+- Outer padding: 2.5rem
+- Section spacing: 2rem (80% of outer)
+- Element spacing: 0.5-1rem (20-40% of outer)
+
+</Tab>
+
+<Tab value="Typography">
+
+**Type scale:**
+
+```css
+h1: 2.5rem (40px)   /* Brand */
+h2: 1.5rem (24px)   /* Title */
+p:  0.95rem (15px)  /* Body */
+small: 0.875rem (14px)  /* Helper */
+```
+
+**Font weights:**
+
+```css
+700: Brand logo (bold)
+600: Section titles (semi-bold)
+500: Links (medium)
+400: Body text (normal)
+```
+
+**Why this matters:**
+
+```
+Clear hierarchy:
+  BRAND (largest, boldest)
+    ↓
+  Title (large, bold)
+    ↓
+  Body (medium, normal)
+    ↓
+  Links (small, medium)
+```
+
+User's eye naturally follows this flow!
+
+</Tab>
+
+<Tab value="Color Palette">
+
+**Color system:**
+
+```css
+/* Primary */
+#667eea → #764ba2  /* Gradient */
+#3b82f6  /* Blue (links) */
+
+/* Neutral */
+#1f2937  /* Almost black (headings) */
+#6b7280  /* Gray (body text) */
+#e5e7eb  /* Light gray (borders) */
+#f3f4f6  /* Very light gray (backgrounds) */
+
+/* Semantic */
+white    /* Card background */
+black    /* Maximum contrast */
+```
+
+**Usage rules:**
+
+```css
+Headings: #1f2937 (dark, important)
+Body text: #6b7280 (readable, not overwhelming)
+Links: #3b82f6 (blue, recognizable)
+Borders: #e5e7eb (subtle separation)
+```
+
+</Tab>
+
+<Tab value="Shadow & Depth">
+
+**Elevation system:**
+
+```css
+/* Level 1: Card */
+box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+            0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+/* Level 2: Buttons (later) */
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+/* Level 3: Dropdowns (later) */
+box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+```
+
+**Why multiple shadows?**
+
+```css
+/* Single shadow (flat) */
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+
+/* Dual shadow (realistic) */
+box-shadow: 
+  0 20px 25px -5px rgba(0, 0, 0, 0.1),  /* Main shadow */
+  0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Ambient shadow */
+```
+
+Dual shadows create more realistic depth!
+
+**Visual effect:**
+
+```
+No shadow:  [Flat]
+One shadow: [Slightly lifted]
+Two shadows: [Elevated, realistic] ✨
+```
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+In Lesson 6, we'll:
+1. Add the SignInPage to React Router
+2. Configure the `/sign-in` route
+3. Test navigation to the sign-in page
+4. Set up route structure for authentication
+
+<Callout type="success">
+**✅ Lesson Complete!** You've created a beautiful sign-in page layout!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Dedicated sign-in page** provides focused experience
+- ✅ **Three-section layout** (header, form, footer) is standard
+- ✅ **Gradient background** creates modern, professional look
+- ✅ **Card design** with shadows adds depth and focus
+- ✅ **Responsive design** works on all screen sizes
+- ✅ **Typography hierarchy** guides user attention
+- ✅ **Accessibility** built in from the start
+- ✅ **Clean placeholder** ready for form in next lesson

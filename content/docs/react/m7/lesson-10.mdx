@@ -1,0 +1,824 @@
+---
+title: "L10: Test Authentication Flow"
+description: "Verify complete sign-in functionality"
+---
+
+# Test Authentication Flow
+
+Let's thoroughly test the authentication system and ensure everything works perfectly! ✅
+
+## Complete Authentication Flow
+
+**Full user journey:**
+
+```
+1. User visits app (not signed in)
+   ↓
+2. Navbar hidden, loading spinner shows
+   ↓
+3. No valid session found
+   ↓
+4. Loading completes, Navbar stays hidden
+   ↓
+5. User navigates to /sign-in
+   ↓
+6. Fills form and submits
+   ↓
+7. API validates credentials
+   ↓
+8. Success: Token + user data returned
+   ↓
+9. AuthContext state updates
+   ↓
+10. Navigate to home (/)
+   ↓
+11. Navbar appears, user is signed in!
+```
+
+## Testing Checklist
+
+<Steps>
+
+<Step>
+
+**Test Initial Load (No Session)**
+
+1. Clear browser storage:
+   ```js
+   // Open DevTools Console
+   localStorage.clear();
+   sessionStorage.clear();
+   document.cookie.split(";").forEach(c => {
+     document.cookie = c.trim().split("=")[0] + '=;expires=' + new Date(0).toUTCString();
+   });
+   ```
+
+2. Refresh page
+3. Observe:
+   - ✅ Loading spinner appears
+   - ✅ No Navbar visible
+   - ✅ Loading completes
+   - ✅ HomePage shows (public content)
+
+</Step>
+
+<Step>
+
+**Test Sign-In Navigation**
+
+1. Click sign-in link/button
+2. Should navigate to `/sign-in`
+3. Observe:
+   - ✅ Sign-in page appears
+   - ✅ Form is visible
+   - ✅ Fields are empty
+   - ✅ No errors shown
+
+</Step>
+
+<Step>
+
+**Test Form Validation**
+
+1. Leave fields empty, click "Sign In"
+2. Should see:
+   - ✅ "Email is required"
+   - ✅ "Password is required"
+
+3. Enter invalid email: `bad-email`
+4. Should see:
+   - ✅ "Please enter a valid email address"
+
+5. Enter short password: `123`
+6. Should see:
+   - ✅ "Password must be at least 8 characters"
+
+</Step>
+
+<Step>
+
+**Test Invalid Credentials**
+
+1. Enter valid format but wrong credentials:
+   - Email: `wrong@example.com`
+   - Password: `wrongpassword123`
+
+2. Click "Sign In"
+3. Should see:
+   - ✅ Button shows "Signing in..."
+   - ✅ Button is disabled
+   - ✅ API error appears: "Invalid email or password"
+   - ✅ Still on sign-in page
+   - ✅ Form is still functional
+
+</Step>
+
+<Step>
+
+**Test Successful Sign-In**
+
+1. Enter valid credentials
+2. Click "Sign In"
+3. Should see:
+   - ✅ Button shows "Signing in..."
+   - ✅ Page redirects to `/`
+   - ✅ Navbar appears
+   - ✅ User name/avatar in Navbar
+   - ✅ Can navigate to protected pages
+
+4. Check React DevTools:
+   - ✅ `user` has data
+   - ✅ `token` has JWT
+   - ✅ `isLoading` is `false`
+
+</Step>
+
+<Step>
+
+**Test Session Persistence**
+
+1. After signing in, refresh page (F5)
+2. Should see:
+   - ✅ Brief loading spinner
+   - ✅ Stays signed in
+   - ✅ Navbar visible
+   - ✅ User data preserved
+   - ✅ Still on same page
+
+</Step>
+
+<Step>
+
+**Test Navigation While Signed In**
+
+1. Navigate to different pages:
+   - `/` → HomePage
+   - `/favorites` → FavoritesPage
+   - `/sign-in` → SignInPage (should redirect)
+
+2. All pages should:
+   - ✅ Show Navbar
+   - ✅ Have user data
+   - ✅ Allow sign-out
+
+</Step>
+
+</Steps>
+
+## Test with Different Scenarios
+
+<Tabs items={['First-Time User', 'Returning User', 'Session Expired', 'Network Issues']}>
+
+<Tab value="First-Time User">
+
+**New user signing in for first time:**
+
+```
+Timeline:
+  0:00 - Visit site
+  0:01 - See homepage (no Navbar)
+  0:02 - Click "Sign In" button
+  0:03 - Fill credentials
+  0:04 - Submit form
+  0:05 - Redirect to homepage
+  0:06 - Navbar appears
+  0:07 - Explore site (signed in)
+```
+
+**Expected behavior:**
+
+```jsx
+// Initial state
+user: null
+token: null
+isLoading: true
+
+// After loading check
+user: null
+token: null
+isLoading: false
+
+// After sign-in
+user: { name: "John", email: "...", ... }
+token: "eyJhbG..."
+isLoading: false
+```
+
+**Test steps:**
+
+1. Clear all storage (new user simulation)
+2. Visit homepage
+3. Navigate to `/sign-in`
+4. Enter valid credentials
+5. Submit form
+6. Verify redirect and Navbar appears
+
+✅ **First-time sign-in successful!**
+
+</Tab>
+
+<Tab value="Returning User">
+
+**User who signed in before (has refresh token cookie):**
+
+```
+Timeline:
+  0:00 - Visit site
+  0:01 - Loading spinner
+  0:02 - API fetches access token
+  0:03 - User data loaded
+  0:04 - Navbar appears
+  0:05 - User is signed in automatically!
+```
+
+**Expected behavior:**
+
+```jsx
+// Initial state
+user: null
+token: null
+isLoading: true
+
+// After token refresh
+user: { name: "John", ... }
+token: "eyJhbG..."
+isLoading: false
+```
+
+**Test steps:**
+
+1. Sign in successfully
+2. Close browser (don't sign out)
+3. Reopen browser
+4. Visit homepage
+5. Should automatically sign in
+
+✅ **Session restored!**
+
+**How long does session last?**
+
+```
+Access token: 15 minutes (in memory)
+Refresh token: 7-30 days (HTTP-only cookie)
+
+After 15 min:
+  - Access token expired
+  - Refresh token still valid
+  - Next request triggers refresh
+  - New access token issued
+```
+
+</Tab>
+
+<Tab value="Session Expired">
+
+**User returns after refresh token expired:**
+
+```
+Timeline:
+  Day 30 - Last signed in
+  Day 31 - Refresh token expires
+  Day 32 - User visits site
+  0:01 - Loading spinner
+  0:02 - API returns 401 (token invalid)
+  0:03 - Loading completes
+  0:04 - No Navbar (not signed in)
+  0:05 - User must sign in again
+```
+
+**Expected behavior:**
+
+```jsx
+// Initial state
+isLoading: true
+
+// After failed token refresh
+user: null
+token: null
+isLoading: false
+
+// User sees:
+- No Navbar
+- Public content only
+- "Sign In" button/link
+```
+
+**Test steps:**
+
+1. Manually delete refresh token cookie
+2. Refresh page
+3. Should see loading, then no Navbar
+4. Navigate to `/sign-in`
+5. Sign in again
+
+✅ **Expired session handled!**
+
+**User experience:**
+
+```
+User perspective:
+"I haven't visited in a while, so I need to sign in again."
+
+Not:
+"The app is broken! I can't access anything!"
+```
+
+Clear communication is key!
+
+</Tab>
+
+<Tab value="Network Issues">
+
+**User has poor/no internet connection:**
+
+**Scenario 1: Network error during sign-in**
+
+```
+User submits form
+  ↓
+API call fails (network error)
+  ↓
+Catch block handles error
+  ↓
+Show error: "Network error. Please try again."
+  ↓
+Form remains functional
+```
+
+**Test steps:**
+
+1. Turn off internet
+2. Fill sign-in form
+3. Submit
+4. Should see network error message
+5. Turn on internet
+6. Submit again
+7. Should work
+
+✅ **Network error handled!**
+
+**Scenario 2: Slow connection**
+
+```
+User submits form
+  ↓
+Button shows "Signing in..."
+  ↓
+Request takes 5-10 seconds
+  ↓
+Button stays disabled
+  ↓
+Finally responds
+  ↓
+User signed in (or error shown)
+```
+
+**Test steps:**
+
+1. Throttle network in DevTools:
+   - Network tab → Throttling → Slow 3G
+2. Submit form
+3. Observe button stays "Signing in..."
+4. Wait for response
+
+✅ **Slow connection handled!**
+
+**Scenario 3: API timeout**
+
+```jsx
+const api = axios.create({
+  baseURL: 'https://v2.api.noroff.dev',
+  timeout: 10000, // 10 seconds
+  withCredentials: true,
+});
+```
+
+If request takes >10s, Axios throws timeout error.
+
+</Tab>
+
+</Tabs>
+
+## Debugging Tools
+
+<Accordions>
+
+<Accordion title="React DevTools">
+
+**Inspect component state:**
+
+1. Install React DevTools extension
+2. Open DevTools → React tab
+3. Find `AuthContext.Provider`
+4. Inspect props/state:
+   - `value.user` → User data
+   - `value.token` → JWT token
+   - `value.isLoading` → Loading state
+
+**Check renders:**
+
+```
+Components tab:
+  App
+    AuthProvider  ← Check value prop
+      BrowserRouter
+        AppContent
+          Navbar  ← Should only render when user exists
+```
+
+**Highlight updates:**
+
+Settings → General → Highlight updates
+
+See which components re-render when state changes!
+
+</Accordion>
+
+<Accordion title="Network Tab (DevTools)">
+
+**Monitor API calls:**
+
+1. Open DevTools → Network tab
+2. Filter: XHR
+3. Sign in
+4. Should see:
+
+```
+POST /auth/login
+  Request:
+    { email: "...", password: "..." }
+  Response (200):
+    { 
+      data: {
+        accessToken: "...",
+        data: { ... }
+      }
+    }
+
+GET /auth/refresh (on page load)
+  Response (200):
+    { accessToken: "...", user: { ... } }
+  OR
+  Response (401):
+    { errors: [{ message: "..." }] }
+```
+
+**Check request headers:**
+
+```
+Content-Type: application/json
+Cookie: refreshToken=...  (automatically sent)
+```
+
+**Check response headers:**
+
+```
+Set-Cookie: refreshToken=...; HttpOnly; Secure; SameSite=Strict
+```
+
+</Accordion>
+
+<Accordion title="Console Logging">
+
+**Add strategic logs:**
+
+```jsx title="src/contexts/AuthContext.jsx"
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  
+  useEffect(() => {
+    const fetchToken = async () => {
+      console.log('🔄 Fetching token on mount...');
+      try {
+        const response = await api.get('/auth/refresh');
+        console.log('✅ Token refresh success:', response.data);
+        setToken(response.data.accessToken);
+        setUser(response.data.user);
+      } catch (error) {
+        console.log('❌ Token refresh failed:', error.message);
+      } finally {
+        console.log('🏁 Loading complete');
+        setIsLoading(false);
+      }
+    };
+    fetchToken();
+  }, []);
+
+  const signIn = async (email, password) => {
+    console.log('🔐 Signing in...', { email });
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      console.log('✅ Sign-in success:', response.data);
+      // ...
+    } catch (error) {
+      console.error('❌ Sign-in failed:', error);
+      // ...
+    }
+  };
+  
+  // ...
+};
+```
+
+**Console output on sign-in:**
+
+```
+🔄 Fetching token on mount...
+❌ Token refresh failed: Request failed with status code 401
+🏁 Loading complete
+
+🔐 Signing in... { email: "test@test.com" }
+✅ Sign-in success: { accessToken: "...", data: { ... } }
+```
+
+</Accordion>
+
+<Accordion title="Redux DevTools (for Context)">
+
+**Track state changes:**
+
+Install: Redux DevTools extension
+
+Add to AuthContext (optional):
+
+```jsx
+import { useReducer } from 'react';
+
+const authReducer = (state, action) => {
+  switch (action.type) {
+    case 'SIGN_IN':
+      return { ...state, user: action.user, token: action.token };
+    case 'SIGN_OUT':
+      return { ...state, user: null, token: null };
+    case 'SET_LOADING':
+      return { ...state, isLoading: action.isLoading };
+    default:
+      return state;
+  }
+};
+
+export const AuthProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(authReducer, {
+    user: null,
+    token: null,
+    isLoading: true,
+  });
+
+  // Use dispatch instead of setState
+  const signIn = async (email, password) => {
+    const response = await api.post('/auth/login', { email, password });
+    dispatch({
+      type: 'SIGN_IN',
+      user: response.data.data,
+      token: response.data.accessToken,
+    });
+  };
+  
+  // ...
+};
+```
+
+Now Redux DevTools shows all state changes!
+
+</Accordion>
+
+</Accordions>
+
+## Performance Testing
+
+<Tabs items={['Render Count', 'API Call Timing', 'Memory Leaks', 'Bundle Size']}>
+
+<Tab value="Render Count">
+
+**Count component renders:**
+
+```jsx
+function Navbar() {
+  const { user } = useAuth();
+  const renderCount = useRef(0);
+  
+  useEffect(() => {
+    renderCount.current++;
+    console.log(`Navbar rendered ${renderCount.current} times`);
+  });
+
+  return <nav>...</nav>;
+}
+```
+
+**Expected renders:**
+
+```
+Initial: 1 render (user = null)
+After sign-in: 1 render (user = data)
+Total: 2 renders ✅
+```
+
+**Too many renders:**
+
+```
+Initial: 1 render
+After sign-in: 1 render
+Random: 1 render (why?)
+Random: 1 render (why?)
+Total: 4 renders ❌
+```
+
+**Causes:**
+
+```jsx
+// ❌ New object every render
+const value = { user, token, signIn: async () => {} };
+
+// ✅ Memoize function
+const signIn = useCallback(async (email, password) => {
+  // ...
+}, []);
+
+const value = useMemo(
+  () => ({ user, token, signIn }),
+  [user, token, signIn]
+);
+```
+
+</Tab>
+
+<Tab value="API Call Timing">
+
+**Measure API performance:**
+
+```jsx
+const signIn = async (email, password) => {
+  const startTime = performance.now();
+  
+  try {
+    const response = await api.post('/auth/login', { email, password });
+    
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    
+    console.log(`Sign-in took ${duration.toFixed(2)}ms`);
+    
+    // ...
+  } catch (error) {
+    // ...
+  }
+};
+```
+
+**Expected timings:**
+
+```
+Fast connection: 100-500ms ✅
+Normal connection: 500-2000ms ✅
+Slow connection: 2000-5000ms ⚠️
+Timeout: >10000ms ❌
+```
+
+**Optimization tips:**
+
+```jsx
+// 1. Add timeout
+const api = axios.create({
+  timeout: 10000, // 10 seconds
+});
+
+// 2. Add retry logic
+const signIn = async (email, password, retries = 3) => {
+  try {
+    return await api.post('/auth/login', { email, password });
+  } catch (error) {
+    if (retries > 0 && error.code === 'ECONNABORTED') {
+      console.log(`Retrying... (${retries} left)`);
+      return signIn(email, password, retries - 1);
+    }
+    throw error;
+  }
+};
+```
+
+</Tab>
+
+<Tab value="Memory Leaks">
+
+**Check for memory leaks:**
+
+```jsx
+// ❌ Potential leak: Missing cleanup
+useEffect(() => {
+  const interval = setInterval(() => {
+    checkTokenExpiry();
+  }, 60000);
+  
+  // Missing: return () => clearInterval(interval);
+}, []);
+
+// ✅ Proper cleanup
+useEffect(() => {
+  const interval = setInterval(() => {
+    checkTokenExpiry();
+  }, 60000);
+  
+  return () => clearInterval(interval);
+}, []);
+```
+
+**Test for leaks:**
+
+1. Open DevTools → Memory tab
+2. Take heap snapshot
+3. Sign in/out 10 times
+4. Take another heap snapshot
+5. Compare: Should be similar size
+
+**Common leak sources:**
+
+```jsx
+// Event listeners
+window.addEventListener('resize', handler);
+// Fix: window.removeEventListener('resize', handler);
+
+// Timers
+setTimeout(() => {}, 1000);
+setInterval(() => {}, 1000);
+// Fix: clearTimeout, clearInterval
+
+// Subscriptions
+const subscription = api.subscribe();
+// Fix: subscription.unsubscribe();
+
+// Async operations
+const fetchData = async () => {
+  const data = await api.get('/data');
+  setState(data); // Component might be unmounted!
+};
+// Fix: Use AbortController or isMounted flag
+```
+
+</Tab>
+
+<Tab value="Bundle Size">
+
+**Check impact on bundle size:**
+
+```bash
+npm run build
+```
+
+**Check output:**
+
+```
+dist/assets/index-abc123.js    142.34 kB
+dist/assets/vendor-def456.js   456.78 kB
+```
+
+**React Hook Form + Zod impact:**
+
+```
+Before: ~120 kB
+After: ~145 kB (+25 kB)
+```
+
+Worth it for the functionality!
+
+**Optimize if needed:**
+
+```jsx
+// 1. Code splitting
+const SignInForm = lazy(() => import('./SignInForm'));
+
+// 2. Tree shaking
+import { z } from 'zod'; // ✅ Imports only what you use
+
+// 3. Dynamic imports
+const loadZod = () => import('zod');
+```
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+In Lesson 11, we'll:
+1. Add Axios request interceptors
+2. Automatically attach token to all requests
+3. Handle token in API calls
+4. Protect API endpoints
+
+<Callout type="success">
+**✅ Lesson Complete!** Authentication flow thoroughly tested and working!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Test systematically** through all user scenarios
+- ✅ **Use DevTools** to inspect state and network
+- ✅ **Console logging** helps debug issues
+- ✅ **Test edge cases** (network errors, expired sessions)
+- ✅ **Session persistence** works via refresh tokens
+- ✅ **Performance monitoring** ensures smooth experience
+- ✅ **Memory leak prevention** with proper cleanup
+- ✅ **First-time vs returning users** have different flows
+- ✅ **Error messages** guide users when things go wrong
+- ✅ **Loading states** provide feedback during async operations

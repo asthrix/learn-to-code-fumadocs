@@ -1,0 +1,752 @@
+---
+title: "L15: Redirect When Signed In"
+description: "Implement smart redirects for better UX"
+---
+
+# Redirect When Signed In
+
+Let's implement intelligent redirect logic for a seamless user experience! 🎯
+
+## The Redirect Problem
+
+**Current behavior (not ideal):**
+
+```
+User visits /favorites (not signed in)
+  ↓
+Redirects to /sign-in
+  ↓
+User signs in
+  ↓
+Redirects to / (homepage)
+  ↓
+User has to navigate to /favorites again 😞
+```
+
+**Desired behavior:**
+
+```
+User visits /favorites (not signed in)
+  ↓
+Redirects to /sign-in (saves intended destination)
+  ↓
+User signs in
+  ↓
+Redirects to /favorites (where they wanted to go!)
+  ↓
+User is exactly where they wanted to be 😊
+```
+
+## Update SignInPage with Redirect
+
+Implement smart redirect after sign-in:
+
+```jsx title="src/pages/SignInPage.jsx"
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import SignInForm from '@/components/SignInForm';
+
+function SignInPage() {
+  const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Get the page they were trying to access
+  const from = location.state?.from?.pathname || '/';
+
+  // If already signed in, redirect immediately
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, from, navigate]);
+
+  // Don't show sign-in form if already signed in
+  if (user) {
+    return null; // Or a brief "Redirecting..." message
+  }
+
+  return (
+    <div className="sign-in-page">
+      <div className="sign-in-container">
+        <div className="sign-in-header">
+          <h1 className="brand-logo">🏖️ Holidaze</h1>
+          <p className="brand-tagline">Your next adventure awaits</p>
+        </div>
+
+        <div className="sign-in-form-container">
+          <h2 className="sign-in-title">Sign in to your account</h2>
+          
+          {/* Show message if redirected from protected page */}
+          {location.state?.from && (
+            <p className="redirect-message">
+              Please sign in to access <strong>{from}</strong>
+            </p>
+          )}
+          
+          <p className="sign-in-subtitle">
+            Welcome back! Please enter your details.
+          </p>
+
+          <SignInForm />
+        </div>
+
+        <div className="sign-in-footer">
+          <p className="footer-text">
+            Don't have an account?{' '}
+            <a href="/sign-up" className="footer-link">
+              Sign up
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SignInPage;
+```
+
+## Update SignInForm to Handle Redirect
+
+Modify the form to redirect after successful sign-in:
+
+```jsx title="src/components/SignInForm.jsx"
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { signInSchema } from '@/schemas/signInSchema';
+import { useAuth } from '@/contexts/AuthContext';
+
+function SignInForm() {
+  const { signIn } = useAuth();
+  const [apiError, setApiError] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Get intended destination
+  const from = location.state?.from?.pathname || '/';
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(signInSchema),
+  });
+
+  const onSubmit = async (data) => {
+    setApiError('');
+
+    const result = await signIn(data.email, data.password);
+
+    if (result.success) {
+      // Success! Redirect to intended page
+      navigate(from, { replace: true });
+    } else {
+      // Show error
+      setApiError(result.error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="sign-in-form">
+      {apiError && (
+        <div className="api-error" role="alert">
+          <p>{apiError}</p>
+        </div>
+      )}
+
+      <div className="form-field">
+        <label htmlFor="email" className="form-label">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          {...register('email')}
+          className={`form-input ${errors.email ? 'form-input-error' : ''}`}
+          placeholder="you@example.com"
+        />
+        {errors.email && (
+          <p className="form-error">{errors.email.message}</p>
+        )}
+      </div>
+
+      <div className="form-field">
+        <label htmlFor="password" className="form-label">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          {...register('password')}
+          className={`form-input ${errors.password ? 'form-input-error' : ''}`}
+          placeholder="••••••••"
+        />
+        {errors.password && (
+          <p className="form-error">{errors.password.message}</p>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="submit-button"
+      >
+        {isSubmitting ? 'Signing in...' : 'Sign In'}
+      </button>
+    </form>
+  );
+}
+
+export default SignInForm;
+```
+
+## Update AuthContext (Remove Auto-Redirect)
+
+Remove automatic redirect from `signIn` since we handle it in the form:
+
+```jsx title="src/contexts/AuthContext.jsx"
+export const AuthProvider = ({ children }) => {
+  // ... existing state and effects
+
+  const signIn = async (email, password) => {
+    try {
+      const response = await api.post('/auth/login', {
+        email,
+        password,
+      });
+
+      const { accessToken, data } = response.data;
+      setToken(accessToken);
+      setUser(data);
+
+      // ❌ Remove this:
+      // navigate('/');
+
+      // ✅ Return success, let caller handle navigation
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.errors?.[0]?.message 
+        || 'Invalid email or password';
+      return { success: false, error: message };
+    }
+  };
+
+  // ... rest of provider
+};
+```
+
+## Add Redirect Message Styling
+
+Style the redirect message:
+
+```css title="src/app/global.css"
+/* Redirect Message */
+.redirect-message {
+  padding: 0.875rem 1rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  color: #1e40af;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.redirect-message strong {
+  font-weight: 600;
+  color: #1e3a8a;
+}
+```
+
+## Understanding the Flow
+
+<Tabs items={['Location State Flow', 'Redirect Scenarios', 'Edge Cases', 'Replace vs Push']}>
+
+<Tab value="Location State Flow">
+
+**Complete redirect flow:**
+
+```
+1. User visits /favorites (not signed in)
+   location = { pathname: '/favorites', state: null }
+
+2. Protected component checks auth
+   user === null → Not authenticated
+
+3. Redirect with state
+   <Navigate 
+     to="/sign-in" 
+     state={{ from: location }} 
+     replace 
+   />
+
+4. Now at /sign-in
+   location = {
+     pathname: '/sign-in',
+     state: { from: { pathname: '/favorites' } }
+   }
+
+5. SignInPage reads state
+   const from = location.state?.from?.pathname || '/';
+   // from = '/favorites'
+
+6. User signs in successfully
+   navigate(from, { replace: true });
+   // Navigates to '/favorites'
+
+7. User is on /favorites (authenticated)
+   Protected component checks auth
+   user !== null → Authenticated
+   Renders FavoritesPage ✅
+```
+
+**State preservation:**
+
+```jsx
+// In Protected component
+<Navigate 
+  to="/sign-in" 
+  state={{ from: location }}  // Pass entire location
+  replace 
+/>
+
+// In SignInPage
+const from = location.state?.from?.pathname;
+// Extracts pathname from state
+
+// Supports complex locations
+location = {
+  pathname: '/search',
+  search: '?q=beach&guests=4',
+  hash: '#results'
+};
+
+// After sign-in, restore full location
+navigate({
+  pathname: from.pathname,
+  search: from.search,
+  hash: from.hash
+}, { replace: true });
+```
+
+</Tab>
+
+<Tab value="Redirect Scenarios">
+
+**Scenario 1: Direct access to protected route**
+
+```
+User types URL: /favorites
+  ↓
+Not signed in
+  ↓
+Redirect to /sign-in (save /favorites)
+  ↓
+Sign in
+  ↓
+Redirect to /favorites ✅
+```
+
+**Scenario 2: Click link to protected route**
+
+```
+User on homepage
+  ↓
+Clicks "Favorites" link
+  ↓
+Not signed in
+  ↓
+Redirect to /sign-in (save /favorites)
+  ↓
+Sign in
+  ↓
+Redirect to /favorites ✅
+```
+
+**Scenario 3: Direct access to sign-in**
+
+```
+User types URL: /sign-in
+  ↓
+No "from" in state
+  ↓
+Sign in
+  ↓
+Redirect to / (homepage) ✅
+```
+
+**Scenario 4: Already signed in**
+
+```
+User signed in → Visits /sign-in
+  ↓
+useEffect detects user
+  ↓
+Redirect to / immediately ✅
+```
+
+**Scenario 5: Multiple redirects**
+
+```
+User visits /bookings (not signed in)
+  ↓
+Redirect to /sign-in (save /bookings)
+  ↓
+User navigates away to /about
+  ↓
+User goes back to /sign-in
+  ↓
+"from" still saved in state
+  ↓
+Sign in
+  ↓
+Redirect to /bookings ✅
+```
+
+</Tab>
+
+<Tab value="Edge Cases">
+
+**Edge case 1: Sign-in page as redirect target**
+
+```jsx
+// Problem: Redirect to /sign-in from /sign-in causes loop
+const from = location.state?.from?.pathname;
+
+// Solution: Don't redirect to /sign-in
+const from = location.state?.from?.pathname === '/sign-in' 
+  ? '/' 
+  : location.state?.from?.pathname || '/';
+```
+
+**Edge case 2: Invalid redirect URL**
+
+```jsx
+// Problem: from = '/admin' but user doesn't have access
+const from = location.state?.from?.pathname || '/';
+
+// Solution: Validate redirect
+const isValidRedirect = (path) => {
+  const publicPaths = ['/', '/about', '/venues'];
+  const protectedPaths = ['/favorites', '/bookings', '/profile'];
+  return [...publicPaths, ...protectedPaths].includes(path);
+};
+
+const from = isValidRedirect(location.state?.from?.pathname) 
+  ? location.state?.from?.pathname 
+  : '/';
+```
+
+**Edge case 3: Query parameters in redirect**
+
+```jsx
+// User was at /search?q=beach&guests=4
+// Preserve full URL
+
+const from = location.state?.from;
+
+// Restore complete location
+if (from) {
+  navigate({
+    pathname: from.pathname,
+    search: from.search,
+    hash: from.hash
+  }, { replace: true });
+} else {
+  navigate('/', { replace: true });
+}
+```
+
+**Edge case 4: Nested protected routes**
+
+```jsx
+// User visits /dashboard/analytics (protected)
+// Redirects to /sign-in with state
+// After sign-in, should go to /dashboard/analytics
+
+// Works automatically with current implementation!
+const from = location.state?.from?.pathname;
+// from = '/dashboard/analytics'
+
+navigate(from, { replace: true });
+// Navigates to '/dashboard/analytics' ✅
+```
+
+</Tab>
+
+<Tab value="Replace vs Push">
+
+**Understanding `replace`:**
+
+```jsx
+// Without replace (push)
+navigate('/sign-in');
+
+History stack:
+  /favorites     ← Was here
+  /sign-in       ← Now here
+
+User clicks back:
+  /favorites  ← Goes here (not signed in, redirects again!)
+  /sign-in    ← Redirect loop!
+
+// With replace
+navigate('/sign-in', { replace: true });
+
+History stack:
+  /sign-in       ← Now here (replaced /favorites)
+
+User clicks back:
+  / (or previous page before /favorites)  ← Goes here ✅
+```
+
+**When to use replace:**
+
+```jsx
+// ✅ Redirects (avoid back-button loops)
+navigate('/sign-in', { replace: true });
+navigate('/', { replace: true });
+
+// ✅ After form submission
+handleSubmit = async () => {
+  await createVenue(data);
+  navigate('/venues/mine', { replace: true });
+};
+
+// ✅ After sign-in/sign-out
+signIn = async () => {
+  // ...
+  navigate(from, { replace: true });
+};
+
+// ❌ Regular navigation (keep in history)
+<Link to="/about">About</Link>
+// User should be able to go back
+```
+
+**Replace in Protected component:**
+
+```jsx
+<Navigate 
+  to="/sign-in" 
+  state={{ from: location }} 
+  replace  // ← Important!
+/>
+```
+
+**Why replace here?**
+
+```
+Without replace:
+  User visits /favorites
+  History: [/, /favorites]
+  Redirects to /sign-in
+  History: [/, /favorites, /sign-in]
+  Signs in, goes to /favorites
+  History: [/, /favorites, /sign-in, /favorites]
+  Clicks back
+  → /sign-in (already signed in, redirects to /)
+  → /favorites
+  Confusing navigation! ❌
+
+With replace:
+  User visits /favorites
+  History: [/, /favorites]
+  Redirects to /sign-in (replaces /favorites)
+  History: [/, /sign-in]
+  Signs in, goes to /favorites (replaces /sign-in)
+  History: [/, /favorites]
+  Clicks back
+  → / (clean!) ✅
+```
+
+</Tab>
+
+</Tabs>
+
+## Testing Redirect Flow
+
+<Steps>
+
+<Step>
+
+**Test redirect from protected route:**
+
+1. Sign out
+2. Visit `/favorites` directly
+3. Should redirect to `/sign-in`
+4. Check URL: `/sign-in`
+5. Page should show: "Please sign in to access **/favorites**"
+
+✅ **Redirect message shown!**
+
+</Step>
+
+<Step>
+
+**Test sign-in and redirect back:**
+
+1. Fill sign-in form
+2. Submit
+3. Should redirect to `/favorites`
+4. Page should show FavoritesPage
+
+✅ **Redirected to intended page!**
+
+</Step>
+
+<Step>
+
+**Test direct sign-in (no redirect):**
+
+1. Sign out
+2. Visit `/sign-in` directly
+3. Sign in
+4. Should redirect to `/` (homepage)
+
+✅ **Default redirect to homepage!**
+
+</Step>
+
+<Step>
+
+**Test already signed in:**
+
+1. Ensure you're signed in
+2. Visit `/sign-in` in new tab
+3. Should immediately redirect to `/`
+4. Sign-in form should not appear
+
+✅ **Already signed-in redirect working!**
+
+</Step>
+
+<Step>
+
+**Test history navigation:**
+
+1. Sign out
+2. Visit `/about`
+3. Visit `/favorites` (redirects to `/sign-in`)
+4. Sign in (redirects to `/favorites`)
+5. Click browser back button
+6. Should go to `/about` (not `/sign-in`)
+
+✅ **History navigation clean!**
+
+</Step>
+
+</Steps>
+
+## Advanced Redirect Patterns
+
+<Accordions>
+
+<Accordion title="Redirect with Toast Message">
+
+**Show success message after redirect:**
+
+```jsx
+import { toast } from 'react-hot-toast';
+
+const onSubmit = async (data) => {
+  const result = await signIn(data.email, data.password);
+
+  if (result.success) {
+    toast.success('Successfully signed in!');
+    navigate(from, { replace: true });
+  }
+};
+```
+
+</Accordion>
+
+<Accordion title="Conditional Redirects Based on User Role">
+
+**Redirect to different pages based on user:**
+
+```jsx
+const onSubmit = async (data) => {
+  const result = await signIn(data.email, data.password);
+
+  if (result.success) {
+    const { user } = result;
+
+    // Admin goes to dashboard
+    if (user.role === 'admin') {
+      navigate('/admin/dashboard', { replace: true });
+    }
+    // Manager goes to manager panel
+    else if (user.role === 'manager') {
+      navigate('/manager', { replace: true });
+    }
+    // Regular user goes to intended page or home
+    else {
+      navigate(from, { replace: true });
+    }
+  }
+};
+```
+
+</Accordion>
+
+<Accordion title="Redirect with Query Parameters">
+
+**Preserve search params in redirect:**
+
+```jsx
+// User was at /search?q=beach&guests=4
+
+const SignInPage = () => {
+  const location = useLocation();
+  
+  // Get full location (with search params)
+  const from = location.state?.from || { pathname: '/' };
+
+  const onSubmit = async (data) => {
+    const result = await signIn(data.email, data.password);
+
+    if (result.success) {
+      // Restore full location
+      navigate({
+        pathname: from.pathname,
+        search: from.search,
+      }, { replace: true });
+    }
+  };
+};
+```
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+In Lesson 16, we'll:
+1. Add sign-out functionality
+2. Create sign-out button in Navbar
+3. Handle sign-out redirect
+4. Clean up state on sign-out
+
+<Callout type="success">
+**✅ Lesson Complete!** Smart redirects implemented for seamless UX!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Location state** preserves intended destination
+- ✅ **Redirect after sign-in** to where user wanted to go
+- ✅ **Default to homepage** if no intended destination
+- ✅ **Show message** indicating why sign-in required
+- ✅ **Redirect if already signed in** to avoid confusion
+- ✅ **Use `replace: true`** to prevent back-button issues
+- ✅ **Preserve query parameters** for complete URL restoration
+- ✅ **Handle edge cases** (invalid redirects, loops)
+- ✅ **Conditional redirects** based on user role
+- ✅ **Clean history navigation** with proper replace usage
