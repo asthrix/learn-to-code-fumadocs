@@ -1,0 +1,673 @@
+---
+title: "L7: M2 Challenge & Wrap-up"
+description: "Apply your skills with a comprehensive challenge"
+module: 2
+lesson: 7
+---
+
+
+
+# Module 2 Challenge & Wrap-up
+
+<Badge variant="purple">Challenge</Badge>
+<Badge variant="blue">Practice</Badge>
+
+Put everything you've learned together in this comprehensive challenge! You'll enhance StaySense with additional features using state management, event handling, and filtering techniques.
+
+---
+
+## 🎯 Challenge Overview
+
+Enhance your StaySense application with these features:
+
+### Required Features
+
+1. **"Save for Later" Functionality**
+   - Add a heart icon to each listing card
+   - Click to toggle saved status
+   - Track saved listings in state
+   - Show count of saved listings
+
+2. **Advanced Filtering**
+   - Add price range filter (min/max)
+   - Add property type filter (house/cabin/loft/all)
+   - Combine all filters seamlessly
+
+3. **Sort Options**
+   - Sort by price (low to high, high to low)
+   - Sort by guest capacity
+   - Sort by name (A-Z)
+
+### Bonus Features (Optional)
+
+4. **Filter Summary**
+   - Show active filters as removable chips
+   - Click chip to remove individual filter
+
+5. **View Saved Listings**
+   - Toggle between "All Listings" and "Saved Listings"
+   - Filter works on saved view too
+
+---
+
+## 📋 Requirements Checklist
+
+Before you begin, make sure you have:
+
+- ✅ Completed Lessons 1-6
+- ✅ Working filter system
+- ✅ Understanding of state management
+- ✅ Familiarity with array methods
+
+---
+
+## 🚀 Challenge Instructions
+
+<Steps>
+  <Step>
+    ### Part 1: Save for Later Feature
+    
+    **Goal:** Let users save their favorite listings.
+    
+    **Steps:**
+    
+    1. Add `savedListings` state to HomePage (array of IDs):
+    
+    ```jsx
+    const [savedListings, setSavedListings] = useState([]);
+    ```
+    
+    2. Create toggle function:
+    
+    ```jsx
+    const toggleSaved = (listingId) => {
+      setSavedListings(prev => {
+        if (prev.includes(listingId)) {
+          return prev.filter(id => id !== listingId);
+        } else {
+          return [...prev, listingId];
+        }
+      });
+    };
+    ```
+    
+    3. Pass to ListingCard:
+    
+    ```jsx
+    <ListingCard 
+      listing={listing}
+      isSaved={savedListings.includes(listing.id)}
+      onToggleSave={toggleSaved}
+    />
+    ```
+    
+    4. Update ListingCard with heart button:
+    
+    ```jsx
+    export function ListingCard({ listing, isSaved, onToggleSave }) {
+      return (
+        <div className="card">
+          <button 
+            onClick={() => onToggleSave(listing.id)}
+            className="absolute top-2 right-2 z-10"
+          >
+            {isSaved ? '❤️' : '🤍'}
+          </button>
+          {/* Rest of card... */}
+        </div>
+      );
+    }
+    ```
+    
+    **Test:** Click hearts to save/unsave listings.
+  </Step>
+  
+  <Step>
+    ### Part 2: Price Range Filter
+    
+    **Goal:** Filter by minimum and maximum price.
+    
+    **Steps:**
+    
+    1. Add price state to HomePage:
+    
+    ```jsx
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(1000);
+    ```
+    
+    2. Add price inputs to ListingFilters:
+    
+    ```jsx
+    <div className="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label>Min Price</label>
+        <input 
+          type="number" 
+          value={minPrice}
+          onChange={(e) => onMinPriceChange(Number(e.target.value))}
+          min="0"
+        />
+      </div>
+      <div>
+        <label>Max Price</label>
+        <input 
+          type="number" 
+          value={maxPrice}
+          onChange={(e) => onMaxPriceChange(Number(e.target.value))}
+          min="0"
+        />
+      </div>
+    </div>
+    ```
+    
+    3. Update filtering logic:
+    
+    ```jsx
+    const matchesPrice = 
+      listing.price >= minPrice && 
+      listing.price <= maxPrice;
+    ```
+    
+    **Test:** Adjust price range to filter listings.
+  </Step>
+  
+  <Step>
+    ### Part 3: Property Type Filter
+    
+    **Goal:** Filter by property type.
+    
+    **Steps:**
+    
+    1. Add property type to listings data:
+    
+    ```jsx
+    {
+      id: 1,
+      title: "Cozy Beach House",
+      type: "house", // Add this
+      // ... rest
+    }
+    ```
+    
+    2. Add type state:
+    
+    ```jsx
+    const [propertyType, setPropertyType] = useState('all');
+    ```
+    
+    3. Add select dropdown to ListingFilters:
+    
+    ```jsx
+    <div className="mb-4">
+      <label>Property Type</label>
+      <select 
+        value={propertyType}
+        onChange={(e) => onPropertyTypeChange(e.target.value)}
+        className="w-full px-4 py-2 border rounded-lg"
+      >
+        <option value="all">All Types</option>
+        <option value="house">House</option>
+        <option value="cabin">Cabin</option>
+        <option value="loft">Loft</option>
+      </select>
+    </div>
+    ```
+    
+    4. Update filter logic:
+    
+    ```jsx
+    const matchesType = 
+      propertyType === 'all' || 
+      listing.type === propertyType;
+    ```
+    
+    **Test:** Select different property types.
+  </Step>
+  
+  <Step>
+    ### Part 4: Sort Functionality
+    
+    **Goal:** Allow users to sort filtered results.
+    
+    **Steps:**
+    
+    1. Add sort state:
+    
+    ```jsx
+    const [sortBy, setSortBy] = useState('default');
+    ```
+    
+    2. Create sort function:
+    
+    ```jsx
+    const getSortedListings = (listings) => {
+      const sorted = [...listings];
+      
+      switch(sortBy) {
+        case 'price-low':
+          return sorted.sort((a, b) => a.price - b.price);
+        case 'price-high':
+          return sorted.sort((a, b) => b.price - a.price);
+        case 'guests':
+          return sorted.sort((a, b) => b.guests - a.guests);
+        case 'name':
+          return sorted.sort((a, b) => a.title.localeCompare(b.title));
+        default:
+          return sorted;
+      }
+    };
+    ```
+    
+    3. Apply sorting after filtering:
+    
+    ```jsx
+    const filteredListings = getFilteredListings();
+    const sortedListings = getSortedListings(filteredListings);
+    ```
+    
+    4. Add sort dropdown to filters:
+    
+    ```jsx
+    <div className="mb-4">
+      <label>Sort By</label>
+      <select 
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+        className="w-full px-4 py-2 border rounded-lg"
+      >
+        <option value="default">Default</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="guests">Guest Capacity</option>
+        <option value="name">Name (A-Z)</option>
+      </select>
+    </div>
+    ```
+    
+    **Test:** Try different sort options.
+  </Step>
+  
+  <Step>
+    ### Part 5: View Saved Listings (Bonus)
+    
+    **Goal:** Toggle between all listings and saved only.
+    
+    **Steps:**
+    
+    1. Add view state:
+    
+    ```jsx
+    const [view, setView] = useState('all'); // 'all' or 'saved'
+    ```
+    
+    2. Add toggle buttons:
+    
+    ```jsx
+    <div className="flex gap-2 mb-4">
+      <button 
+        onClick={() => setView('all')}
+        className={view === 'all' ? 'active' : ''}
+      >
+        All Listings ({listings.length})
+      </button>
+      <button 
+        onClick={() => setView('saved')}
+        className={view === 'saved' ? 'active' : ''}
+      >
+        Saved ({savedListings.length})
+      </button>
+    </div>
+    ```
+    
+    3. Filter by view:
+    
+    ```jsx
+    const getViewListings = () => {
+      if (view === 'saved') {
+        return listings.filter(l => savedListings.includes(l.id));
+      }
+      return listings;
+    };
+    
+    const viewListings = getViewListings();
+    const filteredListings = viewListings.filter(/* filter logic */);
+    ```
+    
+    **Test:** Save some listings, switch to saved view.
+  </Step>
+  
+  <Step>
+    ### Part 6: Filter Chips (Bonus)
+    
+    **Goal:** Show active filters as removable chips.
+    
+    **Steps:**
+    
+    1. Create ActiveFilters component:
+    
+    ```jsx
+    function ActiveFilters({ filters, onRemove }) {
+      return (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {filters.map(filter => (
+            <div 
+              key={filter.id}
+              className="bg-blue-100 px-3 py-1 rounded-full flex items-center gap-2"
+            >
+              <span>{filter.label}</span>
+              <button onClick={() => onRemove(filter.id)}>×</button>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    ```
+    
+    2. Build active filters array:
+    
+    ```jsx
+    const getActiveFilters = () => {
+      const filters = [];
+      
+      if (search) {
+        filters.push({ id: 'search', label: `Search: ${search}` });
+      }
+      if (guests > 1) {
+        filters.push({ id: 'guests', label: `${guests} guests` });
+      }
+      if (propertyType !== 'all') {
+        filters.push({ id: 'type', label: `Type: ${propertyType}` });
+      }
+      
+      return filters;
+    };
+    ```
+    
+    3. Implement remove handler:
+    
+    ```jsx
+    const handleRemoveFilter = (filterId) => {
+      switch(filterId) {
+        case 'search':
+          setSearch('');
+          break;
+        case 'guests':
+          setGuests(1);
+          break;
+        case 'type':
+          setPropertyType('all');
+          break;
+      }
+    };
+    ```
+    
+    **Test:** Apply filters, remove via chips.
+  </Step>
+</Steps>
+
+---
+
+## ✅ Challenge Completion Checklist
+
+**Required Features:**
+- [ ] Save for later functionality works
+- [ ] Heart icons toggle correctly
+- [ ] Price range filter works
+- [ ] Property type filter works
+- [ ] Sort options work
+- [ ] All filters work together
+- [ ] Empty states handled
+
+**Bonus Features:**
+- [ ] Saved listings view works
+- [ ] Active filter chips display
+- [ ] Filter chips removable
+- [ ] Filters work in saved view
+
+**Code Quality:**
+- [ ] No console errors
+- [ ] Proper prop naming
+- [ ] State lifted correctly
+- [ ] Components are organized
+- [ ] Code is readable
+
+---
+
+## 💡 Hints & Tips
+
+<Accordions>
+  <Accordion title="Hint: Combining Multiple Filters">
+    Use AND logic to combine all filters:
+    
+    ```jsx
+    return listings.filter(listing => {
+      const matchesSearch = /* ... */;
+      const matchesGuests = /* ... */;
+      const matchesPrice = /* ... */;
+      const matchesType = /* ... */;
+      
+      return (
+        matchesSearch &&
+        matchesGuests &&
+        matchesPrice &&
+        matchesType
+      );
+    });
+    ```
+  </Accordion>
+  
+  <Accordion title="Hint: Toggle Array Items">
+    To add/remove from array:
+    
+    ```jsx
+    // Add if not present, remove if present
+    setSavedListings(prev => 
+      prev.includes(id)
+        ? prev.filter(savedId => savedId !== id) // Remove
+        : [...prev, id]                          // Add
+    );
+    ```
+  </Accordion>
+  
+  <Accordion title="Hint: Sorting Arrays">
+    Always create a new array before sorting:
+    
+    ```jsx
+    // ❌ Wrong: Mutates original
+    const sorted = listings.sort(...);
+    
+    // ✅ Correct: Creates new array
+    const sorted = [...listings].sort(...);
+    ```
+  </Accordion>
+  
+  <Accordion title="Hint: Number Inputs">
+    Convert string to number:
+    
+    ```jsx
+    <input 
+      type="number"
+      onChange={(e) => setValue(Number(e.target.value))}
+    />
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## 🎯 Solution Preview
+
+<Accordions>
+  <Accordion title="Show Complete Solution">
+    Here's a complete implementation reference:
+    
+    ```jsx
+    // HomePage.jsx
+    import { useState } from 'react';
+    import { ListingCard } from '../components/ListingCard';
+    import { ListingFilters } from '../components/ListingFilters';
+    
+    export function HomePage() {
+      // Listings state
+      const [listings, setListings] = useState([/* ... with types */]);
+      
+      // Filter state
+      const [search, setSearch] = useState('');
+      const [checkIn, setCheckIn] = useState('');
+      const [checkOut, setCheckOut] = useState('');
+      const [guests, setGuests] = useState(1);
+      const [minPrice, setMinPrice] = useState(0);
+      const [maxPrice, setMaxPrice] = useState(1000);
+      const [propertyType, setPropertyType] = useState('all');
+      
+      // Sort & view state
+      const [sortBy, setSortBy] = useState('default');
+      const [view, setView] = useState('all');
+      const [savedListings, setSavedListings] = useState([]);
+      
+      // Toggle saved
+      const toggleSaved = (id) => {
+        setSavedListings(prev =>
+          prev.includes(id)
+            ? prev.filter(savedId => savedId !== id)
+            : [...prev, id]
+        );
+      };
+      
+      // Get filtered listings
+      const getFilteredListings = () => {
+        let filtered = view === 'saved'
+          ? listings.filter(l => savedListings.includes(l.id))
+          : listings;
+        
+        filtered = filtered.filter(listing => {
+          const matchesSearch =
+            search === '' ||
+            listing.location.toLowerCase().includes(search.toLowerCase()) ||
+            listing.title.toLowerCase().includes(search.toLowerCase());
+          
+          const matchesGuests = listing.guests >= guests;
+          const matchesPrice = listing.price >= minPrice && listing.price <= maxPrice;
+          const matchesType = propertyType === 'all' || listing.type === propertyType;
+          
+          return matchesSearch && matchesGuests && matchesPrice && matchesType;
+        });
+        
+        return filtered;
+      };
+      
+      // Sort listings
+      const getSortedListings = (listings) => {
+        const sorted = [...listings];
+        
+        switch(sortBy) {
+          case 'price-low':
+            return sorted.sort((a, b) => a.price - b.price);
+          case 'price-high':
+            return sorted.sort((a, b) => b.price - a.price);
+          case 'guests':
+            return sorted.sort((a, b) => b.guests - a.guests);
+          case 'name':
+            return sorted.sort((a, b) => a.title.localeCompare(b.title));
+          default:
+            return sorted;
+        }
+      };
+      
+      const filteredListings = getFilteredListings();
+      const sortedListings = getSortedListings(filteredListings);
+      
+      return (
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+          
+          {/* View Toggle */}
+          <div className="flex gap-2 mb-4">
+            <button 
+              onClick={() => setView('all')}
+              className={`px-4 py-2 rounded ${view === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            >
+              All Listings ({listings.length})
+            </button>
+            <button 
+              onClick={() => setView('saved')}
+              className={`px-4 py-2 rounded ${view === 'saved' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            >
+              Saved ({savedListings.length})
+            </button>
+          </div>
+          
+          <ListingFilters
+            search={search}
+            checkIn={checkIn}
+            checkOut={checkOut}
+            guests={guests}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            propertyType={propertyType}
+            sortBy={sortBy}
+            onSearchChange={setSearch}
+            onCheckInChange={setCheckIn}
+            onCheckOutChange={setCheckOut}
+            onGuestsChange={setGuests}
+            onMinPriceChange={setMinPrice}
+            onMaxPriceChange={setMaxPrice}
+            onPropertyTypeChange={setPropertyType}
+            onSortChange={setSortBy}
+          />
+          
+          <p className="text-gray-600 mb-4">
+            Found {sortedListings.length} {sortedListings.length === 1 ? 'listing' : 'listings'}
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sortedListings.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500 text-lg mb-2">No listings found</p>
+                <p className="text-gray-400">Try adjusting your filters</p>
+              </div>
+            ) : (
+              sortedListings.map(listing => (
+                <ListingCard 
+                  key={listing.id} 
+                  listing={listing}
+                  isSaved={savedListings.includes(listing.id)}
+                  onToggleSave={toggleSaved}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## 🎉 Congratulations!
+
+By completing this challenge, you've demonstrated mastery of:
+
+- ✅ Complex state management
+- ✅ Multiple filter coordination
+- ✅ Sorting algorithms
+- ✅ Array manipulation
+- ✅ Component communication
+- ✅ User experience patterns
+
+### You're Ready for Module 3!
+
+In Module 3, you'll learn:
+- useEffect hook for side effects
+- Fetching data from APIs
+- Handling async operations
+- Managing loading and error states
+- Building advanced components
+
+**Take a break and celebrate your progress!** 🎊
+
+When you're ready, continue to **Module 3: Effects & Data Fetching**.
+

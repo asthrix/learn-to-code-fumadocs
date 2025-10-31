@@ -1,0 +1,552 @@
+---
+title: "L11: Programmatic Navigation"
+description: "Navigate using JavaScript with the useNavigate hook"
+---
+
+
+# Programmatic Navigation
+
+Sometimes you need to navigate from JavaScript code - after form submissions, button clicks, or timed actions. The `useNavigate` hook lets you control navigation programmatically!
+
+## What You'll Learn
+
+- Use the useNavigate hook
+- Navigate after actions/events
+- Pass `state` between routes
+- Navigate with replace option
+- Go forward/backward in history
+
+## useNavigate Hook
+
+```jsx
+import { useNavigate } from 'react-router-dom';
+
+function Component() {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate('/destination');
+  };
+
+  return <button onClick={handleClick}>Go</button>;
+}
+```
+
+## Common Use Cases
+
+<Tabs items={['After Form Submit', 'After API Call', 'Conditional Redirect', 'Timed Redirect']}>
+
+<Tab value="After Form Submit">
+
+```jsx
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+
+function BookingForm() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({});
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Submit booking
+    const booking = await createBooking(formData);
+    
+    // Navigate to confirmation page
+    navigate(`/booking/${booking.id}/confirm`);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Form fields */}
+      <button type="submit">Book Now</button>
+    </form>
+  );
+}
+```
+
+</Tab>
+
+<Tab value="After API Call">
+
+```jsx
+function DeleteButton({ listingId }) {
+  const navigate = useNavigate();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    
+    try {
+      await fetch(`/api/listings/${listingId}`, {
+        method: 'DELETE'
+      });
+      
+      // Navigate back to listings after delete
+      navigate('/');
+    } catch (error) {
+      alert('Failed to delete');
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <button 
+      onClick={handleDelete}
+      disabled={isDeleting}
+    >
+      {isDeleting ? 'Deleting...' : 'Delete Listing'}
+    </button>
+  );
+}
+```
+
+</Tab>
+
+<Tab value="Conditional Redirect">
+
+```jsx
+function ProtectedPage() {
+  const navigate = useNavigate();
+  const isAuthenticated = useAuth();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
+  return <div>Protected content</div>;
+}
+```
+
+</Tab>
+
+<Tab value="Timed Redirect">
+
+```jsx
+function SuccessPage() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect after 3 seconds
+    const timer = setTimeout(() => {
+      navigate('/');
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [navigate]);
+
+  return (
+    <div>
+      <h1>Success! ✅</h1>
+      <p>Redirecting to home in 3 seconds...</p>
+    </div>
+  );
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Navigate Options
+
+<Accordions>
+
+<Accordion title="Basic Navigation">
+
+```jsx
+const navigate = useNavigate();
+
+// Navigate to path
+navigate('/listing/42');
+
+// Navigate with template literal
+navigate(`/listing/${id}`);
+```
+
+</Accordion>
+
+<Accordion title="Navigate with State">
+
+```jsx
+// Pass data to next page
+navigate('/success', {
+  state: { bookingId: 123, from: 'checkout' }
+});
+```
+
+</Accordion>
+
+```jsx title="SuccessPage.jsx"
+// Access in destination component
+import { useLocation } from 'react-router-dom';
+
+function SuccessPage() {
+  const location = useLocation();
+  const bookingId = location.state?.bookingId;
+  const from = location.state?.from;
+  
+  return <div>Booking #{bookingId} from {from}</div>;
+}
+```
+
+<Accordion title="Replace Current Entry">
+
+```jsx
+// Replace instead of adding to history
+navigate('/login', { replace: true });
+
+// Example: After login, replace so "back" doesn't go to login
+function LoginPage() {
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    await login();
+    navigate('/dashboard', { replace: true });
+  };
+}
+```
+
+</Accordion>
+
+<Accordion title="Relative Navigation">
+
+```jsx
+// Current path: /listing/42/reviews
+
+// Navigate up one level
+navigate('..'); // → /listing/42
+
+// Navigate to sibling path
+navigate('../photos'); // → /listing/42/photos
+
+// Navigate relative to current
+navigate('edit'); // → /listing/42/reviews/edit
+```
+
+</Accordion>
+
+<Accordion title="History Navigation">
+
+```jsx
+const navigate = useNavigate();
+
+// Go back one page
+navigate(-1);
+
+// Go forward one page
+navigate(1);
+
+// Go back two pages
+navigate(-2);
+
+// Example usage
+<button onClick={() => navigate(-1)}>Back</button>
+<button onClick={() => navigate(1)}>Forward</button>
+```
+
+</Accordion>
+
+</Accordions>
+
+## Practical Example: Add to Booking
+
+Let's add a "Book Now" feature that navigates to a booking page:
+
+<Steps>
+
+<Step>
+
+### Update ListingDetailsCard
+
+Add booking button logic:
+
+```jsx title="src/components/ListingDetailsCard.jsx"
+import { useNavigate } from 'react-router-dom'; // [!code ++]
+
+export default function ListingDetailsCard({ listing }) {
+  const navigate = useNavigate(); // [!code ++]
+
+  const handleBooking = () => { // [!code ++]
+    // Navigate to booking page with listing data // [!code ++]
+    navigate(`/booking/${listing.id}`, { // [!code ++]
+      state: { listing: { id: listing.id, title: listing.title, price: listing.price } } // [!code ++]
+    }); // [!code ++]
+  }; // [!code ++]
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* ... existing content ... */}
+
+      {/* Booking Card */}
+      <div className="lg:col-span-1">
+        <div className="border border-gray-200 rounded-lg p-6 shadow-md sticky top-4">
+          <div className="mb-4">
+            <span className="text-2xl font-bold">${listing.price}</span>
+            <span className="text-gray-600"> / night</span>
+          </div>
+
+          <button 
+            onClick={handleBooking} {/* [!code ++] */}
+            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+          >
+            Check Availability
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+</Step>
+
+<Step>
+
+### Create Booking Page (Optional)
+
+```jsx title="src/pages/BookingPage.jsx"
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
+
+export default function BookingPage() {
+  const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const listing = location.state?.listing;
+
+  if (!listing) {
+    return <div>No listing data</div>;
+  }
+
+  const handleConfirmBooking = () => {
+    // Process booking...
+    navigate('/booking-confirmed', {
+      state: { bookingId: 123 }
+    });
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-4">
+        Book {listing.title}
+      </h1>
+      
+      <p className="text-xl mb-6">
+        ${listing.price} / night
+      </p>
+
+      <button 
+        onClick={handleConfirmBooking}
+        className="bg-pink-600 text-white px-6 py-3 rounded-lg"
+      >
+        Confirm Booking
+      </button>
+
+      <button 
+        onClick={() => navigate(-1)}
+        className="ml-4 bg-gray-200 px-6 py-3 rounded-lg"
+      >
+        Cancel
+      </button>
+    </div>
+  );
+}
+```
+
+</Step>
+
+</Steps>
+
+## useNavigate vs Link
+
+<Tabs items={['When to Use Link', 'When to Use useNavigate']}>
+
+<Tab value="When to Use Link">
+
+**Use `<Link>` for:**
+
+- User-initiated clicks
+- Standard navigation
+- Crawlable links (SEO)
+- Keyboard accessibility
+- Right-click → Open in new tab
+
+**Examples:**
+
+```jsx
+// ✅ Navigation menu
+<nav>
+  <Link to="/">Home</Link>
+  <Link to="/about">About</Link>
+</nav>
+
+// ✅ Card links
+<Link to={`/listing/${id}`}>
+  <div className="card">...</div>
+</Link>
+
+// ✅ Buttons that look like links
+<Link to="/signup" className="btn">
+  Sign Up
+</Link>
+```
+
+</Tab>
+
+<Tab value="When to Use useNavigate">
+
+**Use `useNavigate()` for:**
+
+- After form submissions
+- After async operations
+- Conditional redirects
+- Programmatic flow control
+- After timers/delays
+
+**Examples:**
+
+```jsx
+// ✅ After form submit
+const handleSubmit = async () => {
+  await submitForm();
+  navigate('/success');
+};
+
+// ✅ Conditional redirect
+if (!isAuthenticated) {
+  navigate('/login');
+}
+
+// ✅ After API call
+const handleDelete = async () => {
+  await deleteItem();
+  navigate('/');
+};
+
+// ✅ With state data
+navigate('/checkout', {
+  state: { cart: items }
+});
+```
+
+</Tab>
+
+</Tabs>
+
+## Common Patterns
+
+<Accordions>
+
+<Accordion title="Pattern 1: Post-Submit Navigation">
+
+```jsx
+function ContactForm() {
+  const navigate = useNavigate();
+  const [status, setStatus] = useState('idle');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('submitting');
+
+    try {
+      await submitContact(formData);
+      navigate('/thank-you', {
+        state: { from: 'contact' }
+      });
+    } catch (error) {
+      setStatus('error');
+    }
+  };
+
+  return <form onSubmit={handleSubmit}>...</form>;
+}
+```
+
+</Accordion>
+
+<Accordion title="Pattern 2: Authentication Redirect">
+
+```jsx
+function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLogin = async (credentials) => {
+    await login(credentials);
+
+    // Redirect to where they came from, or dashboard
+    const from = location.state?.from || '/dashboard';
+    navigate(from, { replace: true });
+  };
+
+  return <LoginForm onSubmit={handleLogin} />;
+}
+```
+
+</Accordion>
+
+<Accordion title="Pattern 3: Multi-Step Form">
+
+```jsx
+function MultiStepForm() {
+  const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({});
+
+  const nextStep = () => {
+    setStep(step + 1);
+    navigate(`/form/step-${step + 1}`, {
+      state: { formData }
+    });
+  };
+
+  const prevStep = () => {
+    setStep(step - 1);
+    navigate(-1);
+  };
+
+  return (
+    <div>
+      {step === 1 && <Step1 onNext={nextStep} />}
+      {step === 2 && <Step2 onNext={nextStep} onBack={prevStep} />}
+      {step === 3 && <Step3 onSubmit={handleSubmit} />}
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+<Callout type="success" title="Programmatic Navigation Mastered!">
+
+You now know how to navigate from JavaScript code! This is essential for forms, authentication, and complex user flows.
+
+</Callout>
+
+## Quick Recap
+
+**What we learned:**
+
+- ✅ useNavigate hook for programmatic navigation
+- ✅ Navigate after form submissions
+- ✅ Pass `state` between routes
+- ✅ Replace history entries
+- ✅ Navigate backward/forward
+
+**Key concepts:**
+
+- **useNavigate()** - Returns navigation function
+- **navigate(path)** - Navigate to path
+- **navigate(path, `{ state }`)** - Pass data
+- **navigate(path, `{ replace }`)** - Replace history
+- **navigate(-1)** - Go back
+
+## What's Next?
+
+In **Lesson 12**, we'll **review all Module 4 concepts** - routes, parameters, navigation, and best practices. Time to consolidate everything you've learned! 📚

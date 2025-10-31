@@ -1,0 +1,830 @@
+---
+title: "L4: Hide Navbar When Not Signed In"
+description: "Implement conditional UI based on authentication state"
+---
+
+# Hide Navbar When Not Signed In
+
+Let's implement conditional rendering based on authentication state so the Navbar only appears when users are signed in! 🎨
+
+## Why Hide the Navbar?
+
+**Current problem:**
+
+```
+User NOT signed in
+  → Navbar still shows
+  → "Favorites" link visible
+  → But favorites require authentication!
+  → Confusing UX 😕
+```
+
+**Better UX:**
+
+```
+User NOT signed in
+  → Hide Navbar
+  → Show sign-in page
+  → Clean, focused interface ✨
+
+User signed in
+  → Show Navbar
+  → User can navigate
+  → Access authenticated features 🎉
+```
+
+## Understanding Conditional Rendering
+
+<Accordions>
+
+<Accordion title="Conditional Rendering Patterns">
+
+**Three common patterns:**
+
+**1. If statement (early return):**
+
+```jsx
+function Component() {
+  const { user } = useAuth();
+  
+  if (!user) {
+    return null;  // Don't render anything
+  }
+  
+  return <div>Content for signed-in users</div>;
+}
+```
+
+**2. Ternary operator:**
+
+```jsx
+function Component() {
+  const { user } = useAuth();
+  
+  return (
+    <div>
+      {user ? (
+        <div>Signed in content</div>
+      ) : (
+        <div>Not signed in content</div>
+      )}
+    </div>
+  );
+}
+```
+
+**3. Logical AND (&&):**
+
+```jsx
+function Component() {
+  const { user } = useAuth();
+  
+  return (
+    <div>
+      {user && <div>Only show if user exists</div>}
+    </div>
+  );
+}
+```
+
+**Which to use?**
+
+- **Early return:** When entire component shouldn't render
+- **Ternary:** When showing different content for each state
+- **Logical AND:** When showing something or nothing
+
+</Accordion>
+
+<Accordion title="Loading States Matter">
+
+**Why check `isLoading`?**
+
+```jsx
+// ❌ Wrong: Flashes Navbar then hides it
+function App() {
+  const { user } = useAuth();
+  
+  return (
+    <div>
+      {user && <Navbar />}  {/* Flashes on load! */}
+      <Routes>...</Routes>
+    </div>
+  );
+}
+```
+
+**Timeline:**
+```
+0ms: App starts
+    → isLoading: true
+    → user: null
+    → No Navbar (correct!)
+
+100ms: Token fetch complete
+    → isLoading: false
+    → user: { ... }
+    → Navbar appears
+    → Visual "pop" effect 😕
+```
+
+**✅ Correct: Show loading first**
+
+```jsx
+function App() {
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <LoadingSpinner />;  // Smooth experience
+  }
+  
+  return (
+    <div>
+      {user && <Navbar />}
+      <Routes>...</Routes>
+    </div>
+  );
+}
+```
+
+**Better timeline:**
+```
+0ms: App starts
+    → isLoading: true
+    → Show spinner (clear feedback)
+
+100ms: Token fetch complete
+    → isLoading: false
+    → user: { ... }
+    → Show app with Navbar
+    → Smooth transition ✨
+```
+
+</Accordion>
+
+<Accordion title="Why Not Conditionally Render Routes?">
+
+**You might think:**
+
+```jsx
+// ❌ Don't do this
+function App() {
+  const { user } = useAuth();
+  
+  return (
+    <div>
+      {user && <Navbar />}
+      {user ? (
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      ) : (
+        <Routes>
+          <Route path="/sign-in" element={<SignInPage />} />
+        </Routes>
+      )}
+    </div>
+  );
+}
+```
+
+**Problems:**
+
+1. **Routes unmount/remount** - Loses route state
+2. **No URL protection** - Users can manually navigate to any URL
+3. **Complex logic** - Hard to maintain
+
+**✅ Better approach:**
+
+```jsx
+function App() {
+  const { user } = useAuth();
+  
+  return (
+    <div>
+      {user && <Navbar />}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/sign-in" element={<SignInPage />} />
+      </Routes>
+    </div>
+  );
+}
+```
+
+Then protect individual routes with a `<Route>` guard component (we'll create this in Lesson 13).
+
+</Accordion>
+
+</Accordions>
+
+## Update App Component
+
+Add conditional rendering for the Navbar based on auth state:
+
+```jsx title="src/App.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from '@/components/AuthProvider';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import Navbar from '@/components/Navbar';
+import { useAuth } from '@/components/AuthProvider';
+
+function AppContent() {
+  const { user, isLoading } = useAuth();
+
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app">
+      {/* Only show Navbar if user is signed in */}
+      {user && <Navbar />}
+      
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;
+```
+
+## Add Loading Styles
+
+Add CSS for the loading spinner:
+
+```css title="src/app/global.css"
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+/* Spinner Animation */
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container p {
+  margin-top: 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+```
+
+## Understanding the Code
+
+<Tabs items={['Component Split', 'Loading State', 'Conditional Navbar', 'Layout Adjustment']}>
+
+<Tab value="Component Split">
+
+**Why two components?**
+
+```jsx
+// AppContent uses useAuth()
+function AppContent() {
+  const { user, isLoading } = useAuth();  // ✅ Works!
+  // ...
+}
+
+// App wraps with AuthProvider
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />  {/* Can use useAuth */}
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+```
+
+**Why not this?**
+
+```jsx
+// ❌ Won't work!
+function App() {
+  const { user } = useAuth();  // ERROR: Outside AuthProvider!
+  
+  return (
+    <AuthProvider>
+      {/* ... */}
+    </AuthProvider>
+  );
+}
+```
+
+**Rule:** You can only use `useAuth()` **inside** components wrapped by `<AuthProvider>`.
+
+**Solution:** Create `AppContent` inside the provider:
+
+```
+App (no auth access)
+  └── AuthProvider
+      └── BrowserRouter
+          └── AppContent (has auth access ✅)
+```
+
+</Tab>
+
+<Tab value="Loading State">
+
+**Loading state check:**
+
+```jsx
+const { user, isLoading } = useAuth();
+
+if (isLoading) {
+  return (
+    <div className="loading-container">
+      <div className="spinner"></div>
+      <p>Loading...</p>
+    </div>
+  );
+}
+```
+
+**Why this matters:**
+
+**Without loading check:**
+```
+User opens app
+  → isLoading: true, user: null
+  → Shows sign-in page (wrong!)
+  → 100ms later: user data arrives
+  → Switches to home page
+  → Jarring transition 😕
+```
+
+**With loading check:**
+```
+User opens app
+  → isLoading: true
+  → Shows loading spinner
+  → 100ms later: user data arrives
+  → isLoading: false
+  → Shows home page with Navbar
+  → Smooth experience ✨
+```
+
+**User perception:**
+
+```
+Without loading: "Why did it flash the sign-in page?"
+With loading: "App is checking my session, nice!"
+```
+
+</Tab>
+
+<Tab value="Conditional Navbar">
+
+**Conditional rendering:**
+
+```jsx
+{user && <Navbar />}
+```
+
+**How it works:**
+
+**Logical AND evaluation:**
+
+```jsx
+// When user is null:
+{null && <Navbar />}  → null (nothing rendered)
+
+// When user exists:
+{{ id: 1, name: 'John' } && <Navbar />}  → <Navbar /> (rendered!)
+```
+
+**JavaScript logic:**
+
+```javascript
+// Falsy values return first operand:
+null && anything        → null
+undefined && anything   → undefined
+false && anything       → false
+0 && anything          → 0
+'' && anything         → ''
+
+// Truthy values return second operand:
+{} && anything         → anything
+'text' && anything     → anything
+true && anything       → anything
+```
+
+**In JSX:**
+
+```jsx
+// Falsy values (except 0) don't render:
+{null}       → (nothing)
+{undefined}  → (nothing)
+{false}      → (nothing)
+{true}       → (nothing)
+
+// But 0 renders as "0":
+{0}          → "0" (careful!)
+
+// Objects and components render:
+{<Navbar />} → Navbar component
+```
+
+**That's why this works:**
+
+```jsx
+{user && <Navbar />}
+
+// user is null → nothing rendered
+// user is object → Navbar rendered
+```
+
+</Tab>
+
+<Tab value="Layout Adjustment">
+
+**Layout without Navbar:**
+
+```jsx
+return (
+  <div className="app">
+    {/* No Navbar here */}
+    <main className="main-content">
+      <Routes>...</Routes>
+    </main>
+  </div>
+);
+```
+
+**Layout with Navbar:**
+
+```jsx
+return (
+  <div className="app">
+    <Navbar />  {/* Takes up space */}
+    <main className="main-content">
+      <Routes>...</Routes>
+    </main>
+  </div>
+);
+```
+
+**CSS handles both:**
+
+```css
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;  /* Takes remaining space */
+  /* Whether Navbar exists or not */
+}
+```
+
+**Result:**
+
+```
+With Navbar:
+┌─────────────────┐
+│ Navbar (60px)   │
+├─────────────────┤
+│                 │
+│ Main Content    │ ← Fills rest
+│                 │
+└─────────────────┘
+
+Without Navbar:
+┌─────────────────┐
+│                 │
+│                 │
+│ Main Content    │ ← Fills all
+│                 │
+│                 │
+└─────────────────┘
+```
+
+</Tab>
+
+</Tabs>
+
+## Testing the Conditional Rendering
+
+<Steps>
+
+<Step>
+
+**Refresh the page**
+
+You should see:
+1. Loading spinner (briefly)
+2. No Navbar (since not signed in)
+3. Routes still work (HomePage loads)
+
+</Step>
+
+<Step>
+
+**Check browser console**
+
+```javascript
+// In AuthProvider useEffect:
+No valid session: Request failed with status code 401
+
+// This is expected - no user signed in yet
+```
+
+</Step>
+
+<Step>
+
+**Test with React DevTools**
+
+Check AuthProvider state:
+```javascript
+user: null
+token: null
+isLoading: false
+```
+
+Navbar should NOT be in the component tree.
+
+</Step>
+
+<Step>
+
+**Navigate between pages**
+
+Try visiting:
+- `/` - HomePage (works)
+- `/favorites` - FavoritesPage (works)
+- `/random` - NotFoundPage (works)
+
+All routes work, but no Navbar visible.
+
+</Step>
+
+</Steps>
+
+## User Experience Flow
+
+<Tabs items={['First Visit', 'Return Visit (No Session)', 'Return Visit (Has Session)']}>
+
+<Tab value="First Visit">
+
+**Timeline:**
+
+```
+0ms: User opens app
+  → AuthProvider mounts
+  → isLoading: true
+  → Show loading spinner
+
+100ms: Check for token
+  → API call to /auth/refresh
+  → 401 Unauthorized (no token)
+  → user: null, token: null
+  → isLoading: false
+
+101ms: Render app
+  → No Navbar (user is null)
+  → Show routes normally
+  → HomePage visible
+
+User sees:
+  1. Brief loading spinner
+  2. Homepage without Navbar
+  3. Eventually will see sign-in prompt
+```
+
+</Tab>
+
+<Tab value="Return Visit (No Session)">
+
+**Timeline:**
+
+```
+0ms: User returns (session expired)
+  → AuthProvider mounts
+  → isLoading: true
+  → Show loading spinner
+
+100ms: Check for token
+  → API call to /auth/refresh
+  → 401 Unauthorized (expired token)
+  → user: null, token: null
+  → isLoading: false
+
+101ms: Render app
+  → No Navbar
+  → Show routes
+  → HomePage visible
+
+User sees:
+  → Same as first visit
+  → Must sign in again
+```
+
+</Tab>
+
+<Tab value="Return Visit (Has Session)">
+
+**Timeline (we'll implement token fetch in next lessons):**
+
+```
+0ms: User returns (session valid)
+  → AuthProvider mounts
+  → isLoading: true
+  → Show loading spinner
+
+100ms: Check for token
+  → API call to /auth/refresh
+  → 200 OK (valid token!)
+  → user: { id, name, email }
+  → token: "eyJhbG..."
+  → isLoading: false
+
+101ms: Render app
+  → Navbar visible ✅
+  → User data available
+  → Full app access
+
+User sees:
+  1. Brief loading spinner
+  2. App with Navbar
+  3. Still signed in! 🎉
+```
+
+</Tab>
+
+</Tabs>
+
+## Common Loading Patterns
+
+<Accordions>
+
+<Accordion title="Skeleton Screens">
+
+Instead of a spinner, show content placeholder:
+
+```jsx
+if (isLoading) {
+  return (
+    <div className="app">
+      <div className="skeleton-navbar"></div>
+      <div className="skeleton-content">
+        <div className="skeleton-card"></div>
+        <div className="skeleton-card"></div>
+      </div>
+    </div>
+  );
+}
+```
+
+**Benefits:**
+- Feels faster (shows structure)
+- Less jarring transition
+- Better perceived performance
+
+</Accordion>
+
+<Accordion title="Delayed Loading Indicator">
+
+Don't show spinner for fast loads:
+
+```jsx
+const [showSpinner, setShowSpinner] = useState(false);
+
+useEffect(() => {
+  // Only show spinner if loading takes > 200ms
+  const timer = setTimeout(() => {
+    if (isLoading) {
+      setShowSpinner(true);
+    }
+  }, 200);
+  
+  return () => clearTimeout(timer);
+}, [isLoading]);
+
+if (isLoading && showSpinner) {
+  return <LoadingSpinner />;
+}
+```
+
+**Benefits:**
+- No spinner flash for fast loads
+- Better UX for good connections
+- Still shows feedback for slow loads
+
+</Accordion>
+
+<Accordion title="Progressive Enhancement">
+
+Show app immediately, update when loaded:
+
+```jsx
+return (
+  <div className="app">
+    {user && <Navbar />}
+    
+    <main className="main-content">
+      {isLoading ? (
+        <div className="inline-loading">
+          Checking session...
+        </div>
+      ) : (
+        <Routes>...</Routes>
+      )}
+    </main>
+  </div>
+);
+```
+
+**Benefits:**
+- App shell visible immediately
+- Routes load progressively
+- Feels more responsive
+
+</Accordion>
+
+</Accordions>
+
+## What We've Achieved
+
+**Before this lesson:**
+```
+✅ AuthProvider created
+✅ Added to App
+✅ Token fetch on mount
+❌ Navbar always visible (confusing)
+```
+
+**After this lesson:**
+```
+✅ AuthProvider created
+✅ Added to App
+✅ Token fetch on mount
+✅ Navbar conditionally rendered
+✅ Loading state handled
+✅ Clean UX for signed-out users
+```
+
+## What's Next?
+
+In Lesson 5, we'll create the `SignInPage` where users can actually sign in! We'll build:
+1. Page layout
+2. Form container
+3. Error message display
+4. Navigation after success
+
+<Callout type="success">
+**✅ Lesson Complete!** The Navbar now only appears when users are signed in!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Conditional rendering** shows/hides UI based on state
+- ✅ **Loading states** prevent jarring transitions
+- ✅ **Split components** allow using context hooks
+- ✅ **Logical AND (&&)** perfect for show/hide pattern
+- ✅ **User experience** improved with smooth loading feedback
+- ✅ **Early returns** keep code clean and readable
+- ✅ **isLoading check** essential for good UX

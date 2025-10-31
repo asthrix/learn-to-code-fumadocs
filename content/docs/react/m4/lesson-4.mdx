@@ -1,0 +1,818 @@
+---
+title: "L4: Creating the ListingDetailsPage"
+description: "Build a new page to display detailed information about individual listings"
+---
+
+
+# Creating the ListingDetailsPage
+
+Time to build a details page! When users click on a listing card, they'll navigate to a dedicated page showing full information about that property. Let's create the `ListingDetailsPage` component.
+
+## What You'll Learn
+
+- How to create new page components
+- Structuring a details page
+- Preparing for dynamic routing
+- Best practices for page-level components
+
+## Why We Need a Details Page
+
+Right now, your `ListingCard` shows limited information:
+- Title
+- Location
+- Price per night
+- Rating and reviews
+- Small image carousel
+
+But users need to see much more before booking:
+- 📸 **Full image gallery** - All property photos
+- 📝 **Complete description** - Detailed property info
+- 🛏️ **Amenities** - WiFi, kitchen, parking, etc.
+- 🏠 **Property type** - Entire place, private room, shared room
+- 👥 **Host information** - Name, profile, reviews
+- 📅 **Availability calendar** - Check-in/check-out dates
+- 💰 **Pricing breakdown** - Nightly rate, cleaning fee, service fee
+- ⭐ **Detailed reviews** - Guest feedback and ratings
+- 📍 **Map location** - Where the property is located
+
+A dedicated details page provides space for all this information!
+
+## Page vs Component
+
+Before we build, let's understand the difference:
+
+<Tabs items={['Page Component', 'Regular Component']}>
+
+<Tab value="Page Component">
+
+**Page components** represent entire routes/views:
+
+**Characteristics:**
+- Live in `src/pages/` folder
+- Represent full screens/routes
+- Handle their own data fetching
+- Usually named with "Page" suffix
+- Connected to routes in Router
+
+**Examples:**
+
+```
+HomePage.jsx        -> /
+ListingDetailsPage.jsx -> /listing/:id
+ProfilePage.jsx     -> /profile
+NotFoundPage.jsx    -> /404
+```
+
+**Structure:**
+
+```jsx
+export default function ListingDetailsPage() {
+  // Data fetching
+  // State management
+  // Layout
+  
+  return (
+    <div className="page-container">
+      {/* Page content with multiple components */}
+    </div>
+  );
+}
+```
+
+</Tab>
+
+<Tab value="Regular Component">
+
+**Regular components** are reusable pieces:
+
+**Characteristics:**
+- Live in `src/components/` folder
+- Represent UI pieces
+- Receive data via props
+- Named after what they display
+- Used within pages
+
+**Examples:**
+
+```
+ListingCard.jsx
+ImageCarousel.jsx
+Spinner.jsx
+ErrorMessage.jsx
+```
+
+**Structure:**
+
+```jsx
+export default function ListingCard({ listing }) {
+  // Just display logic
+  
+  return (
+    <div className="card">
+      {/* Card content */}
+    </div>
+  );
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Planning the ListingDetailsPage
+
+Let's plan what this page will contain:
+
+```
+ListingDetailsPage
+├── Hero Section
+│   └── Large image carousel (all listing images)
+├── Main Content
+│   ├── Title, location, rating
+│   ├── Host information
+│   ├── Description
+│   └── Amenities list
+└── Sidebar
+    ├── Pricing card
+    ├── Check-in/check-out dates
+    ├── Guest selector
+    └── "Reserve" button
+```
+
+For now, we'll create a basic structure and add features incrementally!
+
+## Step 1: Create the File
+
+<Steps>
+
+<Step>
+
+### Create the Page File
+
+Create a new file in the pages folder:
+
+```bash title="Terminal"
+touch src/pages/ListingDetailsPage.jsx
+```
+
+Your pages folder should now have:
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="pages" defaultOpen>
+      <File name="HomePage.jsx" />
+      <File name="ListingDetailsPage.jsx" />
+    </Folder>
+  </Folder>
+</Files>
+
+</Step>
+
+</Steps>
+
+## Step 2: Build the Basic Structure
+
+<Steps>
+
+<Step>
+
+### Add the Component Skeleton
+
+Start with a simple structure:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+export default function ListingDetailsPage() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        Listing Details
+      </h1>
+      
+      <p className="text-gray-600">
+        Detailed information about the listing will appear here.
+      </p>
+    </div>
+  );
+}
+```
+
+**What we have:**
+- Container with padding and margins
+- Heading for the page
+- Placeholder text
+
+This is just a starting point - we'll add much more content soon!
+
+</Step>
+
+<Step>
+
+### Understanding the Layout Structure
+
+Let's break down the JSX structure:
+
+<Accordions>
+
+<Accordion title="Container Classes">
+
+```jsx
+<div className="container mx-auto px-4 py-8">
+```
+
+**What each class does:**
+- `container` - Max-width container (responsive)
+- `mx-auto` - Center horizontally with margin auto
+- `px-4` - Padding left/right (1rem = 16px)
+- `py-8` - Padding top/bottom (2rem = 32px)
+
+This creates a centered, padded content area that works on all screen sizes.
+
+</Accordion>
+
+<Accordion title="Heading Styles">
+
+```jsx
+<h1 className="text-3xl font-bold text-gray-900 mb-4">
+```
+
+**What each class does:**
+- `text-3xl` - Large font size (1.875rem)
+- `font-bold` - Bold font weight (700)
+- `text-gray-900` - Very dark gray text
+- `mb-4` - Margin bottom (1rem = 16px)
+
+Standard heading styles for page titles.
+
+</Accordion>
+
+<Accordion title="Paragraph Styles">
+
+```jsx
+<p className="text-gray-600">
+```
+
+**What it does:**
+- `text-gray-600` - Medium gray text (for secondary content)
+
+Body text uses lighter colors to create visual hierarchy.
+
+</Accordion>
+
+</Accordions>
+
+</Step>
+
+</Steps>
+
+## Step 3: Add a More Detailed Layout
+
+Let's add more structure to prepare for actual content:
+
+<Steps>
+
+<Step>
+
+### Create Content Sections
+
+Update the page with proper sections:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+export default function ListingDetailsPage() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Listing Title
+        </h1>
+        <div className="flex items-center gap-4 text-sm text-gray-600">
+          <span>📍 Location</span>
+          <span>⭐ Rating</span>
+          <span>👥 Reviews</span>
+        </div>
+      </div>
+
+      {/* Image Section - Placeholder */}
+      <div className="bg-gray-200 rounded-lg h-96 mb-6 flex items-center justify-center">
+        <p className="text-gray-500">Image Gallery Coming Soon</p>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Main Info */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Property Info */}
+          <div>
+            <h2 className="text-xl font-semibold mb-2">About this place</h2>
+            <p className="text-gray-600">
+              Property description will appear here with full details about the listing.
+            </p>
+          </div>
+
+          {/* Amenities */}
+          <div>
+            <h2 className="text-xl font-semibold mb-2">What this place offers</h2>
+            <div className="text-gray-600">
+              Amenities list coming soon
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Booking Card */}
+        <div className="lg:col-span-1">
+          <div className="border border-gray-200 rounded-lg p-6 sticky top-4">
+            <div className="text-2xl font-bold mb-4">
+              $100 <span className="text-base font-normal text-gray-600">/ night</span>
+            </div>
+            <p className="text-gray-600">Booking form coming soon</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+</Step>
+
+<Step>
+
+### Understanding the Layout
+
+Let's break down the structure:
+
+<Accordions>
+
+<Accordion title="Page Header Section">
+
+```jsx
+<div className="mb-6">
+  <h1>Listing Title</h1>
+  <div className="flex items-center gap-4">
+    <span>📍 Location</span>
+    <span>⭐ Rating</span>
+  </div>
+</div>
+```
+
+**Purpose:** Shows listing name and key information
+
+**Layout:**
+- Title at top
+- Metadata (location, rating) below in a flex row
+- `gap-4` adds spacing between items
+- `items-center` vertically aligns content
+
+</Accordion>
+
+<Accordion title="Image Placeholder">
+
+```jsx
+<div className="bg-gray-200 rounded-lg h-96 mb-6 flex items-center justify-center">
+  <p>Image Gallery Coming Soon</p>
+</div>
+```
+
+**Purpose:** Reserved space for image carousel
+
+**Styling:**
+- `h-96` - Fixed height (24rem = 384px)
+- `bg-gray-200` - Light gray background
+- `flex items-center justify-center` - Center the text
+- `rounded-lg` - Rounded corners
+
+This makes it clear where images will go!
+
+</Accordion>
+
+<Accordion title="Grid Layout">
+
+```jsx
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  {/* Left: 2 columns */}
+  <div className="lg:col-span-2">...</div>
+  
+  {/* Right: 1 column */}
+  <div className="lg:col-span-1">...</div>
+</div>
+```
+
+**Purpose:** Two-column layout (main content + sidebar)
+
+**How it works:**
+- `grid-cols-1` - 1 column on mobile
+- `lg:grid-cols-3` - 3 columns on large screens
+- Left content spans 2 columns (`lg:col-span-2`)
+- Right sidebar spans 1 column (`lg:col-span-1`)
+- `gap-8` - Spacing between columns
+
+**Result:** 
+- Mobile: Stack vertically
+- Desktop: 2/3 width for content, 1/3 for sidebar
+
+</Accordion>
+
+<Accordion title="Sticky Sidebar">
+
+```jsx
+<div className="sticky top-4">
+  {/* Booking card content */}
+</div>
+```
+
+**Purpose:** Keep booking card visible while scrolling
+
+**How it works:**
+- `sticky` - Stick to viewport when scrolling
+- `top-4` - Stay 1rem (16px) from top
+
+The booking card stays in view as users scroll through the listing details!
+
+</Accordion>
+
+</Accordions>
+
+</Step>
+
+</Steps>
+
+## Complete ListingDetailsPage Code
+
+Here's the full component with all sections:
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+export default function ListingDetailsPage() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Cozy Beach House
+        </h1>
+        <div className="flex items-center gap-4 text-sm text-gray-600">
+          <span>📍 Malibu, California</span>
+          <span>⭐ 4.8</span>
+          <span>👥 124 reviews</span>
+        </div>
+      </div>
+
+      {/* Image Placeholder */}
+      <div className="bg-gray-200 rounded-lg h-96 mb-6 flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Image Gallery Coming Soon</p>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Main Info */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Host Info */}
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-2">
+              Entire place hosted by John
+            </h2>
+            <div className="text-gray-600">
+              4 guests · 2 bedrooms · 3 beds · 2 bathrooms
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-3">About this place</h2>
+            <p className="text-gray-600 leading-relaxed">
+              Wake up to the sound of waves in this stunning beach house. 
+              Perfect for families or groups seeking a peaceful coastal retreat. 
+              The property features modern amenities, a fully equipped kitchen, 
+              and direct beach access.
+            </p>
+          </div>
+
+          {/* Amenities */}
+          <div className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-semibold mb-3">What this place offers</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3">
+                <span>🏖️</span>
+                <span>Beach access</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span>📶</span>
+                <span>WiFi</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span>🅿️</span>
+                <span>Free parking</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span>🍳</span>
+                <span>Kitchen</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span>❄️</span>
+                <span>Air conditioning</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span>🧺</span>
+                <span>Washer</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Booking Card */}
+        <div className="lg:col-span-1">
+          <div className="border border-gray-200 rounded-lg p-6 shadow-md sticky top-4">
+            <div className="mb-4">
+              <span className="text-2xl font-bold">$250</span>
+              <span className="text-gray-600"> / night</span>
+            </div>
+
+            <div className="mb-4">
+              <div className="text-sm text-gray-600 mb-2">
+                ⭐ 4.8 · 124 reviews
+              </div>
+            </div>
+
+            <button className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+              Check Availability
+            </button>
+
+            <p className="text-center text-sm text-gray-600 mt-4">
+              You won't be charged yet
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## Viewing the Page
+
+Right now, you can't navigate to this page yet because we haven't added a route! But let's verify the component is working:
+
+<Steps>
+
+<Step>
+
+### Temporarily Test the Page
+
+You can temporarily import and render it in `App.jsx` to see it:
+
+```jsx title="src/App.jsx (Temporary - Don't Save)"
+import ListingDetailsPage from './pages/ListingDetailsPage';
+
+function App() {
+  return <ListingDetailsPage />;
+}
+
+export default App;
+```
+
+**Check the browser** - You should see the details page layout!
+
+</Step>
+
+<Step>
+
+### Revert the Change
+
+After viewing, change `App.jsx` back:
+
+```jsx title="src/App.jsx"
+import Router from './components/Router';
+
+function App() {
+  return <Router />;
+}
+
+export default App;
+```
+
+In the next lesson, we'll add the route properly so you can navigate to it!
+
+</Step>
+
+</Steps>
+
+## Responsive Design
+
+Let's see how the layout adapts to different screens:
+
+<Tabs items={['Mobile View', 'Tablet View', 'Desktop View']}>
+
+<Tab value="Mobile View">
+
+**On phones (< 1024px):**
+
+```
+┌─────────────────┐
+│  Header         │
+├─────────────────┤
+│  Images         │
+├─────────────────┤
+│  Main Content   │
+│  - Description  │
+│  - Amenities    │
+├─────────────────┤
+│  Booking Card   │
+└─────────────────┘
+```
+
+Everything stacks vertically (`grid-cols-1`).
+
+</Tab>
+
+<Tab value="Tablet View">
+
+**On tablets (1024px):**
+
+Starts transitioning to two-column layout.
+
+</Tab>
+
+<Tab value="Desktop View">
+
+**On desktops (> 1024px):**
+
+```
+┌─────────────────────────────────────┐
+│  Header                             │
+├─────────────────────────────────────┤
+│  Images                             │
+├─────────────────┬───────────────────┤
+│  Main Content   │  Booking Card     │
+│  (2/3 width)    │  (1/3 width)      │
+│  - Description  │  - Sticky         │
+│  - Amenities    │                   │
+│  - Reviews      │                   │
+└─────────────────┴───────────────────┘
+```
+
+Two-column grid (`lg:grid-cols-3` with span-2 and span-1).
+
+</Tab>
+
+</Tabs>
+
+## Future Enhancements
+
+In upcoming lessons, we'll enhance this page with:
+
+**Lesson 5-6:** Dynamic routing to show different listings  
+**Lesson 7:** Fetch real listing data from API  
+**Lesson 8:** Create a proper `ListingDetailsCard` component  
+**Lesson 9:** Add navigation from HomePage to this page
+
+For now, we have a solid foundation!
+
+## Page Component Best Practices
+
+<Accordions>
+
+<Accordion title="1. Keep Pages Focused">
+
+**Each page should have one primary purpose:**
+
+```jsx
+// ✅ Good - Focused on listing details
+function ListingDetailsPage() {
+  return (
+    <div>
+      <ListingInfo />
+      <BookingCard />
+    </div>
+  );
+}
+
+// ❌ Bad - Too many responsibilities
+function ListingDetailsPage() {
+  return (
+    <div>
+      <Navigation />
+      <ListingInfo />
+      <SearchFilters />
+      <BookingCard />
+      <Footer />
+      <ChatWidget />
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="2. Extract Complex Sections">
+
+**Move complex UI into separate components:**
+
+```jsx
+// ✅ Good - Extracted components
+function ListingDetailsPage() {
+  return (
+    <div>
+      <ListingHeader listing={listing} />
+      <ImageGallery images={images} />
+      <ListingContent listing={listing} />
+      <BookingCard listing={listing} />
+    </div>
+  );
+}
+
+// ❌ Bad - Everything inline
+function ListingDetailsPage() {
+  return (
+    <div>
+      {/* 500 lines of JSX... */}
+    </div>
+  );
+}
+```
+
+We'll do this extraction in Lesson 8!
+
+</Accordion>
+
+<Accordion title="3. Handle Loading and Errors">
+
+**Pages should manage their own states:**
+
+```jsx
+function ListingDetailsPage() {
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+  if (!listing) return <NotFound />;
+
+  return <div>{/* Content */}</div>;
+}
+```
+
+We'll implement this in Lesson 7!
+
+</Accordion>
+
+<Accordion title="4. Use Semantic HTML">
+
+**Structure pages with proper HTML5 elements:**
+
+```jsx
+// ✅ Good - Semantic structure
+<main className="container">
+  <header>
+    <h1>Title</h1>
+  </header>
+  
+  <article>
+    <section>Content</section>
+  </article>
+  
+  <aside>
+    <div>Sidebar</div>
+  </aside>
+</main>
+
+// ❌ Bad - All divs
+<div className="container">
+  <div>
+    <div>Title</div>
+  </div>
+  <div>Content</div>
+</div>
+```
+
+</Accordion>
+
+</Accordions>
+
+<Callout type="success" title="Page Component Created!">
+
+You've built the `ListingDetailsPage` component with a professional layout! It has header, images, content sections, and a sticky booking sidebar. In the next lesson, we'll connect it to a route with dynamic URL parameters.
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Created `ListingDetailsPage.jsx` in pages folder
+- ✅ Built a two-column responsive layout
+- ✅ Added header, content sections, and booking card
+- ✅ Used Tailwind grid for responsive design
+- ✅ Made booking card sticky on scroll
+- ✅ Added placeholder content and structure
+
+**Key concepts:**
+
+- **Page components** - Represent full routes/screens
+- **Grid layout** - Two-column layout with `grid-cols` and `col-span`
+- **Sticky positioning** - Keep elements visible while scrolling
+- **Responsive design** - Different layouts for mobile/desktop
+- **Semantic structure** - Organize content logically
+
+## What's Next?
+
+In **Lesson 5**, we'll add a **dynamic route** with a URL parameter (`:id`) so each listing can have its own unique URL like `/listing/1`, `/listing/2`, etc. This is where routing gets really powerful! 🚀

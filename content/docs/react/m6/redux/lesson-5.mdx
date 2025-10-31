@@ -1,0 +1,614 @@
+---
+title: "L5: Async Thunk for Fetching"
+description: "Create fetchListings async thunk to fetch data from the API"
+---
+
+# Async Thunk for Fetching
+
+Now let's handle **async operations** in Redux! We'll create an async thunk to fetch listings from the API.
+
+## The Problem with Async in Redux
+
+Redux reducers **must be synchronous** and **pure**:
+
+```jsx
+// ❌ CAN'T do this in a reducer
+reducers: {
+  fetchListings: async (state, action) => {
+    const response = await api.get('/listings');  // ❌ Async!
+    state.items = response.data;
+  }
+}
+```
+
+**Why not?**
+- Reducers must be pure functions (same input → same output)
+- Async operations have side effects
+- Redux can't track async state changes properly
+
+## The Solution: Async Thunks
+
+Redux Toolkit provides `createAsyncThunk` to handle async logic:
+
+```jsx
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async () => {
+    const response = await api.get('/listings');  // ✅ Async allowed here!
+    return response.data;
+  }
+);
+```
+
+**What is a thunk?**
+
+A thunk is a function that returns a function. It delays execution:
+
+```jsx
+// Regular function
+const add = (a, b) => a + b;
+add(2, 3);  // Returns 5 immediately
+
+// Thunk
+const addThunk = (a, b) => () => a + b;
+const delayed = addThunk(2, 3);  // Returns a function
+delayed();  // Call it later - returns 5
+```
+
+Redux thunks let you dispatch async actions!
+
+## How Async Thunks Work
+
+An async thunk automatically dispatches three actions:
+
+<Steps>
+
+<Step>
+
+### Pending Action (Before API call)
+
+```jsx
+dispatch(fetchListings());
+```
+
+Automatically dispatches:
+```jsx
+{ type: 'listings/fetchListings/pending' }
+```
+
+Use this to set loading state.
+
+</Step>
+
+<Step>
+
+### Fulfilled Action (Success)
+
+```jsx
+// API returns data successfully
+```
+
+Automatically dispatches:
+```jsx
+{ 
+  type: 'listings/fetchListings/fulfilled',
+  payload: [/* API data */]
+}
+```
+
+Use this to store the fetched data.
+
+</Step>
+
+<Step>
+
+### Rejected Action (Error)
+
+```jsx
+// API call fails
+```
+
+Automatically dispatches:
+```jsx
+{ 
+  type: 'listings/fetchListings/rejected',
+  error: { message: 'Network error' }
+}
+```
+
+Use this to store error message.
+
+</Step>
+
+</Steps>
+
+**The thunk handles all three automatically!** You just write the async logic.
+
+## What We're Building
+
+We'll create `fetchListings` thunk that:
+
+1. Calls the API to fetch listings
+2. Returns the data on success
+3. Handles errors automatically
+
+## Step 1: Import Dependencies
+
+Open `src/state/slices/listingsSlice.js` and update imports:
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '@/api';
+```
+
+**What did we add?**
+
+<Accordions>
+
+<Accordion title="createAsyncThunk">
+
+Function for creating async action creators:
+
+```js
+import { createAsyncThunk } from '@reduxjs/toolkit';
+```
+
+**What it does:**
+- Takes async function (API call, etc.)
+- Returns a thunk action creator
+- Automatically handles pending/fulfilled/rejected states
+- Works with Redux middleware
+
+</Accordion>
+
+<Accordion title="api from '@/api'">
+
+Our Axios instance for making API calls:
+
+```js
+import api from '@/api';
+```
+
+This is the same `api` we've been using in components:
+
+```js
+// src/api/index.js
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:3000',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export default api;
+```
+
+</Accordion>
+
+</Accordions>
+
+## Step 2: Create Async Thunk
+
+Add the async thunk **before** the slice definition:
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '@/api';
+
+const initialState = {
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+};
+
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async (filters = {}) => {
+    const response = await api.get('/listings', {
+      params: filters,
+    });
+    return response.data;
+  }
+);
+
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState,
+  reducers: {
+    toggleFavorite: (state, action) => {
+      const id = action.payload;
+      
+      if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(favoriteId => favoriteId !== id);
+      } else {
+        state.favorites.push(id);
+      }
+    },
+  },
+});
+
+export const { toggleFavorite } = listingsSlice.actions;
+export default listingsSlice.reducer;
+```
+
+**What's happening here?**
+
+<Accordions>
+
+<Accordion title="createAsyncThunk Parameters">
+
+```js
+createAsyncThunk(
+  'listings/fetchListings',  // Action type prefix
+  async (filters = {}) => {  // Async function (payload creator)
+    // Async logic here
+  }
+);
+```
+
+**Parameter 1: Action Type Prefix**
+
+```js
+'listings/fetchListings'
+```
+
+This generates three action types:
+- `listings/fetchListings/pending`
+- `listings/fetchListings/fulfilled`
+- `listings/fetchListings/rejected`
+
+**Parameter 2: Payload Creator Function**
+
+```js
+async (filters = {}) => {
+  const response = await api.get('/listings', { params: filters });
+  return response.data;
+}
+```
+
+- Takes arguments from `dispatch(fetchListings(args))`
+- Performs async operation
+- Returns the result (becomes action payload)
+- Throws errors (triggers rejected action)
+
+</Accordion>
+
+<Accordion title="Why filters parameter?">
+
+The `filters` parameter allows dynamic filtering:
+
+```jsx
+// In component
+dispatch(fetchListings());  // No filters
+dispatch(fetchListings({ search: 'beach' }));  // With search
+dispatch(fetchListings({ maxGuests: 4 }));  // With guests filter
+```
+
+The filters are sent as query params:
+
+```js
+api.get('/listings', {
+  params: filters  // → /listings?search=beach&maxGuests=4
+});
+```
+
+This gives us flexibility for future filtering features!
+
+</Accordion>
+
+<Accordion title="Why export fetchListings?">
+
+```js
+export const fetchListings = createAsyncThunk(/* ... */);
+```
+
+We export it so components can dispatch it:
+
+```jsx
+// In HomePage.jsx
+import { fetchListings } from '@/state/slices/listingsSlice';
+
+function HomePage() {
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(fetchListings());  // ← Dispatch the thunk!
+  }, [dispatch]);
+}
+```
+
+</Accordion>
+
+<Accordion title="Return value becomes payload">
+
+Whatever you return becomes the fulfilled action's payload:
+
+```js
+async (filters = {}) => {
+  const response = await api.get('/listings', { params: filters });
+  return response.data;  // ← This becomes action.payload
+}
+```
+
+When fulfilled:
+
+```js
+{
+  type: 'listings/fetchListings/fulfilled',
+  payload: response.data  // ← Your return value
+}
+```
+
+We'll use this payload to update `state.items` in the next lesson!
+
+</Accordion>
+
+</Accordions>
+
+## Understanding the Async Flow
+
+When you dispatch `fetchListings()`:
+
+<Steps>
+
+<Step>
+
+### Component Dispatches Thunk
+
+```jsx
+dispatch(fetchListings({ search: 'beach' }));
+```
+
+</Step>
+
+<Step>
+
+### Pending Action Dispatched
+
+Redux automatically dispatches:
+
+```js
+{ type: 'listings/fetchListings/pending' }
+```
+
+State updates to:
+```js
+{ status: 'loading' }  // We'll add this in next lesson
+```
+
+</Step>
+
+<Step>
+
+### Async Function Executes
+
+```js
+const response = await api.get('/listings', {
+  params: { search: 'beach' }
+});
+return response.data;
+```
+
+API call happens, returns data.
+
+</Step>
+
+<Step>
+
+### Fulfilled Action Dispatched
+
+Redux automatically dispatches:
+
+```js
+{
+  type: 'listings/fetchListings/fulfilled',
+  payload: [/* listings data */]
+}
+```
+
+State updates to:
+```js
+{
+  items: [/* listings data */],
+  status: 'succeeded'
+}
+```
+
+</Step>
+
+</Steps>
+
+If the API call fails, rejected action is dispatched instead:
+
+```js
+{
+  type: 'listings/fetchListings/rejected',
+  error: { message: 'Network error' }
+}
+```
+
+## Thunk vs Regular Action
+
+**Regular Synchronous Action:**
+
+```js
+// Action creator
+const addTodo = (text) => ({
+  type: 'todos/add',
+  payload: text
+});
+
+// Dispatch
+dispatch(addTodo('Buy milk'));
+
+// Reducer handles immediately
+reducers: {
+  addTodo: (state, action) => {
+    state.push(action.payload);
+  }
+}
+```
+
+**Async Thunk:**
+
+```js
+// Async thunk
+const fetchTodos = createAsyncThunk(
+  'todos/fetch',
+  async () => {
+    const response = await api.get('/todos');
+    return response.data;
+  }
+);
+
+// Dispatch (same syntax!)
+dispatch(fetchTodos());
+
+// Handle with extraReducers (next lesson!)
+extraReducers: (builder) => {
+  builder.addCase(fetchTodos.fulfilled, (state, action) => {
+    state.items = action.payload;
+  });
+}
+```
+
+**Key differences:**
+- Thunks handle async operations
+- Thunks generate 3 actions (pending/fulfilled/rejected)
+- Thunks need `extraReducers` not `reducers`
+
+## Testing the Thunk
+
+We can test the thunk is created correctly by adding a log:
+
+```js title="src/state/slices/listingsSlice.js"
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async (filters = {}) => {
+    console.log('Fetching listings with filters:', filters);
+    const response = await api.get('/listings', {
+      params: filters,
+    });
+    console.log('Fetch succeeded:', response.data);
+    return response.data;
+  }
+);
+```
+
+> **Remove these logs after testing!** We'll handle the data properly in the next lesson.
+
+## Error Handling in Thunks
+
+Async thunks handle errors automatically:
+
+```js
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async (filters = {}) => {
+    try {
+      const response = await api.get('/listings', {
+        params: filters,
+      });
+      return response.data;
+    } catch (error) {
+      // Error is automatically caught and dispatched as rejected action
+      throw error;
+    }
+  }
+);
+```
+
+**You don't need try/catch!** Redux Toolkit handles it:
+
+- If promise resolves → fulfilled action
+- If promise rejects → rejected action with error
+
+For custom error messages:
+
+```js
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async (filters = {}, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/listings', {
+        params: filters,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch listings');
+    }
+  }
+);
+```
+
+We'll keep it simple for now - default error handling works great!
+
+## Complete Code
+
+Here's the complete slice with the async thunk:
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '@/api';
+
+const initialState = {
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+};
+
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async (filters = {}) => {
+    const response = await api.get('/listings', {
+      params: filters,
+    });
+    return response.data;
+  }
+);
+
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState,
+  reducers: {
+    toggleFavorite: (state, action) => {
+      const id = action.payload;
+      
+      if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(favoriteId => favoriteId !== id);
+      } else {
+        state.favorites.push(id);
+      }
+    },
+  },
+});
+
+export const { toggleFavorite } = listingsSlice.actions;
+export default listingsSlice.reducer;
+```
+
+## What's Next?
+
+Great! The async thunk is created. In the next lesson, we'll:
+
+1. **Add extraReducers** - Handle pending/fulfilled/rejected actions
+2. **Update state** - Set loading/error/success states
+3. **Store fetched data** - Put listings in `state.items`
+
+<Callout type="success">
+**✅ Lesson Complete!** You've created an async thunk to fetch listings from the API!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Reducers must be synchronous** - Can't use async/await
+- ✅ **`createAsyncThunk`** handles async operations in Redux
+- ✅ Thunks automatically dispatch **3 actions**: pending, fulfilled, rejected
+- ✅ Return value becomes the **fulfilled payload**
+- ✅ Errors automatically trigger **rejected action**
+- ✅ Export thunk to dispatch from components
+- ✅ Use `filters` parameter for flexible API queries

@@ -1,0 +1,885 @@
+---
+title: "L13: Create Route Guard Component"
+description: "Protect routes that require authentication"
+---
+
+# Create Route Guard Component
+
+Let's build a reusable component to protect routes that require authentication! 🔒
+
+## Why Route Guards?
+
+**Problem without guards:**
+
+```jsx
+// Anyone can access favorites page
+<Route path="/favorites" element={<FavoritesPage />} />
+
+// Unauthenticated user visits /favorites
+→ Page loads
+→ API calls fail (no token)
+→ Error messages everywhere
+→ Poor user experience ❌
+```
+
+**Solution with guards:**
+
+```jsx
+// Only authenticated users can access
+<Route 
+  path="/favorites" 
+  element={<Protected><FavoritesPage /></Protected>} 
+/>
+
+// Unauthenticated user visits /favorites
+→ Guard checks authentication
+→ No user found
+→ Redirect to /sign-in
+→ After sign-in, redirect back to /favorites
+→ Great user experience ✅
+```
+
+## Understanding Route Protection
+
+**Three states to handle:**
+
+```jsx
+1. Loading (checking authentication)
+   → Show loading spinner
+   
+2. Authenticated (user signed in)
+   → Show protected component
+   
+3. Not authenticated (no user)
+   → Redirect to sign-in page
+```
+
+**Flow diagram:**
+
+```
+User visits /favorites
+  ↓
+<Protected> component renders
+  ↓
+Is loading? → Yes → Show spinner
+  ↓ No
+Is authenticated? → Yes → Show FavoritesPage ✅
+  ↓ No
+Redirect to /sign-in ➡️
+  ↓
+Save intended destination (/favorites)
+  ↓
+After sign-in, redirect to /favorites
+```
+
+## Create Protected Component
+
+Create a reusable route guard:
+
+```jsx title="src/components/Protected.jsx"
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+
+function Protected({ children }) {
+  const { user, isLoading } = useAuth();
+  const location = useLocation();
+
+  // Still checking authentication
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Verifying authentication...</p>
+      </div>
+    );
+  }
+
+  // Not authenticated, redirect to sign-in
+  if (!user) {
+    // Save the location they were trying to access
+    return <Navigate to="/sign-in" state={{ from: location }} replace />;
+  }
+
+  // Authenticated, render protected content
+  return children;
+}
+
+export default Protected;
+```
+
+## Understanding the Code
+
+<Tabs items={['Navigate Component', 'Location State', 'Loading State', 'Children Prop']}>
+
+<Tab value="Navigate Component">
+
+**React Router's `<Navigate>` component:**
+
+```jsx
+<Navigate to="/sign-in" />
+```
+
+**What it does:**
+
+```
+Renders <Navigate>
+  ↓
+Immediately redirects to /sign-in
+  ↓
+Component doesn't render children
+  ↓
+URL changes to /sign-in
+```
+
+**Similar to:**
+
+```jsx
+// In a useEffect
+useEffect(() => {
+  navigate('/sign-in');
+}, []);
+
+// But Navigate is declarative (better)
+return <Navigate to="/sign-in" />;
+```
+
+**Navigate vs navigate():**
+
+```jsx
+// ✅ Navigate component (declarative)
+if (!user) {
+  return <Navigate to="/sign-in" />;
+}
+return <FavoritesPage />;
+
+// ❌ navigate() in render (causes issues)
+if (!user) {
+  navigate('/sign-in');  // Don't do this!
+}
+return <FavoritesPage />;
+
+// ✅ navigate() in event handler (correct use)
+const handleClick = () => {
+  navigate('/sign-in');
+};
+```
+
+**Why declarative is better:**
+
+```
+Imperative (navigate):
+  "When this condition is true, go to /sign-in"
+  → Can cause side effects in render
+  → React warns about this
+
+Declarative (Navigate):
+  "When this condition is true, the UI is a redirect"
+  → Pure component behavior
+  → React-friendly pattern
+```
+
+</Tab>
+
+<Tab value="Location State">
+
+**Passing state with navigation:**
+
+```jsx
+<Navigate 
+  to="/sign-in" 
+  state={{ from: location }} 
+  replace 
+/>
+```
+
+**What `state` contains:**
+
+```jsx
+location = {
+  pathname: '/favorites',
+  search: '?sort=recent',
+  hash: '#top',
+  state: null,
+  key: 'abc123'
+};
+
+// Passed as state to /sign-in
+state = { 
+  from: {
+    pathname: '/favorites',
+    search: '?sort=recent',
+    // ...
+  }
+};
+```
+
+**Access in SignInPage:**
+
+```jsx
+import { useLocation, useNavigate } from 'react-router-dom';
+
+function SignInPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Get the page they were trying to access
+  const from = location.state?.from?.pathname || '/';
+
+  const handleSignIn = async () => {
+    await signIn(email, password);
+    
+    // Redirect back to where they came from
+    navigate(from, { replace: true });
+  };
+
+  return <SignInForm onSubmit={handleSignIn} />;
+}
+```
+
+**User flow:**
+
+```
+1. User visits /favorites (not signed in)
+2. Protected redirects to /sign-in with state={{ from: '/favorites' }}
+3. User signs in
+4. SignInPage reads state.from = '/favorites'
+5. Navigates to /favorites
+6. User sees favorites page ✅
+```
+
+**Without state:**
+
+```
+1. User visits /favorites
+2. Redirects to /sign-in
+3. User signs in
+4. No idea where they wanted to go
+5. Navigates to / (homepage)
+6. User has to navigate to /favorites again 😞
+```
+
+</Tab>
+
+<Tab value="Loading State">
+
+**Why check `isLoading`?**
+
+```jsx
+// Initial state
+user: null
+isLoading: true
+
+// Problem without loading check
+if (!user) {
+  return <Navigate to="/sign-in" />;
+}
+// Always redirects during loading! ❌
+
+// Solution: Wait for loading to complete
+if (isLoading) {
+  return <LoadingSpinner />;
+}
+if (!user) {
+  return <Navigate to="/sign-in" />;
+}
+// Only redirects if actually not authenticated ✅
+```
+
+**Timeline:**
+
+```
+0ms: Component mounts
+  isLoading: true
+  user: null
+  → Show loading spinner
+
+500ms: Token fetch completes
+  isLoading: false
+  user: { data }
+  → Show protected content
+
+Alternative (no session):
+500ms: Token fetch fails
+  isLoading: false
+  user: null
+  → Redirect to /sign-in
+```
+
+**Loading UI variations:**
+
+```jsx
+// Simple spinner
+if (isLoading) {
+  return <div className="spinner"></div>;
+}
+
+// Spinner with message
+if (isLoading) {
+  return (
+    <div className="loading-container">
+      <div className="spinner"></div>
+      <p>Verifying authentication...</p>
+    </div>
+  );
+}
+
+// Skeleton screen (better UX)
+if (isLoading) {
+  return <FavoritesPageSkeleton />;
+}
+
+// Progress bar
+if (isLoading) {
+  return <LoadingBar progress={50} />;
+}
+```
+
+</Tab>
+
+<Tab value="Children Prop">
+
+**Understanding `children` prop:**
+
+```jsx
+function Protected({ children }) {
+  // children = whatever is inside <Protected>...</Protected>
+  
+  if (authenticated) {
+    return children;  // Render the children
+  }
+  return <Navigate to="/sign-in" />;
+}
+```
+
+**How it works:**
+
+```jsx
+// JSX
+<Protected>
+  <FavoritesPage />
+</Protected>
+
+// Equivalent to
+<Protected children={<FavoritesPage />} />
+
+// Inside Protected component
+const Protected = ({ children }) => {
+  // children = <FavoritesPage />
+  return children;  // Renders <FavoritesPage />
+};
+```
+
+**Multiple children:**
+
+```jsx
+<Protected>
+  <h1>Title</h1>
+  <p>Content</p>
+  <FavoritesPage />
+</Protected>
+
+// children is an array:
+// [<h1>Title</h1>, <p>Content</p>, <FavoritesPage />]
+
+// Rendered as-is:
+return children;
+// All three elements render
+```
+
+**Why children pattern?**
+
+```jsx
+// ❌ Without children (not reusable)
+function ProtectedFavorites() {
+  if (!user) return <Navigate to="/sign-in" />;
+  return <FavoritesPage />;
+}
+
+function ProtectedProfile() {
+  if (!user) return <Navigate to="/sign-in" />;
+  return <ProfilePage />;
+}
+// Repeat for every protected page!
+
+// ✅ With children (reusable)
+function Protected({ children }) {
+  if (!user) return <Navigate to="/sign-in" />;
+  return children;
+}
+
+// Use anywhere
+<Protected><FavoritesPage /></Protected>
+<Protected><ProfilePage /></Protected>
+<Protected><AnyPage /></Protected>
+```
+
+</Tab>
+
+</Tabs>
+
+## Add Styling for Loading State
+
+Ensure loading spinner is styled:
+
+```css title="src/app/global.css"
+/* Loading Container (full screen center) */
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Spinner Animation */
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading Text */
+.loading-container p {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+```
+
+## Usage Examples
+
+<Tabs items={['Basic Protection', 'Route-Level Protection', 'Component-Level Protection', 'Nested Protection']}>
+
+<Tab value="Basic Protection">
+
+**Protect a single route:**
+
+```jsx title="src/App.jsx"
+import { Routes, Route } from 'react-router-dom';
+import Protected from '@/components/Protected';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+import SignInPage from '@/pages/SignInPage';
+
+function App() {
+  return (
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="/sign-in" element={<SignInPage />} />
+      
+      {/* Protected routes */}
+      <Route 
+        path="/favorites" 
+        element={
+          <Protected>
+            <FavoritesPage />
+          </Protected>
+        } 
+      />
+    </Routes>
+  );
+}
+```
+
+**User flow:**
+
+```
+Authenticated user:
+  /favorites → Shows FavoritesPage ✅
+
+Unauthenticated user:
+  /favorites → Redirects to /sign-in ➡️
+```
+
+</Tab>
+
+<Tab value="Route-Level Protection">
+
+**Protect multiple routes at once:**
+
+```jsx
+<Routes>
+  {/* Public */}
+  <Route path="/" element={<HomePage />} />
+  <Route path="/sign-in" element={<SignInPage />} />
+  
+  {/* Protected group */}
+  <Route element={<Protected><Outlet /></Protected>}>
+    <Route path="/favorites" element={<FavoritesPage />} />
+    <Route path="/bookings" element={<BookingsPage />} />
+    <Route path="/profile" element={<ProfilePage />} />
+  </Route>
+</Routes>
+```
+
+**All nested routes are protected:**
+
+```
+/favorites → Protected
+/bookings  → Protected
+/profile   → Protected
+```
+
+**With layout:**
+
+```jsx
+<Route element={<Protected><DashboardLayout /></Protected>}>
+  <Route path="/dashboard" element={<DashboardHome />} />
+  <Route path="/dashboard/settings" element={<Settings />} />
+  <Route path="/dashboard/profile" element={<Profile />} />
+</Route>
+```
+
+All dashboard routes share `DashboardLayout` and protection!
+
+</Tab>
+
+<Tab value="Component-Level Protection">
+
+**Protect parts of a component:**
+
+```jsx
+function HomePage() {
+  return (
+    <div className="home-page">
+      <h1>Welcome to Holidaze</h1>
+      
+      {/* Public content */}
+      <section className="venues">
+        <VenueGrid venues={allVenues} />
+      </section>
+      
+      {/* Protected content */}
+      <Protected>
+        <section className="personalized">
+          <h2>Your Recommendations</h2>
+          <VenueGrid venues={recommendedVenues} />
+        </section>
+      </Protected>
+    </div>
+  );
+}
+```
+
+**Behavior:**
+
+```
+Unauthenticated:
+  → Shows public content
+  → Hides recommendations
+  → Stays on same page
+
+Authenticated:
+  → Shows all content
+```
+
+**Note:** This redirects the whole page. For hiding content, use conditional rendering instead:
+
+```jsx
+{user && (
+  <section className="personalized">
+    <h2>Your Recommendations</h2>
+  </section>
+)}
+```
+
+</Tab>
+
+<Tab value="Nested Protection">
+
+**Multiple levels of protection:**
+
+```jsx
+// Admin protection
+function AdminProtected({ children }) {
+  const { user } = useAuth();
+  
+  if (!user) {
+    return <Navigate to="/sign-in" />;
+  }
+  
+  if (!user.isAdmin) {
+    return <Navigate to="/" />;
+  }
+  
+  return children;
+}
+
+// Usage
+<Routes>
+  {/* User must be signed in */}
+  <Route 
+    path="/dashboard" 
+    element={<Protected><Dashboard /></Protected>} 
+  />
+  
+  {/* User must be admin */}
+  <Route 
+    path="/admin" 
+    element={
+      <Protected>
+        <AdminProtected>
+          <AdminPanel />
+        </AdminProtected>
+      </Protected>
+    } 
+  />
+</Routes>
+```
+
+**Checks in order:**
+
+```
+/admin
+  ↓
+Protected checks: Signed in? → Yes
+  ↓
+AdminProtected checks: Is admin? → Yes
+  ↓
+Render AdminPanel ✅
+
+/admin (non-admin user)
+  ↓
+Protected checks: Signed in? → Yes
+  ↓
+AdminProtected checks: Is admin? → No
+  ↓
+Redirect to / ➡️
+```
+
+</Tab>
+
+</Tabs>
+
+## Testing Protected Routes
+
+<Steps>
+
+<Step>
+
+**Test unauthenticated access:**
+
+1. Ensure you're signed out
+2. Visit `/favorites` directly
+3. Should:
+   - Show loading spinner briefly
+   - Redirect to `/sign-in`
+   - URL changes to `/sign-in`
+
+✅ **Redirect working!**
+
+</Step>
+
+<Step>
+
+**Test authenticated access:**
+
+1. Sign in
+2. Visit `/favorites`
+3. Should:
+   - Show loading spinner briefly
+   - Display FavoritesPage
+   - Stay on `/favorites`
+
+✅ **Protected route accessible!**
+
+</Step>
+
+<Step>
+
+**Test redirect back:**
+
+1. Sign out
+2. Visit `/favorites` (gets redirected to `/sign-in`)
+3. Sign in
+4. Should automatically redirect to `/favorites`
+
+✅ **Redirect back working!**
+
+</Step>
+
+<Step>
+
+**Test loading state:**
+
+1. Slow down network in DevTools (Slow 3G)
+2. Refresh page on protected route
+3. Should see loading spinner longer
+4. Eventually shows page or redirects
+
+✅ **Loading state handled!**
+
+</Step>
+
+</Steps>
+
+## Advanced Patterns
+
+<Accordions>
+
+<Accordion title="Role-Based Protection">
+
+**Protect based on user role:**
+
+```jsx
+function RoleProtected({ children, allowedRoles }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!user) {
+    return <Navigate to="/sign-in" />;
+  }
+
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/unauthorized" />;
+  }
+
+  return children;
+}
+
+// Usage
+<Route 
+  path="/admin" 
+  element={
+    <RoleProtected allowedRoles={['admin']}>
+      <AdminPanel />
+    </RoleProtected>
+  } 
+/>
+
+<Route 
+  path="/manager" 
+  element={
+    <RoleProtected allowedRoles={['admin', 'manager']}>
+      <ManagerDashboard />
+    </RoleProtected>
+  } 
+/>
+```
+
+</Accordion>
+
+<Accordion title="Permission-Based Protection">
+
+**Check specific permissions:**
+
+```jsx
+function PermissionProtected({ children, requiredPermission }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!user) {
+    return <Navigate to="/sign-in" />;
+  }
+
+  const hasPermission = user.permissions?.includes(requiredPermission);
+
+  if (!hasPermission) {
+    return (
+      <div className="no-permission">
+        <h1>Access Denied</h1>
+        <p>You don't have permission to access this page.</p>
+      </div>
+    );
+  }
+
+  return children;
+}
+
+// Usage
+<Route 
+  path="/venues/create" 
+  element={
+    <PermissionProtected requiredPermission="venue.create">
+      <CreateVenuePage />
+    </PermissionProtected>
+  } 
+/>
+```
+
+</Accordion>
+
+<Accordion title="Subscription-Based Protection">
+
+**Require active subscription:**
+
+```jsx
+function SubscriptionProtected({ children, requiredPlan }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!user) {
+    return <Navigate to="/sign-in" />;
+  }
+
+  const hasActivePlan = user.subscription?.status === 'active';
+  const hasPlan = requiredPlan 
+    ? user.subscription?.plan === requiredPlan 
+    : true;
+
+  if (!hasActivePlan || !hasPlan) {
+    return <Navigate to="/upgrade" />;
+  }
+
+  return children;
+}
+
+// Usage
+<Route 
+  path="/premium-venues" 
+  element={
+    <SubscriptionProtected requiredPlan="premium">
+      <PremiumVenues />
+    </SubscriptionProtected>
+  } 
+/>
+```
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+In Lesson 14, we'll:
+1. Update all routes with protection
+2. Organize public vs protected routes
+3. Add proper navigation structure
+4. Handle edge cases
+
+<Callout type="success">
+**✅ Lesson Complete!** Route guard component created!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **`<Protected>` component** wraps routes requiring authentication
+- ✅ **`<Navigate>` component** handles redirects declaratively
+- ✅ **Location state** preserves intended destination
+- ✅ **Loading check** prevents premature redirects
+- ✅ **Children prop** makes component reusable
+- ✅ **`replace` prop** prevents back-button issues
+- ✅ **Role-based protection** extends basic pattern
+- ✅ **Nested protection** allows multiple checks
+- ✅ **Skeleton screens** improve perceived performance
+- ✅ **User experience** is seamless with proper loading states

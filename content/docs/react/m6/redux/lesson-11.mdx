@@ -1,0 +1,483 @@
+---
+title: "L11: Add Navbar to App"
+description: "Integrate the Navbar into the application layout"
+---
+
+# Add Navbar to App
+
+Let's integrate the Navbar into our application so it appears on every page!
+
+## Current App Structure
+
+Currently, our `App.jsx` looks like this:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import { Router } from './components/Router';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <Router />
+    </Provider>
+  );
+}
+```
+
+The `Router` component contains all our routes. We need to add the Navbar **above** the Router so it appears on every page.
+
+## Where to Add the Navbar?
+
+We have two options:
+
+<Tabs items={['In App.jsx (Recommended)', 'In Router.jsx (Alternative)']}>
+
+<Tab value="In App.jsx (Recommended)">
+
+**Add Navbar in `App.jsx`:**
+
+```jsx
+<Provider store={store}>
+  <Navbar />  {/* Shows on all pages */}
+  <Router />
+</Provider>
+```
+
+**Pros:**
+- ✅ Navbar outside routing logic
+- ✅ Cleaner separation of concerns
+- ✅ Easier to add other global components
+
+**This is what we'll do!**
+
+</Tab>
+
+<Tab value="In Router.jsx (Alternative)">
+
+**Add Navbar inside `Router.jsx`:**
+
+```jsx
+<BrowserRouter>
+  <Navbar />  {/* Inside router */}
+  <Routes>
+    <Route path="/" element={<HomePage />} />
+    {/* ... */}
+  </Routes>
+</BrowserRouter>
+```
+
+**Pros:**
+- ✅ All layout in one file
+
+**Cons:**
+- ❌ Mixes routing with layout
+- ❌ Less flexible
+
+</Tab>
+
+</Tabs>
+
+## Step 1: Import Navbar
+
+Open `src/App.jsx` and import the Navbar:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import { Router } from './components/Router';
+import Navbar from './components/Navbar';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <Router />
+    </Provider>
+  );
+}
+```
+
+## Step 2: Add Navbar Component
+
+Place the Navbar **above** the Router:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import { Router } from './components/Router';
+import Navbar from './components/Navbar';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <Navbar />
+      <Router />
+    </Provider>
+  );
+}
+```
+
+**That's it!** The Navbar now appears on every page! 🎉
+
+## Complete Code
+
+Here's the complete updated `App.jsx`:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import { Router } from './components/Router';
+import Navbar from './components/Navbar';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <Navbar />
+      <Router />
+    </Provider>
+  );
+}
+```
+
+Only **2 lines added!** Simple and clean. ✨
+
+## Understanding the Layout Structure
+
+The component tree now looks like:
+
+```
+App
+ └─ Provider (Redux store)
+     ├─ Navbar (always visible)
+     └─ Router
+         ├─ HomePage (route: /)
+         ├─ ListingDetailsPage (route: /listings/:id)
+         ├─ ListingFavoritesPage (route: /favorites)
+         └─ NotFoundPage (route: /*)
+```
+
+**Key point:** Navbar is **outside** the Router, so it persists across all routes!
+
+## Verify the Integration
+
+Let's test the Navbar:
+
+<Steps>
+
+<Step>
+
+### Check HomePage
+
+Navigate to `/` - you should see:
+- Navbar at the top
+- HomePage content below
+
+The Navbar should stay fixed at the top!
+
+</Step>
+
+<Step>
+
+### Check Favorites Page
+
+Click the "Favorites" link in the Navbar.
+
+You should:
+- Navigate to `/favorites`
+- See the Navbar (still there!)
+- See the FavoritesPage content
+
+</Step>
+
+<Step>
+
+### Check Count Updates
+
+Let's verify the count badge updates:
+
+1. Open Redux DevTools
+2. Manually dispatch:
+   ```json
+   { "type": "listings/toggleFavorite", "payload": 1 }
+   ```
+3. Watch the Navbar badge - it should show "1"!
+4. Dispatch again to remove - badge should disappear!
+
+Perfect! The Navbar is connected to Redux! 🎉
+
+</Step>
+
+</Steps>
+
+## Common Layout Patterns
+
+<Tabs items={['Basic Layout', 'With Footer', 'With Container', 'Full Layout']}>
+
+<Tab value="Basic Layout">
+
+**Current layout (what we have):**
+
+```jsx
+export function App() {
+  return (
+    <Provider store={store}>
+      <Navbar />
+      <Router />
+    </Provider>
+  );
+}
+```
+
+Simple and clean! Navbar + content.
+
+</Tab>
+
+<Tab value="With Footer">
+
+**Add a footer:**
+
+```jsx
+import Footer from './components/Footer';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <Navbar />
+      <main>
+        <Router />
+      </main>
+      <Footer />
+    </Provider>
+  );
+}
+```
+
+Navbar at top, Footer at bottom, content in middle.
+
+</Tab>
+
+<Tab value="With Container">
+
+**Wrap content in layout container:**
+
+```jsx
+export function App() {
+  return (
+    <Provider store={store}>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1">
+          <Router />
+        </main>
+      </div>
+    </Provider>
+  );
+}
+```
+
+**Benefits:**
+- `min-h-screen` - Full viewport height
+- `flex-1` - Content fills available space
+- Proper semantic HTML (`<main>`)
+
+</Tab>
+
+<Tab value="Full Layout">
+
+**Complete layout with footer:**
+
+```jsx
+import Footer from './components/Footer';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 bg-gray-50">
+          <Router />
+        </main>
+        <Footer />
+      </div>
+    </Provider>
+  );
+}
+```
+
+**Production-ready layout!**
+- Full height
+- Content fills space
+- Background color
+- Footer at bottom
+
+</Tab>
+
+</Tabs>
+
+## Improving the Layout
+
+Let's add a container and proper spacing:
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import { Router } from './components/Router';
+import Navbar from './components/Navbar';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1">
+          <Router />
+        </main>
+      </div>
+    </Provider>
+  );
+}
+```
+
+**What changed?**
+
+<Accordions>
+
+<Accordion title="min-h-screen">
+
+```jsx
+<div className="min-h-screen">
+```
+
+**Ensures full viewport height:**
+
+- `min-h-screen` = `min-height: 100vh`
+- Content will fill at least the full screen height
+- If content is longer, page scrolls normally
+
+**Why?**
+- Prevents short pages from having white space at bottom
+- Professional look
+- Footer stays at bottom on short pages
+
+</Accordion>
+
+<Accordion title="flex flex-col">
+
+```jsx
+<div className="min-h-screen flex flex-col">
+```
+
+**Creates vertical flex container:**
+
+- `flex` - Enable flexbox
+- `flex-col` - Stack children vertically
+
+**Children:** Navbar → main → (footer)
+
+</Accordion>
+
+<Accordion title="flex-1 on main">
+
+```jsx
+<main className="flex-1">
+```
+
+**Makes content fill available space:**
+
+- `flex-1` = `flex: 1 1 0%`
+- Takes all remaining space
+- Pushes footer to bottom
+
+**Example:**
+```
+┌─────────────┐
+│  Navbar     │ ← Fixed height
+├─────────────┤
+│             │
+│   Main      │ ← Grows to fill space
+│  Content    │
+│             │
+└─────────────┘
+```
+
+</Accordion>
+
+<Accordion title="Semantic HTML">
+
+```jsx
+<main className="flex-1">
+  <Router />
+</main>
+```
+
+**Using `<main>` tag:**
+
+- Semantic HTML for main content
+- Helps accessibility (screen readers)
+- SEO benefits
+- Best practice!
+
+</Accordion>
+
+</Accordions>
+
+## Testing Navigation
+
+The Navbar should now work perfectly:
+
+<Steps>
+
+<Step>
+
+### Click Home Link
+
+1. Click "Home" in Navbar
+2. URL changes to `/`
+3. HomePage displays
+4. **No page reload!** ✨
+
+</Step>
+
+<Step>
+
+### Click Favorites Link
+
+1. Click "Favorites" in Navbar
+2. URL changes to `/favorites`
+3. FavoritesPage displays
+4. Count badge visible (if you have favorites)
+
+</Step>
+
+<Step>
+
+### Click Logo
+
+1. Click "StayScape" logo
+2. Returns to homepage
+3. Common pattern!
+
+</Step>
+
+</Steps>
+
+## What's Next?
+
+Perfect! The Navbar is integrated. In the next lesson, we'll:
+
+1. **Update Router** - Add the `/favorites` route
+2. **Test routing** - Verify favorites page works
+3. **Connect everything** - Complete the navigation flow
+
+<Callout type="success">
+**✅ Lesson Complete!** The Navbar is now integrated and appears on every page!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Add Navbar in App.jsx** - Shows on all pages
+- ✅ **Place above Router** - Navbar persists across routes
+- ✅ **Use semantic HTML** - `<main>` for content
+- ✅ **Flexbox layout** - Proper spacing and alignment
+- ✅ **min-h-screen** - Full viewport height
+- ✅ **Only 2 lines added** - Simple integration!

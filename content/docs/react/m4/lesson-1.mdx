@@ -1,0 +1,496 @@
+---
+title: "L1: Installing React Router"
+description: "Set up React Router to enable multi-page navigation in your application"
+---
+
+
+# Installing React Router
+
+Welcome to Module 4! In this module, you'll transform your single-page application into a multi-page website using React Router. Users will be able to navigate between different pages without full page reloads!
+
+## What You'll Learn
+
+- What client-side routing is and why it's important
+- How React Router enables navigation in SPAs
+- Installing and setting up React Router
+- The difference between traditional and client-side routing
+
+## Why We Need React Router
+
+Right now, your entire application lives on one page. Everything happens at the URL `http://localhost:5173/`. But real websites have multiple pages:
+
+- **Homepage** - Browse all listings
+- **Listing Details** - View full information about one listing
+- **Favorites** - See saved listings
+- **User Profile** - Account settings
+- **404 Page** - When page doesn't exist
+
+### Traditional vs. Client-Side Routing
+
+<Tabs items={['Traditional Routing', 'Client-Side Routing']}>
+
+<Tab value="Traditional Routing">
+
+**How traditional websites work:**
+
+```
+User clicks link
+    ↓
+Browser requests new HTML page from server
+    ↓
+Server sends entire HTML file
+    ↓
+Browser reloads page from scratch
+    ↓
+New page appears (with flash/flicker)
+```
+
+**Problems:**
+- ❌ Full page reload (slow)
+- ❌ Lose JavaScript state
+- ❌ Flash of white screen
+- ❌ Server must handle every route
+- ❌ Wastes bandwidth
+
+</Tab>
+
+<Tab value="Client-Side Routing">
+
+**How React Router works:**
+
+```
+User clicks link
+    ↓
+React Router intercepts the click
+    ↓
+Updates the URL (no server request)
+    ↓
+React renders the new component
+    ↓
+Content changes instantly (smooth)
+```
+
+**Benefits:**
+- ✅ Instant navigation (fast)
+- ✅ Keep JavaScript state
+- ✅ Smooth transitions
+- ✅ Works offline (PWA)
+- ✅ Better user experience
+
+</Tab>
+
+</Tabs>
+
+## What is React Router?
+
+**React Router** is the standard routing library for React. It allows you to:
+
+- Define multiple pages (routes) in your app
+- Navigate between pages without reloading
+- Access URL parameters (like `/listing/123`)
+- Handle 404 errors
+- Create nested routes
+- Protect routes (authentication)
+
+Think of it as the "GPS" for your React application - it knows where you are and how to get anywhere else!
+
+## How React Router Works
+
+<Steps>
+
+<Step>
+
+### Define Routes
+
+Tell React Router which component to show for each URL:
+
+```jsx title="Conceptual Example"
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/listing/:id" element={<DetailsPage />} />
+  <Route path="/favorites" element={<FavoritesPage />} />
+</Routes>
+```
+
+</Step>
+
+<Step>
+
+### React Router Watches the URL
+
+When the URL changes, React Router:
+1. Looks at the current URL
+2. Finds the matching route
+3. Renders the corresponding component
+
+</Step>
+
+<Step>
+
+### Components Navigate
+
+Use special components to navigate:
+
+```jsx title="Navigation Example"
+// Link component - like <a> but without page reload
+<Link to="/listing/5">View Listing</Link>
+
+// Or programmatically
+const navigate = useNavigate();
+navigate('/favorites');
+```
+
+</Step>
+
+</Steps>
+
+## Installing React Router
+
+Let's install React Router in your project!
+
+<Steps>
+
+<Step>
+
+### Stop Your Development Server
+
+If your dev server is running, stop it with `Ctrl+C` in the terminal.
+
+</Step>
+
+<Step>
+
+### Install the Package
+
+Run this command in your terminal:
+
+```bash title="Terminal"
+npm install react-router-dom
+```
+
+**What's being installed:**
+
+- `react-router-dom` - React Router for web browsers
+- Latest version: 6.x (modern, hook-based API)
+
+<Callout type="info">
+
+**Note:** There's also `react-router-native` for React Native mobile apps, but we're using `react-router-dom` for web applications.
+
+</Callout>
+
+</Step>
+
+<Step>
+
+### Wait for Installation
+
+You'll see output like this:
+
+```bash title="Terminal Output"
+added 3 packages, and audited 200 packages in 5s
+
+found 0 vulnerabilities
+```
+
+</Step>
+
+<Step>
+
+### Verify Installation
+
+Check that it was added to `package.json`:
+
+```json title="package.json" {5}
+{
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.22.0"
+  }
+}
+```
+
+</Step>
+
+<Step>
+
+### Restart Development Server
+
+Start your dev server again:
+
+```bash title="Terminal"
+npm run dev
+```
+
+</Step>
+
+</Steps>
+
+## What's Included in React Router?
+
+When you install `react-router-dom`, you get these key exports:
+
+<Accordions>
+
+<Accordion title="Router Components">
+
+**BrowserRouter** - The main router component that uses browser history
+
+```jsx
+import { BrowserRouter } from 'react-router-dom';
+
+<BrowserRouter>
+  {/* Your routes go here */}
+</BrowserRouter>
+```
+
+We'll use this in the next lesson!
+
+</Accordion>
+
+<Accordion title="Route Configuration">
+
+**Routes** - Container for all your routes
+
+**Route** - Defines a single route (path + component)
+
+```jsx
+import { Routes, Route } from 'react-router-dom';
+
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/about" element={<AboutPage />} />
+</Routes>
+```
+
+</Accordion>
+
+<Accordion title="Navigation Components">
+
+**Link** - Navigate to a route (replaces `<a>` tags)
+
+**NavLink** - Link with active state styling
+
+```jsx
+import { Link, NavLink } from 'react-router-dom';
+
+<Link to="/home">Home</Link>
+
+<NavLink 
+  to="/about" 
+  className={({ isActive }) => isActive ? 'active' : ''}
+>
+  About
+</NavLink>
+```
+
+</Accordion>
+
+<Accordion title="Navigation Hooks">
+
+**useNavigate** - Programmatically navigate
+
+**useParams** - Get URL parameters
+
+**useLocation** - Get current location object
+
+**useSearchParams** - Work with query strings
+
+```jsx
+import { useNavigate, useParams } from 'react-router-dom';
+
+// Programmatic navigation
+const navigate = useNavigate();
+navigate('/login');
+
+// Get URL params
+const { id } = useParams(); // From /listing/:id
+```
+
+</Accordion>
+
+</Accordions>
+
+## React Router Versions
+
+<Callout type="warn" title="Version Differences">
+
+React Router has had major API changes:
+
+- **v5 and earlier** - Component-based API (`<Switch>`, render props)
+- **v6 (current)** - Hook-based API (`<Routes>`, `element` prop)
+
+Make sure you're following v6 tutorials! The syntax is different from older versions.
+
+</Callout>
+
+### v5 vs v6 Quick Comparison
+
+<Tabs items={['React Router v6 (New)', 'React Router v5 (Old)']}>
+
+<Tab value="React Router v6 (New)">
+
+```jsx title="Modern API (v6)"
+// [!code word:Routes]
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+<BrowserRouter>
+  <Routes>
+    <Route path="/" element={<HomePage />} />
+    <Route path="/about" element={<AboutPage />} />
+  </Routes>
+</BrowserRouter>
+```
+
+**Key differences:**
+- ✅ `<Routes>` instead of `<Switch>`
+- ✅ `element` prop (JSX) instead of `component`
+- ✅ All hooks included (useNavigate, useParams, etc.)
+- ✅ Nested routes are easier
+- ✅ Relative routing
+
+</Tab>
+
+<Tab value="React Router v5 (Old)">
+
+```jsx title="Old API (v5)"
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+
+<BrowserRouter>
+  <Switch>
+    <Route exact path="/" component={HomePage} />
+    <Route path="/about" component={AboutPage} />
+  </Switch>
+</BrowserRouter>
+```
+
+**Deprecated patterns:**
+- ❌ `<Switch>` (now `<Routes>`)
+- ❌ `component` prop (now `element`)
+- ❌ `exact` keyword (automatic in v6)
+- ❌ `useHistory` (now `useNavigate`)
+
+</Tab>
+
+</Tabs>
+
+## Routing Terminology
+
+Before we continue, let's define key terms:
+
+<Accordions>
+
+<Accordion title="Route">
+
+A **route** is a URL path mapped to a component:
+
+```jsx
+<Route path="/listing/5" element={<ListingDetailsPage />} />
+```
+
+When user visits `/listing/5`, React Router renders `<ListingDetailsPage />`.
+
+</Accordion>
+
+<Accordion title="Path">
+
+The **path** is the URL pattern:
+
+```jsx
+path="/"              // Homepage
+path="/about"         // Static path
+path="/listing/:id"   // Dynamic path with parameter
+path="*"              // Catch-all (404)
+```
+
+</Accordion>
+
+<Accordion title="URL Parameter">
+
+A **URL parameter** is a variable part of the path:
+
+```jsx
+// Route definition
+<Route path="/listing/:id" element={<Details />} />
+
+// Matches these URLs:
+/listing/1     // id = "1"
+/listing/42    // id = "42"
+/listing/abc   // id = "abc"
+```
+
+Access with `useParams()` hook.
+
+</Accordion>
+
+<Accordion title="Navigate / Navigation">
+
+**Navigation** is moving from one route to another:
+
+```jsx
+// Declarative (with Link)
+<Link to="/about">About</Link>
+
+// Imperative (with hook)
+const navigate = useNavigate();
+navigate('/about');
+```
+
+</Accordion>
+
+</Accordions>
+
+## Your Application's Future Routes
+
+Here's what we'll build in this module:
+
+```
+Route Structure
+│
+├─ /                          → HomePage
+│  (Browse all listings)
+│
+├─ /listing/:id               → ListingDetailsPage
+│  (View single listing)
+│  Examples: /listing/1, /listing/42
+│
+└─ /*                         → NotFoundPage
+   (404 - Page not found)
+```
+
+In later modules, we'll add:
+
+```
+├─ /favorites                 → FavoritesPage (Module 6)
+├─ /sign-in                   → SignInPage (Module 7)
+├─ /sign-up                   → SignUpPage (Module 7)
+└─ /profile                   → ProfilePage (Module 7)
+```
+
+<Callout type="success" title="Installation Complete!">
+
+React Router is now installed and ready to use! In the next lesson, we'll create the Router component and set up our first routes.
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Learned what client-side routing is
+- ✅ Understood why React Router is necessary
+- ✅ Installed `react-router-dom` package
+- ✅ Learned routing terminology
+- ✅ Saw the route structure we'll build
+
+**Key concepts:**
+
+- **Client-side routing** - Navigation without page reloads
+- **React Router** - The standard routing library for React
+- **Routes** - Map URLs to components
+- **URL parameters** - Dynamic segments in paths (`:id`)
+
+## What's Next?
+
+In **Lesson 2**, we'll create the Router component and wrap our application with `<BrowserRouter>`. This is where the magic begins! 🎉

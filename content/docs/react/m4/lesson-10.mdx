@@ -1,0 +1,561 @@
+---
+title: "L10: Creating a NotFoundPage"
+description: "Build a 404 error page for handling invalid routes"
+---
+
+
+# Creating a NotFoundPage
+
+What happens when someone visits a URL that doesn't exist? Right now: a blank page. Let's create a friendly 404 error page to guide users back!
+
+## What You'll Learn
+
+- Create a 404 Not Found page
+- Use catch-all routes with `*`
+- Understand route matching order
+- Build helpful error pages
+- Guide users back to valid pages
+
+## Why We Need a 404 Page
+
+**Bad user experience:**
+
+```
+User visits: /invalid-page
+Result: Blank screen, no guidance
+User thinks: "Is the site broken?"
+```
+
+**Good user experience:**
+
+```
+User visits: /invalid-page
+Result: Friendly 404 page with navigation
+User thinks: "Okay, let me go back home"
+```
+
+## Step 1: Create NotFoundPage Component
+
+<Steps>
+
+<Step>
+
+### Create the Page File
+
+```bash title="Terminal"
+touch src/pages/NotFoundPage.jsx
+```
+
+</Step>
+
+<Step>
+
+### Build the 404 UI
+
+Create a friendly error page:
+
+```jsx title="src/pages/NotFoundPage.jsx"
+import { Link } from 'react-router-dom';
+
+export default function NotFoundPage() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="text-center px-4">
+        {/* Large 404 */}
+        <h1 className="text-9xl font-bold text-gray-300 mb-4">
+          404
+        </h1>
+
+        {/* Error Message */}
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          Page Not Found
+        </h2>
+
+        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+          Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
+        </p>
+
+        {/* Navigation Buttons */}
+        <div className="flex gap-4 justify-center">
+          <Link
+            to="/"
+            className="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+          >
+            Go Home
+          </Link>
+
+          <button
+            onClick={() => window.history.back()}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+
+        {/* Optional: Helpful Links */}
+        <div className="mt-12">
+          <p className="text-sm text-gray-600 mb-4">Or try these pages:</p>
+          <div className="flex gap-4 justify-center text-sm">
+            <Link to="/" className="text-pink-600 hover:underline">
+              Home
+            </Link>
+            <Link to="/about" className="text-pink-600 hover:underline">
+              About
+            </Link>
+            <Link to="/contact" className="text-pink-600 hover:underline">
+              Contact
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+**Features:**
+
+- Large "404" heading
+- Friendly error message
+- "Go Home" button
+- "Go Back" button (browser history)
+- Helpful navigation links
+- Clean, professional design
+
+</Step>
+
+</Steps>
+
+## Step 2: Add Catch-All Route
+
+Now add the route to handle all unmatched URLs:
+
+<Steps>
+
+<Step>
+
+### Update Router Configuration
+
+Add the catch-all route to `Router.jsx`:
+
+```jsx title="src/components/Router.jsx"
+// [!code word:*]
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
+import ListingDetailsPage from '../pages/ListingDetailsPage';
+import NotFoundPage from '../pages/NotFoundPage'; // [!code ++]
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/listing/:id" element={<ListingDetailsPage />} />
+        <Route path="*" element={<NotFoundPage />} /> {/* [!code ++] */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+**The `*` path:**
+
+- Matches **any** URL
+- Acts as a catch-all
+- **Must be last** in route list
+
+</Step>
+
+<Step>
+
+### Test the 404 Page
+
+Try visiting invalid URLs:
+
+```
+http://localhost:5173/invalid-page       → 404 Page
+http://localhost:5173/doesnt-exist      → 404 Page
+http://localhost:5173/listing/abc/xyz   → 404 Page
+http://localhost:5173/random            → 404 Page
+```
+
+All should show your `NotFoundPage`!
+
+</Step>
+
+</Steps>
+
+## Understanding the Catch-All Route
+
+The `*` path is special:
+
+<Tabs items={['How It Works', 'Route Order', 'Examples']}>
+
+<Tab value="How It Works">
+
+**The `*` wildcard:**
+
+```jsx
+<Route path="*" element={<NotFoundPage />} />
+```
+
+**Matches:**
+- `/anything`
+- `/multiple/segments/here`
+- `/listing/invalid/extra/parts`
+- Any URL not matched by previous routes
+
+**Why it works:**
+- React Router checks routes in order
+- First match wins
+- `*` matches everything
+- So if no other route matched, `*` will
+
+</Tab>
+
+<Tab value="Route Order">
+
+**Order matters! Most specific first:**
+
+```jsx
+<Routes>
+  {/* 1. Exact paths */}
+  <Route path="/" element={<HomePage />} />
+
+  {/* 2. Specific static paths */}
+  <Route path="/about" element={<AboutPage />} />
+
+  {/* 3. Dynamic routes */}
+  <Route path="/listing/:id" element={<DetailsPage />} />
+
+  {/* 4. Catch-all LAST */}
+  <Route path="*" element={<NotFoundPage />} />
+</Routes>
+```
+
+**If you put `*` first:**
+
+```jsx
+<Routes>
+  <Route path="*" element={<NotFoundPage />} /> {/* ❌ WRONG */}
+  <Route path="/" element={<HomePage />} />
+  <Route path="/listing/:id" element={<DetailsPage />} />
+</Routes>
+```
+
+**Everything shows 404!** The `*` catches all URLs before other routes can match.
+
+</Tab>
+
+<Tab value="Examples">
+
+**Route matching with catch-all:**
+
+```jsx
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/listing/:id" element={<Details />} />
+  <Route path="*" element={<NotFound />} />
+</Routes>
+```
+
+**URL → Route matching:**
+
+```
+/                    → HomePage (exact match)
+/listing/42          → DetailsPage (dynamic match)
+/listing/999         → DetailsPage (dynamic match)
+/about               → NotFoundPage (no match, caught by *)
+/listing/42/invalid  → NotFoundPage (no match, caught by *)
+/anything            → NotFoundPage (no match, caught by *)
+```
+
+</Tab>
+
+</Tabs>
+
+## Creative 404 Page Ideas
+
+Make your 404 page memorable:
+
+<Accordions>
+
+<Accordion title="Friendly & Helpful">
+
+```jsx
+<div className="text-center">
+  <h1 className="text-6xl mb-4">🤔</h1>
+  <h2 className="text-2xl font-bold mb-4">
+    Hmm, we can't find that page
+  </h2>
+  <p className="text-gray-600 mb-6">
+    But don't worry, here are some helpful links:
+  </p>
+  <div className="flex gap-4 justify-center">
+    <Link to="/">Home</Link>
+    <Link to="/search">Search</Link>
+    <Link to="/help">Help</Link>
+  </div>
+</div>
+```
+
+</Accordion>
+
+<Accordion title="Playful & Fun">
+
+```jsx
+<div className="text-center">
+  <h1 className="text-8xl mb-4">🏝️</h1>
+  <h2 className="text-2xl font-bold mb-4">
+    You've landed on a deserted island!
+  </h2>
+  <p className="text-gray-600 mb-6">
+    This page doesn't exist, but we can help you find your way back.
+  </p>
+  <Link 
+    to="/"
+    className="bg-blue-500 text-white px-6 py-3 rounded-lg"
+  >
+    Rescue Me 🚁
+  </Link>
+</div>
+```
+
+</Accordion>
+
+<Accordion title="Minimal & Clean">
+
+```jsx
+<div className="text-center">
+  <h1 className="text-9xl font-bold text-gray-200">404</h1>
+  <p className="text-xl text-gray-600 mb-8">Page not found</p>
+  <Link 
+    to="/"
+    className="text-blue-600 hover:underline"
+  >
+    Return home
+  </Link>
+</div>
+```
+
+</Accordion>
+
+<Accordion title="With Search Suggestions">
+
+```jsx
+function NotFoundPage() {
+  const [search, setSearch] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`/search?q=${search}`);
+  };
+
+  return (
+    <div className="text-center">
+      <h1 className="text-6xl font-bold mb-4">404</h1>
+      <p className="mb-6">Page not found. Try searching instead?</p>
+      
+      <form onSubmit={handleSearch} className="max-w-md mx-auto">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search listings..."
+          className="w-full px-4 py-2 border rounded-lg"
+        />
+        <button className="mt-2 w-full bg-pink-600 text-white py-2 rounded-lg">
+          Search
+        </button>
+      </form>
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+## Using Browser History
+
+The "Go Back" button uses browser history:
+
+```jsx
+<button onClick={() => window.history.back()}>
+  Go Back
+</button>
+```
+
+**How it works:**
+
+```
+User journey:
+1. User on /
+2. Clicks link to /listing/42
+3. Manually types /invalid-page
+4. Clicks "Go Back"
+5. Returns to /listing/42
+```
+
+**Alternative with useNavigate:**
+
+```jsx
+import { useNavigate } from 'react-router-dom';
+
+function NotFoundPage() {
+  const navigate = useNavigate();
+
+  return (
+    <button onClick={() => navigate(-1)}>
+      Go Back
+    </button>
+  );
+}
+```
+
+Both work the same way!
+
+## Advanced: Custom 404 for Specific Routes
+
+You can have multiple 404 pages:
+
+```jsx
+<Routes>
+  {/* Main routes */}
+  <Route path="/" element={<HomePage />} />
+  
+  {/* Listings section with own 404 */}
+  <Route path="/listing">
+    <Route index element={<ListingsPage />} />
+    <Route path=":id" element={<DetailsPage />} />
+    <Route path="*" element={<ListingNotFound />} />
+  </Route>
+
+  {/* Profile section with own 404 */}
+  <Route path="/profile">
+    <Route index element={<ProfilePage />} />
+    <Route path="settings" element={<SettingsPage />} />
+    <Route path="*" element={<ProfileNotFound />} />
+  </Route>
+
+  {/* Global 404 */}
+  <Route path="*" element={<GlobalNotFound />} />
+</Routes>
+```
+
+**Different 404s for different sections!**
+
+## 404 Page Best Practices
+
+<Accordions>
+
+<Accordion title="1. Be Helpful, Not Apologetic">
+
+```jsx
+// ✅ Good - helpful
+<h2>Page Not Found</h2>
+<p>Let's get you back on track!</p>
+<Link to="/">Go to Homepage</Link>
+
+// ❌ Bad - too apologetic
+<h2>We're so sorry!</h2>
+<p>We sincerely apologize for this inconvenience...</p>
+```
+
+Keep it friendly and action-oriented.
+
+</Accordion>
+
+<Accordion title="2. Provide Clear Navigation">
+
+```jsx
+// ✅ Good - clear options
+<div>
+  <Link to="/">Home</Link>
+  <Link to="/search">Search</Link>
+  <Link to="/help">Help</Link>
+</div>
+
+// ❌ Bad - no guidance
+<div>
+  <p>Page not found.</p>
+  {/* No links */}
+</div>
+```
+
+Give users multiple ways to recover.
+
+</Accordion>
+
+<Accordion title="3. Match Your Brand">
+
+```jsx
+// Make it consistent with your site
+<div className="min-h-screen bg-gray-50"> {/* Your theme */}
+  <h1 className="text-pink-600"> {/* Your colors */}
+    404
+  </h1>
+  <p className="font-sans"> {/* Your fonts */}
+    Page not found
+  </p>
+</div>
+```
+
+</Accordion>
+
+<Accordion title="4. Add Analytics Tracking">
+
+```jsx
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+function NotFoundPage() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Track 404 errors
+    analytics.track('404_error', {
+      path: location.pathname,
+      referrer: document.referrer
+    });
+  }, [location]);
+
+  return <div>404 Content</div>;
+}
+```
+
+Know which pages users are trying to access!
+
+</Accordion>
+
+</Accordions>
+
+<Callout type="success" title="404 Page Complete!">
+
+Your app now gracefully handles invalid routes with a friendly 404 page. Users will always have a way to navigate back to safety!
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Created NotFoundPage component
+- ✅ Added catch-all route with `*`
+- ✅ Provided navigation options
+- ✅ Understood route matching order
+- ✅ Built user-friendly error page
+
+**Key concepts:**
+
+- **Catch-all route** - `path="*"` matches everything
+- **Route order** - More specific routes before catch-all
+- **User guidance** - Provide clear navigation options
+- **Browser history** - `window.history.back()` or `navigate(-1)`
+- **Professional UX** - Handle errors gracefully
+
+## What's Next?
+
+In **Lesson 11**, we'll learn about **programmatic navigation** using the `useNavigate` hook. This lets you navigate from JavaScript code (like after form submissions or button clicks)! 🚀

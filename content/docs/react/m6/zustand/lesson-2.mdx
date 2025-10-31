@@ -1,0 +1,626 @@
+---
+title: "L2: Create Listings Store"
+description: "Build the listings store with state and actions for our app"
+---
+
+# Create Listings Store
+
+Let's create the main store for our application! 🏠
+
+## What We're Building
+
+A `useListingsStore` that manages:
+
+- **items** - All listings from the API
+- **favorites** - Array of favorited listing IDs
+- **status** - Loading state ('idle', 'loading', 'succeeded', 'failed')
+- **error** - Error message if fetch fails
+
+Plus actions to update this state!
+
+## Step 1: Create the Store File
+
+Create a new file for the listings store:
+
+```bash
+mkdir -p src/state
+touch src/state/useListingsStore.js
+```
+
+## Step 2: Define Initial State
+
+Let's start with the state structure:
+
+```js title="src/state/useListingsStore.js"
+import { create } from 'zustand';
+
+const useListingsStore = create((set) => ({
+  // State
+  items: [],
+  favorites: [],
+  status: 'idle',  // 'idle' | 'loading' | 'succeeded' | 'failed'
+  error: null,
+  
+  // Actions will go here...
+}));
+
+export default useListingsStore;
+```
+
+## Understanding the State Shape
+
+<Tabs items={['items', 'favorites', 'status', 'error']}>
+
+<Tab value="items">
+
+**items**: Array of all listings
+
+```js
+items: [
+  {
+    id: 1,
+    title: 'Beach House',
+    description: 'Beautiful beach house...',
+    price: 250,
+    images: ['url1', 'url2'],
+    maxGuests: 6,
+    // ... more fields
+  },
+  {
+    id: 2,
+    title: 'Mountain Cabin',
+    // ...
+  }
+]
+```
+
+**Purpose:** Store all fetched listings for display
+
+</Tab>
+
+<Tab value="favorites">
+
+**favorites**: Array of listing IDs
+
+```js
+favorites: [1, 5, 9]  // User favorited listings 1, 5, and 9
+```
+
+**Why IDs instead of full objects?**
+
+<Accordions>
+
+<Accordion title="Reason 1: Memory Efficiency">
+
+```js
+// With IDs (efficient)
+favorites: [1, 5, 9]  // ~30 bytes
+
+// With full objects (wasteful)
+favorites: [
+  { id: 1, title: 'Beach House', description: '...', images: [...] },
+  // ... duplicates all data!
+]  // ~5000+ bytes
+```
+
+IDs are **100x smaller!**
+
+</Accordion>
+
+<Accordion title="Reason 2: Single Source of Truth">
+
+```js
+// With IDs
+items: [{ id: 1, title: 'Beach House', price: 250 }]
+favorites: [1]
+
+// Update listing price
+set({ items: items.map(item => 
+  item.id === 1 ? { ...item, price: 300 } : item
+)})
+
+// Favorite automatically shows updated price! ✅
+```
+
+**With full objects**, you'd need to update in TWO places!
+
+</Accordion>
+
+<Accordion title="Reason 3: Easy Checking">
+
+```js
+// Check if listing is favorited
+const isFavorited = favorites.includes(listingId);  // ✅ Simple!
+
+// Get favorited listings
+const favoritedListings = items.filter(item => 
+  favorites.includes(item.id)
+);  // ✅ Easy!
+```
+
+</Accordion>
+
+</Accordions>
+
+</Tab>
+
+<Tab value="status">
+
+**status**: Loading state indicator
+
+```js
+status: 'idle'      // Initial state
+status: 'loading'   // Fetching data
+status: 'succeeded' // Fetch successful
+status: 'failed'    // Fetch failed
+```
+
+**Usage in components:**
+
+```jsx
+if (status === 'loading') return <Spinner />;
+if (status === 'failed') return <Error message={error} />;
+if (status === 'succeeded') return <ListingList listings={items} />;
+```
+
+**Why not just `isLoading`?**
+
+```js
+// With boolean (limited)
+isLoading: true/false
+
+// Can't distinguish between:
+// - Initial state (not started)
+// - Currently loading
+// - Successfully loaded
+// - Failed to load
+
+// With status string (clear)
+status: 'idle' | 'loading' | 'succeeded' | 'failed'
+
+// Know exactly what state we're in!
+```
+
+</Tab>
+
+<Tab value="error">
+
+**error**: Error message when fetch fails
+
+```js
+error: null                        // No error
+error: 'Network request failed'    // Network error
+error: 'Listings not found'        // API error
+```
+
+**Usage:**
+
+```jsx
+{status === 'failed' && (
+  <div className="error">
+    Error: {error}
+  </div>
+)}
+```
+
+</Tab>
+
+</Tabs>
+
+## Step 3: Add Actions
+
+Now let's add actions to manipulate state:
+
+```js title="src/state/useListingsStore.js"
+import { create } from 'zustand';
+
+const useListingsStore = create((set) => ({
+  // State
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+  
+  // Actions
+  setItems: (items) => set({ items }),
+  
+  setStatus: (status) => set({ status }),
+  
+  setError: (error) => set({ error }),
+  
+  toggleFavorite: (id) => set((state) => ({
+    favorites: state.favorites.includes(id)
+      ? state.favorites.filter(favId => favId !== id)  // Remove
+      : [...state.favorites, id]                        // Add
+  })),
+}));
+
+export default useListingsStore;
+```
+
+## Understanding the Actions
+
+<Accordions>
+
+<Accordion title="setItems()">
+
+**Updates the items array:**
+
+```js
+setItems: (items) => set({ items })
+
+// Usage
+const setItems = useListingsStore((state) => state.setItems);
+setItems([...newListings]);
+```
+
+**Simple setter** - just replaces the entire items array.
+
+</Accordion>
+
+<Accordion title="setStatus()">
+
+**Updates loading status:**
+
+```js
+setStatus: (status) => set({ status })
+
+// Usage
+const setStatus = useListingsStore((state) => state.setStatus);
+setStatus('loading');  // Start loading
+setStatus('succeeded');  // Fetch successful
+setStatus('failed');  // Fetch failed
+```
+
+</Accordion>
+
+<Accordion title="setError()">
+
+**Sets error message:**
+
+```js
+setError: (error) => set({ error })
+
+// Usage
+const setError = useListingsStore((state) => state.setError);
+setError('Network request failed');
+```
+
+</Accordion>
+
+<Accordion title="toggleFavorite()">
+
+**Adds or removes listing from favorites:**
+
+```js
+toggleFavorite: (id) => set((state) => ({
+  favorites: state.favorites.includes(id)
+    ? state.favorites.filter(favId => favId !== id)  // Remove
+    : [...state.favorites, id]                        // Add
+}))
+```
+
+**How it works:**
+
+```js
+// Initial state
+favorites: []
+
+// User clicks favorite on listing 1
+toggleFavorite(1)
+// Result: favorites: [1]
+
+// User clicks favorite on listing 5
+toggleFavorite(5)
+// Result: favorites: [1, 5]
+
+// User clicks favorite on listing 1 again (unfavorite)
+toggleFavorite(1)
+// Result: favorites: [5]
+```
+
+**The logic:**
+
+```js
+state.favorites.includes(id)  // Is ID in favorites?
+  ? state.favorites.filter(favId => favId !== id)  // YES → Remove it
+  : [...state.favorites, id]                        // NO → Add it
+```
+
+**Perfect toggle behavior!** ✨
+
+</Accordion>
+
+</Accordions>
+
+## Complete Store Code
+
+Here's our complete listings store:
+
+```js title="src/state/useListingsStore.js"
+import { create } from 'zustand';
+
+const useListingsStore = create((set) => ({
+  // State
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+  
+  // Actions
+  setItems: (items) => set({ items }),
+  
+  setStatus: (status) => set({ status }),
+  
+  setError: (error) => set({ error }),
+  
+  toggleFavorite: (id) => set((state) => ({
+    favorites: state.favorites.includes(id)
+      ? state.favorites.filter(favId => favId !== id)
+      : [...state.favorites, id]
+  })),
+}));
+
+export default useListingsStore;
+```
+
+**That's the entire store!** ~20 lines total. 🎉
+
+## Comparison with Redux
+
+Let's see how this compares to Redux Toolkit:
+
+<Tabs items={['Zustand (This)', 'Redux Toolkit']}>
+
+<Tab value="Zustand (This)">
+
+**1 file, ~20 lines:**
+
+```js
+import { create } from 'zustand';
+
+const useListingsStore = create((set) => ({
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+  
+  setItems: (items) => set({ items }),
+  setStatus: (status) => set({ status }),
+  setError: (error) => set({ error }),
+  toggleFavorite: (id) => set((state) => ({
+    favorites: state.favorites.includes(id)
+      ? state.favorites.filter(favId => favId !== id)
+      : [...state.favorites, id]
+  })),
+}));
+
+export default useListingsStore;
+```
+
+**Done!** ✨
+
+</Tab>
+
+<Tab value="Redux Toolkit">
+
+**3 files, ~60 lines:**
+
+**File 1: store.js**
+```js
+import { configureStore } from '@reduxjs/toolkit';
+import listingsReducer from './slices/listingsSlice';
+
+export const store = configureStore({
+  reducer: {
+    listings: listingsReducer
+  }
+});
+```
+
+**File 2: listingsSlice.js**
+```js
+import { createSlice } from '@reduxjs/toolkit';
+
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState: {
+    items: [],
+    favorites: [],
+    status: 'idle',
+    error: null
+  },
+  reducers: {
+    setItems: (state, action) => {
+      state.items = action.payload;
+    },
+    setStatus: (state, action) => {
+      state.status = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+    toggleFavorite: (state, action) => {
+      const id = action.payload;
+      if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(fav => fav !== id);
+      } else {
+        state.favorites.push(id);
+      }
+    }
+  }
+});
+
+export const { setItems, setStatus, setError, toggleFavorite } = listingsSlice.actions;
+export default listingsSlice.reducer;
+```
+
+**File 3: App.jsx**
+```js
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+
+<Provider store={store}>
+  <App />
+</Provider>
+```
+
+**3x more code!**
+
+</Tab>
+
+</Tabs>
+
+## Testing the Store
+
+Let's test our store works correctly. We can test `toggleFavorite` in a component:
+
+```jsx title="Test Component (temporary)"
+import useListingsStore from '@/state/useListingsStore';
+
+function TestStore() {
+  const favorites = useListingsStore((state) => state.favorites);
+  const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+  
+  return (
+    <div>
+      <h2>Favorites: {JSON.stringify(favorites)}</h2>
+      <button onClick={() => toggleFavorite(1)}>Toggle Listing 1</button>
+      <button onClick={() => toggleFavorite(5)}>Toggle Listing 5</button>
+      <button onClick={() => toggleFavorite(9)}>Toggle Listing 9</button>
+    </div>
+  );
+}
+```
+
+**Test sequence:**
+1. Initial: `[]`
+2. Click "Toggle Listing 1": `[1]`
+3. Click "Toggle Listing 5": `[1, 5]`
+4. Click "Toggle Listing 1" again: `[5]`
+
+**Perfect!** The toggle works. ✅
+
+## Understanding set() Behavior
+
+Zustand's `set()` function has smart behavior:
+
+<Accordions>
+
+<Accordion title="Shallow Merge (Default)">
+
+```js
+// Initial state
+{
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null
+}
+
+// Call set({ status: 'loading' })
+{
+  items: [],        // Unchanged ✅
+  favorites: [],    // Unchanged ✅
+  status: 'loading', // Updated ✅
+  error: null       // Unchanged ✅
+}
+```
+
+**set() merges!** You only need to specify what changed.
+
+**Compare with React's useState:**
+
+```js
+// useState (NO merge)
+const [state, setState] = useState({ a: 1, b: 2 });
+setState({ a: 3 });  // { a: 3 } - b is lost! ❌
+setState(prev => ({ ...prev, a: 3 }));  // { a: 3, b: 2 } - need spread ✅
+
+// Zustand set() (automatic merge)
+set({ a: 3 });  // { a: 3, b: 2 } - automatic! ✅
+```
+
+</Accordion>
+
+<Accordion title="Replace Mode">
+
+To replace the entire state instead of merging:
+
+```js
+set({ count: 5 }, true)  // Second parameter = replace mode
+// or
+set({ count: 5 }, { replace: true })
+```
+
+**Rarely needed!** Merge is almost always what you want.
+
+</Accordion>
+
+<Accordion title="Functional Updates">
+
+Use a function when you need the previous state:
+
+```js
+// Reading previous state
+set((state) => ({
+  count: state.count + 1
+}))
+
+// Good for:
+// - Incrementing/decrementing
+// - Array operations
+// - Conditional updates
+```
+
+**Simple updates** (like `setItems`) don't need functions:
+
+```js
+// ✅ Simple
+setItems: (items) => set({ items })
+
+// ❌ Unnecessary
+setItems: (items) => set((state) => ({ items }))
+```
+
+</Accordion>
+
+</Accordions>
+
+## Why This Structure?
+
+Our store structure mirrors what Redux Toolkit would create:
+
+| Field | Purpose | Redux Equivalent |
+|-------|---------|------------------|
+| items | All listings | state.listings.items |
+| favorites | Favorited IDs | state.listings.favorites |
+| status | Loading state | state.listings.status |
+| error | Error message | state.listings.error |
+
+**Benefit:** If you know Redux, Zustand feels familiar!
+
+**Difference:** Zustand is **90% simpler** to set up and use.
+
+## What's Next?
+
+Perfect! Our store is ready. In the next lesson, we'll:
+
+1. **Use the store** in components
+2. **Select state** with selectors
+3. **Call actions** to update state
+4. **Understand re-render optimization**
+
+<Callout type="success">
+**✅ Lesson Complete!** You've created a complete Zustand store for listings!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Store structure** - State + actions in one place
+- ✅ **State shape** - items, favorites, status, error
+- ✅ **Actions are functions** - No dispatch, just call them
+- ✅ **toggleFavorite** - Add/remove IDs from favorites array
+- ✅ **set() merges** - Only specify what changes
+- ✅ **Functional updates** - Use `(state) =>` when reading previous state
+- ✅ **90% simpler** than Redux Toolkit setup

@@ -1,0 +1,841 @@
+---
+title: "L10: M3 Challenge"
+description: "Build a complete listings page with pagination, caching, and advanced features"
+---
+
+
+# Module 3 Challenge: Advanced Listings Page
+
+Time to put everything you've learned to the test! In this comprehensive challenge, you'll build an advanced listings page with pagination, caching, refresh functionality, and optional bonus features.
+
+## Challenge Overview
+
+**Objective:** Build a fully-featured listings page that demonstrates mastery of useEffect, async data, state management, and custom hooks.
+
+**Time Estimate:** 2-3 hours
+
+**Difficulty:** ⭐⭐⭐ Intermediate to Advanced
+
+## Requirements
+
+### Required Features (Core Challenge)
+
+You must implement these three features:
+
+<Steps>
+<Step>
+
+    ### Pagination
+    - Display 6 listings per page
+    - Show current page and total pages
+    - "Previous" and "Next" buttons
+    - Disable buttons at boundaries (first/last page)
+    - Fetch only the listings for the current page
+</Step>
+<Step>
+    ### Refresh Button
+    - Manual refresh button to reload data
+    - Show loading state during refresh
+    - Properly cancel ongoing requests when refreshing
+    - Display success feedback after refresh
+</Step>
+<Step>
+    ### Response Caching
+    - Cache API responses by page number
+    - Don't re-fetch already loaded pages
+    - Clear cache on refresh
+    - Implement cache expiration (5 minutes)
+</Step>
+</Steps>
+### Bonus Features (Optional)
+
+Challenge yourself with these advanced features:
+
+1. **Infinite Scroll** - Load next page automatically when scrolling to bottom
+2. **Search Debouncing** - Implement search with 500ms delay
+3. **Optimistic Updates** - Show immediate feedback before API responds
+4. **Loading Skeletons** - Animated placeholder content instead of spinner
+5. **Error Recovery** - Automatic retry with exponential backoff
+
+## Getting Started
+
+<Steps>
+
+<Step>
+
+### Review Your Current Code
+
+Take a look at your current `HomePage.jsx`. You should have:
+- Data fetching with `useEffect`
+- Loading and error states
+- Display of listings in a grid
+
+</Step>
+
+<Step>
+
+### Plan Your Approach
+
+Before coding, think through:
+
+1. **State management**: What state variables do you need?
+   - `currentPage`, `totalPages`, `cache`, `isRefreshing`, etc.
+
+2. **API updates**: How will you modify the mock API?
+   - Add pagination support: `getAllListings(page, perPage)`
+   - Return metadata: `{ listings, total, page, perPage }`
+
+3. **Custom hooks**: Should you extract any logic?
+   - `usePaginatedListings`?
+   - `useCachedData`?
+
+</Step>
+
+<Step>
+
+### Set Up Your Workspace
+
+Make sure you have:
+- Clean component state (commit or save current work)
+- Mock API ready to modify
+- React DevTools open for debugging
+
+</Step>
+
+</Steps>
+
+## Part 1: Implement Pagination
+
+Let's start with pagination - the foundation of this challenge.
+
+<Accordions>
+
+<Accordion title="Hint: Update Mock API">
+
+First, update your mock API to support pagination:
+
+```javascript title="src/api/mockApi.js"
+// [!code word:getAllListings]
+export async function getAllListings(page = 1, perPage = 6) {
+  await delay(800); // Simulate network delay
+  
+  // Calculate pagination
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  const paginatedListings = LISTINGS.slice(start, end);
+  
+  return {
+    listings: paginatedListings,
+    total: LISTINGS.length,
+    page,
+    perPage,
+    totalPages: Math.ceil(LISTINGS.length / perPage)
+  };
+}
+```
+
+</Accordion>
+
+<Accordion title="Hint: State Management">
+
+You'll need these state variables:
+
+```jsx
+const [listings, setListings] = useState([]);
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+const [isLoading, setIsLoading] = useState(true);
+const [error, setError] = useState(null);
+```
+
+</Accordion>
+
+<Accordion title="Hint: Fetch with Pagination">
+
+Update your fetch function to use pagination:
+
+```jsx
+// [!code word:useEffect]
+useEffect(() => {
+  const controller = new AbortController();
+  
+  const fetchListings = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await getAllListings(currentPage, 6, {
+        signal: controller.signal
+      });
+      
+      setListings(response.listings);
+      setTotalPages(response.totalPages);
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setError(err.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  fetchListings();
+  
+  return () => controller.abort();
+}, [currentPage]); // Re-fetch when page changes
+```
+
+</Accordion>
+
+<Accordion title="Hint: Pagination UI">
+
+Create pagination controls:
+
+```jsx
+<div className="flex justify-center items-center gap-4 mt-8">
+  <button
+    onClick={() => setCurrentPage(prev => prev - 1)}
+    disabled={currentPage === 1}
+    className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
+  >
+    Previous
+  </button>
+  
+  <span className="text-gray-700">
+    Page {currentPage} of {totalPages}
+  </span>
+  
+  <button
+    onClick={() => setCurrentPage(prev => prev + 1)}
+    disabled={currentPage === totalPages}
+    className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
+  >
+    Next
+  </button>
+</div>
+```
+
+</Accordion>
+
+</Accordions>
+
+## Part 2: Add Refresh Functionality
+
+Now implement a manual refresh button that properly handles cleanup.
+
+<Accordions>
+
+<Accordion title="Hint: Refresh State">
+
+Add state to track refreshing separately from loading:
+
+```jsx
+const [isRefreshing, setIsRefreshing] = useState(false);
+```
+
+This lets you show different UI for initial load vs. refresh.
+
+</Accordion>
+
+<Accordion title="Hint: Refresh Function">
+
+Create a refresh function that reloads current page:
+
+```jsx
+const handleRefresh = () => {
+  // Force re-fetch by updating a dependency
+  setRefreshTrigger(prev => prev + 1);
+};
+
+// In useEffect dependencies
+useEffect(() => {
+  // ... fetch logic
+}, [currentPage, refreshTrigger]);
+```
+
+Or simpler: directly call the fetch function.
+
+</Accordion>
+
+<Accordion title="Hint: Refresh Button UI">
+
+```jsx
+<button
+  onClick={handleRefresh}
+  disabled={isRefreshing}
+  className="px-4 py-2 bg-green-500 text-white rounded flex items-center gap-2 disabled:bg-gray-300"
+>
+  <svg className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`}>
+    {/* Refresh icon */}
+  </svg>
+  {isRefreshing ? 'Refreshing...' : 'Refresh'}
+</button>
+```
+
+</Accordion>
+
+</Accordions>
+
+## Part 3: Implement Response Caching
+
+The most challenging part! Cache responses to avoid redundant API calls.
+
+<Accordions>
+
+<Accordion title="Hint: Cache Structure">
+
+Use an object to cache responses by page:
+
+```jsx
+const [cache, setCache] = useState({});
+
+// Cache structure:
+// {
+//   1: { data: [...], timestamp: 1234567890 },
+//   2: { data: [...], timestamp: 1234567891 }
+// }
+```
+
+</Accordion>
+
+<Accordion title="Hint: Check Cache Before Fetching">
+
+```jsx
+const fetchListings = async () => {
+  // Check if data is cached and not expired
+  const cached = cache[currentPage];
+  const now = Date.now();
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  
+  if (cached && (now - cached.timestamp < CACHE_DURATION)) {
+    // Use cached data
+    setListings(cached.data.listings);
+    setTotalPages(cached.data.totalPages);
+    setIsLoading(false);
+    return;
+  }
+  
+  // Otherwise, fetch from API
+  try {
+    const response = await getAllListings(currentPage, 6);
+    
+    // Update cache
+    setCache(prev => ({
+      ...prev,
+      [currentPage]: {
+        data: response,
+        timestamp: now
+      }
+    }));
+    
+    setListings(response.listings);
+    setTotalPages(response.totalPages);
+  } catch (err) {
+    // Handle error
+  }
+};
+```
+
+</Accordion>
+
+<Accordion title="Hint: Clear Cache on Refresh">
+
+```jsx
+const handleRefresh = () => {
+  setCache({}); // Clear all cached data
+  setRefreshTrigger(prev => prev + 1); // Trigger re-fetch
+};
+```
+
+</Accordion>
+
+</Accordions>
+
+## Bonus Challenge 1: Infinite Scroll
+
+<Accordions>
+
+<Accordion title="Hint: Detect Scroll to Bottom">
+
+```jsx
+// [!code word:useEffect]
+useEffect(() => {
+  const handleScroll = () => {
+    const bottom = 
+      window.innerHeight + window.scrollY >= 
+      document.documentElement.scrollHeight - 100;
+    
+    if (bottom && !isLoading && currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+  
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, [isLoading, currentPage, totalPages]);
+```
+
+</Accordion>
+
+<Accordion title="Hint: Append Instead of Replace">
+
+For infinite scroll, append new listings instead of replacing:
+
+```jsx
+setListings(prev => [...prev, ...response.listings]);
+```
+
+</Accordion>
+
+</Accordions>
+
+## Bonus Challenge 2: Search with Debouncing
+
+<Accordions>
+
+<Accordion title="Hint: Debounce Hook">
+
+Create a custom hook for debouncing:
+
+```jsx
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  
+  return debouncedValue;
+}
+```
+
+</Accordion>
+
+<Accordion title="Hint: Use in Search">
+
+```jsx
+const [searchTerm, setSearchTerm] = useState('');
+const debouncedSearch = useDebounce(searchTerm, 500);
+
+useEffect(() => {
+  // Fetch with search term
+  fetchListings(debouncedSearch);
+}, [debouncedSearch]);
+```
+
+</Accordion>
+
+</Accordions>
+
+## Bonus Challenge 3: Loading Skeletons
+
+<Accordions>
+
+<Accordion title="Hint: Create Skeleton Component">
+
+```jsx
+function ListingSkeleton() {
+  return (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+      <div className="h-48 bg-gray-300"></div>
+      <div className="p-4 space-y-3">
+        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+        <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+        <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+      </div>
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="Hint: Show Skeletons While Loading">
+
+```jsx
+{isLoading ? (
+  <>
+    {[...Array(6)].map((_, i) => (
+      <ListingSkeleton key={i} />
+    ))}
+  </>
+) : (
+  <>
+    {listings.map(listing => (
+      <ListingCard key={listing.id} listing={listing} />
+    ))}
+  </>
+)}
+```
+
+</Accordion>
+
+</Accordions>
+
+## Testing Your Solution
+
+<Steps>
+
+<Step>
+
+### Functionality Testing
+
+Test each feature:
+
+1. **Pagination**
+   - Navigate between pages
+   - Check that listings change
+   - Verify buttons disable at boundaries
+   - Check page counter updates correctly
+
+2. **Refresh**
+   - Click refresh button
+   - Verify loading state shows
+   - Check that data reloads
+   - Test refresh while on different pages
+
+3. **Caching**
+   - Go to page 2, then back to page 1
+   - Should load instantly from cache
+   - Wait 5+ minutes, should re-fetch
+   - Refresh should clear cache
+
+</Step>
+
+<Step>
+
+### Edge Cases
+
+Test these scenarios:
+
+- Refresh while already loading
+- Navigate quickly between pages
+- Refresh on last page
+- Empty search results
+- Network errors during refresh
+
+</Step>
+
+<Step>
+
+### Performance Check
+
+Use React DevTools:
+
+- No unnecessary re-renders
+- Cleanup functions running properly
+- No memory leaks (check intervals/listeners)
+- Proper AbortController usage
+
+</Step>
+
+</Steps>
+
+## Complete Solution
+
+<Callout type="warn" title="Try It Yourself First!">
+
+Don't peek at the solution until you've attempted the challenge! Learning happens through struggle. If you're stuck, review the hints in each section first.
+
+</Callout>
+
+<Accordions>
+
+<Accordion title="Solution: Updated Mock API">
+
+```javascript title="src/api/mockApi.js"
+// [!code word:getAllListings]
+// ... existing imports and data ...
+
+export async function getAllListings(page = 1, perPage = 6, options = {}) {
+  await delay(800);
+  
+  // Support cancellation
+  if (options.signal?.aborted) {
+    throw new DOMException('Request aborted', 'AbortError');
+  }
+  
+  // Calculate pagination
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  const paginatedListings = LISTINGS.slice(start, end);
+  
+  return {
+    listings: paginatedListings,
+    total: LISTINGS.length,
+    page,
+    perPage,
+    totalPages: Math.ceil(LISTINGS.length / perPage),
+    timestamp: Date.now()
+  };
+}
+```
+
+</Accordion>
+
+<Accordion title="Solution: Custom Hook for Paginated Data">
+
+```jsx title="src/hooks/usePaginatedListings.js"
+// [!code word:useEffect]
+import { useState, useEffect } from 'react';
+import { getAllListings } from '../api/mockApi';
+
+export default function usePaginatedListings(perPage = 6) {
+  const [listings, setListings] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cache, setCache] = useState({});
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchListings = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      // Check cache
+      const cached = cache[currentPage];
+      const now = Date.now();
+
+      if (cached && (now - cached.timestamp < CACHE_DURATION)) {
+        setListings(cached.data.listings);
+        setTotalPages(cached.data.totalPages);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await getAllListings(currentPage, perPage, {
+          signal: controller.signal
+        });
+
+        // Update cache
+        setCache(prev => ({
+          ...prev,
+          [currentPage]: {
+            data: response,
+            timestamp: now
+          }
+        }));
+
+        setListings(response.listings);
+        setTotalPages(response.totalPages);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message || 'Failed to fetch listings');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchListings();
+
+    return () => controller.abort();
+  }, [currentPage, perPage, refreshTrigger]);
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const refresh = () => {
+    setCache({}); // Clear cache
+    setRefreshTrigger(prev => prev + 1); // Trigger re-fetch
+  };
+
+  return {
+    listings,
+    currentPage,
+    totalPages,
+    isLoading,
+    error,
+    goToPage,
+    goToNextPage,
+    goToPreviousPage,
+    refresh,
+    isCached: !!cache[currentPage]
+  };
+}
+```
+
+</Accordion>
+
+<Accordion title="Solution: Complete HomePage Component">
+
+```jsx title="src/pages/HomePage.jsx"
+import { RefreshCw } from 'lucide-react';
+import usePaginatedListings from '../hooks/usePaginatedListings';
+import ListingCard from '../components/ListingCard';
+import Spinner from '../components/Spinner';
+import ErrorMessage from '../components/ErrorMessage';
+
+export default function HomePage() {
+  const {
+    listings,
+    currentPage,
+    totalPages,
+    isLoading,
+    error,
+    goToNextPage,
+    goToPreviousPage,
+    refresh,
+    isCached
+  } = usePaginatedListings(6);
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorMessage message={error} onRetry={refresh} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Header with Refresh Button */}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Explore Listings
+        </h1>
+        
+        <button
+          onClick={refresh}
+          disabled={isLoading}
+          className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+        >
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          {isLoading ? 'Refreshing...' : 'Refresh'}
+        </button>
+      </div>
+
+      {/* Cache Indicator */}
+      {isCached && !isLoading && (
+        <div className="mb-4 text-sm text-blue-600">
+          📦 Loaded from cache
+        </div>
+      )}
+
+      {/* Listings Grid */}
+      {isLoading ? (
+        <div className="flex justify-center items-center py-20">
+          <Spinner size="large" message="Loading listings..." />
+        </div>
+      ) : listings.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-gray-500 text-lg">No listings found</p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listings.map(listing => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex justify-center items-center gap-4 mt-12">
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1 || isLoading}
+              className="px-6 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+
+            <div className="flex items-center gap-2">
+              <span className="text-gray-700 font-medium">
+                Page {currentPage} of {totalPages}
+              </span>
+            </div>
+
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages || isLoading}
+              className="px-6 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+## Code Quality Checklist
+
+Before submitting, verify:
+
+- ✅ **No console errors** - Clean console output
+- ✅ **Proper cleanup** - All intervals/listeners cleaned up
+- ✅ **Loading states** - User always sees feedback
+- ✅ **Error handling** - All errors caught and displayed
+- ✅ **AbortController** - Requests properly cancelled
+- ✅ **Cache expiration** - Old cache cleared after 5 minutes
+- ✅ **Accessible UI** - Buttons have proper aria-labels
+- ✅ **Responsive design** - Works on mobile/tablet/desktop
+- ✅ **Code organization** - Logic extracted to custom hooks
+- ✅ **Comments** - Complex logic is documented
+
+## Reflection Questions
+
+After completing the challenge, consider:
+
+1. **What was the most challenging part?** Why?
+2. **How did custom hooks improve your code?** What would it look like without them?
+3. **What edge cases did you discover?** How did you handle them?
+4. **How would you test this code?** What unit tests would you write?
+5. **What performance improvements could you make?** React.memo? useMemo?
+
+<Callout type="success" title="Congratulations!">
+
+You've completed Module 3! You now have practical experience with:
+
+- ✅ Complex state management
+- ✅ Advanced useEffect patterns  
+- ✅ Custom hooks for reusability
+- ✅ Caching and performance optimization
+- ✅ Real-world async data handling
+
+These skills form the foundation for building production-ready React applications!
+
+</Callout>
+
+## What's Next?
+
+Continue your React journey with **Module 4: React Router**:
+
+- Learn client-side routing
+- Build multi-page applications
+- Handle dynamic routes and parameters
+- Implement navigation and route protection
+
+You're ready for the next level! 🚀

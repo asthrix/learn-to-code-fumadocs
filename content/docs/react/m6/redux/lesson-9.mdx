@@ -1,0 +1,524 @@
+---
+title: "L9: Favorites Page"
+description: "Create the ListingFavoritesPage to display favorited listings"
+---
+
+# Create Favorites Page
+
+Let's create a dedicated page to display all favorited listings!
+
+## What We're Building
+
+A `ListingFavoritesPage` that:
+
+1. Shows all favorited listings
+2. Handles empty state (no favorites)
+3. Displays count of favorites
+4. Uses existing `ListingList` component
+
+## Step 1: Create the Page File
+
+Create a new file:
+
+```bash
+touch src/pages/ListingFavoritesPage.jsx
+```
+
+## Step 2: Build the Component
+
+Add the basic structure:
+
+```jsx title="src/pages/ListingFavoritesPage.jsx"
+import { useSelector } from 'react-redux';
+import ListingList from '@/components/ListingList';
+
+function ListingFavoritesPage() {
+  const items = useSelector((state) => state.listings.items);
+  const favoriteIds = useSelector((state) => state.listings.favorites);
+  
+  // Filter to get favorited listings
+  const favoriteListings = items.filter((listing) =>
+    favoriteIds.includes(listing.id)
+  );
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        Your Favorites ({favoriteListings.length})
+      </h1>
+      
+      {favoriteListings.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">
+            No favorites yet. Start exploring listings!
+          </p>
+        </div>
+      ) : (
+        <ListingList listings={favoriteListings} />
+      )}
+    </div>
+  );
+}
+
+export default ListingFavoritesPage;
+```
+
+**What's happening here?**
+
+<Steps>
+
+<Step>
+
+### Import Dependencies
+
+```jsx
+import { useSelector } from 'react-redux';
+import ListingList from '@/components/ListingList';
+```
+
+- `useSelector` - Read from Redux store
+- `ListingList` - Existing component to display listings
+
+</Step>
+
+<Step>
+
+### Select State
+
+```jsx
+const items = useSelector((state) => state.listings.items);
+const favoriteIds = useSelector((state) => state.listings.favorites);
+```
+
+We need both:
+- **`items`** - All listings (with full data)
+- **`favoriteIds`** - Array of favorited IDs
+
+</Step>
+
+<Step>
+
+### Filter Favorites
+
+```jsx
+const favoriteListings = items.filter((listing) =>
+  favoriteIds.includes(listing.id)
+);
+```
+
+**How it works:**
+
+```js
+// items = [
+//   { id: 1, title: 'Beach House' },
+//   { id: 2, title: 'Mountain Cabin' },
+//   { id: 3, title: 'City Apartment' },
+//   { id: 4, title: 'Lake House' },
+//   { id: 5, title: 'Desert Villa' }
+// ]
+
+// favoriteIds = [1, 3, 5]
+
+// favoriteListings = [
+//   { id: 1, title: 'Beach House' },
+//   { id: 3, title: 'City Apartment' },
+//   { id: 5, title: 'Desert Villa' }
+// ]
+```
+
+Only listings whose ID is in `favoriteIds` array!
+
+</Step>
+
+<Step>
+
+### Render Header
+
+```jsx
+<h1 className="text-3xl font-bold mb-6">
+  Your Favorites ({favoriteListings.length})
+</h1>
+```
+
+Shows title with count: "Your Favorites (3)"
+
+</Step>
+
+<Step>
+
+### Handle Empty State
+
+```jsx
+{favoriteListings.length === 0 ? (
+  <div className="text-center py-12">
+    <p className="text-gray-500 text-lg">
+      No favorites yet. Start exploring listings!
+    </p>
+  </div>
+) : (
+  <ListingList listings={favoriteListings} />
+)}
+```
+
+**If no favorites:**
+- Show empty state message
+
+**If has favorites:**
+- Show listings with `ListingList` component
+
+</Step>
+
+</Steps>
+
+## Understanding the Filter Logic
+
+Let's break down the filter step by step:
+
+```jsx
+const favoriteListings = items.filter((listing) =>
+  favoriteIds.includes(listing.id)
+);
+```
+
+<Accordions>
+
+<Accordion title="What is .filter()?">
+
+`.filter()` creates a new array with elements that pass a test:
+
+```js
+const numbers = [1, 2, 3, 4, 5];
+const evenNumbers = numbers.filter(num => num % 2 === 0);
+// evenNumbers = [2, 4]
+```
+
+**For each element:**
+- If test returns `true` → include in new array
+- If test returns `false` → exclude from new array
+
+</Accordion>
+
+<Accordion title="What is .includes()?">
+
+`.includes()` checks if an array contains a value:
+
+```js
+const favoriteIds = [1, 3, 5];
+
+favoriteIds.includes(1);  // true
+favoriteIds.includes(2);  // false
+favoriteIds.includes(3);  // true
+```
+
+Returns boolean: `true` if found, `false` if not.
+
+</Accordion>
+
+<Accordion title="How They Work Together">
+
+```js
+items.filter((listing) => favoriteIds.includes(listing.id))
+```
+
+**For each listing:**
+
+1. Get the listing's `id`
+2. Check if `favoriteIds` includes this `id`
+3. If yes → keep listing
+4. If no → remove listing
+
+**Example:**
+
+```js
+// listing = { id: 1, title: 'Beach House' }
+favoriteIds.includes(1)  // true → keep
+
+// listing = { id: 2, title: 'Mountain Cabin' }
+favoriteIds.includes(2)  // false → remove
+
+// listing = { id: 3, title: 'City Apartment' }
+favoriteIds.includes(3)  // true → keep
+```
+
+Result: Only listings with IDs 1 and 3!
+
+</Accordion>
+
+</Accordions>
+
+## Alternative: Using a Selector
+
+We could move the filter logic to a selector:
+
+```js title="src/state/slices/listingsSlice.js"
+// Add this selector
+export const selectFavoriteListings = (state) => {
+  const items = state.listings.items;
+  const favoriteIds = state.listings.favorites;
+  return items.filter(listing => favoriteIds.includes(listing.id));
+};
+```
+
+Then use it in the component:
+
+```jsx title="src/pages/ListingFavoritesPage.jsx"
+import { useSelector } from 'react-redux';
+import { selectFavoriteListings } from '@/state/slices/listingsSlice';
+import ListingList from '@/components/ListingList';
+
+function ListingFavoritesPage() {
+  const favoriteListings = useSelector(selectFavoriteListings);
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        Your Favorites ({favoriteListings.length})
+      </h1>
+      
+      {favoriteListings.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">
+            No favorites yet. Start exploring listings!
+          </p>
+        </div>
+      ) : (
+        <ListingList listings={favoriteListings} />
+      )}
+    </div>
+  );
+}
+
+export default ListingFavoritesPage;
+```
+
+**Cleaner!** The filter logic is now in the slice where it belongs.
+
+## Improving the Empty State
+
+Let's make the empty state more helpful:
+
+```jsx title="src/pages/ListingFavoritesPage.jsx"
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
+import ListingList from '@/components/ListingList';
+
+function ListingFavoritesPage() {
+  const items = useSelector((state) => state.listings.items);
+  const favoriteIds = useSelector((state) => state.listings.favorites);
+  
+  const favoriteListings = items.filter((listing) =>
+    favoriteIds.includes(listing.id)
+  );
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        Your Favorites ({favoriteListings.length})
+      </h1>
+      
+      {favoriteListings.length === 0 ? (
+        <div className="text-center py-12">
+          <Heart size={64} className="mx-auto mb-4 text-gray-300" />
+          <h2 className="text-xl font-semibold mb-2 text-gray-700">
+            No favorites yet
+          </h2>
+          <p className="text-gray-500 mb-6">
+            Start exploring and save your favorite listings!
+          </p>
+          <Link 
+            to="/" 
+            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Browse Listings
+          </Link>
+        </div>
+      ) : (
+        <ListingList listings={favoriteListings} />
+      )}
+    </div>
+  );
+}
+
+export default ListingFavoritesPage;
+```
+
+**Enhanced empty state:**
+- ❤️ Heart icon (visual)
+- Clear heading
+- Helpful message
+- Call-to-action button to browse listings
+
+## Complete Code Options
+
+<Tabs items={['Inline Filter', 'With Selector', 'With Empty State']}>
+
+<Tab value="Inline Filter">
+
+```jsx title="src/pages/ListingFavoritesPage.jsx"
+import { useSelector } from 'react-redux';
+import ListingList from '@/components/ListingList';
+
+function ListingFavoritesPage() {
+  const items = useSelector((state) => state.listings.items);
+  const favoriteIds = useSelector((state) => state.listings.favorites);
+  
+  const favoriteListings = items.filter((listing) =>
+    favoriteIds.includes(listing.id)
+  );
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        Your Favorites ({favoriteListings.length})
+      </h1>
+      
+      {favoriteListings.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">
+            No favorites yet. Start exploring listings!
+          </p>
+        </div>
+      ) : (
+        <ListingList listings={favoriteListings} />
+      )}
+    </div>
+  );
+}
+
+export default ListingFavoritesPage;
+```
+
+**Pros:**
+- Simple and direct
+- All logic in one place
+- Easy to understand
+
+</Tab>
+
+<Tab value="With Selector">
+
+```jsx title="src/pages/ListingFavoritesPage.jsx"
+import { useSelector } from 'react-redux';
+import { selectFavoriteListings } from '@/state/slices/listingsSlice';
+import ListingList from '@/components/ListingList';
+
+function ListingFavoritesPage() {
+  const favoriteListings = useSelector(selectFavoriteListings);
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        Your Favorites ({favoriteListings.length})
+      </h1>
+      
+      {favoriteListings.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">
+            No favorites yet. Start exploring listings!
+          </p>
+        </div>
+      ) : (
+        <ListingList listings={favoriteListings} />
+      )}
+    </div>
+  );
+}
+
+export default ListingFavoritesPage;
+```
+
+**Pros:**
+- Reusable selector
+- Testable logic
+- Follows best practices
+
+Don't forget to add the selector to `listingsSlice.js`:
+
+```js title="src/state/slices/listingsSlice.js"
+export const selectFavoriteListings = (state) => {
+  const items = state.listings.items;
+  const favoriteIds = state.listings.favorites;
+  return items.filter(listing => favoriteIds.includes(listing.id));
+};
+```
+
+</Tab>
+
+<Tab value="With Empty State">
+
+```jsx title="src/pages/ListingFavoritesPage.jsx"
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
+import ListingList from '@/components/ListingList';
+
+function ListingFavoritesPage() {
+  const items = useSelector((state) => state.listings.items);
+  const favoriteIds = useSelector((state) => state.listings.favorites);
+  
+  const favoriteListings = items.filter((listing) =>
+    favoriteIds.includes(listing.id)
+  );
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        Your Favorites ({favoriteListings.length})
+      </h1>
+      
+      {favoriteListings.length === 0 ? (
+        <div className="text-center py-12">
+          <Heart size={64} className="mx-auto mb-4 text-gray-300" />
+          <h2 className="text-xl font-semibold mb-2 text-gray-700">
+            No favorites yet
+          </h2>
+          <p className="text-gray-500 mb-6">
+            Start exploring and save your favorite listings!
+          </p>
+          <Link 
+            to="/" 
+            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Browse Listings
+          </Link>
+        </div>
+      ) : (
+        <ListingList listings={favoriteListings} />
+      )}
+    </div>
+  );
+}
+
+export default ListingFavoritesPage;
+```
+
+**Pros:**
+- Better UX
+- Clear call-to-action
+- Professional look
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+Great! The favorites page is ready. In the next lesson, we'll:
+
+1. **Create Navbar** - Navigation component with links
+2. **Add favorites link** - Link to this new page
+3. **Show favorite count** - Display number of favorites
+
+<Callout type="success">
+**✅ Lesson Complete!** You've created a dedicated page to display favorited listings!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Filter items by IDs** - Combine `items` and `favoriteIds`
+- ✅ **Reuse components** - `ListingList` works for favorites too
+- ✅ **Handle empty state** - Show helpful message when no favorites
+- ✅ **Use selectors** - Move filter logic to slice for reusability
+- ✅ **Count in header** - Display `favoriteListings.length`
+- ✅ **Ternary operator** - Show empty state OR listings

@@ -1,0 +1,678 @@
+---
+title: "L4: Lifting State Up"
+description: "Learn how to share state between components using props and callbacks"
+module: 2
+lesson: 4
+---
+
+
+# Lesson 4: Lifting State Up
+
+<Badge variant="blue">State Management</Badge>
+<Badge variant="green">Props</Badge>
+<Badge variant="purple">Component Communication</Badge>
+
+Right now, the filter state lives in `ListingFilters`, but `HomePage` needs access to these values to filter the listings. The solution? **Lifting state up** - moving state to the nearest common ancestor.
+
+---
+
+## The Problem: Isolated State
+
+Currently, our component tree looks like this:
+
+```jsx title="Current State Location"
+HomePage
+├── listings (state ✅)
+└── ListingFilters
+    ├── search (state ❌ - isolated!)
+    ├── checkIn (state ❌ - isolated!)
+    ├── checkOut (state ❌ - isolated!)
+    └── guests (state ❌ - isolated!)
+```
+
+**Problem:** `HomePage` can't access the filter values because they're trapped in `ListingFilters`.
+
+---
+
+## The Solution: Lift State Up
+
+Move the filter state to `HomePage` (the common ancestor):
+
+```jsx title="After Lifting State Up"
+HomePage
+├── listings (state ✅)
+├── search (state ✅) // [!code ++]
+├── checkIn (state ✅) // [!code ++]
+├── checkOut (state ✅) // [!code ++]
+├── guests (state ✅) // [!code ++]
+└── ListingFilters
+    ├── search (prop from parent)
+    ├── checkIn (prop from parent)
+    ├── checkOut (prop from parent)
+    └── guests (prop from parent)
+```
+
+**Solution:** State lives in `HomePage`, gets passed down as props to `ListingFilters`.
+
+> **Key Principle:** When two components need to share state, move the state to their closest common ancestor.
+
+---
+
+## Understanding Lifting State Up
+
+### Data Flow Pattern
+
+```jsx title="Parent-Child Communication"
+function Parent() {
+  const [value, setValue] = useState('');
+  
+  return (
+    <Child 
+      value={value}              // Pass state down ⬇️
+      onChange={setValue}         // Pass updater down ⬇️
+    />
+  );
+}
+
+function Child({ value, onChange }) {
+  return (
+    <input 
+      value={value}              // Use prop as value
+      onChange={(e) => onChange(e.target.value)} // Call parent's updater ⬆️
+    />
+  );
+}
+```
+
+**Flow:**
+1. Parent owns state
+2. Child receives value via props
+3. Child receives updater function via props
+4. Child calls updater when user interacts
+5. State updates in parent
+6. New value flows down to child
+
+---
+
+## Step-by-Step Implementation
+
+<Steps>
+  <Step>
+    ### Step 1: Move State to HomePage
+    
+    Cut the filter state from `ListingFilters` and paste it into `HomePage`:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    // [!code word:useState]
+    import { useState } from 'react';
+    import { ListingCard } from '../components/ListingCard';
+    import { ListingFilters } from '../components/ListingFilters';
+    
+    export function HomePage() {
+      // Listings state
+      const [listings, setListings] = useState([
+        // ... your listings data
+      ]);
+      
+      // Filter state (moved from ListingFilters)
+      const [search, setSearch] = useState(''); // [!code ++]
+      const [checkIn, setCheckIn] = useState(''); // [!code ++]
+      const [checkOut, setCheckOut] = useState(''); // [!code ++]
+      const [guests, setGuests] = useState(1); // [!code ++]
+      
+      return (
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+          
+          <ListingFilters />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listings.map(listing => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+    > **State is now in HomePage!** The parent component controls all filter values.
+  </Step>
+  
+  <Step>
+    ### Step 2: Pass State as Props to ListingFilters
+    
+    Pass the filter values down to `ListingFilters`:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    export function HomePage() {
+      const [listings, setListings] = useState([/* ... */]);
+      const [search, setSearch] = useState('');
+      const [checkIn, setCheckIn] = useState('');
+      const [checkOut, setCheckOut] = useState('');
+      const [guests, setGuests] = useState(1);
+      
+      return (
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+          
+          <ListingFilters
+            search={search} // [!code ++]
+            checkIn={checkIn} // [!code ++]
+            checkOut={checkOut} // [!code ++]
+            guests={guests} // [!code ++]
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listings.map(listing => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+    > **Props Passed Down:** Filter values now flow from parent to child.
+  </Step>
+  
+  <Step>
+    ### Step 3: Pass Updater Functions as Props
+    
+    Pass the setter functions so `ListingFilters` can update the values:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    <ListingFilters
+      search={search}
+      checkIn={checkIn}
+      checkOut={checkOut}
+      guests={guests}
+      onSearchChange={setSearch} // [!code ++]
+      onCheckInChange={setCheckIn} // [!code ++]
+      onCheckOutChange={setCheckOut} // [!code ++]
+      onGuestsChange={setGuests} // [!code ++]
+    />
+    ```
+    
+    > **Naming Convention:** Use `on[Action]` for callback props (e.g., `onSearchChange`, `onGuestsChange`).
+  </Step>
+  
+  <Step>
+    ### Step 4: Update ListingFilters to Accept Props
+    
+    Modify `ListingFilters` to use props instead of local state:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    import { useState } from 'react'; // [!code --]
+    
+    export function ListingFilters({ // [!code ++]
+      search, // [!code ++]
+      checkIn, // [!code ++]
+      checkOut, // [!code ++]
+      guests, // [!code ++]
+      onSearchChange, // [!code ++]
+      onCheckInChange, // [!code ++]
+      onCheckOutChange, // [!code ++]
+      onGuestsChange, // [!code ++]
+    }) { // [!code ++]
+      // Remove local state
+      const [search, setSearch] = useState(''); // [!code --]
+      const [checkIn, setCheckIn] = useState(''); // [!code --]
+      const [checkOut, setCheckOut] = useState(''); // [!code --]
+      const [guests, setGuests] = useState(1); // [!code --]
+      
+      // Update event handlers to use props
+      const handleDecrement = () => {
+        if (guests > 1) {
+          setGuests(guests - 1); // [!code --]
+          onGuestsChange(guests - 1); // [!code ++]
+        }
+      };
+      
+      const handleIncrement = () => {
+        setGuests(guests + 1); // [!code --]
+        onGuestsChange(guests + 1); // [!code ++]
+      };
+      
+      return (
+        // ... JSX (update inputs next)
+      );
+    }
+    ```
+    
+    > **Props Instead of State:** Component now receives values and updaters from parent.
+  </Step>
+  
+  <Step>
+    ### Step 5: Update Input onChange Handlers
+    
+    Connect inputs to the callback props:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    <input
+      id="search"
+      type="text"
+      placeholder="e.g., Malibu, Beach House..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)} // [!code --]
+      onChange={(e) => onSearchChange(e.target.value)} // [!code ++]
+      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+    ```
+    
+    Update all three inputs:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    {/* Search Input */}
+    <input
+      value={search}
+      onChange={(e) => onSearchChange(e.target.value)} // [!code highlight]
+    />
+    
+    {/* Check-in Date */}
+    <input
+      type="date"
+      value={checkIn}
+      onChange={(e) => onCheckInChange(e.target.value)} // [!code highlight]
+    />
+    
+    {/* Check-out Date */}
+    <input
+      type="date"
+      value={checkOut}
+      onChange={(e) => onCheckOutChange(e.target.value)} // [!code highlight]
+    />
+    ```
+    
+    > **Calling Parent Functions:** When users interact with inputs, we call the parent's setter functions via props.
+  </Step>
+  
+  <Step>
+    ### Step 6: Test the Lifted State
+    
+    Add a debug display in `HomePage` to verify state is updating:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    export function HomePage() {
+      const [listings, setListings] = useState([/* ... */]);
+      const [search, setSearch] = useState('');
+      const [checkIn, setCheckIn] = useState('');
+      const [checkOut, setCheckOut] = useState('');
+      const [guests, setGuests] = useState(1);
+      
+      return (
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+          
+          {/* Debug Display */}
+          <div className="bg-blue-50 p-4 rounded mb-4"> // [!code ++]
+            <p className="font-bold">HomePage can see filters:</p> // [!code ++]
+            <p>Search: {search || '(empty)'}</p> // [!code ++]
+            <p>Check-in: {checkIn || '(not set)'}</p> // [!code ++]
+            <p>Check-out: {checkOut || '(not set)'}</p> // [!code ++]
+            <p>Guests: {guests}</p> // [!code ++]
+          </div> // [!code ++]
+          
+          <ListingFilters
+            search={search}
+            checkIn={checkIn}
+            checkOut={checkOut}
+            guests={guests}
+            onSearchChange={setSearch}
+            onCheckInChange={setCheckIn}
+            onCheckOutChange={setCheckOut}
+            onGuestsChange={setGuests}
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listings.map(listing => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+    **Test:** Type in the search box, change dates, click guest buttons. The HomePage should display the updated values!
+    
+    > **Success!** State is managed in HomePage but controlled in ListingFilters.
+  </Step>
+</Steps>
+
+---
+
+## Complete Code
+
+### HomePage (Parent - Owns State)
+
+```jsx title="src/pages/HomePage.jsx"
+// [!code word:useState]
+import { useState } from 'react';
+import { ListingCard } from '../components/ListingCard';
+import { ListingFilters } from '../components/ListingFilters';
+
+export function HomePage() {
+  // Listings state
+  const [listings, setListings] = useState([
+    {
+      id: 1,
+      title: "Cozy Beach House",
+      price: 250,
+      location: "Malibu, CA",
+      image: "/images/beach-house.jpg",
+      guests: 4,
+      bedrooms: 2,
+      bathrooms: 2,
+    },
+    {
+      id: 2,
+      title: "Mountain Cabin",
+      price: 180,
+      location: "Aspen, CO",
+      image: "/images/cabin.jpg",
+      guests: 6,
+      bedrooms: 3,
+      bathrooms: 2,
+    },
+    {
+      id: 3,
+      title: "Downtown Loft",
+      price: 320,
+      location: "New York, NY",
+      image: "/images/loft.jpg",
+      guests: 2,
+      bedrooms: 1,
+      bathrooms: 1,
+    },
+  ]);
+  
+  // Filter state (lifted up from ListingFilters)
+  const [search, setSearch] = useState(''); // [!code highlight]
+  const [checkIn, setCheckIn] = useState(''); // [!code highlight]
+  const [checkOut, setCheckOut] = useState(''); // [!code highlight]
+  const [guests, setGuests] = useState(1); // [!code highlight]
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+      
+      <ListingFilters // [!code highlight]
+        search={search} // [!code highlight]
+        checkIn={checkIn} // [!code highlight]
+        checkOut={checkOut} // [!code highlight]
+        guests={guests} // [!code highlight]
+        onSearchChange={setSearch} // [!code highlight]
+        onCheckInChange={setCheckIn} // [!code highlight]
+        onCheckOutChange={setCheckOut} // [!code highlight]
+        onGuestsChange={setGuests} // [!code highlight]
+      /> // [!code highlight]
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {listings.map(listing => (
+          <ListingCard key={listing.id} listing={listing} />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+### ListingFilters (Child - Uses Props)
+
+```jsx title="src/components/ListingFilters.jsx"
+export function ListingFilters({ // [!code highlight]
+  search,
+  checkIn,
+  checkOut,
+  guests,
+  onSearchChange,
+  onCheckInChange,
+  onCheckOutChange,
+  onGuestsChange,
+}) { // [!code highlight]
+  const handleDecrement = () => {
+    if (guests > 1) {
+      onGuestsChange(guests - 1); // [!code highlight]
+    }
+  };
+  
+  const handleIncrement = () => {
+    onGuestsChange(guests + 1); // [!code highlight]
+  };
+  
+  return (
+    <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+      <h2 className="text-xl font-semibold mb-4">Filter Stays</h2>
+      
+      {/* Search Input */}
+      <div className="mb-4">
+        <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+          Search by location
+        </label>
+        <input
+          id="search"
+          type="text"
+          placeholder="e.g., Malibu, Beach House..."
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)} // [!code highlight]
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+      
+      {/* Date Inputs */}
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label htmlFor="checkin" className="block text-sm font-medium text-gray-700 mb-2">
+            Check-in
+          </label>
+          <input
+            id="checkin"
+            type="date"
+            value={checkIn}
+            onChange={(e) => onCheckInChange(e.target.value)} // [!code highlight]
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="checkout" className="block text-sm font-medium text-gray-700 mb-2">
+            Check-out
+          </label>
+          <input
+            id="checkout"
+            type="date"
+            value={checkOut}
+            onChange={(e) => onCheckOutChange(e.target.value)} // [!code highlight]
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+      
+      {/* Guest Counter */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Number of guests
+        </label>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleDecrement}
+            className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold"
+          >
+            −
+          </button>
+          
+          <span className="text-lg font-semibold">{guests}</span>
+          
+          <button
+            onClick={handleIncrement}
+            className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center font-bold"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## Visual: State Flow Diagram
+
+<Files>
+  <Folder name="Component Tree" defaultOpen>
+    <File name="HomePage.jsx">
+      ```
+      State: search, checkIn, checkOut, guests
+      ⬇️ Passes as props
+      ⬇️ Passes updaters (setSearch, etc.)
+      ```
+    </File>
+    <File name="ListingFilters.jsx">
+      ```
+      Props: search, checkIn, checkOut, guests
+      Props: onSearchChange, onCheckInChange, etc.
+      ⬆️ Calls callbacks when user interacts
+      ```
+    </File>
+  </Folder>
+</Files>
+
+---
+
+## When to Lift State Up
+
+Lift state up when:
+
+✅ **Multiple components need the same data**
+```jsx
+// Both need user data
+<Profile user={user} />
+<Settings user={user} />
+```
+
+✅ **Parent needs to react to child's state changes**
+```jsx
+// Parent filters list based on child's input
+<SearchBar onSearch={handleSearch} />
+<ResultsList results={filtered} />
+```
+
+✅ **Sibling components need to communicate**
+```jsx
+// Siblings need to share state
+<FilterBar filters={filters} onChange={setFilters} />
+<ProductGrid filters={filters} />
+```
+
+---
+
+## Common Mistakes
+
+### ❌ Mistake 1: Passing State Value But Not Updater
+
+```jsx
+// Wrong: Child can't update
+<Child value={value} />
+
+// Correct: Child can read and update
+<Child value={value} onChange={setValue} />
+```
+
+### ❌ Mistake 2: Directly Mutating Props
+
+```jsx
+// Wrong: Can't mutate props
+function Child({ value }) {
+  value = 'new value'; // ❌
+}
+
+// Correct: Call callback to update
+function Child({ value, onChange }) {
+  onChange('new value'); // ✅
+}
+```
+
+### ❌ Mistake 3: Keeping Duplicate State
+
+```jsx
+// Wrong: State in both components
+function Parent() {
+  const [value, setValue] = useState('');
+  return <Child />;
+}
+
+function Child() {
+  const [value, setValue] = useState(''); // ❌ Duplicate!
+}
+
+// Correct: State only in parent
+function Parent() {
+  const [value, setValue] = useState('');
+  return <Child value={value} onChange={setValue} />;
+}
+```
+
+---
+
+## Checkpoint
+
+<Accordions>
+  <Accordion title="✅ What You Learned">
+    - What "lifting state up" means and why it's necessary
+    - How to move state from child to parent component
+    - How to pass state values down as props
+    - How to pass updater functions as callback props
+    - Naming conventions for callback props (`on[Action]`)
+    - The data flow pattern in React (unidirectional)
+    - When to lift state up vs. keep it local
+  </Accordion>
+  
+  <Accordion title="🧪 Practice Challenge">
+    Add a "Show filters" toggle in HomePage:
+    
+    ```jsx
+    const [showFilters, setShowFilters] = useState(true);
+    
+    <button onClick={() => setShowFilters(!showFilters)}>
+      {showFilters ? 'Hide' : 'Show'} Filters
+    </button>
+    
+    {showFilters && (
+      <ListingFilters {...filterProps} />
+    )}
+    ```
+  </Accordion>
+  
+  <Accordion title="❓ Common Questions">
+    **Q: Should I always lift state to the top of the app?**
+    
+    A: No! Only lift state as high as needed. Keep state close to where it's used for better performance and maintainability.
+    
+    **Q: Can I skip levels when passing props?**
+    
+    A: You have to pass through each level (prop drilling). For deeply nested components, consider Context API (Module 5).
+    
+    **Q: What if I need to share state across many components?**
+    
+    A: For complex state sharing, you'll learn Redux in Module 6. For simpler cases, Context API works well.
+  </Accordion>
+</Accordions>
+
+---
+
+## What's Next?
+
+Now HomePage can see all filter values, but we're not **using** them yet! 
+
+In **Lesson 5**, we'll:
+- Implement the filtering logic
+- Filter listings by search term
+- Filter by dates and guest count
+- Show results in real-time
+- Handle empty states (no results)
+
+Time to make these filters actually work! 🎯
+

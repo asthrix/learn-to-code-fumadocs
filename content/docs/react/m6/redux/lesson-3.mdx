@@ -1,0 +1,638 @@
+---
+title: "L3: Create Listings Slice"
+description: "Build the listings slice with initial state and reducers"
+---
+
+# Create Listings Slice
+
+Now that Redux is connected, let's create our first **slice**! A slice contains all the Redux logic for a specific feature.
+
+## What is a Slice?
+
+A **slice** is a collection of Redux reducer logic and actions for a single feature:
+
+```jsx
+const listingsSlice = createSlice({
+  name: 'listings',                    // Feature name
+  initialState: { items: [], ...},     // Starting state
+  reducers: {                          // State update functions
+    toggleFavorite: (state, action) => {
+      // Update state...
+    }
+  }
+});
+```
+
+One slice = one feature's complete Redux logic!
+
+**Why "slice"?**
+
+Your Redux state is like a pie 🥧. Each feature gets its own slice:
+
+```jsx
+{
+  listings: { ... },   // ← Listings slice
+  user: { ... },       // ← User slice
+  cart: { ... }        // ← Cart slice
+}
+```
+
+## Benefits of Slices
+
+Redux Toolkit's `createSlice()` provides huge benefits:
+
+<Tabs items={['Less Boilerplate', 'Safe Mutations', 'Auto Actions']}>
+
+<Tab value="Less Boilerplate">
+
+**Traditional Redux:** ~50 lines per feature
+
+```jsx
+// Action types
+const TOGGLE_FAVORITE = 'listings/toggleFavorite';
+const SET_LISTINGS = 'listings/setListings';
+
+// Action creators
+const toggleFavorite = (id) => ({
+  type: TOGGLE_FAVORITE,
+  payload: id
+});
+
+const setListings = (listings) => ({
+  type: SET_LISTINGS,
+  payload: listings
+});
+
+// Reducer
+const listingsReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case TOGGLE_FAVORITE:
+      return {
+        ...state,
+        favorites: state.favorites.includes(action.payload)
+          ? state.favorites.filter(id => id !== action.payload)
+          : [...state.favorites, action.payload]
+      };
+    case SET_LISTINGS:
+      return {
+        ...state,
+        items: action.payload
+      };
+    default:
+      return state;
+  }
+};
+```
+
+**Redux Toolkit Slice:** ~15 lines
+
+```jsx
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState: { items: [], favorites: [] },
+  reducers: {
+    toggleFavorite: (state, action) => {
+      const id = action.payload;
+      if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(fav => fav !== id);
+      } else {
+        state.favorites.push(id);
+      }
+    },
+    setListings: (state, action) => {
+      state.items = action.payload;
+    }
+  }
+});
+```
+
+**70% less code!** 🎉
+
+</Tab>
+
+<Tab value="Safe Mutations">
+
+**The Problem:** Redux requires immutability
+
+```jsx
+// ❌ BAD: Mutates state directly
+state.favorites.push(id);
+
+// ✅ GOOD: Creates new array
+state.favorites = [...state.favorites, id];
+```
+
+**The Solution:** Redux Toolkit uses **Immer**
+
+```jsx
+// Looks like mutation, but actually creates new state!
+state.favorites.push(id);  // ✅ Safe with Immer!
+```
+
+Immer tracks changes and creates new immutable state automatically.
+
+**You can write "mutating" code safely:**
+
+```jsx
+reducers: {
+  addItem: (state, action) => {
+    state.items.push(action.payload);  // ✅ Works!
+  },
+  removeItem: (state, action) => {
+    state.items.splice(index, 1);      // ✅ Works!
+  },
+  updateItem: (state, action) => {
+    state.items[0].name = 'New';       // ✅ Works!
+  }
+}
+```
+
+</Tab>
+
+<Tab value="Auto Actions">
+
+**The Problem:** Manually creating actions
+
+```jsx
+// Action types
+const ADD_TODO = 'todos/add';
+
+// Action creators
+const addTodo = (text) => ({
+  type: ADD_TODO,
+  payload: text
+});
+
+// Usage
+dispatch(addTodo('Buy milk'));
+```
+
+**The Solution:** Actions created automatically
+
+```jsx
+const todosSlice = createSlice({
+  name: 'todos',
+  initialState: [],
+  reducers: {
+    addTodo: (state, action) => {
+      state.push(action.payload);
+    }
+  }
+});
+
+// Auto-generated action creator!
+const { addTodo } = todosSlice.actions;
+
+// Usage (same as before)
+dispatch(addTodo('Buy milk'));
+```
+
+Action creators are **automatically generated** from reducer names!
+
+</Tab>
+
+</Tabs>
+
+## Planning Our Listings Slice
+
+Let's plan what our listings slice needs:
+
+**State Structure:**
+
+```jsx
+{
+  items: [],           // All listings from API
+  favorites: [],       // Array of favorited listing IDs
+  status: 'idle',      // 'idle' | 'loading' | 'succeeded' | 'failed'
+  error: null          // Error message if fetch fails
+}
+```
+
+**Reducers (State Updates):**
+
+- `toggleFavorite` - Add/remove listing from favorites
+- Later: Handle async fetching (next lessons)
+
+## Step 1: Create Slice File
+
+Create a new directory and file:
+
+```bash
+mkdir -p src/state/slices
+touch src/state/slices/listingsSlice.js
+```
+
+## Step 2: Import createSlice
+
+Open `src/state/slices/listingsSlice.js` and import:
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice } from '@reduxjs/toolkit';
+```
+
+`createSlice` is the core Redux Toolkit function for creating slices.
+
+## Step 3: Define Initial State
+
+Add the initial state:
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+};
+```
+
+**What is each field for?**
+
+<Accordions>
+
+<Accordion title="items: []">
+
+**All listings fetched from the API**
+
+```js
+items: [
+  { id: 1, title: 'Beach House', price: 200, ... },
+  { id: 2, title: 'Mountain Cabin', price: 150, ... },
+  { id: 3, title: 'City Apartment', price: 100, ... }
+]
+```
+
+This replaces the local `listings` state in `HomePage`!
+
+</Accordion>
+
+<Accordion title="favorites: []">
+
+**Array of listing IDs that user has favorited**
+
+```js
+favorites: [1, 3, 7, 12]
+```
+
+If user favorites listing with `id: 1`, we add `1` to this array.
+
+**Why store IDs instead of full objects?**
+- Smaller memory footprint
+- Easier to check if favorited: `favorites.includes(id)`
+- Prevents duplication of listing data
+
+</Accordion>
+
+<Accordion title="status: 'idle'">
+
+**Tracks the async fetch status**
+
+```js
+status: 'idle' | 'loading' | 'succeeded' | 'failed'
+```
+
+**State flow:**
+1. `'idle'` - No fetch started yet
+2. `'loading'` - Fetch in progress
+3. `'succeeded'` - Fetch completed successfully
+4. `'failed'` - Fetch failed with error
+
+This replaces `isLoading` state in components!
+
+</Accordion>
+
+<Accordion title="error: null">
+
+**Stores error message if fetch fails**
+
+```js
+error: null  // No error
+error: 'Network error'  // Fetch failed
+error: 'Server returned 500'  // Server error
+```
+
+This replaces `error` state in components!
+
+</Accordion>
+
+</Accordions>
+
+## Step 4: Create the Slice
+
+Now create the slice with `toggleFavorite` reducer:
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+};
+
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState,
+  reducers: {
+    toggleFavorite: (state, action) => {
+      const id = action.payload;
+      
+      if (state.favorites.includes(id)) {
+        // Remove from favorites
+        state.favorites = state.favorites.filter(favoriteId => favoriteId !== id);
+      } else {
+        // Add to favorites
+        state.favorites.push(id);
+      }
+    },
+  },
+});
+```
+
+**What's happening here?**
+
+<Steps>
+
+<Step>
+
+### createSlice Configuration
+
+```js
+const listingsSlice = createSlice({
+  name: 'listings',           // Slice name (appears in DevTools)
+  initialState,               // Starting state
+  reducers: { ... }           // State update functions
+});
+```
+
+The `name` is used for:
+- Action types: `listings/toggleFavorite`
+- Redux DevTools display
+- Error messages
+
+</Step>
+
+<Step>
+
+### toggleFavorite Reducer
+
+```js
+toggleFavorite: (state, action) => {
+  const id = action.payload;
+  
+  if (state.favorites.includes(id)) {
+    state.favorites = state.favorites.filter(favoriteId => favoriteId !== id);
+  } else {
+    state.favorites.push(id);
+  }
+}
+```
+
+**Parameters:**
+- `state` - Current state (can be "mutated" safely thanks to Immer)
+- `action` - Action object: `{ type: 'listings/toggleFavorite', payload: 123 }`
+
+**Logic:**
+1. Extract listing ID from `action.payload`
+2. Check if already favorited
+3. If yes → remove from array
+4. If no → add to array
+
+**Why can we mutate state?**
+
+Immer converts this:
+```js
+state.favorites.push(id);
+```
+
+Into this:
+```js
+return {
+  ...state,
+  favorites: [...state.favorites, id]
+};
+```
+
+Automatically! You write simple code, Redux Toolkit handles immutability.
+
+</Step>
+
+</Steps>
+
+## Step 5: Export Actions and Reducer
+
+Add exports at the end of the file:
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+};
+
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState,
+  reducers: {
+    toggleFavorite: (state, action) => {
+      const id = action.payload;
+      
+      if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(favoriteId => favoriteId !== id);
+      } else {
+        state.favorites.push(id);
+      }
+    },
+  },
+});
+
+export const { toggleFavorite } = listingsSlice.actions;
+export default listingsSlice.reducer;
+```
+
+**What are we exporting?**
+
+<Accordions>
+
+<Accordion title="Named Export: Actions">
+
+```js
+export const { toggleFavorite } = listingsSlice.actions;
+```
+
+**What is `listingsSlice.actions`?**
+
+It's an object containing **automatically generated action creators**:
+
+```js
+{
+  toggleFavorite: (payload) => ({
+    type: 'listings/toggleFavorite',
+    payload: payload
+  })
+}
+```
+
+**Usage in components:**
+
+```js
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+
+// Dispatch the action
+dispatch(toggleFavorite(123));
+
+// Generates:
+// { type: 'listings/toggleFavorite', payload: 123 }
+```
+
+</Accordion>
+
+<Accordion title="Default Export: Reducer">
+
+```js
+export default listingsSlice.reducer;
+```
+
+**What is `listingsSlice.reducer`?**
+
+The reducer function that Redux uses internally:
+
+```js
+(state, action) => {
+  switch (action.type) {
+    case 'listings/toggleFavorite':
+      // Handle toggle favorite
+    default:
+      return state;
+  }
+}
+```
+
+**Usage in store:**
+
+```js
+import listingsReducer from './slices/listingsSlice';
+
+configureStore({
+  reducer: {
+    listings: listingsReducer  // ← Use the reducer here
+  }
+});
+```
+
+</Accordion>
+
+</Accordions>
+
+## Complete Code
+
+Here's the complete `listingsSlice.js`:
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+  items: [],
+  favorites: [],
+  status: 'idle',
+  error: null,
+};
+
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState,
+  reducers: {
+    toggleFavorite: (state, action) => {
+      const id = action.payload;
+      
+      if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(favoriteId => favoriteId !== id);
+      } else {
+        state.favorites.push(id);
+      }
+    },
+  },
+});
+
+export const { toggleFavorite } = listingsSlice.actions;
+export default listingsSlice.reducer;
+```
+
+Only **28 lines** for a complete Redux feature! 🎉
+
+## Understanding the Flow
+
+When you dispatch `toggleFavorite(123)`:
+
+<Steps>
+
+<Step>
+
+### Action is Created
+
+```js
+dispatch(toggleFavorite(123));
+// Creates: { type: 'listings/toggleFavorite', payload: 123 }
+```
+
+</Step>
+
+<Step>
+
+### Redux Calls Reducer
+
+```js
+reducer(state, { type: 'listings/toggleFavorite', payload: 123 })
+```
+
+</Step>
+
+<Step>
+
+### State is Updated
+
+```js
+// Before
+{ favorites: [1, 5, 9] }
+
+// After (123 added)
+{ favorites: [1, 5, 9, 123] }
+```
+
+</Step>
+
+<Step>
+
+### Components Re-render
+
+All components using `useSelector(state => state.listings.favorites)` automatically re-render with the new state!
+
+</Step>
+
+</Steps>
+
+## What's Next?
+
+Excellent! We've created the listings slice. In the next lesson, we'll:
+
+1. **Add the slice to the store** - Register our reducer
+2. **See it in Redux DevTools** - Verify it works
+3. **Test the state structure** - Confirm setup is correct
+
+<Callout type="success">
+**✅ Lesson Complete!** You've created your first Redux slice with state and a reducer!
+</Callout>
+
+## Key Takeaways
+
+- ✅ A **slice** contains all Redux logic for one feature
+- ✅ `createSlice()` generates actions and reducers automatically
+- ✅ Write "mutating" code safely with **Immer**
+- ✅ Export actions for components to dispatch
+- ✅ Export reducer for store configuration
+- ✅ **70% less boilerplate** compared to traditional Redux!

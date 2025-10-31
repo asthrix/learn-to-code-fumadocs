@@ -1,0 +1,699 @@
+---
+title: "L7: React.memo Optimization"
+description: "Prevent unnecessary component re-renders with React.memo"
+---
+
+# React.memo Optimization
+
+Learn how to optimize component rendering with `React.memo` - a higher-order component that prevents unnecessary re-renders!
+
+## What You'll Learn
+
+- What React.memo is
+- How to wrap components
+- When to use React.memo
+- Combine with useCallback/useMemo
+- Custom comparison functions
+- Measure performance improvements
+
+## The Re-render Problem
+
+By default, when a parent re-renders, **ALL children re-render**:
+
+```jsx
+function Parent() {
+  const [count, setCount] = useState(0);
+  const [text, setText] = useState('');
+  
+  return (
+    <div>
+      <input value={text} onChange={(e) => setText(e.target.value)} />
+      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+      <ExpensiveChild data="static" />
+    </div>
+  );
+}
+
+function ExpensiveChild({ data }) {
+  console.log('ExpensiveChild rendered'); // Renders every keystroke!
+  // Expensive rendering logic
+  return <div>{data}</div>;
+}
+```
+
+**Problem:** Typing in input causes `ExpensiveChild` to re-render, even though its props (`data="static"`) never change!
+
+<Callout type="warning">
+**Performance impact:** Unnecessary re-renders cause:
+- Slower UI updates
+- Wasted CPU cycles
+- Poor user experience
+- Battery drain on mobile
+</Callout>
+
+## What is React.memo?
+
+<Callout type="info">
+**React.memo** is a higher-order component that memoizes your component. It only re-renders if props change.
+</Callout>
+
+**How it works:**
+
+1. Wraps your component
+2. Remembers last rendered output
+3. On re-render, compares previous props with new props
+4. If props unchanged → Skip render, reuse previous output
+5. If props changed → Render component
+
+## Basic Usage
+
+<Tabs items={['Without memo', 'With memo']}>
+
+<Tab value="Without memo">
+
+```jsx
+function ExpensiveChild({ data }) {
+  console.log('Rendered'); // Every parent render
+  return <div>{data}</div>;
+}
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>
+        {count}
+      </button>
+      <ExpensiveChild data="static" />
+    </div>
+  );
+}
+```
+
+**Behavior:** Child renders every time count changes
+
+</Tab>
+
+<Tab value="With memo">
+
+```jsx
+const ExpensiveChild = React.memo(function ExpensiveChild({ data }) {
+  console.log('Rendered'); // Only when data changes
+  return <div>{data}</div>;
+});
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>
+        {count}
+      </button>
+      <ExpensiveChild data="static" />
+    </div>
+  );
+}
+```
+
+**Behavior:** Child only renders when `data` prop changes (never, in this case!)
+
+</Tab>
+
+</Tabs>
+
+## Three Ways to Use memo
+
+<Accordions>
+
+<Accordion title="1. Wrap inline (Named function)">
+
+```jsx
+const Component = React.memo(function Component({ prop }) {
+  return <div>{prop}</div>;
+});
+```
+
+**Best for:** Components defined in same file
+
+</Accordion>
+
+<Accordion title="2. Wrap at export">
+
+```jsx
+function Component({ prop }) {
+  return <div>{prop}</div>;
+}
+
+export default React.memo(Component);
+```
+
+**Best for:** Default exports
+
+</Accordion>
+
+<Accordion title="3. Wrap separately">
+
+```jsx
+function Component({ prop }) {
+  return <div>{prop}</div>;
+}
+
+const MemoizedComponent = React.memo(Component);
+
+export { Component, MemoizedComponent };
+```
+
+**Best for:** Exporting both versions
+
+</Accordion>
+
+</Accordions>
+
+## Real Example: ListingCard
+
+Let's optimize our `ListingCard`:
+
+```jsx title="src/components/ListingCard.jsx"
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const ListingCard = React.memo(function ListingCard({ listing }) {
+  console.log('ListingCard rendered:', listing.id);
+  
+  return (
+    <Link to={`/listings/${listing.id}`} className="block">
+      <div className="border rounded-lg overflow-hidden hover:shadow-lg transition">
+        <img 
+          src={listing.images[0]} 
+          alt={listing.title}
+          className="w-full h-48 object-cover"
+        />
+        <div className="p-4">
+          <h3 className="font-semibold text-lg">{listing.title}</h3>
+          <p className="text-gray-600">{listing.location}</p>
+          <div className="mt-2 flex justify-between items-center">
+            <span className="text-xl font-bold">${listing.price}/night</span>
+            <span className="text-sm text-gray-500">
+              ⭐ {listing.rating}
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+});
+
+export default ListingCard;
+```
+
+**Benefits:**
+
+- Card only re-renders when `listing` prop changes
+- Parent re-renders don't affect cards
+- Scrolling is smoother
+- Better performance with many cards
+
+## Combining with useCallback
+
+For `React.memo` to work with function props, use `useCallback`:
+
+<Tabs items={['Problem', 'Solution']}>
+
+<Tab value="Problem">
+
+```jsx
+function Parent() {
+  const [count, setCount] = useState(0);
+  
+  // New function every render!
+  const handleClick = () => {
+    console.log('Clicked');
+  };
+  
+  // Child re-renders even though memoized
+  return <MemoizedChild onClick={handleClick} />;
+}
+
+const MemoizedChild = React.memo(function Child({ onClick }) {
+  console.log('Child rendered'); // Renders every time!
+  return <button onClick={onClick}>Click</button>;
+});
+```
+
+**Problem:** `handleClick` is a new function reference every render, so `React.memo` thinks props changed!
+
+</Tab>
+
+<Tab value="Solution">
+
+```jsx
+function Parent() {
+  const [count, setCount] = useState(0);
+  
+  // Same function reference across renders
+  const handleClick = useCallback(() => {
+    console.log('Clicked');
+  }, []);
+  
+  // Child doesn't re-render!
+  return <MemoizedChild onClick={handleClick} />;
+}
+
+const MemoizedChild = React.memo(function Child({ onClick }) {
+  console.log('Child rendered'); // Only renders once!
+  return <button onClick={onClick}>Click</button>;
+});
+```
+
+**Solution:** `useCallback` keeps function reference stable, so `React.memo` works correctly!
+
+</Tab>
+
+</Tabs>
+
+## Optimizing ListingList
+
+Let's optimize the list and card components:
+
+```jsx title="src/components/ListingList.jsx"
+import React from 'react';
+import { ListingCard } from './ListingCard';
+
+const ListingList = React.memo(function ListingList({ listings }) {
+  console.log('ListingList rendered with', listings.length, 'items');
+  
+  if (listings.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No listings found
+      </div>
+    );
+  }
+  
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {listings.map(listing => (
+        <ListingCard key={listing.id} listing={listing} />
+      ))}
+    </div>
+  );
+});
+
+export default ListingList;
+```
+
+**Combined with HomePage:**
+
+```jsx title="src/pages/HomePage.jsx"
+import React, { useState, useMemo, useCallback } from 'react';
+import { useFetch } from '@/hooks/useFetch';
+import ListingList from '@/components/ListingList';
+import ListingFilters from '@/components/ListingFilters';
+
+export function HomePage() {
+  const { data: listings, isLoading, error } = useFetch('/listings');
+  
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  // Memoize callbacks for filters
+  const handleSearchChange = useCallback((value) => {
+    setSearch(value);
+  }, []);
+  
+  const handleDatesChange = useCallback((newDates) => {
+    setDates(newDates);
+  }, []);
+  
+  const handleGuestsChange = useCallback((value) => {
+    setGuests(value);
+  }, []);
+  
+  // Memoize filtered listings
+  const filteredListings = useMemo(() => {
+    if (!listings) return [];
+    return listings.filter(listing => {
+      const matchesSearch = listing.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      const matchesGuests = listing.maxGuests >= guests;
+      return matchesSearch && matchesGuests;
+    });
+  }, [listings, search, guests]);
+  
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <ListingFilters
+        search={search}
+        onSearchChange={handleSearchChange}
+        dates={dates}
+        onDatesChange={handleDatesChange}
+        guests={guests}
+        onGuestsChange={handleGuestsChange}
+      />
+      <ListingList listings={filteredListings} />
+    </div>
+  );
+}
+```
+
+**Optimization chain:**
+
+1. **useMemo** - Prevents recalculating filtered listings
+2. **useCallback** - Prevents recreating handler functions
+3. **React.memo** - Prevents re-rendering ListingFilters, ListingList, and ListingCards
+
+Result: **Minimal re-renders!** ⚡
+
+## Custom Comparison Function
+
+By default, `React.memo` does shallow comparison. You can provide custom logic:
+
+```jsx
+const Component = React.memo(
+  function Component({ user, settings }) {
+    return <div>{user.name}</div>;
+  },
+  (prevProps, nextProps) => {
+    // Return true if props are equal (skip render)
+    // Return false if props changed (re-render)
+    return prevProps.user.id === nextProps.user.id &&
+           prevProps.settings.theme === nextProps.settings.theme;
+  }
+);
+```
+
+**Use cases:**
+
+```jsx
+// Only compare specific fields
+const UserCard = React.memo(
+  ({ user }) => <div>{user.name}</div>,
+  (prev, next) => prev.user.id === next.user.id
+);
+
+// Deep comparison for nested objects
+const DeepComponent = React.memo(
+  ({ data }) => <div>{data.nested.value}</div>,
+  (prev, next) => {
+    return JSON.stringify(prev.data) === JSON.stringify(next.data);
+  }
+);
+
+// Compare array contents
+const ListComponent = React.memo(
+  ({ items }) => <ul>{items.map(i => <li key={i}>{i}</li>)}</ul>,
+  (prev, next) => {
+    return prev.items.length === next.items.length &&
+           prev.items.every((item, index) => item === next.items[index]);
+  }
+);
+```
+
+<Callout type="warning">
+**Performance note:** Custom comparison functions have overhead. Only use when default shallow comparison isn't sufficient.
+</Callout>
+
+## When to Use React.memo
+
+Use `React.memo` for:
+
+✅ **Pure components** - Same props → same output
+```jsx
+const PureDisplay = React.memo(({ data }) => {
+  return <div>{data}</div>;
+});
+```
+
+✅ **Expensive renders** - Heavy calculations or many elements
+```jsx
+const ExpensiveChart = React.memo(({ data }) => {
+  // Complex charting library
+  return <Chart data={processData(data)} />;
+});
+```
+
+✅ **Lists of components** - Many repeated items
+```jsx
+const ListItem = React.memo(({ item }) => {
+  return <li>{item.name}</li>;
+});
+
+// Render 1000 items efficiently
+{items.map(item => <ListItem key={item.id} item={item} />)}
+```
+
+✅ **Components far from state changes** - Deep in tree
+```jsx
+<App>
+  <Header />  {/* State changes here */}
+  <Main>
+    <Sidebar />
+    <Content>
+      <Article>
+        <DeepComponent />  {/* Memo this! */}
+      </Article>
+    </Content>
+  </Main>
+</App>
+```
+
+## When NOT to Use React.memo
+
+Don't use it for:
+
+❌ **Props change frequently**
+```jsx
+// Props change every render anyway
+const Counter = React.memo(({ count }) => {
+  return <div>{count}</div>;
+});
+```
+
+❌ **Components with children**
+```jsx
+// Children prop changes every render
+const Wrapper = React.memo(({ children }) => {
+  return <div>{children}</div>;
+});
+
+<Wrapper>
+  <Child />  {/* New element every render */}
+</Wrapper>
+```
+
+❌ **Lightweight components**
+```jsx
+// Render is already fast
+const SimpleButton = React.memo(({ text }) => {
+  return <button>{text}</button>;
+});
+```
+
+❌ **Function/object props without useCallback/useMemo**
+```jsx
+// onClick changes every render
+const Button = React.memo(({ onClick, text }) => {
+  return <button onClick={onClick}>{text}</button>;
+});
+
+// Parent doesn't use useCallback
+<Button onClick={() => { ... }} text="Click" />
+```
+
+## Performance Comparison
+
+<Tabs items={['Before Optimization', 'After Optimization']}>
+
+<Tab value="Before Optimization">
+
+```jsx
+// No memoization
+function HomePage() {
+  const [search, setSearch] = useState('');
+  const { data: listings } = useFetch('/listings');
+  
+  const filtered = listings?.filter(...);
+  
+  return (
+    <>
+      <Filters onChange={setSearch} />
+      <List items={filtered} />
+    </>
+  );
+}
+```
+
+**Typing "beach":**
+- Type "b" → Filter 1000 items, render Filters, render List, render 1000 cards
+- Type "e" → Filter 1000 items, render Filters, render List, render 1000 cards
+- Type "a" → Filter 1000 items, render Filters, render List, render 1000 cards
+- Type "c" → Filter 1000 items, render Filters, render List, render 1000 cards
+- Type "h" → Filter 1000 items, render Filters, render List, render 1000 cards
+
+**Total:** ~500ms for "beach"
+
+</Tab>
+
+<Tab value="After Optimization">
+
+```jsx
+// Full memoization
+function HomePage() {
+  const [search, setSearch] = useState('');
+  const { data: listings } = useFetch('/listings');
+  
+  const handleSearchChange = useCallback(setSearch, []);
+  
+  const filtered = useMemo(() => {
+    return listings?.filter(...);
+  }, [listings, search]);
+  
+  return (
+    <>
+      <MemoizedFilters onChange={handleSearchChange} />
+      <MemoizedList items={filtered} />
+    </>
+  );
+}
+
+const MemoizedFilters = React.memo(Filters);
+const MemoizedList = React.memo(List);
+const MemoizedCard = React.memo(Card);
+```
+
+**Typing "beach":**
+- Type "b" → Filter 1000 items, render List, render NEW filtered cards (~200)
+- Type "e" → Filter 1000 items, render List, render NEW filtered cards (~150)
+- Type "a" → Filter 1000 items, render List, render NEW filtered cards (~100)
+- Type "c" → Filter 1000 items, render List, render NEW filtered cards (~50)
+- Type "h" → Filter 1000 items, render List, render NEW filtered cards (~10)
+
+**Total:** ~100ms for "beach"
+
+**Performance improvement: 80% faster!** ⚡
+
+</Tab>
+
+</Tabs>
+
+## Testing Your Optimizations
+
+Use React DevTools Profiler:
+
+<Steps>
+
+<Step>
+
+### Enable Profiler
+
+1. Install React DevTools extension
+2. Open DevTools → Profiler tab
+3. Click record button (●)
+
+</Step>
+
+<Step>
+
+### Interact with app
+
+Type in search box, change filters, etc.
+
+</Step>
+
+<Step>
+
+### Stop and analyze
+
+1. Click stop button (■)
+2. Review flamegraph
+3. Look for:
+   - Yellow/red components (slow)
+   - Gray components (did not render - good!)
+   - Component render counts
+
+</Step>
+
+<Step>
+
+### Compare before/after
+
+- Before: All components yellow on every keystroke
+- After: Most components gray, only affected ones render
+
+</Step>
+
+</Steps>
+
+## Best Practices
+
+<Steps>
+
+<Step>
+
+### Memoize leaf components first
+
+```jsx
+// Start here - most impact
+const Card = React.memo(...);
+
+// Then parent containers
+const List = React.memo(...);
+
+// Finally top-level if needed
+const Page = React.memo(...);
+```
+
+</Step>
+
+<Step>
+
+### Combine with useCallback/useMemo
+
+```jsx
+function Parent() {
+  const handleClick = useCallback(...);  // Stable reference
+  const data = useMemo(...);             // Stable reference
+  
+  return <MemoizedChild onClick={handleClick} data={data} />;
+}
+```
+
+</Step>
+
+<Step>
+
+### Measure before/after
+
+```jsx
+// Add logging to memoized components
+const Component = React.memo(function Component(props) {
+  console.log('Component rendered');
+  return <div>...</div>;
+});
+```
+
+</Step>
+
+</Steps>
+
+## What's Next?
+
+In **Lesson 8**, we'll learn how to **profile performance** with React DevTools and identify optimization opportunities. You'll learn to measure real performance gains! 🚀
+
+## Summary
+
+- ✅ React.memo prevents unnecessary re-renders
+- ✅ Only re-renders when props change
+- ✅ Combine with useCallback/useMemo
+- ✅ Use for expensive or frequently rendered components
+- ✅ Can provide custom comparison function
+- ✅ 80% performance improvement measured
+
+**Key concept:** React.memo = Component-level memoization. Use it to prevent wasted renders!

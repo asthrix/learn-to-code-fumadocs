@@ -1,0 +1,463 @@
+---
+title: "L12: Module 4 Review"
+description: "Comprehensive review of React Router concepts and patterns"
+---
+
+
+# Module 4 Review: Routes & Navigation
+
+Congratulations on completing Module 4! Let's review everything you've learned about React Router and client-side navigation.
+
+## What You've Learned
+
+Over 11 lessons, you've mastered:
+
+- ✅ Installing and configuring React Router
+- ✅ Setting up BrowserRouter and Routes
+- ✅ Creating page components
+- ✅ Dynamic routes with URL parameters
+- ✅ Extracting parameters with useParams
+- ✅ Fetching data based on route params
+- ✅ Component extraction and composition
+- ✅ Navigation with Link components
+- ✅ Handling 404 errors
+- ✅ Programmatic navigation with useNavigate
+
+## Core Concepts Summary
+
+### 1. React Router Setup
+
+```jsx
+// Router.jsx - Central routing configuration
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/listing/:id" element={<ListingDetailsPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+**Key components:**
+- **BrowserRouter** - Provides routing context
+- **Routes** - Container for route definitions
+- **Route** - Maps paths to components
+
+### 2. Dynamic Routes
+
+```jsx
+// Route with parameter
+<Route path="/listing/:id" element={<ListingDetailsPage />} />
+
+// Extract parameter in component
+import { useParams } from 'react-router-dom';
+
+function ListingDetailsPage() {
+  const { id } = useParams(); // id = "42" from /listing/42
+  
+  useEffect(() => {
+    fetch(`/api/listings/${id}`)
+      .then(res => res.json())
+      .then(setListing);
+  }, [id]); // Re-fetch when ID changes
+}
+```
+
+**Remember:**
+- Parameters are always strings
+- Include param in useEffect dependencies
+- Use template literals for dynamic URLs
+
+### 3. Navigation
+
+<Tabs items={['Link Component', 'useNavigate Hook']}>
+
+<Tab value="Link Component">
+
+**For user-initiated clicks:**
+
+```jsx
+import { Link } from 'react-router-dom';
+
+// Basic link
+<Link to="/about">About</Link>
+
+// Dynamic link
+<Link to={`/listing/${listing.id}`}>
+  View Details
+</Link>
+
+// With styling
+<Link 
+  to="/profile"
+  className="text-blue-500 hover:underline"
+>
+  Profile
+</Link>
+```
+
+</Tab>
+
+<Tab value="useNavigate Hook">
+
+**For programmatic navigation:**
+
+```jsx
+import { useNavigate } from 'react-router-dom';
+
+function Component() {
+  const navigate = useNavigate();
+
+  // After form submit
+  const handleSubmit = async () => {
+    await submitForm();
+    navigate('/success');
+  };
+
+  // Go back
+  const goBack = () => navigate(-1);
+
+  // With state
+  const checkout = () => {
+    navigate('/checkout', {
+      state: { items: cart }
+    });
+  };
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Common Patterns
+
+<Accordions>
+
+<Accordion title="Pattern 1: Page with Data Fetching">
+
+```jsx
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+function DetailsPage() {
+  const { id } = useParams();
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(`/api/items/${id}`, { signal: controller.signal })
+      .then(res => {
+        if (!res.ok) throw new Error('Not found');
+        return res.json();
+      })
+      .then(setData)
+      .catch(err => {
+        if (err.name !== 'AbortError') setError(err.message);
+      })
+      .finally(() => setIsLoading(false));
+
+    return () => controller.abort();
+  }, [id]);
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+
+  return <DisplayComponent data={data} />;
+}
+```
+
+</Accordion>
+
+<Accordion title="Pattern 2: Protected Route">
+
+```jsx
+function ProtectedPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', {
+        state: { from: location.pathname }
+      });
+    }
+  }, [user, navigate]);
+
+  return user ? <ProtectedContent /> : null;
+}
+```
+
+</Accordion>
+
+<Accordion title="Pattern 3: Form with Navigation">
+
+```jsx
+function BookingForm() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({});
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const booking = await createBooking(formData);
+      navigate(`/booking/${booking.id}/confirm`, {
+        state: { booking }
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  return <form onSubmit={handleSubmit}>...</form>;
+}
+```
+
+</Accordion>
+
+<Accordion title="Pattern 4: Nested Routes">
+
+```jsx
+<Routes>
+  <Route path="/dashboard" element={<DashboardLayout />}>
+    <Route index element={<DashboardHome />} />
+    <Route path="profile" element={<Profile />} />
+    <Route path="settings" element={<Settings />} />
+  </Route>
+</Routes>
+
+// DashboardLayout.jsx
+import { Outlet } from 'react-router-dom';
+
+function DashboardLayout() {
+  return (
+    <div>
+      <DashboardNav />
+      <Outlet /> {/* Renders child routes */}
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+## Best Practices
+
+### Routing Best Practices
+
+1. **Route Organization**
+   ```jsx
+   // ✅ Keep routes in one central file
+   // src/components/Router.jsx
+   
+   // ❌ Don't scatter routes across files
+   ```
+
+2. **Route Order**
+   ```jsx
+   <Routes>
+     {/* Specific routes first */}
+     <Route path="/listing/new" element={<CreateListing />} />
+     
+     {/* Dynamic routes next */}
+     <Route path="/listing/:id" element={<Details />} />
+     
+     {/* Catch-all last */}
+     <Route path="*" element={<NotFound />} />
+   </Routes>
+   ```
+
+3. **URL Design**
+   ```jsx
+   // ✅ Good - clear, RESTful
+   /listings           // List all
+   /listing/:id        // View one
+   /listing/:id/edit   // Edit one
+   
+   // ❌ Bad - unclear
+   /view?id=42
+   /edit-listing-42
+   ```
+
+### Component Best Practices
+
+1. **Separate Concerns**
+   ```jsx
+   // ✅ Page handles data, Card handles display
+   function ListingDetailsPage() {
+     const { id } = useParams();
+     const listing = useFetch(`/api/listings/${id}`);
+     return <ListingDetailsCard listing={listing} />;
+   }
+   ```
+
+2. **Error Handling**
+   ```jsx
+   // ✅ Always handle loading and errors
+   if (isLoading) return <Spinner />;
+   if (error) return <ErrorMessage error={error} />;
+   return <Content data={data} />;
+   ```
+
+3. **Cleanup**
+   ```jsx
+   // ✅ Always cleanup side effects
+   useEffect(() => {
+     const controller = new AbortController();
+     
+     fetch(url, { signal: controller.signal })
+       .then(/* ... */);
+     
+     return () => controller.abort();
+   }, [id]);
+   ```
+
+## Common Pitfalls
+
+<Accordions>
+
+<Accordion title="Forgetting Dependencies">
+
+```jsx
+// ❌ Wrong - missing id dependency
+useEffect(() => {
+  fetch(`/api/listings/${id}`)
+    .then(setListing);
+}, []); // Won't re-fetch when ID changes!
+
+// ✅ Correct - include id
+useEffect(() => {
+  fetch(`/api/listings/${id}`)
+    .then(setListing);
+}, [id]); // Re-fetches when ID changes
+```
+
+</Accordion>
+
+<Accordion title="Using <a> Instead of Link">
+
+```jsx
+// ❌ Wrong - full page reload
+<a href="/listing/42">View</a>
+
+// ✅ Correct - client-side navigation
+<Link to="/listing/42">View</Link>
+```
+
+</Accordion>
+
+<Accordion title="Catch-All Route Order">
+
+```jsx
+// ❌ Wrong - catch-all first
+<Routes>
+  <Route path="*" element={<NotFound />} />
+  <Route path="/listing/:id" element={<Details />} />
+</Routes>
+
+// ✅ Correct - catch-all last
+<Routes>
+  <Route path="/listing/:id" element={<Details />} />
+  <Route path="*" element={<NotFound />} />
+</Routes>
+```
+
+</Accordion>
+
+<Accordion title="Forgetting Route Cleanup">
+
+```jsx
+// ❌ Wrong - no cleanup
+useEffect(() => {
+  fetch(`/api/listings/${id}`)
+    .then(setListing);
+}, [id]); // Race conditions possible!
+
+// ✅ Correct - with cleanup
+useEffect(() => {
+  const controller = new AbortController();
+  
+  fetch(`/api/listings/${id}`, { 
+    signal: controller.signal 
+  })
+    .then(setListing);
+    
+  return () => controller.abort();
+}, [id]);
+```
+
+</Accordion>
+
+</Accordions>
+
+## React Router Hooks Quick Reference
+
+| Hook | Purpose | Example |
+|------|---------|---------|
+| `useParams` | Get URL parameters | `const { id } = useParams()` |
+| `useNavigate` | Programmatic navigation | `navigate('/home')` |
+| `useLocation` | Get current location | `const location = useLocation()` |
+| `useSearchParams` | Query string params | `const [params] = useSearchParams()` |
+| `useMatch` | Check route match | `const match = useMatch('/listing/:id')` |
+
+## Testing Your Knowledge
+
+**Can you answer these?**
+
+1. What's the difference between `<Link>` and `<a>` tags?
+2. Why must parameters be included in useEffect dependencies?
+3. When should you use `useNavigate` instead of `Link`?
+4. What does the `*` path match in routes?
+5. How do you prevent race conditions in data fetching?
+
+<Callout type="info" title="Check Your Understanding">
+
+If you can answer all these questions, you've mastered React Router! If not, review the relevant lessons.
+
+</Callout>
+
+## What You Can Build Now
+
+With Module 4 complete, you can build:
+
+- ✅ Multi-page single-page applications (SPAs)
+- ✅ Dynamic routes with URL parameters
+- ✅ Protected/authenticated routes
+- ✅ Nested navigation structures
+- ✅ Form flows with navigation
+- ✅ Professional 404 error pages
+- ✅ Complex navigation patterns
+
+## Module 4 Stats
+
+**What you built:**
+- 7 components (HomePage, DetailsPage, NotFoundPage, Router, Card, etc.)
+- 13 routes (including dynamic routes)
+- Multiple navigation patterns
+- Complete booking platform navigation
+
+**Lines of code:** ~1,500 lines across all lessons
+
+**Concepts mastered:** 15+ routing concepts
+
+## What's Next?
+
+In **Lesson 13**, you'll put everything together in a **comprehensive challenge**! Build a complete routing feature with search, favorites, and breadcrumbs. Time to test your skills! 🚀
+
+<Callout type="success" title="Module 4 Complete! 🎉">
+
+You've mastered React Router! You know how to build complex, multi-page applications with professional navigation. Great work!
+
+</Callout>

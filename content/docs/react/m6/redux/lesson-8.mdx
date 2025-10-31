@@ -1,0 +1,663 @@
+---
+title: "L8: Favorites Setup"
+description: "Test the toggleFavorite reducer and prepare for favorites UI"
+---
+
+# Favorites Setup
+
+We already have a `toggleFavorite` reducer in our slice! Let's test it and prepare to use it in our UI.
+
+## Review: toggleFavorite Reducer
+
+Back in Lesson 3, we created this reducer:
+
+```js title="src/state/slices/listingsSlice.js"
+reducers: {
+  toggleFavorite: (state, action) => {
+    const id = action.payload;
+    
+    if (state.favorites.includes(id)) {
+      // Remove from favorites
+      state.favorites = state.favorites.filter(favoriteId => favoriteId !== id);
+    } else {
+      // Add to favorites
+      state.favorites.push(id);
+    }
+  },
+}
+```
+
+**What it does:**
+- Takes a listing ID as payload
+- If ID is in favorites → remove it
+- If ID not in favorites → add it
+- Perfect for toggle buttons!
+
+## Understanding the Favorites State
+
+The `favorites` array stores listing IDs:
+
+```js
+// Initial state
+{
+  favorites: []
+}
+
+// After favoriting listings 1, 5, and 9
+{
+  favorites: [1, 5, 9]
+}
+
+// After unfavoriting listing 5
+{
+  favorites: [1, 9]
+}
+```
+
+**Why store IDs instead of full listing objects?**
+
+<Accordions>
+
+<Accordion title="Reason 1: Smaller Memory Footprint">
+
+**Storing IDs:**
+```js
+favorites: [1, 5, 9]  // ~30 bytes
+```
+
+**Storing full objects:**
+```js
+favorites: [
+  { id: 1, title: 'Beach House', description: '...', images: [...], ... },
+  { id: 5, title: 'Mountain Cabin', description: '...', images: [...], ... },
+  { id: 9, title: 'City Apartment', description: '...', images: [...], ... }
+]  // ~5000+ bytes
+```
+
+IDs are much more memory efficient!
+
+</Accordion>
+
+<Accordion title="Reason 2: Easier to Check">
+
+**With IDs:**
+```js
+const isFavorited = favorites.includes(id);  // ✅ Simple!
+```
+
+**With objects:**
+```js
+const isFavorited = favorites.some(fav => fav.id === id);  // ❌ More complex
+```
+
+</Accordion>
+
+<Accordion title="Reason 3: No Duplication">
+
+**With IDs:**
+```js
+favorites: [1, 5, 9]
+items: [
+  { id: 1, title: 'Beach House', ... },
+  { id: 5, title: 'Mountain Cabin', ... },
+  // ...
+]
+```
+
+Listing data lives in `items`, favorites just reference them.
+
+**With objects:**
+```js
+favorites: [
+  { id: 1, title: 'Beach House', ... },  // Duplicate!
+  // ...
+]
+items: [
+  { id: 1, title: 'Beach House', ... },  // Original
+  // ...
+]
+```
+
+Data is duplicated - if listing updates, must update both places!
+
+</Accordion>
+
+<Accordion title="Reason 4: Persistence-Ready">
+
+Saving to localStorage or backend:
+
+**With IDs:**
+```js
+localStorage.setItem('favorites', JSON.stringify([1, 5, 9]));
+// Stores: "[1,5,9]" - tiny!
+```
+
+**With objects:**
+```js
+localStorage.setItem('favorites', JSON.stringify(favorites));
+// Stores: "[{...},{...},{...}]" - huge!
+```
+
+</Accordion>
+
+</Accordions>
+
+## How to Get Favorited Listings
+
+Even though we store IDs, we can easily get the full listing data:
+
+```jsx
+function FavoritesPage() {
+  const items = useSelector((state) => state.listings.items);
+  const favoriteIds = useSelector((state) => state.listings.favorites);
+  
+  // Get full listing objects for favorited IDs
+  const favoriteListings = items.filter(listing => 
+    favoriteIds.includes(listing.id)
+  );
+  
+  return (
+    <div>
+      {favoriteListings.map(listing => (
+        <ListingCard key={listing.id} listing={listing} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Pattern:**
+1. Get all listings from `state.listings.items`
+2. Get favorite IDs from `state.listings.favorites`
+3. Filter listings to only those with IDs in favorites array
+
+Simple and efficient! ✨
+
+## Testing toggleFavorite
+
+Let's test the reducer works correctly. Open Redux DevTools:
+
+<Steps>
+
+<Step>
+
+### Open Redux DevTools
+
+1. Open your app in browser
+2. Open DevTools (F12)
+3. Click **Redux** tab
+
+</Step>
+
+<Step>
+
+### Check Initial State
+
+In the **State** tab, you should see:
+
+```json
+{
+  "listings": {
+    "items": [/* listings */],
+    "favorites": [],
+    "status": "succeeded",
+    "error": null
+  }
+}
+```
+
+Favorites is empty initially.
+
+</Step>
+
+<Step>
+
+### Manually Dispatch Toggle
+
+In the **Dispatch** section, manually dispatch:
+
+```json
+{
+  "type": "listings/toggleFavorite",
+  "payload": 1
+}
+```
+
+Click **Dispatch**.
+
+</Step>
+
+<Step>
+
+### Verify State Updated
+
+Check the **State** tab again:
+
+```json
+{
+  "listings": {
+    "items": [/* listings */],
+    "favorites": [1],
+    "status": "succeeded",
+    "error": null
+  }
+}
+```
+
+ID `1` was added! 🎉
+
+</Step>
+
+<Step>
+
+### Toggle Again (Remove)
+
+Dispatch the same action again:
+
+```json
+{
+  "type": "listings/toggleFavorite",
+  "payload": 1
+}
+```
+
+Check state - `1` should be removed:
+
+```json
+{
+  "listings": {
+    "favorites": []
+  }
+}
+```
+
+Perfect! The toggle works both ways! ✨
+
+</Step>
+
+<Step>
+
+### Add Multiple Favorites
+
+Try adding multiple:
+
+```json
+{ "type": "listings/toggleFavorite", "payload": 1 }
+{ "type": "listings/toggleFavorite", "payload": 5 }
+{ "type": "listings/toggleFavorite", "payload": 9 }
+```
+
+State should show:
+
+```json
+{
+  "listings": {
+    "favorites": [1, 5, 9]
+  }
+}
+```
+
+Excellent! 🎉
+
+</Step>
+
+</Steps>
+
+## Selector Patterns for Favorites
+
+Here are useful selectors you'll use:
+
+<Tabs items={['Get Favorite IDs', 'Get Favorited Listings', 'Check if Favorited', 'Count Favorites']}>
+
+<Tab value="Get Favorite IDs">
+
+**Get the array of favorite IDs:**
+
+```jsx
+import { useSelector } from 'react-redux';
+
+function Component() {
+  const favoriteIds = useSelector((state) => state.listings.favorites);
+  
+  console.log(favoriteIds);  // [1, 5, 9]
+}
+```
+
+**Use when:** You just need the IDs (for checking, counting, etc.)
+
+</Tab>
+
+<Tab value="Get Favorited Listings">
+
+**Get the full listing objects:**
+
+```jsx
+import { useSelector } from 'react-redux';
+
+function Component() {
+  const items = useSelector((state) => state.listings.items);
+  const favoriteIds = useSelector((state) => state.listings.favorites);
+  
+  const favoriteListings = items.filter(listing => 
+    favoriteIds.includes(listing.id)
+  );
+  
+  console.log(favoriteListings);
+  // [
+  //   { id: 1, title: 'Beach House', ... },
+  //   { id: 5, title: 'Mountain Cabin', ... },
+  //   { id: 9, title: 'City Apartment', ... }
+  // ]
+}
+```
+
+**Use when:** You need to display favorited listings
+
+</Tab>
+
+<Tab value="Check if Favorited">
+
+**Check if a specific listing is favorited:**
+
+```jsx
+import { useSelector } from 'react-redux';
+
+function ListingCard({ listing }) {
+  const favoriteIds = useSelector((state) => state.listings.favorites);
+  
+  const isFavorited = favoriteIds.includes(listing.id);
+  
+  return (
+    <div>
+      <h3>{listing.title}</h3>
+      <button>
+        {isFavorited ? '❤️ Favorited' : '🤍 Favorite'}
+      </button>
+    </div>
+  );
+}
+```
+
+**Use when:** You need to show if a listing is favorited (for button state)
+
+</Tab>
+
+<Tab value="Count Favorites">
+
+**Get the number of favorites:**
+
+```jsx
+import { useSelector } from 'react-redux';
+
+function Navbar() {
+  const favoriteCount = useSelector((state) => state.listings.favorites.length);
+  
+  return (
+    <nav>
+      <a href="/favorites">
+        Favorites ({favoriteCount})
+      </a>
+    </nav>
+  );
+}
+```
+
+**Use when:** You need to display a count (badge, counter, etc.)
+
+</Tab>
+
+</Tabs>
+
+## Creating Selector Functions (Best Practice)
+
+Instead of writing selectors inline, create reusable selector functions:
+
+```js title="src/state/slices/listingsSlice.js"
+// At the bottom of the file, after the slice
+
+// Selectors
+export const selectAllListings = (state) => state.listings.items;
+export const selectFavoriteIds = (state) => state.listings.favorites;
+export const selectListingsStatus = (state) => state.listings.status;
+export const selectListingsError = (state) => state.listings.error;
+
+// Computed selector - favorited listings
+export const selectFavoriteListings = (state) => {
+  const items = state.listings.items;
+  const favoriteIds = state.listings.favorites;
+  return items.filter(listing => favoriteIds.includes(listing.id));
+};
+
+// Computed selector - is listing favorited?
+export const selectIsListingFavorited = (state, listingId) => {
+  return state.listings.favorites.includes(listingId);
+};
+
+// Computed selector - favorite count
+export const selectFavoriteCount = (state) => state.listings.favorites.length;
+```
+
+**Usage in components:**
+
+```jsx
+import { useSelector } from 'react-redux';
+import { 
+  selectFavoriteListings, 
+  selectFavoriteCount 
+} from '@/state/slices/listingsSlice';
+
+function FavoritesPage() {
+  const favoriteListings = useSelector(selectFavoriteListings);
+  const count = useSelector(selectFavoriteCount);
+  
+  return (
+    <div>
+      <h1>Your Favorites ({count})</h1>
+      {favoriteListings.map(listing => (
+        <ListingCard key={listing.id} listing={listing} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Benefits:**
+- ✅ Reusable across components
+- ✅ Easy to test
+- ✅ Single source of truth
+- ✅ Can be memoized for performance
+- ✅ Self-documenting
+
+## Dispatching toggleFavorite
+
+To use `toggleFavorite` in components:
+
+```jsx
+import { useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+
+function ListingCard({ listing }) {
+  const dispatch = useDispatch();
+  
+  const handleToggleFavorite = () => {
+    dispatch(toggleFavorite(listing.id));
+  };
+  
+  return (
+    <div>
+      <h3>{listing.title}</h3>
+      <button onClick={handleToggleFavorite}>
+        Toggle Favorite
+      </button>
+    </div>
+  );
+}
+```
+
+**Flow:**
+1. User clicks button
+2. `handleToggleFavorite` runs
+3. Dispatches `toggleFavorite(listing.id)`
+4. Reducer adds/removes ID from favorites
+5. Components re-render with new state
+
+## Understanding the Toggle Pattern
+
+The toggle pattern is common in Redux:
+
+<Tabs items={['Add/Remove Pattern', 'Toggle Boolean', 'Cycle Through States']}>
+
+<Tab value="Add/Remove Pattern">
+
+**Our current pattern - add or remove:**
+
+```js
+toggleFavorite: (state, action) => {
+  const id = action.payload;
+  
+  if (state.favorites.includes(id)) {
+    state.favorites = state.favorites.filter(fav => fav !== id);
+  } else {
+    state.favorites.push(id);
+  }
+}
+```
+
+**Use when:** Managing arrays of IDs (favorites, selected items, tags)
+
+</Tab>
+
+<Tab value="Toggle Boolean">
+
+**Toggle boolean values:**
+
+```js
+toggleSidebar: (state) => {
+  state.sidebarOpen = !state.sidebarOpen;
+}
+
+toggleDarkMode: (state) => {
+  state.darkMode = !state.darkMode;
+}
+```
+
+**Use when:** Simple on/off states (modals, sidebars, themes)
+
+</Tab>
+
+<Tab value="Cycle Through States">
+
+**Cycle through multiple states:**
+
+```js
+cycleView: (state) => {
+  const views = ['grid', 'list', 'map'];
+  const currentIndex = views.indexOf(state.view);
+  const nextIndex = (currentIndex + 1) % views.length;
+  state.view = views[nextIndex];
+}
+```
+
+**Use when:** Cycling through options (views, themes, sort orders)
+
+</Tab>
+
+</Tabs>
+
+## Preparing for UI
+
+In the next lessons, we'll build:
+
+<Steps>
+
+<Step>
+
+### Favorites Page (Lesson 9)
+
+Display all favorited listings:
+
+```jsx
+function ListingFavoritesPage() {
+  const favoriteListings = useSelector(selectFavoriteListings);
+  
+  return (
+    <div>
+      <h1>Your Favorites</h1>
+      {favoriteListings.map(listing => (
+        <ListingCard key={listing.id} listing={listing} />
+      ))}
+    </div>
+  );
+}
+```
+
+</Step>
+
+<Step>
+
+### Navbar with Link (Lesson 10-11)
+
+Navigation with favorites count:
+
+```jsx
+function Navbar() {
+  const count = useSelector(selectFavoriteCount);
+  
+  return (
+    <nav>
+      <Link to="/favorites">
+        ❤️ Favorites ({count})
+      </Link>
+    </nav>
+  );
+}
+```
+
+</Step>
+
+<Step>
+
+### Favorite Button (Lesson 13-14)
+
+Toggle button on listing cards:
+
+```jsx
+function ListingFavoriteButton({ listingId }) {
+  const dispatch = useDispatch();
+  const isFavorited = useSelector((state) => 
+    selectIsListingFavorited(state, listingId)
+  );
+  
+  return (
+    <button onClick={() => dispatch(toggleFavorite(listingId))}>
+      {isFavorited ? '❤️' : '🤍'}
+    </button>
+  );
+}
+```
+
+</Step>
+
+</Steps>
+
+## What's Next?
+
+Perfect! The favorites system is ready to use. In the next lesson, we'll:
+
+1. **Create FavoritesPage** - New page to display favorites
+2. **Use selectors** - Get favorited listings from Redux
+3. **Handle empty state** - Show message when no favorites
+
+<Callout type="success">
+**✅ Lesson Complete!** You've tested the toggleFavorite reducer and learned how to work with favorites in Redux!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Store IDs, not objects** - More efficient and easier to manage
+- ✅ **Filter items** to get full listing objects from IDs
+- ✅ **Toggle pattern** - Add if not present, remove if present
+- ✅ **Create selectors** for reusable state access
+- ✅ **Computed selectors** derive data from existing state
+- ✅ Test reducers with **Redux DevTools** manual dispatch
+- ✅ `.includes()` checks if ID is in favorites array

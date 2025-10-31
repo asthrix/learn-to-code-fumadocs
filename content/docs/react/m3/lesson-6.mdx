@@ -1,0 +1,722 @@
+---
+title: "L6: Cleanup & AbortController"
+description: "Prevent race conditions and memory leaks with proper cleanup functions"
+---
+
+
+# Lesson 6: Cleanup & AbortController
+
+## What You'll Learn
+
+Your app now loads data, shows loading states, and handles errors. But there's a subtle bug lurking! In this lesson, you'll:
+
+- Understand race conditions and why they're dangerous
+- Learn about cleanup functions in useEffect
+- Implement AbortController to cancel requests
+- Prevent memory leaks
+- Write production-ready async code
+
+## The Hidden Problem: Race Conditions
+
+### What is a Race Condition?
+
+A **race condition** occurs when multiple async operations compete, and the result depends on which one finishes first.
+
+**Scenario:**
+
+```
+1. User visits HomePage → Fetch starts (takes 2 seconds)
+2. User quickly navigates away → Component unmounts
+3. Fetch completes → Tries to update unmounted component
+4. Result: Memory leak + React warning!
+```
+
+### Real-World Example
+
+```jsx title="The Problem"
+// [!code word:useEffect]
+function HomePage() {
+  const [listings, setListings] = useState([]);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      const data = await getAllListings(); // Takes 2 seconds
+      setListings(data); // ❌ May run after unmount!
+    };
+
+    fetchListings();
+  }, []);
+
+  return <ListingList listings={listings} />;
+}
+```
+
+**What happens:**
+
+1. Component mounts, fetch starts
+2. User navigates to different page
+3. HomePage unmounts
+4. 2 seconds later, fetch completes
+5. `setListings(data)` tries to update non-existent component
+6. React warning: "Can't perform a React state update on an unmounted component"
+
+> **Warning:** This is a memory leak! The component is gone but the callback still holds references.
+
+## Solution 1: Cleanup with Boolean Flag
+
+The simplest solution uses a boolean flag:
+
+<Steps>
+  <Step>
+    ### Add Mounted Flag
+
+    ```jsx title="src/pages/HomePage.jsx"
+    // [!code word:useEffect]
+    useEffect(() => {
+      let isMounted = true; // [!code highlight]
+
+      const fetchListings = async () => {
+        setIsLoading(true);
+        setError(null);
+        
+        try {
+          const data = await getAllListings();
+          
+          // Only update if still mounted
+          if (isMounted) { // [!code highlight]
+            setListings(data); // [!code highlight]
+          } // [!code highlight]
+        } catch (err) {
+          if (isMounted) { // [!code highlight]
+            setError(err.message); // [!code highlight]
+          } // [!code highlight]
+        } finally {
+          if (isMounted) { // [!code highlight]
+            setIsLoading(false); // [!code highlight]
+          } // [!code highlight]
+        }
+      };
+
+      fetchListings();
+
+      // Cleanup function
+      return () => { // [!code highlight]
+        isMounted = false; // [!code highlight]
+      }; // [!code highlight]
+    }, []);
+    ```
+
+    **How it works:**
+
+    1. `isMounted = true` - Component is mounted
+    2. Async fetch starts
+    3. If user navigates away, cleanup runs: `isMounted = false`
+    4. Fetch completes, but `if (isMounted)` prevents state updates
+
+  </Step>
+</Steps>
+
+## Solution 2: AbortController (Modern Approach)
+
+The better solution is `AbortController` - it actually cancels the request!
+
+### Understanding AbortController
+
+```jsx title="AbortController Basics"
+// Create controller
+const controller = new AbortController();
+
+// Get signal
+const signal = controller.signal;
+
+// Pass signal to fetch
+fetch('/api/data', { signal });
+
+// Cancel the request
+controller.abort(); // Request is cancelled!
+```
+
+**Benefits:**
+
+- ✅ Actually cancels the network request (saves bandwidth)
+- ✅ Browser stops processing the response
+- ✅ More efficient than boolean flag
+- ✅ Standard web API (works everywhere)
+
+### Implementing AbortController
+
+<Steps>
+  <Step>
+    ### Update API to Support AbortController
+
+    First, modify your API functions to accept an abort signal:
+
+    ```jsx title="src/api/listings.js"
+    export const getAllListings = async (options = {}) => {
+      try {
+        const response = await mockApiCall(mockListings, {
+          delayMs: 1500,
+          errorRate: 0.05,
+          signal: options.signal, // [!code highlight]
+          ...options
+        });
+
+        return response.data;
+      } catch (error) {
+        // Check if error was due to abort
+        if (error.name === 'AbortError') { // [!code highlight]
+          console.log('Fetch was cancelled'); // [!code highlight]
+          throw new Error('Request cancelled'); // [!code highlight]
+        } // [!code highlight]
+        
+        console.error('Error fetching listings:', error);
+        throw error;
+      }
+    };
+    ```
+
+  </Step>
+
+  <Step>
+    ### Update HomePage with AbortController
+
+    ```jsx title="src/pages/HomePage.jsx (Complete with AbortController)"
+    // [!code word:useEffect]
+    import { useState, useEffect } from 'react';
+    import { ListingList } from '@/components/ListingList';
+    import { ListingFilters } from '@/components/ListingFilters';
+    import { Spinner } from '@/components/Spinner';
+    import { ErrorMessage } from '@/components/ErrorMessage';
+    import { getAllListings } from '@/api';
+
+    export function HomePage() {
+      const [listings, setListings] = useState([]);
+      const [isLoading, setIsLoading] = useState(true);
+      const [error, setError] = useState(null);
+      const [search, setSearch] = useState('');
+      const [dates, setDates] = useState({ checkIn: null, checkOut: null });
+      const [guests, setGuests] = useState(1);
+
+      useEffect(() => {
+        const controller = new AbortController(); // [!code highlight]
+        const signal = controller.signal; // [!code highlight]
+
+        const fetchListings = async () => {
+          setIsLoading(true);
+          setError(null);
+          
+          try {
+            const data = await getAllListings({ signal }); // [!code highlight]
+            setListings(data);
+            console.log('Fetched listings:', data);
+          } catch (err) {
+            // Ignore abort errors
+            if (err.message !== 'Request cancelled') { // [!code highlight]
+              console.error('Failed to fetch listings:', err);
+              setError(err.message || 'Failed to load listings');
+            } // [!code highlight]
+          } finally {
+            setIsLoading(false);
+          }
+        };
+
+        fetchListings();
+
+        // Cleanup: abort the request if component unmounts
+        return () => { // [!code highlight]
+          controller.abort(); // [!code highlight]
+        }; // [!code highlight]
+      }, []); // Empty array = mount/unmount only
+
+      // Filter listings (same as before)
+      const filteredListings = listings.filter(listing => {
+        const matchesSearch = 
+          search === '' ||
+          listing.title.toLowerCase().includes(search.toLowerCase()) ||
+          listing.location.toLowerCase().includes(search.toLowerCase());
+
+        const matchesGuests = listing.maxGuests >= guests;
+        const matchesDates = true;
+
+        return matchesSearch && matchesGuests && matchesDates;
+      });
+
+      // Error state
+      if (error) {
+        return (
+          <div className="min-h-screen bg-gray-50">
+            <div className="container mx-auto px-4 py-8">
+              <h1 className="text-3xl font-bold mb-8">
+                Find Your Perfect Stay
+              </h1>
+              <ErrorMessage 
+                title="Unable to Load Listings"
+                message={error}
+                onRetry={() => window.location.reload()}
+              />
+            </div>
+          </div>
+        );
+      }
+
+      // Loading state
+      if (isLoading) {
+        return (
+          <div className="min-h-screen bg-gray-50">
+            <div className="container mx-auto px-4 py-8">
+              <h1 className="text-3xl font-bold mb-8">
+                Find Your Perfect Stay
+              </h1>
+              <Spinner 
+                size="large"
+                message="Loading amazing stays..."
+              />
+            </div>
+          </div>
+        );
+      }
+
+      // Main content
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-8">Find Your Perfect Stay</h1>
+            
+            <ListingFilters 
+              search={search}
+              onSearchChange={setSearch}
+              dates={dates}
+              onDatesChange={setDates}
+              guests={guests}
+              onGuestsChange={setGuests}
+            />
+
+            <div className="mt-8">
+              <p className="text-gray-600 mb-4">
+                Showing {filteredListings.length} of {listings.length} listings
+              </p>
+              
+              <ListingList listings={filteredListings} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ```
+
+    **Key changes:**
+
+    1. Create `AbortController` at start of effect
+    2. Pass `signal` to API call
+    3. Return cleanup function that calls `controller.abort()`
+    4. Ignore "Request cancelled" errors in catch block
+
+  </Step>
+</Steps>
+
+## Understanding Cleanup Functions
+
+### The Cleanup Pattern
+
+```jsx title="useEffect Cleanup Pattern"
+// [!code word:useEffect]
+useEffect(() => {
+  // 1. Setup code runs when component mounts (or deps change)
+  const subscription = subscribeToData();
+  const timer = setInterval(doSomething, 1000);
+
+  // 2. Cleanup function runs BEFORE next effect or unmount
+  return () => {
+    subscription.unsubscribe();
+    clearInterval(timer);
+  };
+}, [dependencies]);
+```
+
+**When cleanup runs:**
+
+- Before the effect runs again (if dependencies changed)
+- When the component unmounts
+- NOT on the initial mount
+
+### Cleanup Examples
+
+<Tabs items={['Subscriptions', 'Timers', 'Event Listeners', 'Fetch Requests']}>
+  <Tab value="Subscriptions">
+    ```jsx title="Cleaning Up Subscriptions"
+    // [!code word:useEffect]
+    useEffect(() => {
+      // Subscribe to data source
+      const subscription = dataSource.subscribe(data => {
+        setData(data);
+      });
+
+      // Cleanup: unsubscribe
+      return () => {
+        subscription.unsubscribe();
+      };
+    }, []);
+    ```
+
+    **Why:** Prevents memory leaks from active subscriptions.
+  </Tab>
+
+  <Tab value="Timers">
+    ```jsx title="Cleaning Up Timers"
+    // [!code word:useEffect]
+    useEffect(() => {
+      // Set up interval
+      const interval = setInterval(() => {
+        setTime(new Date());
+      }, 1000);
+
+      // Cleanup: clear interval
+      return () => {
+        clearInterval(interval);
+      };
+    }, []);
+    ```
+
+    **Why:** Prevents multiple timers running simultaneously.
+  </Tab>
+
+  <Tab value="Event Listeners">
+    ```jsx title="Cleaning Up Event Listeners"
+    // [!code word:useEffect]
+    useEffect(() => {
+      const handleResize = () => {
+        setWidth(window.innerWidth);
+      };
+
+      // Add listener
+      window.addEventListener('resize', handleResize);
+
+      // Cleanup: remove listener
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []);
+    ```
+
+    **Why:** Prevents duplicate listeners and memory leaks.
+  </Tab>
+
+  <Tab value="Fetch Requests">
+    ```jsx title="Cleaning Up Fetch Requests"
+    // [!code word:useEffect]
+    useEffect(() => {
+      const controller = new AbortController();
+
+      const fetchData = async () => {
+        try {
+          const response = await fetch('/api/data', {
+            signal: controller.signal
+          });
+          const data = await response.json();
+          setData(data);
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            setError(err);
+          }
+        }
+      };
+
+      fetchData();
+
+      // Cleanup: abort fetch
+      return () => {
+        controller.abort();
+      };
+    }, []);
+    ```
+
+    **Why:** Cancels in-flight requests, prevents state updates on unmounted components.
+  </Tab>
+</Tabs>
+
+## Advanced Patterns
+
+<Accordions type="single">
+  <Accordion id="pattern-1" title="Pattern: Debounced Search with Cleanup">
+    Implement search that waits for user to stop typing:
+
+    ```jsx title="Debounced Search"
+    // [!code word:useEffect]
+    const [search, setSearch] = useState('');
+    const [results, setResults] = useState([]);
+
+    useEffect(() => {
+      // Don't search empty strings
+      if (!search) {
+        setResults([]);
+        return;
+      }
+
+      // Wait 500ms after user stops typing
+      const timer = setTimeout(async () => {
+        const controller = new AbortController();
+        
+        try {
+          const data = await searchListings(search, {
+            signal: controller.signal
+          });
+          setResults(data);
+        } catch (err) {
+          if (err.message !== 'Request cancelled') {
+            console.error(err);
+          }
+        }
+      }, 500);
+
+      // Cleanup: cancel timer and any pending request
+      return () => {
+        clearTimeout(timer);
+      };
+    }, [search]);
+    ```
+
+    **Benefits:**
+
+    - Reduces API calls (only searches after user stops typing)
+    - Cancels old timers when search changes
+    - Better user experience
+
+  </Accordion>
+
+  <Accordion id="pattern-2" title="Pattern: Multiple Cleanup Actions">
+    Handle multiple cleanup tasks:
+
+    ```jsx title="Multiple Cleanups"
+    // [!code word:useEffect]
+    useEffect(() => {
+      const controller = new AbortController();
+      const timer = setInterval(checkStatus, 5000);
+      const subscription = eventSource.subscribe(handleEvent);
+
+      // All cleanup in one function
+      return () => {
+        controller.abort();
+        clearInterval(timer);
+        subscription.unsubscribe();
+      };
+    }, []);
+    ```
+
+  </Accordion>
+
+  <Accordion id="pattern-3" title="Pattern: Conditional Cleanup">
+    Only clean up if something was set up:
+
+    ```jsx title="Conditional Cleanup"
+    // [!code word:useEffect]
+    useEffect(() => {
+      let subscription = null;
+
+      if (userId) {
+        subscription = subscribeToUser(userId);
+      }
+
+      return () => {
+        // Only unsubscribe if we subscribed
+        if (subscription) {
+          subscription.unsubscribe();
+        }
+      };
+    }, [userId]);
+    ```
+
+  </Accordion>
+
+  <Accordion id="pattern-4" title="Pattern: Async Cleanup">
+    When cleanup is async (rare but happens):
+
+    ```jsx title="Async Cleanup"
+    // [!code word:useEffect]
+    useEffect(() => {
+      let cancelled = false;
+
+      const setup = async () => {
+        const resource = await createResource();
+        
+        if (!cancelled) {
+          setResource(resource);
+        } else {
+          // Resource created but component unmounted
+          await resource.cleanup();
+        }
+      };
+
+      setup();
+
+      return () => {
+        cancelled = true;
+        // Can't return promise from cleanup!
+        // Use flag pattern instead
+      };
+    }, []);
+    ```
+
+  </Accordion>
+</Accordions>
+
+## Testing Cleanup
+
+<Steps>
+  <Step>
+    ### Test Component Unmount
+
+    1. Start on HomePage (fetch begins)
+    2. Quickly navigate to another page
+    3. Check console - should see "Fetch was cancelled"
+    4. No React warnings about unmounted components
+
+  </Step>
+
+  <Step>
+    ### Test with React DevTools
+
+    Install React DevTools browser extension:
+
+    1. Open DevTools → Components tab
+    2. Find HomePage component
+    3. Right-click → "Suspend this component"
+    4. Watch cleanup function run
+
+  </Step>
+
+  <Step>
+    ### Add Debug Logging
+
+    ```jsx title="Debug Cleanup"
+    // [!code word:useEffect]
+    useEffect(() => {
+      console.log('🟢 Effect setup');
+      const controller = new AbortController();
+
+      fetchData({ signal: controller.signal });
+
+      return () => {
+        console.log('🔴 Cleanup running');
+        controller.abort();
+      };
+    }, []);
+    ```
+
+    **Expected console output:**
+
+    ```
+    🟢 Effect setup
+    [user navigates away]
+    🔴 Cleanup running
+    ```
+
+  </Step>
+</Steps>
+
+## Common Cleanup Mistakes
+
+<Accordions type="single">
+  <Accordion id="mistake-1" title="❌ Mistake 1: Forgetting Cleanup">
+    ```jsx title="Memory Leak!"
+    // [!code word:useEffect]
+    useEffect(() => {
+      const interval = setInterval(() => {
+        doSomething();
+      }, 1000);
+      
+      // No cleanup! Interval keeps running forever
+    }, []);
+    ```
+
+    **Fix:** Always clean up timers and subscriptions.
+
+  </Accordion>
+
+  <Accordion id="mistake-2" title="❌ Mistake 2: Async Cleanup Function">
+    ```jsx title="Invalid - Cleanup Can't Be Async"
+    // [!code word:useEffect]
+    useEffect(() => {
+      fetchData();
+
+      // ❌ Can't make cleanup async!
+      return async () => {
+        await cleanup();
+      };
+    }, []);
+    ```
+
+    **Fix:** Use IIFE or flag pattern for async cleanup.
+
+  </Accordion>
+
+  <Accordion id="mistake-3" title="❌ Mistake 3: Cleaning Up Too Much">
+    ```jsx title="Over-Cleanup"
+    // [!code word:useEffect]
+    useEffect(() => {
+      const data = processData();
+      setData(data);
+
+      // ❌ No cleanup needed! No side effects to clean
+      return () => {
+        // Nothing to do here
+      };
+    }, []);
+    ```
+
+    **Fix:** Only add cleanup if there are side effects to clean up.
+
+  </Accordion>
+
+  <Accordion id="mistake-4" title="❌ Mistake 4: Wrong Cleanup Timing">
+    ```jsx title="Cleaning Up Too Early"
+    // [!code word:useEffect]
+    useEffect(() => {
+      const timer = setInterval(doSomething, 1000);
+      
+      // ❌ Clearing immediately defeats the purpose!
+      clearInterval(timer);
+
+      return () => {
+        clearInterval(timer); // Already cleared above
+      };
+    }, []);
+    ```
+
+    **Fix:** Only clear in the cleanup function.
+
+  </Accordion>
+</Accordions>
+
+## Key Takeaways
+
+<Callout type="success" title="Cleanup prevents bugs!">
+  **What you learned:**
+
+  - ✅ Race conditions happen when async operations complete after unmount
+  - ✅ Cleanup functions prevent memory leaks
+  - ✅ AbortController cancels network requests efficiently
+  - ✅ Return cleanup function from useEffect
+  - ✅ Cleanup runs before next effect and on unmount
+
+  **Cleanup checklist:**
+
+  - 🔲 Timers (setInterval, setTimeout) → clearInterval, clearTimeout
+  - 🔲 Subscriptions → unsubscribe
+  - 🔲 Event listeners → removeEventListener
+  - 🔲 Fetch requests → controller.abort()
+  - 🔲 WebSocket connections → socket.close()
+
+  **Next:** Extract reusable logic into custom hooks!
+</Callout>
+
+## What's Next?
+
+Your data fetching is now production-ready! But the code in HomePage is getting long. In the next lesson, you'll:
+
+- 🎣 Create custom hooks to reuse logic
+- 🧹 Clean up component code
+- 📦 Separate concerns properly
+- 🔧 Build a `useFetchListings` hook
+
+Let's refactor for maintainability! 🚀
+

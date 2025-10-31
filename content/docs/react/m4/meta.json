@@ -1,15 +1,19 @@
 {
-   "title": "M4 · Routes & Navigation",
+   "title": "M4: Routes & Navigation",
    "pages": [
-      "0_index",
-      "1_introduction-navigation",
-      "2_client-vs-server-routing",
-      "3_routing-in-react",
-      "4_react-router-part-1",
-      "5_react-router-part-2",
-      "6_react-router-part-3",
-      "7_routing-best-practices",
-      "8_implementation",
-      "9_validation"
+      "index",
+      "lesson-1",
+      "lesson-2",
+      "lesson-3",
+      "lesson-4",
+      "lesson-5",
+      "lesson-6",
+      "lesson-7",
+      "lesson-8",
+      "lesson-9",
+      "lesson-10",
+      "lesson-11",
+      "lesson-12",
+      "lesson-13"
    ]
 }

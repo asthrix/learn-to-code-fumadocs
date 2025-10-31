@@ -11,13 +11,13 @@ export default function LegacyHomePage() {
          <HeroSection />
 
          {/* Featured Courses */}
-         <section className='py-20 bg-gradient-to-b from-gray-50 to-white'>
+         <section className='py-20 bg-gradient-to-b from-background to-card'>
             <div className='container mx-auto px-4'>
                <div className='text-center mb-16'>
-                  <h2 className='text-4xl font-bold text-gray-900 mb-4'>
+                  <h2 className='text-4xl font-bold text-foreground mb-4'>
                      Master Frontend Development
                   </h2>
-                  <p className='text-xl text-gray-600 max-w-3xl mx-auto'>
+                  <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
                      Learn modern web development with our comprehensive,
                      project-based courses. From HTML fundamentals to advanced
                      React applications.
@@ -33,7 +33,7 @@ export default function LegacyHomePage() {
                <div className='text-center mt-12'>
                   <Link
                      href='/courses'
-                     className='inline-flex items-center px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors'
+                     className='inline-flex items-center px-8 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors'
                   >
                      View All Courses
                      <svg
@@ -58,18 +58,18 @@ export default function LegacyHomePage() {
          <FeaturesSection />
 
          {/* CTA Section */}
-         <section className='py-20 bg-blue-600'>
+         <section className='py-20 bg-primary'>
             <div className='container mx-auto px-4 text-center'>
-               <h2 className='text-4xl font-bold text-white mb-4'>
+               <h2 className='text-4xl font-bold text-primary-foreground mb-4'>
                   Ready to Start Your Journey?
                </h2>
-               <p className='text-xl text-blue-100 mb-8 max-w-2xl mx-auto'>
+               <p className='text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto'>
                   Join thousands of developers who have mastered frontend
                   development with our hands-on approach.
                </p>
                <Link
                   href='/docs/html'
-                  className='inline-flex items-center px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors'
+                  className='inline-flex items-center px-8 py-3 bg-background text-foreground font-semibold rounded-lg hover:bg-card transition-colors'
                >
                   Start with HTML Basics
                   <svg

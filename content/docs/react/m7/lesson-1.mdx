@@ -1,0 +1,480 @@
+---
+title: "L1: Create AuthProvider Component"
+description: "Build the foundation for authentication with Context API"
+---
+
+# Create AuthProvider Component
+
+Let's build the foundation for authentication by creating an `AuthProvider` component using React's Context API! 🏗️
+
+## Why We Need AuthProvider
+
+Right now, our app has no way to:
+- Know if a user is signed in
+- Share authentication state across components
+- Protect routes that require authentication
+- Add auth tokens to API requests
+
+**The solution:** Create a **global authentication context** that wraps our entire app and provides auth state to any component that needs it.
+
+## What is Context API?
+
+<Accordions>
+
+<Accordion title="Understanding Context API">
+
+**Context API** is React's built-in solution for sharing data across components without prop drilling.
+
+**Problem it solves:**
+
+```jsx
+// ❌ Without Context: Prop drilling nightmare
+<App>
+  <Navbar user={user} onSignOut={signOut} />
+  <HomePage user={user} />
+  <ProfilePage user={user} onSignOut={signOut} />
+</App>
+
+// Every component needs user & signOut passed down!
+```
+
+**Solution with Context:**
+
+```jsx
+// ✅ With Context: Direct access anywhere
+<AuthProvider>
+  <App>
+    <Navbar />  {/* Gets user from context */}
+    <HomePage />  {/* Gets user from context */}
+    <ProfilePage />  {/* Gets user from context */}
+  </App>
+</AuthProvider>
+
+// Components access auth directly via useAuth() hook!
+```
+
+**Key concepts:**
+1. **Context** - Container holding shared data
+2. **Provider** - Component that provides the data
+3. **Consumer** - Components that use the data (via hooks)
+
+</Accordion>
+
+<Accordion title="AuthProvider Responsibilities">
+
+Our `AuthProvider` will handle:
+
+**1. Authentication State:**
+```jsx
+{
+  user: null | { id, name, email },  // Current user
+  token: null | string,              // Access token
+  isLoading: boolean                 // Loading state
+}
+```
+
+**2. Authentication Actions:**
+- `signIn(email, password)` - Sign in user
+- `signOut()` - Sign out user
+- `refreshToken()` - Refresh expired token
+
+**3. Side Effects:**
+- Fetch token on app load
+- Add token to API requests
+- Handle token expiration
+- Clear state on sign out
+
+**Think of it as:** A global authentication manager that every component can tap into.
+
+</Accordion>
+
+<Accordion title="Context Pattern Explained">
+
+**Three-part pattern:**
+
+```jsx
+// 1. CREATE CONTEXT
+const AuthContext = createContext(undefined);
+
+// 2. CREATE PROVIDER (wraps app)
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  
+  return (
+    <AuthContext.Provider value={{ user, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// 3. CREATE HOOK (access context)
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
+```
+
+**Usage in components:**
+
+```jsx
+function Navbar() {
+  const { user, signOut } = useAuth();  // Access auth!
+  
+  return (
+    <div>
+      {user ? (
+        <>
+          <span>Hi, {user.name}!</span>
+          <button onClick={signOut}>Sign Out</button>
+        </>
+      ) : (
+        <Link to="/sign-in">Sign In</Link>
+      )}
+    </div>
+  );
+}
+```
+
+**Benefits:**
+- No prop drilling
+- Clean component APIs
+- Centralized state management
+- Easy to test
+
+</Accordion>
+
+</Accordions>
+
+## Create AuthProvider Component
+
+Create a new file for the authentication provider:
+
+```jsx title="src/components/AuthProvider.jsx"
+import { createContext, useContext, useState } from 'react';
+
+// 1. Create Auth Context
+const AuthContext = createContext(undefined);
+
+// 2. Create useAuth Hook
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  
+  return context;
+};
+
+// 3. Create AuthProvider Component
+export const AuthProvider = ({ children }) => {
+  // Authentication state
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Sign in function
+  const signIn = async (email, password) => {
+    // TODO: Implement in later lesson
+    console.log('signIn called:', email);
+  };
+
+  // Sign out function
+  const signOut = () => {
+    setUser(null);
+    setToken(null);
+  };
+
+  // Context value provided to children
+  const value = {
+    user,
+    token,
+    isLoading,
+    signIn,
+    signOut,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+```
+
+## Understanding the Code
+
+<Tabs items={['Context Setup', 'State Management', 'Hook Pattern', 'Provider Pattern']}>
+
+<Tab value="Context Setup">
+
+**Creating the context:**
+
+```jsx
+const AuthContext = createContext(undefined);
+```
+
+**Why `undefined` as default?**
+
+This forces us to use the hook correctly. If someone tries to use `useAuth()` outside of `<AuthProvider>`, they'll get:
+
+```jsx
+const context = useContext(AuthContext);  // undefined
+if (context === undefined) {
+  throw new Error('useAuth must be used within an AuthProvider');
+}
+```
+
+**Better than `null` because:**
+- `null` could be a valid state (no user)
+- `undefined` clearly means "not wrapped in provider"
+- Catches setup errors early
+
+</Tab>
+
+<Tab value="State Management">
+
+**Three pieces of state:**
+
+```jsx
+const [user, setUser] = useState(null);
+const [token, setToken] = useState(null);
+const [isLoading, setIsLoading] = useState(true);
+```
+
+**Why each one:**
+
+**1. `user` (null | object)**
+```jsx
+// null = not signed in
+user = null
+
+// object = signed in
+user = {
+  id: '123',
+  name: 'John Doe',
+  email: 'john@example.com'
+}
+```
+
+**2. `token` (null | string)**
+```jsx
+// null = no auth token
+token = null
+
+// string = has auth token
+token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+```
+
+**3. `isLoading` (boolean)**
+```jsx
+// true = checking for existing session
+isLoading = true  // On app start
+
+// false = done checking
+isLoading = false  // After checking token
+```
+
+**Why start with `isLoading: true`?**
+
+When the app loads, we need to check if the user has an existing session (stored token). During this check, we show a loading state. Once the check completes, we set `isLoading` to `false`.
+
+</Tab>
+
+<Tab value="Hook Pattern">
+
+**Custom hook for accessing context:**
+
+```jsx
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  
+  return context;
+};
+```
+
+**Why this pattern?**
+
+**1. Error handling:**
+```jsx
+// ❌ Without hook:
+function Component() {
+  const auth = useContext(AuthContext);
+  // If outside provider, auth is undefined
+  // Might cause runtime errors later
+}
+
+// ✅ With hook:
+function Component() {
+  const auth = useAuth();
+  // Throws error immediately if outside provider
+  // Catches mistakes during development
+}
+```
+
+**2. Cleaner imports:**
+```jsx
+// ❌ Without hook:
+import { useContext } from 'react';
+import { AuthContext } from './AuthProvider';
+const auth = useContext(AuthContext);
+
+// ✅ With hook:
+import { useAuth } from './AuthProvider';
+const auth = useAuth();
+```
+
+**3. Abstraction:**
+If we change the internal implementation, components using `useAuth()` don't need updates.
+
+</Tab>
+
+<Tab value="Provider Pattern">
+
+**Provider component wraps children:**
+
+```jsx
+export const AuthProvider = ({ children }) => {
+  // State and functions...
+  
+  const value = {
+    user,
+    token,
+    isLoading,
+    signIn,
+    signOut,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+```
+
+**Key points:**
+
+**1. `children` prop:**
+```jsx
+<AuthProvider>
+  <App />  {/* This is children */}
+</AuthProvider>
+```
+
+**2. `value` object:**
+Everything in `value` is accessible via `useAuth()`:
+```jsx
+const { user, token, signIn, signOut } = useAuth();
+```
+
+**3. Provider renders children:**
+```jsx
+{children}  // Renders wrapped components
+```
+
+**Flow:**
+```
+AuthProvider
+  → Manages auth state
+  → Provides value to children
+  → Children can access via useAuth()
+```
+
+</Tab>
+
+</Tabs>
+
+## Placeholder Functions
+
+Notice the placeholder functions:
+
+```jsx
+const signIn = async (email, password) => {
+  // TODO: Implement in later lesson
+  console.log('signIn called:', email);
+};
+
+const signOut = () => {
+  setUser(null);
+  setToken(null);
+};
+```
+
+**Why not implement now?**
+
+We're building incrementally:
+1. **Lesson 1** - Create provider structure
+2. **Lesson 2** - Add to app
+3. **Lesson 3** - Fetch token on mount
+4. **Later** - Full sign-in implementation
+
+This approach helps you understand each piece before combining them.
+
+## Testing the Component
+
+Even though it's not connected yet, let's verify it compiles:
+
+<Steps>
+
+<Step>
+
+**Check file structure:**
+
+```
+src/
+├── components/
+│   └── AuthProvider.jsx  ← New file!
+```
+
+</Step>
+
+<Step>
+
+**Verify imports:**
+
+Make sure all imports are correct:
+- `createContext` from 'react'
+- `useContext` from 'react'
+- `useState` from 'react'
+
+</Step>
+
+<Step>
+
+**Check exports:**
+
+File should export:
+- `useAuth` hook
+- `AuthProvider` component
+
+</Step>
+
+</Steps>
+
+## What's Next?
+
+In the next lesson, we'll:
+1. Add `AuthProvider` to wrap our entire app
+2. Make auth state available to all components
+3. Test that `useAuth()` hook works
+
+<Callout type="success">
+**✅ Lesson Complete!** You've created the AuthProvider component with Context API!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Context API** provides global state without prop drilling
+- ✅ **Three-part pattern:** Context, Provider, Custom Hook
+- ✅ **AuthProvider** manages user, token, and loading state
+- ✅ **useAuth hook** provides safe access to auth context
+- ✅ **Error handling** catches misuse during development
+- ✅ **Placeholder functions** prepare for future implementation

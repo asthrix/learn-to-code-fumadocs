@@ -1,0 +1,583 @@
+---
+title: "L9: M3 Review"
+description: "Comprehensive review of useEffect, side effects, and async data patterns"
+---
+
+
+# Module 3 Review: Effects & Data Fetching
+
+Congratulations on completing Module 3! Let's review everything you've learned about `useEffect`, side effects, and handling asynchronous data in React.
+
+## What You've Learned
+
+Over the past 8 lessons, you've mastered:
+
+### Core Concepts
+- ✅ **useEffect hook** - Running side effects in functional components
+- ✅ **Dependency arrays** - Controlling when effects run
+- ✅ **Async/await** - Handling asynchronous operations in React
+- ✅ **Data fetching** - Loading data from APIs
+- ✅ **Loading states** - Showing feedback during async operations
+- ✅ **Error handling** - Gracefully handling failures
+- ✅ **Cleanup functions** - Preventing memory leaks and race conditions
+- ✅ **Custom hooks** - Extracting and reusing logic
+
+### Practical Skills
+- Built a mock API for development
+- Implemented data fetching with proper state management
+- Created reusable UI components (Spinner, ErrorMessage, ImageCarousel)
+- Handled edge cases and error scenarios
+- Used AbortController for request cancellation
+- Refactored complex components with custom hooks
+
+## useEffect Patterns Quick Reference
+
+<Accordions>
+
+<Accordion title="Pattern 1: Run Once on Mount">
+
+```jsx
+// [!code word:useEffect]
+useEffect(() => {
+  // This runs once when component mounts
+  console.log('Component mounted');
+  
+  // Fetch initial data, set up subscriptions, etc.
+}, []); // Empty array = run once
+```
+
+**Use cases:**
+- Fetching data on page load
+- Setting up event listeners
+- Initializing third-party libraries
+
+</Accordion>
+
+<Accordion title="Pattern 2: Run on Specific Changes">
+
+```jsx
+// [!code word:useEffect]
+useEffect(() => {
+  // This runs when userId changes
+  fetchUserData(userId);
+}, [userId]); // Runs when userId changes
+```
+
+**Use cases:**
+- Fetching data based on props/state
+- Syncing with external systems
+- Updating based on user actions
+
+</Accordion>
+
+<Accordion title="Pattern 3: Cleanup Function">
+
+```jsx
+// [!code word:useEffect]
+useEffect(() => {
+  const timer = setInterval(() => {
+    console.log('Tick');
+  }, 1000);
+  
+  // Cleanup runs before next effect and on unmount
+  return () => {
+    clearInterval(timer);
+  };
+}, []);
+```
+
+**Use cases:**
+- Clearing timers/intervals
+- Cancelling API requests
+- Removing event listeners
+- Cleaning up subscriptions
+
+</Accordion>
+
+<Accordion title="Pattern 4: Data Fetching with Cleanup">
+
+```jsx
+// [!code word:useEffect]
+useEffect(() => {
+  const controller = new AbortController();
+  
+  const fetchData = async () => {
+    try {
+      const data = await api.getData({ signal: controller.signal });
+      setData(data);
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        setError(error);
+      }
+    }
+  };
+  
+  fetchData();
+  
+  return () => controller.abort();
+}, []);
+```
+
+**Use cases:**
+- Fetching data with cancellation support
+- Preventing race conditions
+- Avoiding state updates on unmounted components
+
+</Accordion>
+
+</Accordions>
+
+## Common useEffect Pitfalls
+
+Learn from these common mistakes!
+
+<Accordions>
+
+<Accordion title="Pitfall 1: Missing Dependencies">
+
+**Problem:**
+
+```jsx
+// ❌ BAD - userId is missing from dependencies
+useEffect(() => {
+  fetchUser(userId);
+}, []); // Stale closure!
+```
+
+**Solution:**
+
+```jsx
+// ✅ GOOD - Include all dependencies
+useEffect(() => {
+  fetchUser(userId);
+}, [userId]);
+```
+
+**Why it matters:** Missing dependencies cause stale closures and bugs.
+
+</Accordion>
+
+<Accordion title="Pitfall 2: Infinite Loops">
+
+**Problem:**
+
+```jsx
+// ❌ BAD - No dependency array
+useEffect(() => {
+  setCount(count + 1); // Runs on every render, causing infinite loop!
+});
+```
+
+**Solution:**
+
+```jsx
+// ✅ GOOD - Specific dependencies
+useEffect(() => {
+  if (someCondition) {
+    setCount(count + 1);
+  }
+}, [someCondition]); // Only runs when condition changes
+```
+
+**Why it matters:** Missing dependency arrays cause infinite re-renders.
+
+</Accordion>
+
+<Accordion title="Pitfall 3: Forgetting Cleanup">
+
+**Problem:**
+
+```jsx
+// ❌ BAD - No cleanup for interval
+useEffect(() => {
+  setInterval(() => {
+    setCount(c => c + 1);
+  }, 1000);
+}, []); // Memory leak!
+```
+
+**Solution:**
+
+```jsx
+// ✅ GOOD - Clear interval on cleanup
+useEffect(() => {
+  const id = setInterval(() => {
+    setCount(c => c + 1);
+  }, 1000);
+  
+  return () => clearInterval(id);
+}, []);
+```
+
+**Why it matters:** Uncleaned effects cause memory leaks and bugs.
+
+</Accordion>
+
+<Accordion title="Pitfall 4: Using useEffect for Derived State">
+
+**Problem:**
+
+```jsx
+// ❌ BAD - Don't use useEffect to sync state
+const [price, setPrice] = useState(100);
+const [tax, setTax] = useState(0);
+
+useEffect(() => {
+  setTax(price * 0.1);
+}, [price]);
+```
+
+**Solution:**
+
+```jsx
+// ✅ GOOD - Calculate during render
+const [price, setPrice] = useState(100);
+const tax = price * 0.1; // No useEffect needed!
+```
+
+**Why it matters:** Derived state doesn't need useEffect - just calculate it!
+
+</Accordion>
+
+<Accordion title="Pitfall 5: Race Conditions">
+
+**Problem:**
+
+```jsx
+// ❌ BAD - Race condition possible
+useEffect(() => {
+  fetchUser(userId).then(user => {
+    setUser(user); // May update with old userId!
+  });
+}, [userId]);
+```
+
+**Solution:**
+
+```jsx
+// ✅ GOOD - Use cleanup to prevent race conditions
+useEffect(() => {
+  let cancelled = false;
+  
+  fetchUser(userId).then(user => {
+    if (!cancelled) {
+      setUser(user);
+    }
+  });
+  
+  return () => {
+    cancelled = true;
+  };
+}, [userId]);
+```
+
+**Why it matters:** Async operations can complete out of order.
+
+</Accordion>
+
+</Accordions>
+
+## When to Use useEffect
+
+<Tabs items={['DO Use useEffect', 'DON\'T Use useEffect']}>
+
+<Tab value="DO Use useEffect">
+
+**✅ Use useEffect for:**
+
+1. **Data fetching**
+   ```jsx
+   useEffect(() => {
+     fetchData();
+   }, []);
+   ```
+
+2. **Subscriptions**
+   ```jsx
+   useEffect(() => {
+     const sub = api.subscribe(callback);
+     return () => sub.unsubscribe();
+   }, []);
+   ```
+
+3. **Timers**
+   ```jsx
+   useEffect(() => {
+     const id = setTimeout(doSomething, 1000);
+     return () => clearTimeout(id);
+   }, []);
+   ```
+
+4. **DOM manipulation**
+   ```jsx
+   useEffect(() => {
+     document.title = `Page: ${page}`;
+   }, [page]);
+   ```
+
+5. **Event listeners**
+   ```jsx
+   useEffect(() => {
+     window.addEventListener('resize', handleResize);
+     return () => window.removeEventListener('resize', handleResize);
+   }, []);
+   ```
+
+6. **Syncing with external systems**
+   ```jsx
+   useEffect(() => {
+     map.setCenter(coordinates);
+   }, [coordinates]);
+   ```
+
+</Tab>
+
+<Tab value="DON'T Use useEffect">
+
+**❌ DON'T use useEffect for:**
+
+1. **Derived state** (calculate during render)
+   ```jsx
+   // ❌ Don't
+   useEffect(() => {
+     setTotal(price * quantity);
+   }, [price, quantity]);
+   
+   // ✅ Do
+   const total = price * quantity;
+   ```
+
+2. **Event handlers** (use event handler functions)
+   ```jsx
+   // ❌ Don't
+   useEffect(() => {
+     if (clicked) handleClick();
+   }, [clicked]);
+   
+   // ✅ Do
+   <button onClick={handleClick}>Click</button>
+   ```
+
+3. **Transforming data for render** (transform during render)
+   ```jsx
+   // ❌ Don't
+   useEffect(() => {
+     setFilteredUsers(users.filter(u => u.active));
+   }, [users]);
+   
+   // ✅ Do
+   const filteredUsers = users.filter(u => u.active);
+   ```
+
+4. **Initializing state** (use default state or useMemo)
+   ```jsx
+   // ❌ Don't
+   useEffect(() => {
+     setInitialData(expensiveComputation());
+   }, []);
+   
+   // ✅ Do
+   const [data] = useState(() => expensiveComputation());
+   ```
+
+</Tab>
+
+</Tabs>
+
+## Best Practices Summary
+
+<Callout type="info" title="useEffect Best Practices">
+
+1. **Always specify dependencies** - Include every value used in the effect
+2. **Always clean up** - Return cleanup function for timers, subscriptions, requests
+3. **Use functional updates** - Use `setState(prev => ...)` for state in dependencies
+4. **Keep effects focused** - One effect per concern, split complex effects
+5. **Handle loading/error states** - Always show feedback to users
+6. **Cancel requests** - Use AbortController for fetch requests
+7. **Avoid race conditions** - Use cleanup flags or AbortController
+8. **Consider custom hooks** - Extract reusable logic into custom hooks
+
+</Callout>
+
+## Data Fetching Pattern Checklist
+
+When implementing data fetching, make sure you:
+
+- ✅ Use `useEffect` with empty array for initial fetch
+- ✅ Add `isLoading` state that starts as `true`
+- ✅ Add `error` state for error handling
+- ✅ Wrap fetch in async function inside effect
+- ✅ Use `try/catch/finally` for proper error handling
+- ✅ Set `isLoading = false` in `finally` block
+- ✅ Clear previous errors before new fetch
+- ✅ Add cleanup function with AbortController
+- ✅ Check for AbortError in catch block
+- ✅ Show loading UI while fetching
+- ✅ Show error UI with retry option if failed
+- ✅ Handle empty results gracefully
+
+## Module 3 Component Architecture
+
+Here's how the components we built fit together:
+
+```
+HomePage
+├── Spinner (loading state)
+├── ErrorMessage (error state)
+└── ListingCard (for each listing)
+    └── ImageCarousel (image display)
+        ├── Navigation buttons
+        └── Slide indicators
+
+Custom Hooks
+├── useFetchListings (data fetching logic)
+└── useFilteredListings (filtering logic)
+
+API Layer
+└── mockApi.js
+    ├── getAllListings()
+    ├── getListingById()
+    ├── searchListings()
+    └── filterListings()
+```
+
+## Self-Assessment Quiz
+
+Test your understanding! Try to answer these before expanding:
+
+<Accordions>
+
+<Accordion title="Question 1: When does useEffect run?">
+
+**Answer:**
+
+- **With `[]` (empty array)**: Once after first render (mount)
+- **With `[dep1, dep2]`**: After first render and whenever dependencies change
+- **With no array**: After every render (usually not what you want!)
+- **Cleanup function**: Before next effect run and on unmount
+
+</Accordion>
+
+<Accordion title="Question 2: Why use AbortController?">
+
+**Answer:**
+
+AbortController prevents:
+- **Race conditions**: Old requests completing after new ones
+- **Memory leaks**: Setting state on unmounted components
+- **Wasted resources**: Completing requests no longer needed
+
+```jsx
+const controller = new AbortController();
+fetch(url, { signal: controller.signal });
+return () => controller.abort(); // Cleanup
+```
+
+</Accordion>
+
+<Accordion title="Question 3: What's wrong with this code?">
+
+```jsx
+useEffect(() => {
+  fetchData(userId);
+}, []); // userId is missing!
+```
+
+**Answer:**
+
+Missing dependency! `userId` should be in the dependency array:
+
+```jsx
+useEffect(() => {
+  fetchData(userId);
+}, [userId]); // ✅ Correct
+```
+
+Without it, the effect uses the `userId` from the first render forever (stale closure).
+
+</Accordion>
+
+<Accordion title="Question 4: When should you create a custom hook?">
+
+**Answer:**
+
+Create a custom hook when:
+- Logic is reused across multiple components
+- Component becomes too complex (100+ lines)
+- You want to separate concerns (data fetching vs. UI)
+- Logic contains useState + useEffect patterns
+- You want to make code testable
+
+Remember: Start with "use" and return what components need!
+
+</Accordion>
+
+<Accordion title="Question 5: How do you prevent infinite loops?">
+
+**Answer:**
+
+Infinite loops happen when:
+1. Missing dependency array (runs on every render)
+2. Updating state without conditions
+3. Objects/arrays in dependencies that are recreated
+
+**Solutions:**
+- Always provide dependency array
+- Add conditions before state updates
+- Use useCallback/useMemo for object/array dependencies
+- Extract values from objects (use `user.id` instead of `user`)
+
+</Accordion>
+
+</Accordions>
+
+## What You Can Build Now
+
+With Module 3 complete, you can build:
+
+- 📱 **Data-driven applications** with API fetching
+- 🎨 **Interactive components** with timers and animations
+- 🔄 **Auto-updating UIs** with subscriptions
+- 🎠 **Image carousels** and sliders
+- 🔍 **Search interfaces** with debouncing
+- 📊 **Dashboards** with real-time data
+- 🎯 **Forms with validation** and async submission
+
+## Preview: Module 4 - React Router
+
+In the next module, you'll learn:
+
+- **Client-side routing** - Building multi-page SPAs
+- **Route parameters** - Dynamic URLs like `/listing/:id`
+- **Nested routes** - Complex page layouts
+- **Navigation** - Links, redirects, and programmatic navigation
+- **Route protection** - Authentication and guards
+- **Data loading** - Fetching data based on routes
+
+Get ready to build a complete multi-page booking application!
+
+<Callout type="success" title="You've Mastered useEffect!">
+
+You now understand:
+- How side effects work in React
+- When and how to use useEffect
+- How to handle async data properly
+- How to prevent common bugs (race conditions, memory leaks)
+- How to write clean, reusable code with custom hooks
+
+Take the Module Challenge next to solidify these skills!
+
+</Callout>
+
+## What's Next?
+
+Ready to test your knowledge? The **Module 3 Challenge** awaits!
+
+You'll build a complete feature that combines everything from this module:
+- Data fetching with loading and error states
+- Pagination for browsing listings
+- Refresh button with proper cleanup
+- Response caching to reduce API calls
+- Bonus challenges: infinite scroll, search debouncing, optimistic updates
+
+This is your chance to prove you've mastered React effects and async data!

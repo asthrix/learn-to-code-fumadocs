@@ -1,0 +1,842 @@
+---
+title: "L16: Add Sign-Out Button"
+description: "Implement sign-out functionality"
+---
+
+# Add Sign-Out Button
+
+Let's complete the authentication system with sign-out functionality! 👋
+
+## Why Sign-Out Matters
+
+**Security reasons:**
+
+```
+Shared computers: Next user shouldn't access your account
+Public WiFi: Close session when leaving
+Work computers: Don't leave account open
+Privacy: End session when done
+```
+
+**User control:**
+
+```
+Switch accounts: Sign out of one, into another
+Testing: Developers need to test both states
+Troubleshooting: "Have you tried signing out and back in?"
+Peace of mind: User controls their session
+```
+
+## Add Sign-Out Button to Navbar
+
+Update Navbar with sign-out functionality:
+
+```jsx title="src/components/Navbar.jsx"
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+
+function Navbar() {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  return (
+    <nav className="navbar">
+      {/* Brand */}
+      <Link to="/" className="nav-brand">
+        🏖️ Holidaze
+      </Link>
+
+      {/* Navigation Links */}
+      <div className="nav-links">
+        <Link to="/">Home</Link>
+        <Link to="/venues">Venues</Link>
+
+        {user ? (
+          <>
+            {/* Authenticated links */}
+            <Link to="/bookings">My Bookings</Link>
+            <Link to="/favorites">Favorites</Link>
+            <Link to="/venues/create">List Venue</Link>
+
+            {/* User dropdown */}
+            <div className="nav-user-menu">
+              <button className="nav-user-button">
+                <img 
+                  src={user.avatar?.url || '/default-avatar.png'} 
+                  alt={user.name}
+                  className="nav-user-avatar"
+                />
+                <span className="nav-user-name">{user.name}</span>
+                <span className="nav-user-icon">▼</span>
+              </button>
+
+              {/* Dropdown menu */}
+              <div className="nav-user-dropdown">
+                <Link to="/profile" className="dropdown-item">
+                  <span className="dropdown-icon">👤</span>
+                  Profile
+                </Link>
+                <Link to="/settings" className="dropdown-item">
+                  <span className="dropdown-icon">⚙️</span>
+                  Settings
+                </Link>
+                <Link to="/bookings" className="dropdown-item">
+                  <span className="dropdown-icon">📅</span>
+                  My Bookings
+                </Link>
+                <hr className="dropdown-divider" />
+                <button 
+                  onClick={handleSignOut}
+                  className="dropdown-item dropdown-item-danger"
+                >
+                  <span className="dropdown-icon">🚪</span>
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Guest links */}
+            <Link to="/sign-in" className="nav-link-secondary">
+              Sign In
+            </Link>
+            <Link to="/sign-up" className="nav-link-primary">
+              Sign Up
+            </Link>
+          </>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+```
+
+## Add Navbar Dropdown Styling
+
+Style the user dropdown menu:
+
+```css title="src/app/global.css"
+/* User Menu */
+.nav-user-menu {
+  position: relative;
+}
+
+.nav-user-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-user-button:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.nav-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.nav-user-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.nav-user-icon {
+  font-size: 0.75rem;
+  color: #6b7280;
+  transition: transform 0.2s;
+}
+
+.nav-user-menu:hover .nav-user-icon {
+  transform: rotate(180deg);
+}
+
+/* Dropdown */
+.nav-user-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 200px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s;
+  z-index: 1000;
+}
+
+.nav-user-menu:hover .nav-user-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown Items */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: #f3f4f6;
+}
+
+.dropdown-icon {
+  font-size: 1.125rem;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dropdown-item-danger {
+  color: #dc2626;
+}
+
+.dropdown-item-danger:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .nav-user-name {
+    display: none;
+  }
+
+  .nav-user-button {
+    padding: 0.5rem;
+  }
+}
+```
+
+## Update AuthContext signOut
+
+Ensure sign-out clears all state:
+
+```jsx title="src/contexts/AuthContext.jsx"
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '@/lib/api';
+import { tokenStore } from '@/lib/tokenStore';
+
+// ... (previous code)
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // ... (previous useEffects and signIn)
+
+  const signOut = async () => {
+    try {
+      // Call logout endpoint (clears refresh token cookie)
+      await api.post('/auth/logout');
+    } catch (error) {
+      // Even if API call fails, sign out locally
+      console.error('Logout error:', error);
+    } finally {
+      // Clear local state
+      setUser(null);
+      setToken(null);
+      
+      // Clear token store
+      tokenStore.clearToken();
+      
+      // Redirect to home
+      navigate('/', { replace: true });
+    }
+  };
+
+  const value = { user, token, isLoading, signIn, signOut };
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+```
+
+## Understanding Sign-Out Flow
+
+<Tabs items={['Complete Flow', 'State Cleanup', 'API Call', 'Redirect Strategy']}>
+
+<Tab value="Complete Flow">
+
+**Step-by-step sign-out:**
+
+```
+1. User clicks "Sign Out" button
+   handleSignOut() triggered
+
+2. Call signOut() from AuthContext
+   await signOut();
+
+3. Make API call to logout endpoint
+   await api.post('/auth/logout');
+   → Server invalidates refresh token
+   → Cookie deleted/marked invalid
+
+4. Clear local state
+   setUser(null);
+   setToken(null);
+   tokenStore.clearToken();
+
+5. Redirect to homepage
+   navigate('/', { replace: true });
+
+6. Navbar re-renders
+   user === null
+   → Shows "Sign In" and "Sign Up" links
+
+7. Protected routes now inaccessible
+   User visits /favorites
+   → Protected checks: user === null
+   → Redirects to /sign-in
+```
+
+**Timeline:**
+
+```
+0ms:  User clicks "Sign Out"
+10ms: signOut() starts
+20ms: API call to /auth/logout
+50ms: Server responds
+60ms: Clear state (user, token)
+65ms: Navigate to /
+70ms: Navbar updates (no user)
+```
+
+</Tab>
+
+<Tab value="State Cleanup">
+
+**What needs to be cleared:**
+
+```jsx
+// 1. React state
+setUser(null);
+setToken(null);
+
+// 2. Token store (for interceptor)
+tokenStore.clearToken();
+
+// 3. Any cached data (if applicable)
+queryClient.clear();  // React Query
+dispatch(clearCache());  // Redux
+
+// 4. localStorage (if used)
+localStorage.removeItem('preferences');
+
+// 5. sessionStorage
+sessionStorage.clear();
+```
+
+**Why each matters:**
+
+```jsx
+// user state
+setUser(null);
+// → Navbar shows guest links
+// → Protected routes redirect
+// → Conditional content hidden
+
+// token state
+setToken(null);
+// → Context value updated
+// → Components re-render
+
+// tokenStore
+tokenStore.clearToken();
+// → Interceptor won't add Authorization header
+// → Future API calls won't include token
+
+// Redirect
+navigate('/', { replace: true });
+// → User sees public homepage
+// → Back button doesn't return to protected page
+```
+
+**Cleanup order:**
+
+```jsx
+// ✅ Correct order
+await api.post('/auth/logout');  // 1. Server first
+setUser(null);                   // 2. Then local state
+setToken(null);
+tokenStore.clearToken();
+navigate('/');                   // 3. Finally redirect
+
+// ❌ Wrong order
+navigate('/');                   // Redirect first
+await api.post('/auth/logout');  // Server call after redirect
+setUser(null);                   // State cleared after user left
+// User might see flash of old state!
+```
+
+</Tab>
+
+<Tab value="API Call">
+
+**Logout endpoint:**
+
+```jsx
+await api.post('/auth/logout');
+```
+
+**What server does:**
+
+```
+1. Validates refresh token from cookie
+2. Marks token as invalid in database
+3. Deletes/expires refresh token cookie
+4. Returns success response
+```
+
+**Response format:**
+
+```js
+// Success (200)
+{
+  message: "Successfully logged out"
+}
+
+// Cookie header
+Set-Cookie: refreshToken=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT
+```
+
+**Handle errors:**
+
+```jsx
+const signOut = async () => {
+  try {
+    await api.post('/auth/logout');
+  } catch (error) {
+    // Server error, network error, etc.
+    console.error('Logout error:', error);
+    
+    // Still sign out locally (important!)
+    // User shouldn't stay signed in if they tried to sign out
+  } finally {
+    // Always clear local state
+    setUser(null);
+    setToken(null);
+    tokenStore.clearToken();
+    navigate('/', { replace: true });
+  }
+};
+```
+
+**Why `finally` block?**
+
+```
+Scenario 1: API succeeds
+  → Clear state
+  → Redirect
+
+Scenario 2: API fails (network error)
+  → Still clear state (user wants to sign out!)
+  → Redirect
+
+finally ensures sign-out happens either way
+```
+
+</Tab>
+
+<Tab value="Redirect Strategy">
+
+**Where to redirect after sign-out:**
+
+```jsx
+// Option 1: Homepage (most common)
+navigate('/', { replace: true });
+
+// Option 2: Sign-in page
+navigate('/sign-in', { replace: true });
+
+// Option 3: Stay on same page (if public)
+// Don't navigate, just clear state
+// Only works if current page is public!
+
+// Option 4: Last public page
+const lastPublicPage = getLastPublicPage();
+navigate(lastPublicPage, { replace: true });
+```
+
+**Choosing the right redirect:**
+
+```jsx
+const signOut = async () => {
+  const currentPath = location.pathname;
+  const publicPaths = ['/', '/about', '/venues', '/contact'];
+  const isCurrentPublic = publicPaths.includes(currentPath);
+
+  // Clear state...
+
+  if (isCurrentPublic) {
+    // Stay on current page
+    // No navigation needed
+  } else {
+    // Was on protected page, go home
+    navigate('/', { replace: true });
+  }
+};
+```
+
+**Why `replace: true`:**
+
+```
+Without replace:
+  User on /profile
+  Clicks "Sign Out"
+  History: [/profile, /]
+  Clicks back
+  → /profile (but not signed in!)
+  → Redirects to /sign-in
+  Confusing! ❌
+
+With replace:
+  User on /profile
+  Clicks "Sign Out"
+  History: [/] (replaced /profile)
+  Clicks back
+  → Previous page before /profile
+  Clean! ✅
+```
+
+</Tab>
+
+</Tabs>
+
+## Alternative Sign-Out Patterns
+
+<Accordions>
+
+<Accordion title="Simple Sign-Out Button (No Dropdown)">
+
+**For minimal UI:**
+
+```jsx
+function Navbar() {
+  const { user, signOut } = useAuth();
+
+  return (
+    <nav className="navbar">
+      {/* ... other links */}
+
+      {user ? (
+        <>
+          <Link to="/profile">
+            <img src={user.avatar?.url} alt={user.name} />
+            {user.name}
+          </Link>
+          <button onClick={signOut} className="sign-out-button">
+            Sign Out
+          </button>
+        </>
+      ) : (
+        <Link to="/sign-in">Sign In</Link>
+      )}
+    </nav>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="Confirm Before Sign-Out">
+
+**Prevent accidental sign-out:**
+
+```jsx
+import { useState } from 'react';
+
+function Navbar() {
+  const { signOut } = useAuth();
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleSignOut = () => {
+    setShowConfirm(true);
+  };
+
+  const confirmSignOut = async () => {
+    setShowConfirm(false);
+    await signOut();
+  };
+
+  return (
+    <>
+      <nav className="navbar">
+        {/* ... */}
+        <button onClick={handleSignOut}>Sign Out</button>
+      </nav>
+
+      {/* Confirmation modal */}
+      {showConfirm && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Sign Out?</h2>
+            <p>Are you sure you want to sign out?</p>
+            <div className="modal-actions">
+              <button onClick={confirmSignOut}>Yes, Sign Out</button>
+              <button onClick={() => setShowConfirm(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="Sign-Out with Toast Notification">
+
+**Provide feedback:**
+
+```jsx
+import { toast } from 'react-hot-toast';
+
+function Navbar() {
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success('Successfully signed out');
+    } catch (error) {
+      toast.error('Error signing out. Please try again.');
+    }
+  };
+
+  return (
+    <nav className="navbar">
+      {/* ... */}
+      <button onClick={handleSignOut}>Sign Out</button>
+    </nav>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="Auto Sign-Out on Inactivity">
+
+**Security feature for public computers:**
+
+```jsx
+import { useEffect, useRef } from 'react';
+
+export const AuthProvider = ({ children }) => {
+  const { signOut } = useAuth();
+  const timeoutRef = useRef(null);
+  const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+  const resetTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      signOut();
+      toast.info('Signed out due to inactivity');
+    }, INACTIVITY_TIMEOUT);
+  };
+
+  useEffect(() => {
+    // Track user activity
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    
+    events.forEach(event => {
+      document.addEventListener(event, resetTimeout);
+    });
+
+    // Start timeout
+    resetTimeout();
+
+    // Cleanup
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, resetTimeout);
+      });
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  // ... rest of provider
+};
+```
+
+</Accordion>
+
+</Accordions>
+
+## Testing Sign-Out
+
+<Steps>
+
+<Step>
+
+**Sign in first:**
+
+1. Navigate to `/sign-in`
+2. Sign in with valid credentials
+3. Verify you're signed in (Navbar shows user menu)
+
+</Step>
+
+<Step>
+
+**Test sign-out button:**
+
+1. Hover over user menu
+2. Dropdown should appear
+3. Click "Sign Out"
+4. Should redirect to `/` (homepage)
+
+✅ **Sign-out button works!**
+
+</Step>
+
+<Step>
+
+**Verify state cleared:**
+
+1. Check Navbar: Should show "Sign In" and "Sign Up" links
+2. Open React DevTools
+3. Find AuthContext.Provider
+4. Check value:
+   - `user`: should be `null`
+   - `token`: should be `null`
+
+✅ **State cleared!**
+
+</Step>
+
+<Step>
+
+**Test protected route access:**
+
+1. After signing out, visit `/favorites`
+2. Should redirect to `/sign-in`
+3. Should show message: "Please sign in to access /favorites"
+
+✅ **Protected routes blocked!**
+
+</Step>
+
+<Step>
+
+**Test API calls without token:**
+
+1. Open Network tab
+2. After sign-out, trigger API call
+3. Check request headers
+4. Should NOT have `Authorization` header
+
+✅ **Token removed from requests!**
+
+</Step>
+
+<Step>
+
+**Test cookie deletion:**
+
+1. Sign in
+2. Open DevTools → Application → Cookies
+3. Find `refreshToken` cookie
+4. Sign out
+5. Cookie should be deleted or expired
+
+✅ **Refresh token removed!**
+
+</Step>
+
+</Steps>
+
+## Module 7 Complete! 🎉
+
+<Callout type="success">
+**🎉 Congratulations!** You've completed Module 7: Forms & Authentication!
+</Callout>
+
+**What you've learned:**
+
+1. ✅ **Context API** for global state management
+2. ✅ **React Hook Form** for powerful form handling
+3. ✅ **Zod validation** for type-safe schemas
+4. ✅ **JWT authentication** with access + refresh tokens
+5. ✅ **Axios interceptors** for automatic token management
+6. ✅ **Token refresh** for seamless re-authentication
+7. ✅ **Protected routes** with route guards
+8. ✅ **Smart redirects** for great UX
+9. ✅ **Sign-out functionality** with complete cleanup
+
+**Your authentication system now includes:**
+
+- 🔐 Secure sign-in with validation
+- 🎫 JWT token management (access + refresh)
+- 🔄 Automatic token refresh
+- 🛡️ Protected routes with guards
+- 🎯 Smart redirects after sign-in
+- 👋 Clean sign-out flow
+- 🔒 HTTP-only cookies for security
+- ⚡ Axios request/response interceptors
+- 📱 Responsive, accessible UI
+
+**Next steps:**
+
+Continue to Module 8 or practice by:
+- Adding password reset flow
+- Implementing social sign-in
+- Adding email verification
+- Creating admin dashboards
+- Building role-based permissions
+
+## Key Takeaways
+
+- ✅ **Sign-out button** in user dropdown menu
+- ✅ **Hover dropdown** for user menu
+- ✅ **API call** invalidates refresh token on server
+- ✅ **Clear all state** (user, token, token store)
+- ✅ **Redirect to homepage** with replace
+- ✅ **Finally block** ensures sign-out happens
+- ✅ **Protected routes** immediately inaccessible
+- ✅ **Navbar updates** to show guest links
+- ✅ **Back button** doesn't return to protected pages
+- ✅ **Complete cleanup** leaves no stale data

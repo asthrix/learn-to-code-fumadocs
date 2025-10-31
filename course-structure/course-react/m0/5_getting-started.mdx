@@ -1,0 +1,379 @@
+---
+title: "Getting Started"
+description:
+   "Bootstrap your first React project and understand the file structure"
+---
+
+# Getting Started
+
+<div className='flex gap-2 mb-4 flex-wrap'>
+   <Badge variant='primary'>Lesson 5 of 5</Badge>
+   <Badge>5 min read</Badge>
+</div>
+
+Let's create your first React project using Vite, a modern build tool that
+provides an incredibly fast development experience.
+
+## Why Vite?
+
+**Vite** (French for "fast") is a next-generation build tool that offers:
+
+-  ⚡ **Instant server start** - No bundling required
+-  🔥 **Lightning-fast HMR** - Hot Module Replacement
+-  📦 **Optimized builds** - Pre-configured production builds
+-  🎯 **Modern by default** - ES modules, TypeScript support
+-  🛠️ **Simple configuration** - Works out of the box
+
+## Creating Your Project
+
+<Steps>
+   <Step>
+      ### Open Your Terminal Navigate to where you want to create your project
+   </Step>
+   <Step>### Run the Create Command Execute the Vite creation command</Step>
+   <Step>### Answer the Prompts Configure your project settings</Step>
+   <Step>### Install Dependencies Install required packages</Step>
+   <Step>### Start Development Server Run your React application</Step>
+</Steps>
+
+### Step-by-Step Instructions
+
+**1. Open your terminal** and navigate to your projects folder:
+
+   ```bash cd ~/projects # or wherever you keep your projects ```
+
+**2. Create a new Vite project:**
+
+   ```bash npm create vite@latest booking-app ```
+
+**3. Answer the prompts:**
+
+<Tabs items={["Recommended", "Alternative"]}>
+   <Tab value='Recommended'>
+      ``` ? Select a framework: › React ? Select a variant: › JavaScript ```
+      We'll use JavaScript for simplicity. You can use TypeScript later once
+      you're comfortable with React.
+   </Tab>
+
+   <Tab value='Alternative'>
+      ``` ? Select a framework: › React ? Select a variant: › TypeScript ```
+      Choose TypeScript if you're already familiar with it. The course examples
+      work with both.
+   </Tab>
+</Tabs>
+
+**4. Navigate into your project:**
+
+```bash
+cd booking-app 
+```
+
+**5. Install dependencies:**
+
+```bash
+npm install 
+```
+
+This downloads all required packages. It might take a minute.
+
+**6. Start the development server:**
+
+```bash
+npm run dev 
+```
+
+You should see output like:
+
+```
+  VITE v5.0.0  ready in 234 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+```
+
+**7. Open in your browser:**
+
+Visit `http://localhost:5173/` and you should see the Vite + React welcome
+screen!
+
+## Project Structure
+
+Let's understand what Vite created for you:
+
+<Files>
+   <Folder name='booking-app' defaultOpen>
+      <Folder name='public'>
+         <File name='vite.svg' icon='🖼️' />
+      </Folder>
+      <Folder name='src' defaultOpen>
+         <File name='App.css' icon='🎨' />
+         <File name='App.jsx' icon='⚛️' />
+         <File name='index.css' icon='🎨' />
+         <File name='main.jsx' icon='⚛️' />
+      </Folder>
+      <Folder name='node_modules'>
+         <File name='...' icon='📦' />
+      </Folder>
+      <File name='.gitignore' icon='📄' />
+      <File name='index.html' icon='📄' />
+      <File name='package.json' icon='📦' />
+      <File name='vite.config.js' icon='⚙️' />
+   </Folder>
+</Files>
+
+### Important Files Explained
+
+<Steps>
+  <Step>
+    ### `index.html`
+    The entry point of your application. Contains the root `<div>` where React renders.
+    
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vite + React</title>
+      </head>
+      <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.jsx"></script>
+      </body>
+    </html>
+    ```
+  </Step>
+  
+  <Step>
+    ### `src/main.jsx`
+    Renders your React app into the DOM. This is where React takes control.
+    
+    ```jsx
+    import React from 'react'
+    import ReactDOM from 'react-dom/client'
+    import App from './App.jsx'
+    import './index.css'
+
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>,
+    )
+    ```
+
+    **What's happening:**
+    - `ReactDOM.createRoot()` - Creates a React root
+    - `document.getElementById('root')` - Finds the root div
+    - `.render()` - Renders the App component
+    - `<React.StrictMode>` - Enables development checks
+
+  </Step>
+  
+  <Step>
+    ### `src/App.jsx`
+    Your main component. This is where you'll start building.
+    
+    ```jsx
+    import { useState } from 'react'
+    import './App.css'
+
+    function App() {
+      const [count, setCount] = useState(0)
+
+      return (
+        <div className="App">
+          <h1>Vite + React</h1>
+          <button onClick={() => setCount(count + 1)}>
+            count is {count}
+          </button>
+        </div>
+      )
+    }
+
+    export default App
+    ```
+
+  </Step>
+  
+  <Step>
+    ### `package.json`
+    Defines your project dependencies and scripts.
+    
+    ```json
+    {
+      "name": "booking-app",
+      "private": true,
+      "version": "0.0.0",
+      "type": "module",
+      "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+      },
+      "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+      },
+      "devDependencies": {
+        "@vitejs/plugin-react": "^4.2.1",
+        "vite": "^5.0.0"
+      }
+    }
+    ```
+    
+    **Scripts:**
+    - `npm run dev` - Start development server
+    - `npm run build` - Build for production
+    - `npm run preview` - Preview production build
+  </Step>
+  
+  <Step>
+    ### `vite.config.js`
+    Vite configuration file. Usually you don't need to touch this.
+    
+    ```javascript
+    import { defineConfig } from 'vite'
+    import react from '@vitejs/plugin-react'
+
+    export default defineConfig({
+      plugins: [react()],
+    })
+    ```
+
+  </Step>
+</Steps>
+
+## Understanding the Flow
+
+Here's how your React app works:
+
+```
+1. Browser loads index.html
+         ↓
+2. HTML loads src/main.jsx
+         ↓
+3. main.jsx imports App component
+         ↓
+4. App component is rendered
+         ↓
+5. React injects App into #root div
+         ↓
+6. You see your application!
+```
+
+## Testing Your Setup
+
+Let's make a simple change to verify everything works:
+
+**1. Open `src/App.jsx` in VS Code**
+
+**2. Change the heading:**
+
+```jsx
+function App() {
+  const [count, setCount] = useState(0)
+
+return ( <div className="App"> <h1>My Booking App</h1> {/* Changed this line */}
+
+<button onClick={() => setCount(count + 1)}> count is {count} </button> </div> )
+}
+
+````
+
+**3. Save the file**
+
+Your browser should **automatically update** without refreshing! This is Hot Module Replacement (HMR) in action.
+
+**4. Click the button** a few times to see the counter increment. This is React state in action!
+
+## Common Issues
+
+<Steps>
+  <Step>
+    ### Port Already in Use
+
+    **Error:** `Port 5173 is already in use`
+
+    **Solution:**
+    - Kill the process using that port, or
+    - Vite will automatically use the next available port
+    - Check the terminal for the actual URL
+  </Step>
+
+  <Step>
+    ### npm Command Not Found
+
+    **Error:** `command not found: npm`
+
+    **Solution:**
+    - Ensure Node.js is installed
+    - Restart your terminal
+    - Check with `node --version`
+  </Step>
+
+  <Step>
+    ### Module Not Found
+
+    **Error:** `Cannot find module 'react'`
+
+    **Solution:**
+    - Run `npm install` again
+    - Delete `node_modules` and run `npm install`
+    - Check you're in the correct directory
+  </Step>
+</Steps>
+
+## Development Workflow
+
+Here's your typical development workflow:
+
+**1. Start the dev server:**
+```bash
+npm run dev
+````
+
+**2. Open your browser** to the provided URL
+
+**3. Open your code editor** (VS Code)
+
+**4. Make changes** to your code
+
+**5. Watch updates** appear instantly in the browser
+
+**6. Stop the server** when done (Ctrl+C)
+
+## Module 0 Complete! 🎉
+
+Congratulations! You've completed Module 0. You now have:
+
+-  ✅ Development environment set up
+-  ✅ Understanding of what React is
+-  ✅ React project created with Vite
+-  ✅ Dev server running
+-  ✅ Made your first code change
+
+## What's Next?
+
+In **Module 1: React Fundamentals**, you'll learn:
+
+-  How to create React components
+-  Understanding JSX syntax
+-  Working with props
+-  Component composition
+-  Building the homepage structure
+
+<div className='flex gap-2 mt-6 flex-wrap'>
+   <a
+      href='/docs/react/m0/4_project-overview'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4'
+   >
+      ← Lesson 4: Project Overview
+   </a>
+   <a
+      href='/docs/react/m1'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8'
+   >
+      Start Module 1 →
+   </a>
+</div>

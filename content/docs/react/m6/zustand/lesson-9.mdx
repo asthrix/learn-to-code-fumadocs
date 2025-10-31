@@ -1,0 +1,343 @@
+---
+title: "L9: Add Navbar to App"
+description: "Integrate the Navbar into the application layout"
+---
+
+# Add Navbar to App
+
+Let's add the Navbar to our application! 🎨
+
+## Step 1: Update App.jsx
+
+Add the Navbar to your app layout:
+
+```jsx title="src/App.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="app">
+        {/* Navbar appears on all pages */}
+        <Navbar />
+        
+        {/* Main content area */}
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+## Step 2: Add Layout Styling
+
+```css title="src/app/global.css"
+/* App Layout */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f9fafb;
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 2rem;
+}
+
+/* Global Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+```
+
+## Test Navigation
+
+Now test your navigation:
+
+1. Start on HomePage (/)
+2. Click "Favorites" in navbar
+3. URL changes to `/favorites`
+4. Page shows FavoritesPage
+5. Click "Home" in navbar
+6. URL changes to `/`
+7. Page shows HomePage
+8. Navbar stays visible on both pages! ✅
+
+## Why This Layout Works
+
+<Accordions>
+
+<Accordion title="Persistent Navbar">
+
+**Navbar outside Routes:**
+
+```jsx
+<BrowserRouter>
+  <Navbar />  {/* Renders once, stays mounted */}
+  <Routes>
+    <Route path="/" element={<HomePage />} />
+    <Route path="/favorites" element={<FavoritesPage />} />
+  </Routes>
+</BrowserRouter>
+```
+
+**What happens when navigating:**
+
+```
+User clicks "Favorites" link
+↓
+Router changes route to /favorites
+↓
+HomePage unmounts, FavoritesPage mounts
+↓
+Navbar stays mounted (doesn't re-render!)
+↓
+Navbar updates active link (useLocation detects change)
+```
+
+**Navbar persists across pages!** No re-mounting. ✨
+
+</Accordion>
+
+<Accordion title="Why Zustand is Perfect Here">
+
+**The problem with local state:**
+
+```jsx
+// ❌ Bad: Navbar re-mounts, loses state
+<Routes>
+  <Route path="/" element={
+    <>
+      <Navbar />
+      <HomePage />
+    </>
+  } />
+  <Route path="/favorites" element={
+    <>
+      <Navbar />  {/* Different Navbar instance! */}
+      <FavoritesPage />
+    </>
+  } />
+</Routes>
+```
+
+**With Zustand:**
+
+```jsx
+// ✅ Good: One Navbar, reads from global store
+<Navbar />  {/* Always the same instance */}
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/favorites" element={<FavoritesPage />} />
+</Routes>
+
+// Navbar always shows correct count
+// Even as pages change!
+```
+
+</Accordion>
+
+<Accordion title="Flexbox Layout">
+
+**Why use flexbox:**
+
+```css
+.app {
+  min-height: 100vh;  /* Full viewport height */
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;  /* Takes remaining space */
+}
+```
+
+**Result:**
+
+```
+┌─────────────────────┐
+│  Navbar (fixed)     │
+├─────────────────────┤
+│                     │
+│  Main Content       │
+│  (grows to fill)    │
+│                     │
+│                     │
+└─────────────────────┘
+```
+
+**Perfect layout!** Navbar at top, content fills rest.
+
+</Accordion>
+
+</Accordions>
+
+## Complete Test Sequence
+
+**Try this end-to-end test:**
+
+1. **Start app** → Navbar shows "Favorites" (no badge)
+2. **On HomePage** → See listings grid
+3. **Click favorite** on listing → Button turns ❤️
+4. **Check Navbar** → Shows "Favorites [1]" ✅
+5. **Click 2 more favorites** → Navbar shows "Favorites [3]" ✅
+6. **Click "Favorites"** in navbar → Navigate to FavoritesPage
+7. **See 3 listings** on FavoritesPage ✅
+8. **Click unfavorite** on one → Listing disappears
+9. **Check Navbar** → Shows "Favorites [2]" ✅
+10. **Click "Home"** → Navigate back to HomePage
+11. **Check listings** → One shows 🤍 (unfavorited) ✅
+
+**Everything works!** 🎉
+
+## Zustand Benefits Recap
+
+<Tabs items={['No Prop Drilling', 'Real-Time Sync', 'Persistent State']}>
+
+<Tab value="No Prop Drilling">
+
+**Without Zustand:**
+
+```jsx
+// ❌ Need to pass data down
+function App() {
+  const [favorites, setFavorites] = useState([]);
+  
+  return (
+    <div>
+      <Navbar count={favorites.length} />
+      <Routes>
+        <Route path="/" element={
+          <HomePage
+            favorites={favorites}
+            onToggleFavorite={(id) => {/* update favorites */}}
+          />
+        } />
+        <Route path="/favorites" element={
+          <FavoritesPage
+            favorites={favorites}
+            onToggleFavorite={...}
+          />
+        } />
+      </Routes>
+    </div>
+  );
+}
+```
+
+**With Zustand:**
+
+```jsx
+// ✅ No props needed!
+function App() {
+  return (
+    <div>
+      <Navbar />  {/* Reads from store */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />  {/* Reads from store */}
+        <Route path="/favorites" element={<FavoritesPage />} />  {/* Reads from store */}
+      </Routes>
+    </div>
+  );
+}
+```
+
+**Clean and simple!**
+
+</Tab>
+
+<Tab value="Real-Time Sync">
+
+**All components update automatically:**
+
+```
+User toggles favorite on HomePage
+↓
+Store updates: favorites = [1, 2, 3, 4]
+↓
+Navbar re-renders: Badge shows "4"
+HomePage re-renders: Button shows ❤️
+FavoritesPage re-renders (if mounted): Shows 4 listings
+↓
+All UI in sync! ✨
+```
+
+**No manual updates needed!**
+
+</Tab>
+
+<Tab value="Persistent State">
+
+**State persists across navigation:**
+
+```
+HomePage: User favorites 3 listings
+favorites = [1, 2, 3]
+↓
+Navigate to FavoritesPage
+favorites = [1, 2, 3]  (same state!)
+↓
+FavoritesPage: User unfavorites 1 listing
+favorites = [2, 3]
+↓
+Navigate back to HomePage
+favorites = [2, 3]  (still same state!)
+↓
+HomePage shows correct state!
+```
+
+**State doesn't reset on navigation!** ✅
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+Navbar is integrated! Our application now has:
+- ✅ HomePage with listings and filters
+- ✅ FavoritesPage with favorited listings
+- ✅ Navbar with navigation and count badge
+- ✅ All pages sharing global state
+
+In the next lesson:
+1. **Final polish** - Add favorite button to ListingCard
+2. **Complete integration** - Ensure everything works together
+3. **Testing** - Verify all features work
+
+<Callout type="success">
+**✅ Lesson Complete!** Navbar is integrated and navigation works perfectly!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Navbar persists** - Outside Routes, stays mounted across navigation
+- ✅ **Active link updates** - useLocation() tracks current page
+- ✅ **Badge updates** - Shows correct count on all pages
+- ✅ **No prop drilling** - Components independent, read from store
+- ✅ **Flexbox layout** - Navbar at top, content fills remaining space
+- ✅ **Global state works** - Favorites persist across page changes
+- ✅ **Real-time sync** - All components update automatically
+- ✅ **Clean architecture** - Simple, maintainable code

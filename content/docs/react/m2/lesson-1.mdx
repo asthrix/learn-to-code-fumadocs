@@ -1,0 +1,413 @@
+---
+title: "L1: Converting Listings to State"
+description: "Transform static data into React state using the useState hook"
+module: 2
+lesson: 1
+---
+
+
+# Lesson 1: Converting Listings to State
+
+<Badge variant="blue">State Management</Badge>
+<Badge variant="green">useState Hook</Badge>
+
+In Module 1, we built StaySense with hardcoded listings data. Now it's time to make our application **dynamic** and **interactive** by introducing **React state**.
+
+---
+
+## Why Do We Need State?
+
+Right now, our `HomePage` component has a static array of listings:
+
+```jsx title="src/pages/HomePage.jsx (Current - Static)"
+const listings = [
+  {
+    id: 1,
+    title: "Cozy Beach House",
+    price: 250,
+    location: "Malibu, CA"
+  },
+  // More listings...
+];
+```
+
+**Problem:** This data never changes. We can't:
+- Filter listings based on search criteria
+- Add or remove listings dynamically
+- Update prices or availability
+- Make the app respond to user interactions
+
+**Solution:** Convert the array to **React state** using the `useState` hook.
+
+> **Key Concept:** State is data that can change over time. When state changes, React automatically re-renders your component to reflect the new data.
+
+---
+
+## Understanding useState
+
+The `useState` hook is React's way of giving components memory:
+
+```jsx title="useState Syntax"
+// [!code word:useState]
+import { useState } from 'react';
+
+function Component() {
+  const [value, setValue] = useState(initialValue); // [!code highlight]
+  
+  // value: current state value
+  // setValue: function to update state
+  // initialValue: starting value
+  
+  return <div>{value}</div>;
+}
+```
+
+**Key Points:**
+
+1. **Import from React:** `useState` is a named export
+2. **Array Destructuring:** Returns [currentValue, updaterFunction]
+3. **Initial Value:** Only used on first render
+4. **Updater Function:** Always starts with "set" by convention
+
+> **Important:** The updater function doesn't modify the existing state - it replaces it with a new value. State is **immutable**.
+
+---
+
+## Step-by-Step Implementation
+
+<Steps>
+  <Step>
+    ### Step 1: Import useState
+    
+    Open `src/pages/HomePage.jsx` and add the `useState` import:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    import { useState } from 'react'; // [!code ++]
+    import { ListingCard } from '../components/ListingCard';
+    
+    export function HomePage() {
+      // Component code...
+    }
+    ```
+    
+    > **Why at the top?** All React hooks must be imported before they're used.
+  </Step>
+  
+  <Step>
+    ### Step 2: Replace Static Array with State
+    
+    Find the hardcoded `listings` array and convert it to state:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    export function HomePage() {
+      // ❌ Old: Static array (can't change)
+      const listings = [ // [!code --]
+        { // [!code --]
+          id: 1, // [!code --]
+          title: "Cozy Beach House", // [!code --]
+          price: 250, // [!code --]
+          location: "Malibu, CA", // [!code --]
+          image: "/images/beach-house.jpg", // [!code --]
+        }, // [!code --]
+        { // [!code --]
+          id: 2, // [!code --]
+          title: "Mountain Cabin", // [!code --]
+          price: 180, // [!code --]
+          location: "Aspen, CO", // [!code --]
+          image: "/images/cabin.jpg", // [!code --]
+        }, // [!code --]
+        { // [!code --]
+          id: 3, // [!code --]
+          title: "Downtown Loft", // [!code --]
+          price: 320, // [!code --]
+          location: "New York, NY", // [!code --]
+          image: "/images/loft.jpg", // [!code --]
+        }, // [!code --]
+      ]; // [!code --]
+      
+      // ✅ New: State (can be updated dynamically)
+      const [listings, setListings] = useState([ // [!code ++]
+        { // [!code ++]
+          id: 1, // [!code ++]
+          title: "Cozy Beach House", // [!code ++]
+          price: 250, // [!code ++]
+          location: "Malibu, CA", // [!code ++]
+          image: "/images/beach-house.jpg", // [!code ++]
+        }, // [!code ++]
+        { // [!code ++]
+          id: 2, // [!code ++]
+          title: "Mountain Cabin", // [!code ++]
+          price: 180, // [!code ++]
+          location: "Aspen, CO", // [!code ++]
+          image: "/images/cabin.jpg", // [!code ++]
+        }, // [!code ++]
+        { // [!code ++]
+          id: 3, // [!code ++]
+          title: "Downtown Loft", // [!code ++]
+          price: 320, // [!code ++]
+          location: "New York, NY", // [!code ++]
+          image: "/images/loft.jpg", // [!code ++]
+        }, // [!code ++]
+      ]); // [!code ++]
+      
+      return (
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listings.map(listing => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+    > **What Changed?**
+    > - `const listings = [...]` → `const [listings, setListings] = useState([...])`
+    > - Same data, now managed by React state
+    > - `setListings` function ready for future updates
+  </Step>
+  
+  <Step>
+    ### Step 3: Verify Nothing Broke
+    
+    Save the file and check your browser. The page should look **exactly the same**.
+    
+    > **Good Sign!** We've refactored to state without breaking the UI. The component still renders the same listings.
+    
+    **Why no visible change?**
+    
+    We converted to state but haven't used the `setListings` function yet. The listings display the same because we passed the same initial data.
+  </Step>
+</Steps>
+
+---
+
+## Understanding State vs. Regular Variables
+
+Why use state instead of a regular variable? Let's compare:
+
+### ❌ Regular Variable (Doesn't Work)
+
+```jsx title="Won't Trigger Re-render"
+function Component() {
+  let count = 0; // Regular variable
+  
+  const increment = () => {
+    count = count + 1; // Value changes...
+    console.log(count); // Logs the new value...
+    // But UI doesn't update! ❌
+  };
+  
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+**Problem:** Changing `count` doesn't tell React to re-render. The UI stays frozen at 0.
+
+### ✅ State Variable (Works Perfectly)
+
+```jsx title="Triggers Re-render"
+// [!code word:useState]
+import { useState } from 'react';
+
+function Component() {
+  const [count, setCount] = useState(0); // State variable // [!code highlight]
+  
+  const increment = () => {
+    setCount(count + 1); // Update state // [!code highlight]
+    // React re-renders with new value ✅
+  };
+  
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+**Solution:** Calling `setCount` tells React to re-render with the new value.
+
+> **React's Golden Rule:** Components re-render when:
+> 1. State changes (via setState functions)
+> 2. Props change (parent passes new props)
+> 3. Parent re-renders (React re-renders children)
+
+---
+
+## Complete HomePage Code
+
+Here's your complete `HomePage` component with state:
+
+```jsx title="src/pages/HomePage.jsx"
+// [!code word:useState]
+import { useState } from 'react';
+import { ListingCard } from '../components/ListingCard';
+
+export function HomePage() {
+  const [listings, setListings] = useState([ // [!code highlight]
+    {
+      id: 1,
+      title: "Cozy Beach House",
+      price: 250,
+      location: "Malibu, CA",
+      image: "/images/beach-house.jpg",
+      guests: 4,
+      bedrooms: 2,
+      bathrooms: 2,
+    },
+    {
+      id: 2,
+      title: "Mountain Cabin",
+      price: 180,
+      location: "Aspen, CO",
+      image: "/images/cabin.jpg",
+      guests: 6,
+      bedrooms: 3,
+      bathrooms: 2,
+    },
+    {
+      id: 3,
+      title: "Downtown Loft",
+      price: 320,
+      location: "New York, NY",
+      image: "/images/loft.jpg",
+      guests: 2,
+      bedrooms: 1,
+      bathrooms: 1,
+    },
+  ]); // [!code highlight]
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {listings.map(listing => (
+          <ListingCard key={listing.id} listing={listing} />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## State Management Best Practices
+
+### 1. Naming Convention
+
+Always name state variables and their updaters consistently:
+
+```jsx
+// [!code word:useState]
+const [user, setUser] = useState(null);
+const [count, setCount] = useState(0);
+const [isLoading, setIsLoading] = useState(false);
+const [items, setItems] = useState([]);
+
+// Pattern: [noun, setNoun] or [isCondition, setIsCondition]
+```
+
+### 2. Initialize with Correct Data Type
+
+```jsx
+const [count, setCount] = useState(0);        // Number
+const [name, setName] = useState('');         // String
+const [isOpen, setIsOpen] = useState(false);  // Boolean
+const [items, setItems] = useState([]);       // Array
+const [user, setUser] = useState(null);       // Object (or null)
+```
+
+### 3. Don't Mutate State Directly
+
+```jsx
+// ❌ Wrong: Mutating state
+const [items, setItems] = useState([1, 2, 3]);
+items.push(4); // Don't do this!
+setItems(items);
+
+// ✅ Correct: Create new array
+setItems([...items, 4]); // Create new array with spread
+```
+
+> **Remember:** State is immutable. Always create new objects/arrays.
+
+---
+
+## Checkpoint
+
+<Accordions>
+  <Accordion title="✅ What You Should Know">
+    - How to import and use the `useState` hook
+    - The syntax: `const [value, setValue] = useState(initialValue)`
+    - Why state triggers re-renders but regular variables don't
+    - How to convert static data to state
+    - Naming conventions for state variables
+    - State is immutable (never mutate directly)
+  </Accordion>
+  
+  <Accordion title="🧪 Quick Practice">
+    Try adding another state variable to track the number of listings:
+    
+    ```jsx
+    const [listingCount, setListingCount] = useState(listings.length);
+    ```
+    
+    Display it in your component:
+    
+    ```jsx
+    <p>Showing {listingCount} listings</p>
+    ```
+  </Accordion>
+  
+  <Accordion title="❓ Common Questions">
+    **Q: Can I have multiple useState calls?**
+    
+    A: Yes! Each piece of state should have its own useState:
+    
+    ```jsx
+    const [listings, setListings] = useState([]);
+    const [search, setSearch] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    ```
+    
+    **Q: Does changing state immediately update the value?**
+    
+    A: No, state updates are asynchronous. React schedules a re-render, then updates the value. The new value is available on the next render.
+    
+    **Q: What happens if I call setState multiple times?**
+    
+    A: React batches updates together for performance. Use the updater function form when the new state depends on the old state:
+    
+    ```jsx
+    setCount(prev => prev + 1);
+    setCount(prev => prev + 1); // Works correctly
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## What's Next?
+
+In **Lesson 2**, we'll create the `ListingFilters` component with search input, date pickers, and guest controls. You'll learn how to handle user input and manage multiple pieces of state.
+
+**Coming up:**
+- Event handlers (`onChange`, `onClick`)
+- Controlled inputs
+- Multiple state variables
+- Component communication
+
+Great job converting to state! 🎉
+

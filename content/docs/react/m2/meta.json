@@ -1,17 +1,13 @@
 {
-   "title": "M2 · State & Events",
+   "title": "M2: State & Events",
    "pages": [
-      "0_index",
-      "1_introduction-state",
-      "2_state-in-react",
-      "3_event-handlers",
-      "4_handling-click-events",
-      "5_handling-change-events",
-      "6_handling-form-submission",
-      "7_event-handler-best-practices",
-      "8_use-state-hook",
-      "9_controlled-vs-uncontrolled",
-      "10_implementation",
-      "11_validation"
+      "index",
+      "lesson-1",
+      "lesson-2",
+      "lesson-3",
+      "lesson-4",
+      "lesson-5",
+      "lesson-6",
+      "lesson-7"
    ]
 }

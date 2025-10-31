@@ -1,0 +1,549 @@
+---
+title: "L12: Add Favorite Button to ListingCard"
+description: "Complete the ListingCard integration with FavoriteButton"
+---
+
+# Add Favorite Button to ListingCard
+
+Let's complete the ListingCard with our FavoriteButton! 🎨
+
+## Final ListingCard Component
+
+Here's the complete, polished ListingCard:
+
+```jsx title="src/components/ListingCard.jsx"
+import { Link } from 'react-router-dom';
+import FavoriteButton from '@/components/FavoriteButton';
+
+function ListingCard({ listing }) {
+  // Fallback for missing data
+  const image = listing.media?.[0]?.url || '/placeholder.jpg';
+  const imageAlt = listing.media?.[0]?.alt || listing.name;
+  const description = listing.description || 'No description available';
+  const maxGuests = listing.maxGuests || 1;
+  
+  return (
+    <div className="listing-card">
+      {/* Image with Favorite Button */}
+      <div className="listing-image">
+        <img src={image} alt={imageAlt} />
+        
+        {/* Favorite Button - positioned absolutely */}
+        <FavoriteButton 
+          listingId={listing.id}
+          size="medium"
+          className="listing-card__favorite"
+        />
+      </div>
+      
+      {/* Content */}
+      <div className="listing-content">
+        <h3 className="listing-title">{listing.name}</h3>
+        
+        <p className="listing-description">
+          {description.length > 100 
+            ? `${description.substring(0, 100)}...`
+            : description
+          }
+        </p>
+        
+        {/* Details */}
+        <div className="listing-details">
+          <span className="listing-price">
+            <strong>${listing.price}</strong>/night
+          </span>
+          <span className="listing-guests">
+            👥 Up to {maxGuests} {maxGuests === 1 ? 'guest' : 'guests'}
+          </span>
+        </div>
+        
+        {/* Optional: Rating */}
+        {listing.rating > 0 && (
+          <div className="listing-rating">
+            ⭐ {listing.rating.toFixed(1)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default ListingCard;
+```
+
+## Complete Styling
+
+```css title="src/app/global.css"
+/* Listing Card */
+.listing-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.listing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Image Section */
+.listing-image {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.listing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.listing-card:hover .listing-image img {
+  transform: scale(1.05);
+}
+
+/* Favorite Button Position */
+.listing-card__favorite {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+/* Content Section */
+.listing-content {
+  padding: 1.25rem;
+}
+
+.listing-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.4;
+  /* Limit to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.listing-description {
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  /* Limit to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Details Row */
+.listing-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.listing-price {
+  color: #0369a1;
+  font-size: 1.1rem;
+}
+
+.listing-price strong {
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.listing-guests {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Rating */
+.listing-rating {
+  margin-top: 0.5rem;
+  color: #f59e0b;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .listing-image {
+    height: 180px;
+  }
+  
+  .listing-content {
+    padding: 1rem;
+  }
+  
+  .listing-title {
+    font-size: 1.1rem;
+  }
+}
+```
+
+## How It Works
+
+<Accordions>
+
+<Accordion title="Button Positioning">
+
+**Absolute positioning:**
+
+```css
+.listing-image {
+  position: relative;  /* Parent */
+}
+
+.listing-card__favorite {
+  position: absolute;  /* Child */
+  top: 0.75rem;
+  right: 0.75rem;
+}
+```
+
+**Result:**
+
+```
+┌────────────────────────┐
+│ Image              [❤️]│  ← Button in top-right
+│                        │
+│                        │
+└────────────────────────┘
+```
+
+**Why absolute?**
+- Floats above image
+- Doesn't affect layout
+- Easy to position precisely
+
+</Accordion>
+
+<Accordion title="Text Clamping">
+
+**Limit text to 2 lines:**
+
+```css
+.listing-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+```
+
+**Why?**
+
+```jsx
+// Long title:
+"Beautiful Beachfront Villa with Stunning Ocean Views and Private Pool in Tropical Paradise"
+
+// Shows as:
+"Beautiful Beachfront Villa with Stunning
+Ocean Views and Private Pool in..."  (2 lines)
+```
+
+**Consistent card heights!**
+
+</Accordion>
+
+<Accordion title="Hover Effects">
+
+**Card lifts and image zooms:**
+
+```css
+.listing-card:hover {
+  transform: translateY(-4px);  /* Lift up */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);  /* Bigger shadow */
+}
+
+.listing-card:hover .listing-image img {
+  transform: scale(1.05);  /* Zoom in 5% */
+}
+```
+
+**Smooth animations!** ✨
+
+</Accordion>
+
+</Accordions>
+
+## Testing the Complete Flow
+
+**End-to-end test:**
+
+1. **HomePage loads** → Listings grid appears
+2. **Hover over card** → Card lifts, image zooms
+3. **Click favorite button** → Button turns ❤️
+4. **Check navbar** → Shows "Favorites [1]"
+5. **Click favorite on 2 more** → Navbar shows "Favorites [3]"
+6. **Click "Favorites" in navbar** → Navigate to FavoritesPage
+7. **See 3 favorited listings** → All show ❤️ buttons
+8. **Click unfavorite** → Listing disappears
+9. **Check navbar** → Shows "Favorites [2]"
+10. **Click "Home"** → Navigate back
+11. **Check listings** → One shows 🤍 (unfavorited)
+
+**Perfect!** Everything works together. ✅
+
+## Component Architecture
+
+<Tabs items={['Component Tree', 'Data Flow', 'Zustand Benefits']}>
+
+<Tab value="Component Tree">
+
+**Component hierarchy:**
+
+```
+App
+├── Navbar
+│   └── FavoriteButton (count badge)
+└── Routes
+    ├── HomePage
+    │   └── ListingCard (many)
+    │       └── FavoriteButton
+    └── FavoritesPage
+        └── ListingCard (filtered)
+            └── FavoriteButton
+```
+
+**All FavoriteButtons share same store!** ✨
+
+</Tab>
+
+<Tab value="Data Flow">
+
+**How data flows:**
+
+```
+User clicks FavoriteButton in ListingCard on HomePage
+↓
+FavoriteButton calls toggleFavorite(id)
+↓
+Zustand store updates: favorites = [1, 2, 3, 4]
+↓
+All components using favorites re-render:
+  - Navbar badge: "4"
+  - ListingCard buttons: Update ❤️/🤍
+  - FavoritesPage: Shows 4 listings
+↓
+UI synchronized everywhere!
+```
+
+**One action, many updates!**
+
+</Tab>
+
+<Tab value="Zustand Benefits">
+
+**Why Zustand makes this easy:**
+
+**1. No prop drilling:**
+```jsx
+// ❌ Without Zustand:
+<App favorites={favorites}>
+  <Navbar count={favorites.length} />
+  <HomePage favorites={favorites} onToggle={handleToggle} />
+</App>
+
+// ✅ With Zustand:
+<App>
+  <Navbar />  {/* Reads from store */}
+  <HomePage />  {/* Reads from store */}
+</App>
+```
+
+**2. Automatic sync:**
+```jsx
+// All these update automatically:
+const count = useListingsStore((state) => state.favorites.length);  // Navbar
+const isFavorited = favorites.includes(id);  // Button
+const favoritedItems = getFavoritedItems();  // Page
+```
+
+**3. Simple code:**
+```jsx
+// Toggle favorite anywhere:
+const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+toggleFavorite(id);  // That's it!
+```
+
+**Clean architecture!** ✨
+
+</Tab>
+
+</Tabs>
+
+## Accessibility Checklist
+
+<Accordions>
+
+<Accordion title="Keyboard Navigation">
+
+**All interactive elements are keyboard accessible:**
+
+```jsx
+// FavoriteButton is a <button>
+<button onClick={handleClick}>  {/* Tab + Enter works */}
+  ❤️
+</button>
+
+// Links in Navbar use <Link>
+<Link to="/favorites">  {/* Tab + Enter works */}
+  Favorites
+</Link>
+```
+
+**Test:**
+- Tab through page
+- Enter activates buttons/links
+
+**Works!** ✅
+
+</Accordion>
+
+<Accordion title="Screen Readers">
+
+**aria-label provides context:**
+
+```jsx
+<button
+  aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+>
+  {isFavorited ? '❤️' : '🤍'}
+</button>
+```
+
+**Screen reader announces:**
+- "Add to favorites, button" (when not favorited)
+- "Remove from favorites, button" (when favorited)
+
+**Clear feedback!** ♿
+
+</Accordion>
+
+<Accordion title="Color Contrast">
+
+**Check color contrast ratios:**
+
+```css
+/* Text on background */
+color: #1f2937;  /* Dark gray on white */
+background: white;
+/* Ratio: 16:1 (Excellent!) */
+
+/* Link color */
+color: #0369a1;  /* Blue on white */
+/* Ratio: 4.9:1 (Good!) */
+```
+
+**WCAG AAA compliant!** ✅
+
+</Accordion>
+
+</Accordions>
+
+## Performance Optimization
+
+<Tabs items={['Selective Re-renders', 'Memoization', 'Image Loading']}>
+
+<Tab value="Selective Re-renders">
+
+**Zustand only re-renders components that use changed data:**
+
+```jsx
+// ListingCard
+const isFavorited = favorites.includes(listing.id);
+// Re-renders when favorites changes ✅
+
+// Navbar
+const count = useListingsStore((state) => state.favorites.length);
+// Re-renders when favorites length changes ✅
+
+// HomePage filter
+const searchQuery = useListingsStore((state) => state.searchQuery);
+// Does NOT re-render when favorites changes ✅
+```
+
+**Efficient!** Only necessary re-renders. 🚀
+
+</Tab>
+
+<Tab value="Memoization">
+
+**Optimize expensive calculations:**
+
+```jsx
+import { useMemo } from 'react';
+
+function FavoritesPage() {
+  const items = useListingsStore((state) => state.items);
+  const favorites = useListingsStore((state) => state.favorites);
+  
+  // Memoize filtered items
+  const favoritedItems = useMemo(() => {
+    return items.filter(item => favorites.includes(item.id));
+  }, [items, favorites]);  // Only recalculate when these change
+  
+  return <div>{favoritedItems.map(...)}</div>;
+}
+```
+
+**Faster rendering!** ⚡
+
+</Tab>
+
+<Tab value="Image Loading">
+
+**Optimize images:**
+
+```jsx
+<img
+  src={listing.media?.[0]?.url}
+  alt={listing.media?.[0]?.alt}
+  loading="lazy"  // Lazy load images
+  decoding="async"  // Async decode
+/>
+```
+
+**Better performance!** Especially with many listings.
+
+</Tab>
+
+</Tabs>
+
+## What's Next?
+
+ListingCard is complete with FavoriteButton integration! In the final lesson:
+
+1. **Module review** - Recap everything we built
+2. **Compare with Redux** - See the differences
+3. **Best practices** - Key takeaways
+4. **Next steps** - What to learn next
+
+<Callout type="success">
+**✅ Lesson Complete!** ListingCard fully integrated with FavoriteButton!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Complete integration** - FavoriteButton works in ListingCard
+- ✅ **Proper positioning** - Absolute positioning in top-right
+- ✅ **Hover effects** - Card lifts, image zooms
+- ✅ **Text clamping** - Consistent card heights
+- ✅ **Responsive design** - Works on all screen sizes
+- ✅ **Accessible** - Keyboard navigation, screen readers, color contrast
+- ✅ **Performant** - Selective re-renders, memoization, lazy loading
+- ✅ **Clean code** - Separated concerns, reusable components

@@ -1,0 +1,931 @@
+---
+title: "L12: Refresh Token When Expired"
+description: "Automatically refresh expired access tokens"
+---
+
+# Refresh Token When Expired
+
+Let's implement automatic token refresh to keep users signed in seamlessly! 🔄
+
+## The Token Expiration Problem
+
+**What happens when access token expires:**
+
+```
+User signs in
+  ↓
+Access token: Valid for 15 minutes
+  ↓
+User browses site (10 minutes)
+  ↓
+Access token still valid → Requests succeed ✅
+  ↓
+User continues browsing (20 minutes total)
+  ↓
+Access token expired → Requests fail with 401 ❌
+  ↓
+Without auto-refresh: User must sign in again 😞
+With auto-refresh: Token refreshes automatically 😊
+```
+
+## Understanding Token Refresh
+
+**Two-token system:**
+
+```jsx
+// Access Token (short-lived)
+{
+  token: "eyJhbGc...",
+  expiresIn: 900,     // 15 minutes
+  storage: "memory",  // JavaScript variable
+  purpose: "API requests"
+}
+
+// Refresh Token (long-lived)
+{
+  token: "eyJhbGc...",
+  expiresIn: 2592000,        // 30 days
+  storage: "HTTP-only cookie", // Secure cookie
+  purpose: "Get new access token"
+}
+```
+
+**Why two tokens?**
+
+<Accordions>
+
+<Accordion title="Security Benefits">
+
+**Short-lived access tokens:**
+
+```
+If access token stolen:
+  - Attacker has 15 minutes to use it
+  - Token expires automatically
+  - Limited damage
+
+If refresh token stolen:
+  - Stored in HTTP-only cookie
+  - JavaScript cannot access it
+  - XSS attacks cannot steal it
+  - Still protected
+```
+
+**Example attack:**
+
+```jsx
+// ❌ XSS attack tries to steal tokens
+const accessToken = localStorage.getItem('token');
+// Can steal if stored in localStorage!
+
+const refreshToken = document.cookie;
+// Cannot access HTTP-only cookies! 🛡️
+```
+
+</Accordion>
+
+<Accordion title="Performance Benefits">
+
+**Access token in memory:**
+
+```jsx
+// Fast: No cookie parsing on every request
+const token = tokenStore.getToken();  // Instant!
+```
+
+**Refresh token in cookie:**
+
+```jsx
+// Only used when needed (rare)
+const response = await api.get('/auth/refresh');
+// Maybe once every 15 minutes
+```
+
+**Request comparison:**
+
+```
+With access token only (every request):
+  Request → Cookie sent → Server parses cookie → Response
+  Average: 5-10ms overhead per request
+
+With access + refresh tokens:
+  Request → Header sent → Server validates → Response
+  Average: 1-2ms overhead per request
+  
+  Refresh (every 15 min):
+  Request → Cookie sent → New access token → Cache
+  Average: 50-100ms once per 15 minutes
+```
+
+</Accordion>
+
+<Accordion title="User Experience Benefits">
+
+**Seamless re-authentication:**
+
+```
+Without auto-refresh:
+  User browsing (15 min)
+  → Token expires
+  → API call fails
+  → Error message: "Please sign in again"
+  → User clicks sign-in
+  → Enter credentials again
+  → Continue browsing
+  Total interruption: 30-60 seconds 😞
+
+With auto-refresh:
+  User browsing (15 min)
+  → Token expires
+  → API call fails with 401
+  → Auto-refresh triggered
+  → New access token obtained
+  → Original request retried
+  → Success!
+  Total interruption: 0.5-1 second 😊
+```
+
+</Accordion>
+
+</Accordions>
+
+## Implement Token Refresh
+
+Update the response interceptor to handle 401 errors:
+
+```jsx title="src/lib/api.js"
+import axios from 'axios';
+import { tokenStore } from './tokenStore';
+
+const api = axios.create({
+  baseURL: 'https://v2.api.noroff.dev',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
+});
+
+// Track if we're currently refreshing
+let isRefreshing = false;
+let failedQueue = [];
+
+// Process failed requests after refresh
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
+// REQUEST INTERCEPTOR
+api.interceptors.request.use(
+  (config) => {
+    const token = tokenStore.getToken();
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// RESPONSE INTERCEPTOR with auto-refresh
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Check if error is 401 and we haven't retried yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // Already refreshing, queue this request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(token => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch(err => {
+            return Promise.reject(err);
+          });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Request new access token
+        const response = await api.get('/auth/refresh');
+        const { accessToken } = response.data;
+
+        // Update token store
+        tokenStore.setToken(accessToken);
+
+        // Update original request with new token
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+        // Process queued requests
+        processQueue(null, accessToken);
+
+        // Retry original request
+        return api(originalRequest);
+      } catch (refreshError) {
+        // Refresh failed, sign out user
+        processQueue(refreshError, null);
+        tokenStore.clearToken();
+        
+        // Redirect to sign-in (if in browser context)
+        if (typeof window !== 'undefined') {
+          window.location.href = '/sign-in';
+        }
+        
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+```
+
+## Update AuthContext
+
+Add a method to update token from outside:
+
+```jsx title="src/contexts/AuthContext.jsx"
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '@/lib/api';
+import { tokenStore } from '@/lib/tokenStore';
+
+const AuthContext = createContext(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // Sync token with tokenStore
+  useEffect(() => {
+    if (token) {
+      tokenStore.setToken(token);
+    } else {
+      tokenStore.clearToken();
+    }
+  }, [token]);
+
+  // Fetch token on mount
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const response = await api.get('/auth/refresh');
+        const { accessToken, data } = response.data;
+        setToken(accessToken);
+        setUser(data);
+      } catch (error) {
+        console.log('No valid session');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchToken();
+  }, []);
+
+  // Update token (can be called from outside)
+  const updateToken = (newToken) => {
+    setToken(newToken);
+  };
+
+  // Sign in
+  const signIn = async (email, password) => {
+    try {
+      const response = await api.post('/auth/login', {
+        email,
+        password,
+      });
+
+      const { accessToken, data } = response.data;
+      setToken(accessToken);
+      setUser(data);
+      navigate('/');
+
+      return { success: true };
+    } catch (error) {
+      const message = error.response?.data?.errors?.[0]?.message 
+        || 'Invalid email or password';
+      return { success: false, error: message };
+    }
+  };
+
+  // Sign out
+  const signOut = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      setToken(null);
+      navigate('/sign-in');
+    }
+  };
+
+  const value = { user, token, isLoading, signIn, signOut, updateToken };
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+```
+
+## Understanding the Code
+
+<Tabs items={['Refresh Logic', 'Request Queuing', 'Race Conditions', 'Error Handling']}>
+
+<Tab value="Refresh Logic">
+
+**Step-by-step refresh flow:**
+
+```
+1. User makes API request
+   api.get('/venues')
+
+2. Request has expired token
+   Authorization: Bearer (expired)
+
+3. Server responds with 401
+   { errors: [{ message: "Token expired" }] }
+
+4. Response interceptor catches 401
+   if (status === 401 && !originalRequest._retry)
+
+5. Check if already refreshing
+   if (isRefreshing) → Queue request
+   else → Start refresh
+
+6. Request new access token
+   api.get('/auth/refresh')
+
+7. Server validates refresh token (cookie)
+   HttpOnly cookie sent automatically
+
+8. New access token returned
+   { accessToken: "eyJhbGc..." }
+
+9. Update token store
+   tokenStore.setToken(newAccessToken)
+
+10. Retry original request with new token
+    api(originalRequest)
+
+11. Success!
+    User never noticed anything
+```
+
+**Preventing infinite loops:**
+
+```jsx
+originalRequest._retry = true;
+
+// First attempt:
+if (!originalRequest._retry) {
+  // Try to refresh
+}
+
+// After refresh, retry request:
+api(originalRequest)  // Now has _retry = true
+
+// If this fails with 401 again:
+if (originalRequest._retry) {
+  // Don't refresh again, just fail
+  return Promise.reject(error);
+}
+```
+
+**Why `_retry` flag?**
+
+```
+Without _retry:
+  Request → 401 → Refresh → Retry
+  → 401 → Refresh → Retry
+  → 401 → Refresh → Retry
+  → Infinite loop! ❌
+
+With _retry:
+  Request → 401 → Refresh → Retry (_retry=true)
+  → 401 → Don't refresh, fail ✅
+```
+
+</Tab>
+
+<Tab value="Request Queuing">
+
+**Why queue requests?**
+
+```
+Scenario: Multiple requests fail at same time
+
+Request 1: GET /venues     → 401
+Request 2: GET /bookings   → 401
+Request 3: POST /favorites → 401
+
+Without queuing:
+  Request 1 → Refresh → Retry ✅
+  Request 2 → Refresh → Retry ✅ (unnecessary refresh!)
+  Request 3 → Refresh → Retry ✅ (unnecessary refresh!)
+  Total: 3 refresh calls (2 wasted)
+
+With queuing:
+  Request 1 → Start refresh
+  Request 2 → Wait in queue
+  Request 3 → Wait in queue
+  Refresh completes
+  → Process queue with new token
+  Request 1 → Retry ✅
+  Request 2 → Retry ✅
+  Request 3 → Retry ✅
+  Total: 1 refresh call (efficient!)
+```
+
+**Queue implementation:**
+
+```jsx
+let failedQueue = [];
+
+// Request fails, refresh in progress
+if (isRefreshing) {
+  return new Promise((resolve, reject) => {
+    // Add to queue
+    failedQueue.push({ resolve, reject });
+  });
+  // Promise waits until processQueue is called
+}
+
+// After refresh succeeds
+processQueue(null, newToken);
+
+// Process queue:
+failedQueue.forEach(prom => {
+  prom.resolve(newToken);  // Resolves waiting promises
+});
+
+// Waiting promises continue:
+.then(token => {
+  originalRequest.headers.Authorization = `Bearer ${token}`;
+  return api(originalRequest);  // Retry with new token
+})
+```
+
+</Tab>
+
+<Tab value="Race Conditions">
+
+**Race condition scenarios:**
+
+**Scenario 1: Simultaneous requests**
+
+```
+Time 0ms:  Request A starts
+Time 10ms: Request B starts
+Time 50ms: Request A fails (401)
+Time 55ms: Request B fails (401)
+
+Without protection:
+  50ms: A starts refresh
+  55ms: B starts refresh (race condition!)
+  → Two refresh calls
+
+With isRefreshing flag:
+  50ms: A starts refresh (isRefreshing = true)
+  55ms: B checks isRefreshing → Queue B
+  70ms: Refresh completes
+  → Process A and B with same token ✅
+```
+
+**Scenario 2: Refresh during refresh**
+
+```jsx
+let isRefreshing = false;
+
+// Request 1
+if (isRefreshing) {
+  // Queue
+} else {
+  isRefreshing = true;  // Lock
+  await refresh();
+  isRefreshing = false; // Unlock
+}
+
+// Request 2 (happens during Request 1 refresh)
+if (isRefreshing) {
+  // Queued, waits for unlock
+}
+```
+
+**Scenario 3: Failed refresh**
+
+```
+Request A → 401 → Start refresh
+Request B → 401 → Queue
+Refresh fails (refresh token expired)
+→ Must fail both A and B
+
+processQueue(error, null);
+// Rejects all queued promises
+// Redirects to sign-in
+```
+
+</Tab>
+
+<Tab value="Error Handling">
+
+**Different error scenarios:**
+
+```jsx
+// 1. Token expired (refresh succeeds)
+try {
+  const response = await api.get('/venues');
+} catch (error) {
+  // Interceptor handles it automatically
+  // User never sees error
+}
+
+// 2. Refresh token expired (refresh fails)
+try {
+  const response = await api.get('/venues');
+} catch (error) {
+  // Interceptor redirects to /sign-in
+  // User must sign in again
+}
+
+// 3. Network error (no retry)
+try {
+  const response = await api.get('/venues');
+} catch (error) {
+  // Not a 401, doesn't trigger refresh
+  // Component handles error
+  setError('Network error. Please try again.');
+}
+
+// 4. Server error (500, etc.)
+try {
+  const response = await api.get('/venues');
+} catch (error) {
+  // Not a 401, doesn't trigger refresh
+  // Component handles error
+  setError('Server error. Please try later.');
+}
+```
+
+**Refresh failure handling:**
+
+```jsx
+catch (refreshError) {
+  // Clear token
+  tokenStore.clearToken();
+  
+  // Fail all queued requests
+  processQueue(refreshError, null);
+  
+  // Redirect to sign-in
+  if (typeof window !== 'undefined') {
+    window.location.href = '/sign-in';
+  }
+  
+  return Promise.reject(refreshError);
+}
+```
+
+**Why `window.location.href`?**
+
+```jsx
+// Option 1: navigate (React Router)
+navigate('/sign-in');
+// ❌ Doesn't work in interceptor (no hook context)
+
+// Option 2: window.location.href
+window.location.href = '/sign-in';
+// ✅ Works anywhere, forces full page reload
+
+// Option 3: Emit event
+window.dispatchEvent(new CustomEvent('auth:expired'));
+// AuthContext listens and calls navigate()
+// ✅ Works, but more complex
+```
+
+</Tab>
+
+</Tabs>
+
+## Testing Token Refresh
+
+<Steps>
+
+<Step>
+
+**Sign in and get token:**
+
+1. Sign in to your account
+2. Open DevTools → Application → Cookies
+3. Verify `refreshToken` cookie exists
+
+</Step>
+
+<Step>
+
+**Simulate expired token:**
+
+```jsx
+// In browser console
+import { tokenStore } from './lib/tokenStore';
+
+// Set invalid token to simulate expiration
+tokenStore.setToken('invalid-token');
+```
+
+Or manually edit token in React DevTools.
+
+</Step>
+
+<Step>
+
+**Make API request:**
+
+```jsx
+// Click button or trigger API call
+const response = await api.get('/holidaze/venues');
+```
+
+</Step>
+
+<Step>
+
+**Observe automatic refresh:**
+
+Network tab should show:
+
+```
+1. GET /holidaze/venues  → 401 (Unauthorized)
+2. GET /auth/refresh     → 200 (Success)
+3. GET /holidaze/venues  → 200 (Retried with new token)
+```
+
+✅ **Automatic refresh working!**
+
+</Step>
+
+<Step>
+
+**Test multiple simultaneous requests:**
+
+```jsx
+// Trigger multiple requests at once
+Promise.all([
+  api.get('/holidaze/venues'),
+  api.get('/holidaze/bookings/mine'),
+  api.get('/holidaze/profiles/me'),
+]);
+```
+
+Network tab should show:
+
+```
+1. GET /venues   → 401
+2. GET /bookings → 401
+3. GET /profiles → 401
+4. GET /auth/refresh → 200 (Single refresh!)
+5. GET /venues   → 200 (All retry)
+6. GET /bookings → 200
+7. GET /profiles → 200
+```
+
+✅ **Request queuing working!**
+
+</Step>
+
+<Step>
+
+**Test refresh token expiration:**
+
+```jsx
+// Delete refresh token cookie
+document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+
+// Make API request
+const response = await api.get('/holidaze/venues');
+// Should redirect to /sign-in
+```
+
+✅ **Expired refresh token handled!**
+
+</Step>
+
+</Steps>
+
+## Handling Edge Cases
+
+<Accordions>
+
+<Accordion title="Token Refresh During Sign-Out">
+
+**Problem:** User signs out while refresh is in progress
+
+```
+User clicks "Sign Out"
+  → signOut() starts
+  → Meanwhile, API request fails
+  → Refresh starts
+  → signOut() clears token
+  → Refresh completes with new token
+  → User is signed in again! ❌
+```
+
+**Solution:** Add a flag to prevent refresh during sign-out
+
+```jsx title="src/lib/api.js"
+let isSigningOut = false;
+
+export const setSigningOut = (value) => {
+  isSigningOut = value;
+};
+
+api.interceptors.response.use(
+  response => response,
+  async error => {
+    // Don't refresh if signing out
+    if (isSigningOut) {
+      return Promise.reject(error);
+    }
+    
+    // Normal refresh logic...
+  }
+);
+```
+
+```jsx title="src/contexts/AuthContext.jsx"
+import { setSigningOut } from '@/lib/api';
+
+const signOut = async () => {
+  setSigningOut(true);  // Prevent refresh
+  
+  try {
+    await api.post('/auth/logout');
+  } catch (error) {
+    console.error('Logout error:', error);
+  } finally {
+    setUser(null);
+    setToken(null);
+    navigate('/sign-in');
+    setSigningOut(false);  // Reset flag
+  }
+};
+```
+
+</Accordion>
+
+<Accordion title="Refresh Token Rotation">
+
+**Some APIs rotate refresh tokens:**
+
+```
+Old flow:
+  Refresh token: ABC123 (never changes)
+
+New flow (rotation):
+  1. Use refresh token: ABC123
+  2. Get new access token + new refresh token: DEF456
+  3. Old refresh token ABC123 invalid
+  4. Use new refresh token: DEF456
+```
+
+**Update refresh logic:**
+
+```jsx
+try {
+  const response = await api.get('/auth/refresh');
+  const { accessToken, refreshToken } = response.data;
+  
+  // Update access token
+  tokenStore.setToken(accessToken);
+  
+  // Update refresh token (if API returns it)
+  if (refreshToken) {
+    // Store new refresh token (browser handles cookie automatically)
+    console.log('Refresh token rotated');
+  }
+  
+  // Retry request
+  return api(originalRequest);
+} catch (refreshError) {
+  // ...
+}
+```
+
+**Why rotate?**
+
+```
+Security benefit:
+  - Old refresh tokens immediately invalid
+  - If stolen, can only be used once
+  - Detects replay attacks
+```
+
+</Accordion>
+
+<Accordion title="Concurrent Refresh Requests">
+
+**Multiple tabs, same user:**
+
+```
+Tab 1: Token expires → Refresh
+Tab 2: Token expires → Refresh
+
+Problem:
+  - Two refresh requests
+  - Different new tokens
+  - Tabs out of sync
+
+Solution 1: Broadcast channel
+Tab 1 refreshes → Broadcasts new token
+Tab 2 receives → Updates token
+
+Solution 2: Shared worker
+Centralized token management across tabs
+```
+
+**Broadcast channel implementation:**
+
+```jsx title="src/lib/tokenSync.js"
+const channel = new BroadcastChannel('auth_channel');
+
+// Send new token to other tabs
+export const broadcastToken = (token) => {
+  channel.postMessage({ type: 'TOKEN_UPDATE', token });
+};
+
+// Listen for token updates from other tabs
+channel.onmessage = (event) => {
+  if (event.data.type === 'TOKEN_UPDATE') {
+    tokenStore.setToken(event.data.token);
+  }
+};
+```
+
+```jsx title="src/lib/api.js"
+import { broadcastToken } from './tokenSync';
+
+// After successful refresh
+tokenStore.setToken(accessToken);
+broadcastToken(accessToken);  // Notify other tabs
+```
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+In Lesson 13, we'll:
+1. Create a Route guard component
+2. Protect specific routes (require sign-in)
+3. Redirect unauthenticated users
+4. Handle loading states during auth check
+
+<Callout type="success">
+**✅ Lesson Complete!** Automatic token refresh implemented!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Access tokens** expire quickly (15 min), **refresh tokens** last longer (30 days)
+- ✅ **401 errors** trigger automatic token refresh
+- ✅ **Request queuing** prevents multiple simultaneous refresh calls
+- ✅ **`_retry` flag** prevents infinite refresh loops
+- ✅ **`isRefreshing` flag** coordinates multiple requests
+- ✅ **Failed refresh** redirects to sign-in
+- ✅ **Successful refresh** retries original request transparently
+- ✅ **User experience** is seamless (no re-authentication needed)
+- ✅ **HTTP-only cookies** store refresh token securely
+- ✅ **Race conditions** handled with proper locking

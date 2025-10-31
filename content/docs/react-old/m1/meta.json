@@ -1,0 +1,17 @@
+{
+   "title": "M1 · React Fundamentals",
+   "pages": [
+      "0_index",
+      "1_intro-react",
+      "2_why-react",
+      "3_jsx-overview",
+      "4_jsx-iteration",
+      "5_components",
+      "6_component-props",
+      "7_component-lifecycle",
+      "8_introduction-hooks",
+      "9_styling-tailwind",
+      "10_implementation",
+      "11_validation"
+   ]
+}

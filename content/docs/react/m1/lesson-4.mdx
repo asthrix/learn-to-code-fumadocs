@@ -1,0 +1,481 @@
+---
+title: "L4: PropertyCard Component with Props"
+description:
+   "Build a reusable PropertyCard component and learn how to pass data with
+   props."
+module: 1
+lesson: 4
+---
+
+# Lesson 4: PropertyCard Component with Props
+
+Time to create your first reusable component! The `PropertyCard` will display
+individual property information and introduce you to **props** - React's way of
+passing data between components.
+
+---
+
+## What Are Props?
+
+**Props** (short for "properties") are how you pass data from a parent component
+to a child component. Think of them like function arguments:
+
+```jsx title="Props vs Function Parameters"
+// Function with parameters
+function greet(name) {
+   return `Hello, ${name}!`;
+}
+
+// Component with props
+function Greeting({ name }) {
+   return <h1>Hello, {name}!</h1>;
+}
+
+// Usage
+<Greeting name='Sarah' />;
+```
+
+Props make components **reusable** - same component, different data!
+
+---
+
+## Step 1: Create the PropertyCard Component
+
+Create a new file in the `components` folder:
+
+<Files>
+   <Folder name='src'>
+      <Folder name='components' defaultOpen>
+         <File name='PropertyCard.jsx ← CREATE THIS FILE' />
+      </Folder>
+   </Folder>
+</Files>
+
+Add this code:
+
+```jsx title="src/components/PropertyCard.jsx"
+function PropertyCard({ title, location, price, rating, image }) {
+   return (
+      <div className='property-card'>
+         <img src={image} alt={title} />
+
+         <div className='property-info'>
+            <h3>{title}</h3>
+            <p className='location'>{location}</p>
+
+            <div className='property-footer'>
+               <span className='price'>${price} / night</span>
+               <span className='rating'>⭐ {rating}</span>
+            </div>
+         </div>
+      </div>
+   );
+}
+
+export default PropertyCard;
+```
+
+---
+
+## Understanding Props Destructuring
+
+Let's break down the component signature:
+
+```jsx title="Props Destructuring"
+function PropertyCard({ title, location, price, rating, image }) {
+   // ...
+}
+```
+
+This is **destructuring** the props object. It's equivalent to:
+
+```jsx title="Without Destructuring"
+function PropertyCard(props) {
+   const title = props.title;
+   const location = props.location;
+   const price = props.price;
+   // ... and so on
+
+   // Then use: {title}, {location}, etc.
+}
+```
+
+**Destructuring is cleaner!** We extract the values we need directly in the
+parameters.
+
+---
+
+## Step 2: Use PropertyCard in HomePage
+
+Now let's use the PropertyCard. Update your HomePage:
+
+```jsx title="src/pages/HomePage.jsx"
+import PropertyCard from "../components/PropertyCard"; // ← NEW: Import
+
+function HomePage() {
+   const properties = [
+      {
+         id: 1,
+         title: "Cozy Beach House",
+         location: "Malibu, California",
+         price: 250,
+         rating: 4.9,
+         image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800",
+      },
+      {
+         id: 2,
+         title: "Modern Downtown Loft",
+         location: "New York, NY",
+         price: 180,
+         rating: 4.7,
+         image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800",
+      },
+      {
+         id: 3,
+         title: "Mountain Cabin Retreat",
+         location: "Aspen, Colorado",
+         price: 320,
+         rating: 5.0,
+         image: "https://images.unsplash.com/photo-1518732714860-b62714ce0c59?w=800",
+      },
+      {
+         id: 4,
+         title: "Lakefront Villa",
+         location: "Lake Tahoe, Nevada",
+         price: 400,
+         rating: 4.8,
+         image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+      },
+   ];
+
+   return (
+      <div className='home-page'>
+         <header className='hero'>
+            <h1>Find Your Perfect Stay</h1>
+            <p>Discover amazing places to stay around the world</p>
+         </header>
+
+         <section className='listings'>
+            <h2>Featured Properties</h2>
+
+            {/* ← NEW: Using PropertyCard */}
+            <PropertyCard
+               title={properties[0].title}
+               location={properties[0].location}
+               price={properties[0].price}
+               rating={properties[0].rating}
+               image={properties[0].image}
+            />
+         </section>
+      </div>
+   );
+}
+
+export default HomePage;
+```
+
+---
+
+## How Props Work
+
+When you write:
+
+```jsx title="Passing Props"
+<PropertyCard
+   title='Cozy Beach House'
+   location='Malibu, California'
+   price={250}
+/>
+```
+
+React creates a props object:
+
+```javascript title="Props Object"
+{
+  title: "Cozy Beach House",
+  location: "Malibu, California",
+  price: 250
+}
+```
+
+And passes it to the PropertyCard function!
+
+---
+
+## Props Syntax Rules
+
+<Steps>
+   <Step>
+      ### String Props
+      
+      Use quotes for strings:
+      
+      ```jsx title="String Props"
+      <PropertyCard title='Beach House' />
+      ```
+   </Step>
+
+   <Step>
+      ### Number Props
+      
+      Use curly braces for numbers:
+      
+      ```jsx title="Number Props"
+      <PropertyCard price={250} />
+      ```
+   </Step>
+
+   <Step>
+      ### Variable Props
+      
+      Use curly braces for variables:
+      
+      ```jsx title="Variable Props"
+      const propertyTitle = "Beach House";
+      <PropertyCard title={propertyTitle} />
+      ```
+   </Step>
+
+   <Step>
+      ### Object Properties as Props
+      
+      Access object properties:
+      
+      ```jsx title="Object Property Props"
+      <PropertyCard title={properties[0].title} />
+      ```
+   </Step>
+</Steps>
+
+---
+
+## Verify in Browser
+
+Save your files and check the browser. You should see:
+
+-  Your hero section
+-  "Featured Properties" heading
+-  **One property card** displaying the first property
+
+The card should show:
+
+-  Property image
+-  Title: "Cozy Beach House"
+-  Location: "Malibu, California"
+-  Price: "$250 / night"
+-  Rating: "⭐ 4.9"
+
+---
+
+## Why This is Powerful
+
+The same `PropertyCard` component can display different properties:
+
+```jsx title="Component Reusability"
+// Same component, different data!
+<PropertyCard title="Beach House" price={250} />
+<PropertyCard title="City Loft" price={180} />
+<PropertyCard title="Mountain Cabin" price={320} />
+```
+
+**Write once, use everywhere!** This is the core principle of component-based
+architecture.
+
+---
+
+## Component Composition
+
+Look at your component hierarchy now:
+
+```
+App
+ └─ HomePage
+     └─ PropertyCard (displays first property)
+```
+
+We're building a tree of components, each handling a specific piece of the UI!
+
+---
+
+## Props vs. State
+
+<Accordions type='single'>
+   <Accordion id='props' title='Props (What We Just Learned)' value='props'>
+      - **Passed from parent** to child
+      - **Read-only** (child can't modify them)
+      - Used to configure a component
+      - Like function parameters
+      
+      ```jsx title="Props Example"
+      <PropertyCard price={250} /> // Parent passes
+      // PropertyCard receives and displays
+      ```
+   </Accordion>
+
+   <Accordion id='state' title='State (Coming in Module 2)' value='state'>
+      - **Managed within** a component
+      - **Can be modified** by the component
+      - Causes re-renders when changed
+      - Used for interactive data
+      
+      ```jsx title="State Example (Preview)"
+      const [count, setCount] = useState(0);
+      // Component owns and can change this
+      ```
+   </Accordion>
+</Accordions>
+
+---
+
+## Common Props Mistakes
+
+<Accordions type="single">
+  <Accordion id="wrong-curly" title="Forgetting Curly Braces for Numbers" value="wrong-curly">
+    ```jsx title="Number Prop Syntax"
+    // ❌ Wrong: Number as string
+    <PropertyCard price="250" />
+    // PropertyCard receives: "250" (string)
+    
+    // ✅ Correct: Number as number
+    <PropertyCard price={250} />
+    // PropertyCard receives: 250 (number)
+    ```
+    
+    **Why it matters:** Math operations won't work on strings!
+  </Accordion>
+  
+  <Accordion id="typo" title="Mismatched Prop Names" value="typo">
+    ```jsx title="Prop Name Mismatch"
+    // In PropertyCard:
+    function PropertyCard({ title, location }) {
+      return <h3>{title}</h3>;
+    }
+    
+    // ❌ Wrong prop name
+    <PropertyCard name="Beach House" />
+    // {title} will be undefined!
+    
+    // ✅ Correct prop name
+    <PropertyCard title="Beach House" />
+    ```
+  </Accordion>
+  
+  <Accordion id="missing-import" title="Forgetting to Import" value="missing-import">
+    ```jsx title="Import Requirements"
+    // ❌ Will cause error: PropertyCard is not defined
+    function HomePage() {
+      return <PropertyCard title="House" />;
+    }
+    
+    // ✅ Always import first
+    import PropertyCard from '../components/PropertyCard';
+    
+    function HomePage() {
+      return <PropertyCard title="House" />;
+    }
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## Practice Challenge
+
+Try these exercises:
+
+<Accordions type="single">
+  <Accordion id="ex1" title="Exercise 1: Add Another PropertyCard" value="ex1">
+    Display the second property as well:
+    
+    ```jsx title="Multiple PropertyCards"
+    <PropertyCard
+      title={properties[1].title}
+      location={properties[1].location}
+      price={properties[1].price}
+      rating={properties[1].rating}
+      image={properties[1].image}
+    />
+    ```
+    
+    You should now see two property cards!
+  </Accordion>
+  
+  <Accordion id="ex2" title="Exercise 2: Add a 'Featured' Badge" value="ex2">
+    Add a boolean prop to highlight special properties:
+    
+    ```jsx title="src/components/PropertyCard.jsx"
+    // In PropertyCard.jsx
+    function PropertyCard({ title, location, price, rating, image, featured }) {
+      return (
+        <div className="property-card">
+          {featured && <span className="badge">⭐ Featured</span>}
+          {/* rest of the component */}
+        </div>
+      );
+    }
+    
+    // Usage:
+    <PropertyCard featured={true} title="Beach House" price={250} />
+    ```
+  </Accordion>
+  
+  <Accordion id="ex3" title="Exercise 3: Calculate Nightly Cost" value="ex3">
+    Show both nightly and weekly prices:
+    
+    ```jsx title="Calculate Weekly Price"
+    function PropertyCard({ title, location, price, rating, image }) {
+      const weeklyPrice = price * 7;
+      
+      return (
+        <div className="property-card">
+          {/* ... other content ... */}
+          <span className="price">${price} / night</span>
+          <span className="weekly">${weeklyPrice} / week</span>
+        </div>
+      );
+    }
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## What You Learned
+
+<Badge variant='success'>Concepts Mastered</Badge>
+
+-  ✅ Creating reusable components
+-  ✅ Passing data with props
+-  ✅ Destructuring props in function parameters
+-  ✅ Using props in JSX
+-  ✅ Understanding props vs state (conceptually)
+-  ✅ Component composition patterns
+-  ✅ Importing and using custom components
+
+---
+
+## Checkpoint ✅
+
+Before continuing, ensure:
+
+-  ✅ PropertyCard.jsx file exists in `src/components/`
+-  ✅ PropertyCard is imported in HomePage
+-  ✅ At least one property card displays in the browser
+-  ✅ The card shows image, title, location, price, and rating
+-  ✅ No console errors
+
+---
+
+## Next Up
+
+You've mastered props! Next, we'll create a `PropertyList` component that uses
+`.map()` to display **all** properties dynamically. No more manual duplication!
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m1/lesson-3'>← Previous: Adding Property Data</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m1/lesson-5'>Next: PropertyList with Map →</a>
+   </Button>
+</div>

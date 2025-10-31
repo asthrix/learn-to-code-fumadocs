@@ -1,21 +1,8 @@
 {
-   "title": "M6 · State Management",
+   "title": "M6: State Management",
    "pages": [
-      "0_index",
-      "1_introduction-state-management",
-      "2_state-management-in-react",
-      "3_prop-drilling",
-      "4_use-context",
-      "5_zustand-introduction",
-      "6_zustand-selectors",
-      "7_zustand-async",
-      "8_zustand-integration",
-      "9_redux-part-1",
-      "10_redux-part-2",
-      "11_redux-part-3",
-      "12_redux-custom-components",
-      "13_redux-best-practices",
-      "14_implementation",
-      "15_validation"
+      "index",
+      "redux",
+      "zustand"
    ]
 }

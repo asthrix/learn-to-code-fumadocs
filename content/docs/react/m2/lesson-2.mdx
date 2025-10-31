@@ -1,0 +1,570 @@
+---
+title: "L2: Creating the ListingFilters Component"
+description: "Build an interactive filter component with search, dates, and guest controls"
+module: 2
+lesson: 2
+---
+
+
+# Lesson 2: Creating the ListingFilters Component
+
+<Badge variant="blue">Components</Badge>
+<Badge variant="green">State</Badge>
+<Badge variant="purple">Event Handling</Badge>
+
+Now that our listings are managed with state, let's build the **ListingFilters** component that will allow users to search and filter properties by location, dates, and number of guests.
+
+---
+
+## What We're Building
+
+A filter bar with three main controls:
+
+1. **Search Input** - Filter by location or property name
+2. **Date Inputs** - Filter by check-in and check-out dates
+3. **Guest Counter** - Filter by number of guests
+
+```jsx title="Visual Structure"
+┌─────────────────────────────────────────────────────────┐
+│  Search: [Malibu, CA.............]                      │
+│  Dates: [Check-in] → [Check-out]                        │
+│  Guests: [-] 2 [+]                                      │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Step-by-Step Implementation
+
+<Steps>
+  <Step>
+    ### Step 1: Create the Component File
+    
+    Create a new file `src/components/ListingFilters.jsx`:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    export function ListingFilters() {
+      return (
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Filter Stays</h2>
+          
+          {/* We'll add filters here */}
+        </div>
+      );
+    }
+    ```
+    
+    > **Component Structure:** We're creating a controlled component that will manage its own filter state initially.
+  </Step>
+  
+  <Step>
+    ### Step 2: Add Search Input
+    
+    Add a search input field to filter by location:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    export function ListingFilters() {
+      return (
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Filter Stays</h2>
+          
+          {/* Search Input */}
+          <div className="mb-4">
+            <label 
+              htmlFor="search" 
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Search by location
+            </label>
+            <input
+              id="search"
+              type="text"
+              placeholder="e.g., Malibu, Beach House..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+    > **Accessibility:** We use `htmlFor` on the label to connect it with the input via the `id` attribute.
+  </Step>
+  
+  <Step>
+    ### Step 3: Add Date Inputs
+    
+    Add check-in and check-out date inputs:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    export function ListingFilters() {
+      return (
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Filter Stays</h2>
+          
+          {/* Search Input */}
+          <div className="mb-4">
+            <label 
+              htmlFor="search" 
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Search by location
+            </label>
+            <input
+              id="search"
+              type="text"
+              placeholder="e.g., Malibu, Beach House..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          
+          {/* Date Inputs */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label 
+                htmlFor="checkin" 
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Check-in
+              </label>
+              <input
+                id="checkin"
+                type="date"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            
+            <div>
+              <label 
+                htmlFor="checkout" 
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Check-out
+              </label>
+              <input
+                id="checkout"
+                type="date"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+    > **Grid Layout:** We use `grid-cols-2` to place check-in and check-out side by side on larger screens.
+  </Step>
+  
+  <Step>
+    ### Step 4: Add Guest Counter
+    
+    Add buttons to increment/decrement guest count:
+    
+    ```jsx title="src/components/ListingFilters.jsx"
+    export function ListingFilters() {
+      return (
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Filter Stays</h2>
+          
+          {/* Search Input */}
+          <div className="mb-4">
+            <label 
+              htmlFor="search" 
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Search by location
+            </label>
+            <input
+              id="search"
+              type="text"
+              placeholder="e.g., Malibu, Beach House..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          
+          {/* Date Inputs */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label 
+                htmlFor="checkin" 
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Check-in
+              </label>
+              <input
+                id="checkin"
+                type="date"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            
+            <div>
+              <label 
+                htmlFor="checkout" 
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Check-out
+              </label>
+              <input
+                id="checkout"
+                type="date"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          
+          {/* Guest Counter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Number of guests
+            </label>
+            <div className="flex items-center gap-4">
+              <button
+                className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold"
+              >
+                −
+              </button>
+              
+              <span className="text-lg font-semibold">1</span>
+              
+              <button
+                className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center font-bold"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+    > **Buttons:** We have minus (−) and plus (+) buttons to adjust guest count. Currently displaying hardcoded "1" guest.
+  </Step>
+  
+  <Step>
+    ### Step 5: Add Component to HomePage
+    
+    Import and render the `ListingFilters` component in `HomePage`:
+    
+    ```jsx title="src/pages/HomePage.jsx"
+    import { useState } from 'react';
+    import { ListingCard } from '../components/ListingCard';
+    import { ListingFilters } from '../components/ListingFilters'; // [!code ++]
+    
+    export function HomePage() {
+      const [listings, setListings] = useState([
+        // ... your listings data
+      ]);
+      
+      return (
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8">Available Stays</h1>
+          
+          <ListingFilters /> // [!code ++]
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listings.map(listing => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+    > **Component Placement:** The filter bar appears above the listings grid.
+  </Step>
+  
+  <Step>
+    ### Step 6: Check Your Browser
+    
+    Save all files and check the browser. You should see:
+    
+    - ✅ Filter bar with search input
+    - ✅ Check-in and check-out date pickers
+    - ✅ Guest counter with + and − buttons
+    - ✅ Listings displayed below the filters
+    
+    > **No Functionality Yet:** The filters look great but don't actually work. That's expected! We'll add state and event handlers in the next lesson.
+  </Step>
+</Steps>
+
+---
+
+## Understanding the Component Structure
+
+Let's break down what we built:
+
+```jsx title="Component Anatomy"
+<div className="container">
+  {/* Filter Container */}
+  <div className="filter-section">
+    
+    {/* Search Input */}
+    <div className="input-group">
+      <label>Label</label>
+      <input type="text" />
+    </div>
+    
+    {/* Date Inputs (Grid) */}
+    <div className="grid">
+      <div>Check-in input</div>
+      <div>Check-out input</div>
+    </div>
+    
+    {/* Guest Counter (Flex) */}
+    <div className="flex">
+      <button>−</button>
+      <span>1</span>
+      <button>+</button>
+    </div>
+    
+  </div>
+</div>
+```
+
+---
+
+## Complete ListingFilters Code
+
+Here's the complete component we built:
+
+```jsx title="src/components/ListingFilters.jsx"
+export function ListingFilters() {
+  return (
+    <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+      <h2 className="text-xl font-semibold mb-4">Filter Stays</h2>
+      
+      {/* Search Input */}
+      <div className="mb-4">
+        <label 
+          htmlFor="search" 
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Search by location
+        </label>
+        <input
+          id="search"
+          type="text"
+          placeholder="e.g., Malibu, Beach House..."
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+      
+      {/* Date Inputs */}
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label 
+            htmlFor="checkin" 
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Check-in
+          </label>
+          <input
+            id="checkin"
+            type="date"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        
+        <div>
+          <label 
+            htmlFor="checkout" 
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Check-out
+          </label>
+          <input
+            id="checkout"
+            type="date"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+      
+      {/* Guest Counter */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Number of guests
+        </label>
+        <div className="flex items-center gap-4">
+          <button
+            className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold"
+          >
+            −
+          </button>
+          
+          <span className="text-lg font-semibold">1</span>
+          
+          <button
+            className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center font-bold"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## Styling Breakdown
+
+Let's understand the Tailwind CSS classes we used:
+
+### Container Styling
+
+```jsx
+className="bg-white shadow-md rounded-lg p-6 mb-8"
+```
+
+- `bg-white` - White background
+- `shadow-md` - Medium drop shadow
+- `rounded-lg` - Large border radius
+- `p-6` - Padding all sides (1.5rem)
+- `mb-8` - Margin bottom (2rem)
+
+### Input Styling
+
+```jsx
+className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+```
+
+- `w-full` - Full width
+- `px-4 py-2` - Horizontal/vertical padding
+- `border border-gray-300` - Gray border
+- `rounded-lg` - Rounded corners
+- `focus:ring-2` - Focus ring on interaction
+- `focus:ring-blue-500` - Blue focus color
+
+### Button Styling
+
+```jsx
+className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white"
+```
+
+- `w-10 h-10` - Fixed square dimensions
+- `rounded-full` - Perfect circle
+- `bg-blue-500` - Blue background
+- `hover:bg-blue-600` - Darker on hover
+- `text-white` - White text
+
+---
+
+## Form Best Practices
+
+### 1. Always Use Labels
+
+```jsx
+// ✅ Good: Label connected to input
+<label htmlFor="search">Search</label>
+<input id="search" type="text" />
+
+// ❌ Bad: No label connection
+<input type="text" />
+```
+
+### 2. Provide Placeholder Text
+
+```jsx
+<input 
+  type="text" 
+  placeholder="e.g., Malibu, Beach House..." // [!code highlight]
+/>
+```
+
+### 3. Use Semantic HTML
+
+```jsx
+// ✅ Use correct input types
+<input type="text" />   // Text search
+<input type="date" />   // Date picker
+<input type="number" /> // Numeric input
+```
+
+### 4. Visual Feedback
+
+```jsx
+// Hover states
+hover:bg-gray-300
+
+// Focus states
+focus:ring-2 focus:ring-blue-500
+
+// Active states (coming in next lesson)
+```
+
+---
+
+## What's Missing?
+
+Right now, our component is **presentational only**. It looks good but:
+
+- ❌ Clicking buttons does nothing
+- ❌ Typing in inputs has no effect
+- ❌ No state management
+- ❌ Doesn't communicate with HomePage
+
+**In Lesson 3**, we'll add:
+- State for search, dates, and guests
+- Event handlers (`onChange`, `onClick`)
+- Controlled inputs
+- Make the buttons work!
+
+---
+
+## Checkpoint
+
+<Accordions>
+  <Accordion title="✅ What You Accomplished">
+    - Created a new `ListingFilters` component
+    - Added a search input with label
+    - Created date picker inputs for check-in/check-out
+    - Built a guest counter with increment/decrement buttons
+    - Applied Tailwind CSS for professional styling
+    - Integrated the filter component into HomePage
+    - Learned form accessibility basics (labels, htmlFor, id)
+  </Accordion>
+  
+  <Accordion title="🎨 Styling Challenge">
+    Try customizing the filter bar:
+    
+    1. Change the background color from white to light gray
+    2. Adjust the shadow size
+    3. Change the border radius
+    4. Modify button colors
+    
+    Experiment with Tailwind classes!
+  </Accordion>
+  
+  <Accordion title="❓ Common Questions">
+    **Q: Why use `htmlFor` instead of `for`?**
+    
+    A: In JSX, `for` is a reserved JavaScript keyword, so React uses `htmlFor` instead. It compiles to `for` in the final HTML.
+    
+    **Q: Can I use a different date picker library?**
+    
+    A: Yes! You can use libraries like `react-datepicker` or `date-fns`. We're using native `<input type="date">` for simplicity.
+    
+    **Q: Why isn't the guest counter working?**
+    
+    A: We haven't added event handlers (`onClick`) or state yet. The buttons are purely visual right now. We'll make them functional in the next lesson.
+  </Accordion>
+</Accordions>
+
+---
+
+## What's Next?
+
+In **Lesson 3**, we'll bring this component to life by:
+- Adding state for search, dates, and guests
+- Creating event handler functions
+- Making inputs **controlled components**
+- Enabling real-time updates
+
+Get ready to make your filters interactive! 🚀
+

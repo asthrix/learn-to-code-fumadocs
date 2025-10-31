@@ -2,5 +2,5 @@
    "title": "React Launchpad",
    "root": true,
    "description": "Beginner React track building the StaySense listing from components to mock backend.",
-   "pages": ["index", "m1", "m2", "m3", "m4"]
+   "pages": ["index", "component-test", "m1", "m2", "m3", "m4"]
 }

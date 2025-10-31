@@ -1,0 +1,670 @@
+---
+title: "L8: Create Navbar Component"
+description: "Build a navigation bar with favorites count badge"
+---
+
+# Create Navbar Component
+
+Let's build a navbar with navigation links and a favorites counter! 🧭
+
+## What We're Building
+
+A `Navbar` component that:
+- Displays site logo/name
+- Links to HomePage and FavoritesPage
+- Shows favorites count in a badge
+- Updates count in real-time
+- Highlights active page
+
+## Step 1: Create the Component
+
+```jsx title="src/components/Navbar.jsx"
+import { Link, useLocation } from 'react-router-dom';
+import useListingsStore from '@/state/useListingsStore';
+
+function Navbar() {
+  // Get favorites count
+  const favorites = useListingsStore((state) => state.favorites);
+  const favoritesCount = favorites.length;
+  
+  // Get current location for active link
+  const location = useLocation();
+  
+  return (
+    <nav className="navbar">
+      <div className="navbar-container">
+        {/* Logo/Brand */}
+        <Link to="/" className="navbar-brand">
+          <span className="logo">🏖️</span>
+          <span className="brand-name">Holidaze</span>
+        </Link>
+        
+        {/* Navigation Links */}
+        <div className="navbar-links">
+          <Link
+            to="/"
+            className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
+          >
+            <span className="nav-icon">🏠</span>
+            <span className="nav-text">Home</span>
+          </Link>
+          
+          <Link
+            to="/favorites"
+            className={`nav-link ${location.pathname === '/favorites' ? 'active' : ''}`}
+          >
+            <span className="nav-icon">❤️</span>
+            <span className="nav-text">Favorites</span>
+            {favoritesCount > 0 && (
+              <span className="badge">{favoritesCount}</span>
+            )}
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+```
+
+## Understanding the Component
+
+<Accordions>
+
+<Accordion title="Favorites Count">
+
+**How we get the count:**
+
+```jsx
+const favorites = useListingsStore((state) => state.favorites);
+const favoritesCount = favorites.length;
+```
+
+**Why select the array, not just the length?**
+
+```jsx
+// Option 1: Select array, get length (✅ Good)
+const favorites = useListingsStore((state) => state.favorites);
+const count = favorites.length;
+// Re-renders when favorites array changes
+
+// Option 2: Select length directly (✅ Also good!)
+const count = useListingsStore((state) => state.favorites.length);
+// Re-renders when favorites length changes
+
+// Option 3: Select entire state (❌ Bad)
+const state = useListingsStore();
+const count = state.favorites.length;
+// Re-renders on ANY state change! ❌
+```
+
+**Both options 1 and 2 work!** Option 2 is slightly more specific.
+
+**Better version:**
+
+```jsx
+const favoritesCount = useListingsStore((state) => state.favorites.length);
+```
+
+</Accordion>
+
+<Accordion title="Active Link Highlighting">
+
+**How we determine which link is active:**
+
+```jsx
+import { useLocation } from 'react-router-dom';
+
+const location = useLocation();
+// location.pathname = '/' or '/favorites'
+
+// For Home link
+<Link className={location.pathname === '/' ? 'active' : ''} />
+
+// For Favorites link
+<Link className={location.pathname === '/favorites' ? 'active' : ''} />
+```
+
+**Why `useLocation()`?**
+
+```jsx
+// ❌ Bad: Manual tracking
+const [activePage, setActivePage] = useState('home');
+
+<Link onClick={() => setActivePage('home')} />
+// Problem: Doesn't update on browser back/forward! ❌
+
+// ✅ Good: Use router state
+const location = useLocation();
+<Link className={location.pathname === '/' ? 'active' : ''} />
+// Works with back/forward buttons! ✅
+```
+
+</Accordion>
+
+<Accordion title="Conditional Badge">
+
+**Show badge only when there are favorites:**
+
+```jsx
+{favoritesCount > 0 && (
+  <span className="badge">{favoritesCount}</span>
+)}
+```
+
+**Why conditional?**
+
+```jsx
+// ❌ Always show (even when 0)
+<span className="badge">{favoritesCount}</span>
+// Shows: Favorites [0] ← Looks bad!
+
+// ✅ Only show when > 0
+{favoritesCount > 0 && <span className="badge">{favoritesCount}</span>}
+// Shows: Favorites [5] ← Looks good!
+// Shows: Favorites ← When 0 (clean!)
+```
+
+**Better UX!**
+
+</Accordion>
+
+</Accordions>
+
+## Step 2: Add Styling
+
+```css title="src/app/global.css"
+/* Navbar */
+.navbar {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Brand/Logo */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #0369a1;
+  font-weight: 700;
+  font-size: 1.5rem;
+  transition: transform 0.2s;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+}
+
+.logo {
+  font-size: 2rem;
+}
+
+.brand-name {
+  font-size: 1.5rem;
+}
+
+/* Navigation Links */
+.navbar-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  text-decoration: none;
+  color: #6b7280;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.nav-link:hover {
+  background: #f3f4f6;
+  color: #0369a1;
+}
+
+.nav-link.active {
+  background: #dbeafe;
+  color: #0369a1;
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+}
+
+.nav-text {
+  font-size: 1rem;
+}
+
+/* Badge */
+.badge {
+  background: #dc2626;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  min-width: 20px;
+  text-align: center;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  animation: badge-appear 0.3s ease;
+}
+
+@keyframes badge-appear {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .navbar-container {
+    padding: 1rem;
+  }
+  
+  .brand-name {
+    display: none;
+  }
+  
+  .nav-text {
+    display: none;
+  }
+  
+  .nav-link {
+    padding: 0.75rem;
+  }
+}
+```
+
+## Real-Time Updates
+
+The best part about using Zustand: **The count updates automatically!**
+
+<Tabs items={['How It Works', 'Try It Out', 'Performance']}>
+
+<Tab value="How It Works">
+
+**The flow:**
+
+```
+1. User is on HomePage
+   Navbar shows "Favorites [3]"
+   
+2. User clicks favorite button on listing
+   ↓
+3. toggleFavorite() is called
+   ↓
+4. Store updates: favorites = [1, 5, 9, 12] (added 12)
+   ↓
+5. Navbar re-renders (it selects favorites.length)
+   ↓
+6. Badge updates: "Favorites [4]"
+```
+
+**No props, no context, no manual updates!** Just works. ✨
+
+</Tab>
+
+<Tab value="Try It Out">
+
+**Test sequence:**
+
+1. Open app, go to HomePage
+2. Look at navbar: "Favorites" (no badge)
+3. Click favorite on a listing
+4. Watch navbar: "Favorites [1]" appears!
+5. Click favorite on 2 more listings
+6. Watch navbar: "Favorites [3]"
+7. Go to FavoritesPage
+8. Remove a favorite
+9. Watch navbar: "Favorites [2]" updates!
+
+**It works from any page!** 🎉
+
+</Tab>
+
+<Tab value="Performance">
+
+**How efficient is this?**
+
+```jsx
+// Navbar selects favorites.length
+const count = useListingsStore((state) => state.favorites.length);
+
+// When user changes search filter:
+// - HomePage re-renders (uses searchQuery)
+// - Navbar does NOT re-render (doesn't use searchQuery) ✅
+
+// When user toggles favorite:
+// - HomePage re-renders (uses favorites for button)
+// - Navbar re-renders (uses favorites.length for badge) ✅
+// - Both necessary!
+
+// When user changes price filter:
+// - HomePage re-renders (uses maxPrice)
+// - Navbar does NOT re-render (doesn't use maxPrice) ✅
+```
+
+**Zustand only re-renders components that use the changed state!** 🚀
+
+</Tab>
+
+</Tabs>
+
+## Improved Version with Memoization
+
+For maximum performance, we can optimize:
+
+```jsx title="src/components/Navbar.jsx (Optimized)"
+import { Link, useLocation } from 'react-router-dom';
+import useListingsStore from '@/state/useListingsStore';
+
+function Navbar() {
+  // Select only the count, not the entire array
+  const favoritesCount = useListingsStore((state) => state.favorites.length);
+  
+  const location = useLocation();
+  
+  return (
+    <nav className="navbar">
+      <div className="navbar-container">
+        <Link to="/" className="navbar-brand">
+          <span className="logo">🏖️</span>
+          <span className="brand-name">Holidaze</span>
+        </Link>
+        
+        <div className="navbar-links">
+          <Link
+            to="/"
+            className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
+          >
+            <span className="nav-icon">🏠</span>
+            <span className="nav-text">Home</span>
+          </Link>
+          
+          <Link
+            to="/favorites"
+            className={`nav-link ${location.pathname === '/favorites' ? 'active' : ''}`}
+          >
+            <span className="nav-icon">❤️</span>
+            <span className="nav-text">Favorites</span>
+            {favoritesCount > 0 && (
+              <span className="badge">{favoritesCount}</span>
+            )}
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+```
+
+**Difference:**
+
+```jsx
+// Before: Selects array, calculates length
+const favorites = useListingsStore((state) => state.favorites);
+const count = favorites.length;
+
+// After: Selects length directly
+const count = useListingsStore((state) => state.favorites.length);
+```
+
+**Why better?**
+
+```jsx
+// Scenario: favorites array is [1, 2, 3]
+// User toggles favorite 1 OFF, then favorite 1 ON
+
+// Before:
+// 1. favorites = [2, 3] → re-render (array changed)
+// 2. favorites = [1, 2, 3] → re-render (array changed)
+// Total: 2 re-renders
+
+// After:
+// 1. favorites.length = 2 → re-render (length changed)
+// 2. favorites.length = 3 → re-render (length changed)
+// Total: 2 re-renders
+
+// Actually same! But if reordering:
+// favorites = [1, 2, 3] → [3, 2, 1] (reordered)
+
+// Before: Re-renders (array reference changed)
+// After: Doesn't re-render (length still 3) ✅
+```
+
+**More stable!**
+
+## Comparison with Redux
+
+<Tabs items={['Zustand (This)', 'Redux']}>
+
+<Tab value="Zustand (This)">
+
+**Simple and direct:**
+
+```jsx
+import useListingsStore from '@/state/useListingsStore';
+
+function Navbar() {
+  // Just select what you need
+  const count = useListingsStore((state) => state.favorites.length);
+  
+  return (
+    <nav>
+      Favorites {count > 0 && <span>{count}</span>}
+    </nav>
+  );
+}
+```
+
+**No Provider, no hooks setup, just works!** ✨
+
+</Tab>
+
+<Tab value="Redux">
+
+**More setup required:**
+
+```jsx
+import { useSelector } from 'react-redux';
+
+function Navbar() {
+  // Need to know nested path
+  const count = useSelector((state) => state.listings.favorites.length);
+  
+  return (
+    <nav>
+      Favorites {count > 0 && <span>{count}</span>}
+    </nav>
+  );
+}
+
+// Also need Provider in root:
+// <Provider store={store}>
+//   <App />
+// </Provider>
+```
+
+**More imports, nested paths, Provider needed.**
+
+</Tab>
+
+</Tabs>
+
+## Add Navbar to Layout
+
+We'll add the navbar to our app layout in the next lesson, but here's a preview:
+
+```jsx title="src/App.jsx (Preview)"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import HomePage from '@/pages/HomePage';
+import FavoritesPage from '@/pages/FavoritesPage';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="app">
+        <Navbar />  {/* Add navbar here! */}
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+## Understanding Zustand's Power
+
+<Accordions>
+
+<Accordion title="No Prop Drilling">
+
+**Without Zustand:**
+
+```jsx
+// ❌ Bad: Pass count through props
+function App() {
+  const [favoritesCount, setFavoritesCount] = useState(0);
+  
+  return (
+    <div>
+      <Navbar count={favoritesCount} />
+      <HomePage onFavoriteToggle={(newCount) => setFavoritesCount(newCount)} />
+      <FavoritesPage count={favoritesCount} onFavoriteToggle={...} />
+    </div>
+  );
+}
+
+// Every component needs to receive and pass props! ❌
+```
+
+**With Zustand:**
+
+```jsx
+// ✅ Good: Components read directly from store
+function App() {
+  return (
+    <div>
+      <Navbar />  {/* Reads count from store */}
+      <HomePage />  {/* Updates favorites in store */}
+      <FavoritesPage />  {/* Reads from store */}
+    </div>
+  );
+}
+
+// No props! Components are independent! ✅
+```
+
+</Accordion>
+
+<Accordion title="Automatic Synchronization">
+
+**All components stay in sync automatically:**
+
+```jsx
+// Navbar shows count
+const count = useListingsStore((state) => state.favorites.length);
+
+// HomePage's button toggles
+const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
+
+// FavoritesPage shows list
+const getFavoritedItems = useListingsStore((state) => state.getFavoritedItems);
+
+// ONE action updates EVERYTHING:
+toggleFavorite(5)
+// ↓
+// Navbar: Badge updates (3 → 4)
+// HomePage: Button changes (🤍 → ❤️)
+// FavoritesPage: List grows (adds listing 5)
+```
+
+**All automatic!** No manual synchronization needed. ✨
+
+</Accordion>
+
+<Accordion title="Testable Components">
+
+**Each component can be tested independently:**
+
+```jsx
+// Test Navbar
+it('shows favorites count', () => {
+  // Set up store
+  useListingsStore.setState({ favorites: [1, 2, 3] });
+  
+  // Render component
+  render(<Navbar />);
+  
+  // Check badge
+  expect(screen.getByText('3')).toBeInTheDocument();
+});
+
+// No need to set up entire app!
+```
+
+**Components are self-contained!**
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+Perfect! Navbar is ready. In the next lesson:
+
+1. **Add Navbar to App** - Integrate into layout
+2. **Update Router** - Add favorites route
+3. **Test navigation** - Ensure all links work
+4. **Add layout styling** - Polish the design
+
+<Callout type="success">
+**✅ Lesson Complete!** Navbar displays favorites count with real-time updates!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Real-time count** - Badge updates automatically when favorites change
+- ✅ **Active link highlighting** - Shows current page with `useLocation()`
+- ✅ **Conditional badge** - Only shows when count > 0
+- ✅ **No prop drilling** - Component reads directly from store
+- ✅ **Optimized selector** - Selects only `favorites.length`, not entire array
+- ✅ **Responsive design** - Adapts to mobile screens
+- ✅ **Simpler than Redux** - No Provider, no nested paths, just hooks
+- ✅ **Automatic sync** - All components update together

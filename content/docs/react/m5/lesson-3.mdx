@@ -1,0 +1,477 @@
+---
+title: "L3: Refactor ListingDetailsPage"
+description: "Use useFetch with dynamic URLs and route parameters"
+---
+
+# Refactor ListingDetailsPage
+
+Let's apply `useFetch` to another component - this time with a dynamic URL that changes based on route parameters!
+
+## What You'll Learn
+
+- Use useFetch with dynamic URLs
+- Combine useParams with custom hooks
+- Handle URL parameter changes
+- Refetch data when params change
+- Simplify details page logic
+
+## Current ListingDetailsPage
+
+Right now, `ListingDetailsPage` has similar fetch logic to what `HomePage` had:
+
+```jsx title="src/pages/ListingDetailsPage.jsx" {5-7,9-28}
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import api from '@/api';
+
+export function ListingDetailsPage() {
+  const { id } = useParams();
+  
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchListing = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(`/listings/${id}`, {
+          signal: controller.signal
+        });
+        setListing(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchListing();
+    return () => controller.abort();
+  }, [id]);
+  
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+  if (!listing) return <div>Listing not found</div>;
+  
+  return <ListingDetailsCard listing={listing} />;
+}
+```
+
+Notice the URL uses the `id` from `useParams` - this is a **dynamic URL**!
+
+## Dynamic URLs with useFetch
+
+The beauty of `useFetch` is that it automatically refetches when the URL changes:
+
+```jsx
+// When id changes, useFetch automatically refetches!
+const { data } = useFetch(`/listings/${id}`);
+```
+
+This works because:
+1. `useFetch` includes `url` in the dependency array
+2. When `id` changes, the URL changes
+3. `useEffect` runs again
+4. New data is fetched automatically
+
+<Callout type="info">
+**Key insight:** Custom hooks can use values from the parent component (like `id` from `useParams`). When those values change, the hook automatically responds!
+</Callout>
+
+## Step-by-Step Refactoring
+
+<Steps>
+
+<Step>
+
+### Import useFetch
+
+```jsx title="src/pages/ListingDetailsPage.jsx" {2-3}
+import { useParams } from 'react-router-dom';
+import { useFetch } from '@/hooks/useFetch';
+import { ListingDetailsCard } from '@/components/ListingDetailsCard';
+import { Spinner } from '@/components/ui/Spinner';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
+```
+
+Remove `useState`, `useEffect`, and `api` imports.
+
+</Step>
+
+<Step>
+
+### Replace fetch logic
+
+```jsx title="src/pages/ListingDetailsPage.jsx" {4-5}
+export function ListingDetailsPage() {
+  const { id } = useParams();
+  
+  // Replace all the fetch logic with this:
+  const { data: listing, isLoading, error } = useFetch(`/listings/${id}`);
+  
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+  if (!listing) return <div>Listing not found</div>;
+  
+  return <ListingDetailsCard listing={listing} />;
+}
+```
+
+**One line replaces 30+** lines again! The URL includes the dynamic `id` parameter.
+
+</Step>
+
+<Step>
+
+### Test URL changes
+
+When you navigate between different listings, `useFetch` automatically:
+
+1. Detects URL changed (id changed)
+2. Cancels previous request (AbortController)
+3. Fetches new listing data
+4. Updates the UI
+
+Try clicking between different listings - you'll see:
+- Loading spinner appears
+- New listing loads
+- Old request is canceled
+
+All handled automatically! 🎉
+
+</Step>
+
+</Steps>
+
+## Complete Refactored Code
+
+```jsx title="src/pages/ListingDetailsPage.jsx"
+import { useParams } from 'react-router-dom';
+import { useFetch } from '@/hooks/useFetch';
+import { ListingDetailsCard } from '@/components/ListingDetailsCard';
+import { Spinner } from '@/components/ui/Spinner';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
+
+export function ListingDetailsPage() {
+  const { id } = useParams();
+  const { data: listing, isLoading, error } = useFetch(`/listings/${id}`);
+  
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spinner />
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorMessage message={error} />
+      </div>
+    );
+  }
+  
+  if (!listing) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <p className="text-center text-gray-600">
+          Listing not found
+        </p>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <ListingDetailsCard listing={listing} />
+    </div>
+  );
+}
+```
+
+From ~60 lines to ~35 lines - almost **40% reduction**! 🚀
+
+## Code Comparison
+
+<Tabs items={['Before', 'After']}>
+
+<Tab value="Before">
+
+```jsx
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import api from '@/api';
+
+export function ListingDetailsPage() {
+  const { id } = useParams();
+  
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchListing = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(`/listings/${id}`, {
+          signal: controller.signal
+        });
+        setListing(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchListing();
+    return () => controller.abort();
+  }, [id]);
+  
+  // ... render logic
+}
+```
+
+**Complexity:**
+- Manual state management
+- AbortController setup
+- Error handling
+- Cleanup function
+- Dependency array
+
+</Tab>
+
+<Tab value="After">
+
+```jsx
+import { useParams } from 'react-router-dom';
+import { useFetch } from '@/hooks/useFetch';
+
+export function ListingDetailsPage() {
+  const { id } = useParams();
+  const { data: listing, isLoading, error } = useFetch(`/listings/${id}`);
+  
+  // ... render logic
+}
+```
+
+**Simplicity:**
+- ✅ No manual state
+- ✅ No AbortController
+- ✅ No error handling
+- ✅ No cleanup
+- ✅ No dependency array
+
+Everything is handled by `useFetch`!
+
+</Tab>
+
+</Tabs>
+
+## How It Works
+
+Let's understand the flow:
+
+<Accordions>
+
+<Accordion title="1. Component Mounts">
+
+```jsx
+// Component renders first time
+const { id } = useParams(); // id = "123"
+const { data, isLoading } = useFetch(`/listings/123`);
+
+// useFetch internal behavior:
+// 1. Sets isLoading = true
+// 2. Makes GET request to /listings/123
+// 3. Sets data when response arrives
+// 4. Sets isLoading = false
+```
+
+Component shows spinner while `isLoading` is true.
+
+</Accordion>
+
+<Accordion title="2. User Clicks Different Listing">
+
+```jsx
+// URL changes: /listings/123 → /listings/456
+const { id } = useParams(); // id = "456" (changed!)
+const { data, isLoading } = useFetch(`/listings/456`);
+
+// useFetch detects URL changed:
+// 1. Cancels request to /listings/123 (AbortController)
+// 2. Sets isLoading = true
+// 3. Makes new request to /listings/456
+// 4. Sets new data
+// 5. Sets isLoading = false
+```
+
+Component shows spinner again, then new listing.
+
+</Accordion>
+
+<Accordion title="3. Component Unmounts">
+
+```jsx
+// User navigates away from details page
+// useFetch cleanup runs:
+// 1. AbortController cancels any in-flight request
+// 2. Prevents state updates on unmounted component
+```
+
+No memory leaks or warnings!
+
+</Accordion>
+
+</Accordions>
+
+## Benefits Summary
+
+| Aspect | Before | After |
+|--------|--------|-------|
+| **Lines of code** | ~60 | ~35 |
+| **State variables** | 3 manual | 0 manual |
+| **useEffect hooks** | 1 complex | 0 |
+| **AbortController** | Manual setup | Automatic |
+| **Error handling** | Manual try/catch | Automatic |
+| **Refetch logic** | Manual in useEffect | Automatic |
+| **Cleanup** | Manual return | Automatic |
+
+## Real-World Usage Pattern
+
+This pattern works for **any** dynamic URL:
+
+```jsx
+// Different components, same pattern
+function UserProfile() {
+  const { userId } = useParams();
+  const { data: user } = useFetch(`/users/${userId}`);
+  return <Profile user={user} />;
+}
+
+function BlogPost() {
+  const { slug } = useParams();
+  const { data: post } = useFetch(`/posts/${slug}`);
+  return <Article post={post} />;
+}
+
+function ProductDetails() {
+  const { productId } = useParams();
+  const { data: product } = useFetch(`/products/${productId}`);
+  return <ProductCard product={product} />;
+}
+```
+
+**Same pattern everywhere** - consistent and maintainable! ✨
+
+## Testing Your Changes
+
+1. **Navigate to a listing** - Should load correctly
+2. **Click another listing** - Should fetch new data
+3. **Check browser console** - No errors or warnings
+4. **Navigate back and forth** - Should work smoothly
+5. **Check Network tab** - Should see requests being canceled when URL changes
+
+## Common Issues
+
+<Accordions>
+
+<Accordion title="listing is null on first render">
+
+**Problem:** Component tries to render before data loads
+
+**Solution:** This is correct! Check loading state first
+
+```jsx
+if (isLoading) return <Spinner />;
+if (!listing) return <div>Not found</div>;
+
+// Now safe to use listing
+return <ListingDetailsCard listing={listing} />;
+```
+
+The order matters:
+1. Check loading first
+2. Then check for null/undefined
+3. Then render with data
+
+</Accordion>
+
+<Accordion title="Stale data when switching listings">
+
+**Problem:** Old listing data visible briefly
+
+**Solution:** This shouldn't happen with `useFetch` - it automatically:
+1. Shows loading state
+2. Cancels old request
+3. Fetches new data
+
+If you see stale data, check that you're using the hook correctly.
+
+</Accordion>
+
+<Accordion title="Multiple requests for same listing">
+
+**Problem:** Component fetches same data twice
+
+**Solution:** This is normal in development (React.StrictMode). In production, it only fetches once. In Lesson 9, we'll add caching to eliminate even development duplicates!
+
+</Accordion>
+
+</Accordions>
+
+## What Changed?
+
+**Removed:**
+```jsx
+import { useState, useEffect } from 'react';
+import api from '@/api';
+
+const [listing, setListing] = useState(null);
+const [isLoading, setIsLoading] = useState(true);
+const [error, setError] = useState(null);
+
+useEffect(() => {
+  // 25+ lines
+}, [id]);
+```
+
+**Added:**
+```jsx
+import { useFetch } from '@/hooks/useFetch';
+
+const { data: listing, isLoading, error } = useFetch(`/listings/${id}`);
+```
+
+**Gained:**
+- ✅ 40% less code
+- ✅ Automatic refetch on URL change
+- ✅ Automatic cleanup
+- ✅ Consistent error handling
+- ✅ Same loading patterns
+
+## What's Next?
+
+In **Lesson 4**, we'll learn about **useMemo** - a hook that prevents expensive calculations from running on every render. We'll optimize our listing filtering logic! 🚀
+
+## Summary
+
+- ✅ Refactored ListingDetailsPage with useFetch
+- ✅ Reduced code by 40%
+- ✅ Automatic refetch when URL changes
+- ✅ Same pattern as HomePage
+- ✅ Handles dynamic URLs seamlessly
+- ✅ Proper cleanup on unmount
+
+**Key concept:** Custom hooks work perfectly with React Router - they automatically respond to URL parameter changes!

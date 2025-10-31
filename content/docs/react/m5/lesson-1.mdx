@@ -1,0 +1,512 @@
+---
+title: "L1: Custom Hook Basics"
+description: "Learn to create reusable custom hooks to share logic between components"
+---
+
+# Custom Hook Basics
+
+React custom hooks let you extract component logic into reusable functions. They're one of React's most powerful features for keeping code DRY (Don't Repeat Yourself)!
+
+## What You'll Learn
+
+- What custom hooks are
+- Rules for creating hooks
+- Extract useFetch custom hook
+- Share logic between components
+- Clean up duplicate code
+
+## The Problem: Duplicate Code
+
+Right now, both `HomePage` and `ListingDetailsPage` have nearly identical data fetching logic:
+
+```jsx title="src/pages/HomePage.jsx" {4-6,8-10,12-14}
+export function HomePage() {
+  const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get('/listings');
+        setListings(response.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchListings();
+  }, []);
+  
+  // ... rest of component
+}
+```
+
+```jsx title="src/pages/ListingDetailsPage.jsx" {5-7,9-11,13-15}
+export function ListingDetailsPage() {
+  const { id } = useParams();
+  
+  const [listing, setListing] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchListing = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(`/listings/${id}`);
+        setListing(response.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchListing();
+  }, [id]);
+  
+  // ... rest of component
+}
+```
+
+**Notice the pattern?** Almost identical state management, error handling, and loading logic. This is a perfect use case for a **custom hook**!
+
+## What Are Custom Hooks?
+
+<Callout type="info">
+**Custom hooks** are JavaScript functions that use React hooks internally. They let you extract component logic into reusable functions that can be shared across multiple components.
+</Callout>
+
+**Benefits:**
+
+- ✅ Eliminate duplicate code
+- ✅ Share logic between components
+- ✅ Easier testing and maintenance
+- ✅ Better code organization
+- ✅ Compose complex behaviors
+
+## Rules of Custom Hooks
+
+Custom hooks must follow these rules:
+
+<Accordions>
+
+<Accordion title="Rule 1: Name starts with 'use'">
+
+```jsx
+// ✅ Good - starts with 'use'
+function useFetch() { }
+function useLocalStorage() { }
+function useAuth() { }
+
+// ❌ Bad - doesn't start with 'use'
+function fetchData() { }
+function localStorage() { }
+function auth() { }
+```
+
+The `use` prefix tells React this is a hook and should follow hook rules.
+
+</Accordion>
+
+<Accordion title="Rule 2: Can call other hooks">
+
+```jsx
+// ✅ Custom hooks can use other hooks
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Fetch logic
+  }, [url]);
+  
+  return { data, isLoading };
+}
+```
+
+Custom hooks can call `useState`, `useEffect`, and other hooks!
+
+</Accordion>
+
+<Accordion title="Rule 3: Called from React functions">
+
+```jsx
+// ✅ Call from components
+function HomePage() {
+  const { data } = useFetch('/listings');
+  return <div>{data}</div>;
+}
+
+// ✅ Call from other hooks
+function useListings() {
+  const { data } = useFetch('/listings');
+  return data;
+}
+
+// ❌ Can't call from regular functions
+function fetchAndProcess() {
+  const { data } = useFetch('/listings'); // Error!
+  return processData(data);
+}
+```
+
+</Accordion>
+
+<Accordion title="Rule 4: Each call is independent">
+
+```jsx
+function Component1() {
+  const { data: data1 } = useFetch('/listings');
+  // Has its own state
+}
+
+function Component2() {
+  const { data: data2 } = useFetch('/listings');
+  // Has separate state from Component1
+}
+```
+
+Each component that calls a custom hook gets its own isolated state.
+
+</Accordion>
+
+</Accordions>
+
+## Creating useFetch Hook
+
+Let's create a `useFetch` custom hook that handles all our data fetching logic!
+
+<Steps>
+
+<Step>
+
+### Create hooks directory
+
+First, create a new folder for your custom hooks:
+
+```bash title="Terminal"
+mkdir src/hooks
+touch src/hooks/useFetch.js
+```
+
+This keeps all custom hooks organized in one place.
+
+</Step>
+
+<Step>
+
+### Import dependencies
+
+```jsx title="src/hooks/useFetch.js"
+import { useState, useEffect } from 'react';
+import api from '@/api';
+```
+
+We need `useState` for state management, `useEffect` for side effects, and our `api` instance for requests.
+
+</Step>
+
+<Step>
+
+### Define the hook function
+
+```jsx title="src/hooks/useFetch.js"
+import { useState, useEffect } from 'react';
+import api from '@/api';
+
+export function useFetch(url) {
+  // Hook implementation will go here
+}
+```
+
+**Parameters:**
+- `url` - The API endpoint to fetch from (e.g., `/listings` or `/listings/123`)
+
+</Step>
+
+<Step>
+
+### Add state variables
+
+```jsx title="src/hooks/useFetch.js"
+export function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Effect will go here
+  
+  return { data, isLoading, error };
+}
+```
+
+Same three states we use everywhere:
+- `data` - The fetched data
+- `isLoading` - Loading state
+- `error` - Error message if request fails
+
+</Step>
+
+<Step>
+
+### Add fetch logic with useEffect
+
+```jsx title="src/hooks/useFetch.js"
+export function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await api.get(url);
+        setData(response.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [url]);
+  
+  return { data, isLoading, error };
+}
+```
+
+**Key points:**
+
+- Runs whenever `url` changes
+- Sets loading state before fetching
+- Catches and stores errors
+- Always sets loading to false (finally block)
+
+</Step>
+
+<Step>
+
+### Add AbortController cleanup
+
+```jsx title="src/hooks/useFetch.js"
+export function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await api.get(url, {
+          signal: controller.signal
+        });
+        setData(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+    
+    return () => controller.abort();
+  }, [url]);
+  
+  return { data, isLoading, error };
+}
+```
+
+Prevents race conditions by canceling in-flight requests when:
+- Component unmounts
+- URL changes
+
+</Step>
+
+</Steps>
+
+## Complete Hook Code
+
+Here's the full `useFetch` hook:
+
+```jsx title="src/hooks/useFetch.js"
+import { useState, useEffect } from 'react';
+import api from '@/api';
+
+export function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await api.get(url, {
+          signal: controller.signal
+        });
+        setData(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+    
+    return () => controller.abort();
+  }, [url]);
+  
+  return { data, isLoading, error };
+}
+```
+
+## How to Use It
+
+Now you can use this hook in any component:
+
+```jsx title="Example Usage"
+import { useFetch } from '@/hooks/useFetch';
+
+function MyComponent() {
+  const { data, isLoading, error } = useFetch('/api/endpoint');
+  
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  
+  return <div>{JSON.stringify(data)}</div>;
+}
+```
+
+**One line replaces 20+ lines** of fetch logic! 🎉
+
+## Benefits Recap
+
+<Tabs items={['Before', 'After']}>
+
+<Tab value="Before">
+
+```jsx
+// Duplicated in multiple components
+function Component() {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(url, {
+          signal: controller.signal
+        });
+        setData(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+    return () => controller.abort();
+  }, [url]);
+  
+  // ... rest
+}
+```
+
+**Problems:**
+- 25+ lines of boilerplate
+- Copy-pasted everywhere
+- Hard to maintain
+- Easy to forget cleanup
+
+</Tab>
+
+<Tab value="After">
+
+```jsx
+// Clean and reusable
+function Component() {
+  const { data, isLoading, error } = useFetch(url);
+  
+  // ... rest
+}
+```
+
+**Benefits:**
+- ✅ 1 line instead of 25+
+- ✅ Logic in one place
+- ✅ Easy to maintain
+- ✅ Cleanup handled automatically
+- ✅ Reusable across app
+
+</Tab>
+
+</Tabs>
+
+## Testing Your Hook
+
+Let's verify the hook works:
+
+```jsx title="Test in HomePage (temporary)"
+import { useFetch } from '@/hooks/useFetch';
+
+export function HomePage() {
+  const { data, isLoading, error } = useFetch('/listings');
+  
+  console.log('Hook data:', data);
+  console.log('Hook loading:', isLoading);
+  console.log('Hook error:', error);
+  
+  // ... rest of component (keep existing code for now)
+}
+```
+
+Check your browser console - you should see:
+1. `isLoading: true` initially
+2. `data: [...]` with listings array
+3. `isLoading: false` when done
+
+## What's Next?
+
+In **Lesson 2**, we'll **refactor HomePage** to use `useFetch` instead of manual fetch logic. We'll eliminate 25+ lines of duplicate code! 🚀
+
+## Summary
+
+- ✅ Custom hooks start with `use`
+- ✅ Extract reusable logic from components
+- ✅ Can use other React hooks
+- ✅ Each call gets isolated state
+- ✅ Created useFetch for data fetching
+- ✅ Eliminates code duplication
+
+**Key concept:** Custom hooks are functions that use hooks - they're not magic, just a pattern for sharing logic!

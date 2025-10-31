@@ -1,0 +1,206 @@
+---
+title: "State and Events"
+description:
+   "Make your React app interactive with useState and event handling. Add search
+   filters and dynamic data."
+module: 2
+totalSteps: 7
+duration: "2-3 hours"
+difficulty: "beginner"
+prerequisites: ["module-1"]
+objectives:
+   - "Understand React state and the useState hook"
+   - "Handle user events (clicks, typing, selections)"
+   - "Create controlled form components"
+   - "Lift state up between components"
+   - "Filter data dynamically based on user input"
+   - "Build an interactive search and filter system"
+tags: ["react", "state", "events", "useState", "forms"]
+---
+
+# Module 2 - State and Events
+
+Welcome to Module 2! It's time to bring your application to life with
+**interactivity**. 🎯
+
+In Module 1, you built a static homepage. Now you'll add state management and
+event handling to make it dynamic and responsive to user actions.
+
+---
+
+## Overview
+
+**State** is data that can change over time. When state changes, React
+automatically updates the UI to reflect those changes. Without state, your app
+would always look the same!
+
+**Events** are how users interact with your application - clicking buttons,
+typing in inputs, selecting options. You'll learn to handle these events and
+update state accordingly.
+
+---
+
+## What You'll Build
+
+By the end of this module, your homepage will have:
+
+<Steps>
+   <Step>
+      ### 🔍 Search Functionality Users can search properties by name or
+      location
+   </Step>
+   <Step>### 📅 Date Range Picker Select check-in and check-out dates</Step>
+   <Step>### 👥 Guest Selector Choose number of guests</Step>
+   <Step>
+      ### ⚡ Real-time Filtering Listings update instantly as users interact
+      with filters
+   </Step>
+</Steps>
+
+---
+
+## Key Concepts
+
+### useState Hook
+
+The `useState` hook lets you add state to functional components:
+
+```jsx
+import { useState } from "react";
+
+function Counter() {
+   const [count, setCount] = useState(0);
+
+   return (
+      <div>
+         <p>Count: {count}</p>
+         <button onClick={() => setCount(count + 1)}>Increment</button>
+      </div>
+   );
+}
+```
+
+### Event Handling
+
+React uses camelCase event handlers:
+
+```jsx
+<button onClick={handleClick}>Click Me</button>
+<input onChange={handleChange} value={text} />
+<form onSubmit={handleSubmit}>...</form>
+```
+
+### Controlled Components
+
+Form inputs controlled by React state:
+
+```jsx
+const [name, setName] = useState("");
+
+<input value={name} onChange={(e) => setName(e.target.value)} />;
+```
+
+---
+
+## Learning Objectives
+
+<Accordions type='single'>
+   <Accordion id='obj1' title='Lesson 1: Turn Listings into State' value='obj1'>
+      Convert the static listings array into React state using useState
+   </Accordion>
+
+   <Accordion
+      id='obj2'
+      title='Lesson 2: Create Search Filter Component'
+      value='obj2'
+   >
+      Build a SearchFilters component with input fields
+   </Accordion>
+
+   <Accordion id='obj3' title='Lesson 3: Add Filter State' value='obj3'>
+      Manage search, dates, and guest count in state
+   </Accordion>
+
+   <Accordion id='obj4' title='Lesson 4: Handle Input Events' value='obj4'>
+      Respond to user typing and selections
+   </Accordion>
+
+   <Accordion id='obj5' title='Lesson 5: Lift State Up' value='obj5'>
+      Share filter state between parent and child components
+   </Accordion>
+
+   <Accordion id='obj6' title='Lesson 6: Filter Listings' value='obj6'>
+      Filter the property array based on user-selected criteria
+   </Accordion>
+
+   <Accordion id='obj7' title='Lesson 7: Polish and Review' value='obj7'>
+      Add finishing touches and review concepts
+   </Accordion>
+</Accordions>
+
+---
+
+## Module Roadmap
+
+| Lesson | Component/Feature       | Concepts Introduced                   |
+| ------ | ----------------------- | ------------------------------------- |
+| **1**  | Listings as state       | useState basics                       |
+| **2**  | SearchFilters component | Form components                       |
+| **3**  | Filter state            | Multiple state variables              |
+| **4**  | Event handlers          | onChange, onClick                     |
+| **5**  | State lifting           | Callback props                        |
+| **6**  | Filter logic            | Array.filter(), conditional rendering |
+| **7**  | Final polish            | State management patterns             |
+
+---
+
+## Prerequisites
+
+Before starting, ensure:
+
+-  ✅ Completed Module 1
+-  ✅ HomePage displays property listings
+-  ✅ PropertyCard and PropertyList components work
+-  ✅ Understand components and props
+
+---
+
+## Quick Refresher
+
+### JavaScript Concepts You'll Use
+
+<Steps>
+  <Step>
+    ### Array Methods
+    ```javascript
+    const filtered = array.filter(item => item.price < 100);
+    const found = array.find(item => item.id === 1);
+    ```
+  </Step>
+  <Step>
+    ### Conditional Operators
+    ```javascript
+    const result = condition ? 'yes' : 'no';
+    const value = input || 'default';
+    ```
+  </Step>
+  <Step>
+    ### Event Objects
+    ```javascript
+    onChange={(e) => setValue(e.target.value)}
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Let's Begin!
+
+Ready to make your app interactive? Let's start by converting the listings array
+to state!
+
+<div className='mt-6'>
+   <Button asChild>
+      <a href='/docs/react/m2/lesson-1'>Start Lesson 1: Listings State →</a>
+   </Button>
+</div>

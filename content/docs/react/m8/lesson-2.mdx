@@ -1,0 +1,1073 @@
+---
+title: "L2: Deploy to Production"
+description: "Deploy your React application to Vercel and go live"
+---
+
+# Deploy to Production 🚀
+
+Time to make your application live on the internet! Let's deploy to Vercel and celebrate your achievement!
+
+## Deployment Overview
+
+**What will happen:**
+
+```
+1. Run `vercel` command
+   ↓
+2. Answer configuration questions
+   ↓
+3. Vercel builds your application
+   ↓
+4. Upload to global CDN
+   ↓
+5. Get production URL
+   ↓
+6. Application is LIVE! 🎉
+```
+
+## Deploy Your Application
+
+Let's deploy! Make sure you're in your project directory.
+
+<Steps>
+
+<Step>
+
+**Run deployment command:**
+
+```bash title="Terminal"
+vercel
+```
+
+This single command starts the entire deployment process! ✨
+
+</Step>
+
+<Step>
+
+**Answer configuration questions:**
+
+Vercel will ask several questions on first deployment:
+
+```bash
+Vercel CLI 33.0.1
+? Set up and deploy "~/projects/booking-app"? [Y/n]
+```
+
+**Type:** `Y` (Yes) and press Enter
+
+```bash
+? Which scope do you want to deploy to?
+```
+
+**Choose:** Your account name (should be selected by default)
+
+```bash
+? Link to existing project? [y/N]
+```
+
+**Type:** `N` (No - first time deploying)
+
+```bash
+? What's your project's name? (booking-app)
+```
+
+**Type:** Project name (or press Enter to use default)
+
+**Tips for naming:**
+- Use lowercase
+- No spaces (use hyphens: `booking-app`)
+- Descriptive but short
+- This becomes part of your URL
+
+```bash
+? In which directory is your code located? ./
+```
+
+**Type:** `./` (current directory) or press Enter
+
+</Step>
+
+<Step>
+
+**Vercel auto-detects framework:**
+
+```bash
+Auto-detected Project Settings (Vite):
+- Build Command: vite build
+- Development Command: vite --port $PORT
+- Install Command: npm install
+- Output Directory: dist
+? Want to modify these settings? [y/N]
+```
+
+**Type:** `N` (No - defaults are perfect for Vite)
+
+<Callout type="info">
+**Auto-detection is smart!** Vercel recognizes Vite, Next.js, Create React App, and dozens of other frameworks automatically.
+</Callout>
+
+</Step>
+
+<Step>
+
+**Watch the build process:**
+
+Vercel will now build your application:
+
+```bash
+🔗  Linked to your-account/booking-app (created .vercel)
+🔍  Inspect: https://vercel.com/your-account/booking-app/[id]
+✅  Production: https://booking-app.vercel.app [2s]
+
+📝  Deployed to production. Run `vercel --prod` to overwrite later.
+```
+
+**What just happened:**
+
+1. **Linked**: Connected local project to Vercel
+2. **Inspect**: Link to view build logs
+3. **Production**: Your live URL!
+4. **Time**: Build completed in ~2 seconds
+
+</Step>
+
+<Step>
+
+**Visit your deployed application!**
+
+Click the production URL or open it in your browser:
+
+```
+https://booking-app.vercel.app
+```
+
+**🎉 Congratulations! Your app is LIVE!** 🎉
+
+</Step>
+
+</Steps>
+
+## Understanding Deployment Output
+
+Let's break down what Vercel shows you:
+
+<Tabs items={['URL Structure', 'Build Logs', 'Deployment Types', 'Project Files']}>
+
+<Tab value="URL Structure">
+
+**Your deployment URLs:**
+
+```
+Preview Deployment:
+https://booking-app-git-main-youraccount.vercel.app
+  ↑              ↑      ↑         ↑
+project     branch   branch   account
+
+Production Deployment:
+https://booking-app.vercel.app
+  ↑              ↑
+project      platform
+```
+
+**Types of URLs:**
+
+1. **Production URL** (main):
+   - `https://booking-app.vercel.app`
+   - Always points to latest `--prod` deployment
+   - Share this URL publicly
+   - Custom domains point here
+
+2. **Preview URL** (per deployment):
+   - Unique URL for each deployment
+   - Perfect for testing
+   - Includes git branch name
+   - Expires after 30 days (on free tier)
+
+3. **Alias URL** (custom):
+   - `https://yourdomain.com` (if you have a domain)
+   - Points to production
+   - Professional branding
+
+</Tab>
+
+<Tab value="Build Logs">
+
+**Understanding build output:**
+
+```bash
+[1/4] Installing dependencies
+▶ npm install
+  added 1250 packages in 15s
+
+[2/4] Building application  
+▶ npm run build
+  vite v5.0.0 building for production...
+  ✓ 1234 modules transformed.
+  ✓ built in 5.23s
+
+[3/4] Uploading build output
+▶ Uploading 145 files...
+  ✓ Upload complete
+
+[4/4] Finalizing deployment
+▶ Assigning domains...
+  ✓ booking-app.vercel.app
+```
+
+**Each phase:**
+
+1. **Dependencies:** Install npm packages
+2. **Building:** Run `npm run build`
+3. **Uploading:** Send files to CDN
+4. **Finalizing:** Assign URLs and deploy
+
+**Build time:** Usually 30-60 seconds for React apps
+
+**If build fails:** Check inspect URL for detailed error logs
+
+</Tab>
+
+<Tab value="Deployment Types">
+
+**Preview vs Production:**
+
+| Feature | Preview | Production |
+|---------|---------|------------|
+| **Command** | `vercel` | `vercel --prod` |
+| **URL** | Unique per deploy | Single stable URL |
+| **Purpose** | Testing | Live users |
+| **Auto-update** | Every push | Manual `--prod` |
+| **SSL** | ✅ | ✅ |
+| **CDN** | ✅ | ✅ |
+
+**Workflow:**
+
+```
+1. Make code changes
+2. Run `vercel` (preview)
+3. Test preview URL
+4. If good, run `vercel --prod`
+5. Production updated!
+```
+
+**Best practice:**
+
+```bash
+# Deploy preview
+vercel
+
+# Test thoroughly
+# Visit preview URL, check all features
+
+# Promote to production
+vercel --prod
+```
+
+</Tab>
+
+<Tab value="Project Files">
+
+**What Vercel created:**
+
+```
+your-project/
+  .vercel/
+    project.json          # Project configuration
+    README.txt            # Info about .vercel folder
+  .gitignore              # Updated to ignore .vercel/
+  (your app files)
+```
+
+**project.json contents:**
+
+```json
+{
+  "orgId": "team_abc123",
+  "projectId": "prj_xyz789"
+}
+```
+
+**Purpose:**
+- Links local project to Vercel project
+- Enables `vercel` command to work
+- **Commit to Git** if you want other devs to deploy
+- **Don't commit** if you want only you to deploy
+
+</Tab>
+
+</Tabs>
+
+## Configure Environment Variables
+
+If your app uses environment variables (like API keys), add them to Vercel.
+
+<Steps>
+
+<Step>
+
+**Open Vercel dashboard:**
+
+Visit: [vercel.com/dashboard](https://vercel.com/dashboard)
+
+</Step>
+
+<Step>
+
+**Select your project:**
+
+Click on your `booking-app` project.
+
+</Step>
+
+<Step>
+
+**Go to Settings:**
+
+Click "Settings" tab in the project navigation.
+
+</Step>
+
+<Step>
+
+**Add environment variables:**
+
+1. Click "Environment Variables" in left sidebar
+2. Click "Add New"
+3. Enter variable details:
+
+```
+Name:  VITE_API_BASE_URL
+Value: https://api.example.com
+Environments: ✓ Production ✓ Preview ✓ Development
+```
+
+**Important for Vite:** Environment variables must start with `VITE_` to be exposed to your application.
+
+**Common variables:**
+
+```bash
+VITE_API_BASE_URL=https://api.example.com
+VITE_API_KEY=your_api_key_here
+VITE_STRIPE_PUBLIC_KEY=pk_live_...
+```
+
+</Step>
+
+<Step>
+
+**Redeploy with new variables:**
+
+Environment variables only apply to NEW deployments:
+
+```bash title="Terminal"
+vercel --prod
+```
+
+This redeploys with your new environment variables.
+
+</Step>
+
+</Steps>
+
+<Callout type="warning">
+**Security:** Never commit `.env` files to Git! Always use Vercel dashboard for production secrets.
+</Callout>
+
+<Callout type="info">
+**Vite specific:** Variables must start with `VITE_` to be accessible in your code:
+
+```jsx
+// ✅ Accessible
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+// ❌ Not accessible (no VITE_ prefix)
+const secret = import.meta.env.SECRET_KEY;
+```
+</Callout>
+
+## Update Your Application
+
+Need to deploy changes? It's easy!
+
+<Steps>
+
+<Step>
+
+**Make code changes:**
+
+Edit your code as needed.
+
+</Step>
+
+<Step>
+
+**Test locally:**
+
+```bash title="Terminal"
+npm run dev
+```
+
+Make sure changes work locally.
+
+</Step>
+
+<Step>
+
+**Deploy preview:**
+
+```bash title="Terminal"
+vercel
+```
+
+Get a preview URL to test.
+
+</Step>
+
+<Step>
+
+**Deploy to production:**
+
+```bash title="Terminal"
+vercel --prod
+```
+
+Update your live site!
+
+</Step>
+
+</Steps>
+
+**That's it!** Your users see the updated version immediately.
+
+## Git Integration (Optional)
+
+For automatic deployments, connect your Git repository.
+
+<Steps>
+
+<Step>
+
+**Push to GitHub:**
+
+```bash title="Terminal"
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/yourusername/booking-app.git
+git push -u origin main
+```
+
+</Step>
+
+<Step>
+
+**Connect to Vercel:**
+
+1. Go to Vercel dashboard
+2. Click "Import Project"
+3. Select your GitHub repository
+4. Click "Import"
+5. Configure settings (auto-detected)
+6. Click "Deploy"
+
+</Step>
+
+<Step>
+
+**Automatic deployments:**
+
+Now every time you push to GitHub:
+
+```bash
+git push origin main
+  ↓
+GitHub webhook triggers Vercel
+  ↓
+Vercel auto-builds and deploys
+  ↓
+New version goes live!
+```
+
+**No more manual `vercel` commands!** 🎉
+
+</Step>
+
+</Steps>
+
+<Callout type="success">
+**Pro workflow:** Connect Git for automatic preview deployments on pull requests. Every PR gets its own preview URL for testing!
+</Callout>
+
+## Custom Domain (Optional)
+
+Want a custom domain like `mybookingapp.com`?
+
+<Steps>
+
+<Step>
+
+**Purchase domain:**
+
+Buy from domain registrar:
+- Namecheap
+- Google Domains
+- GoDaddy
+- Vercel Domains (easiest integration)
+
+</Step>
+
+<Step>
+
+**Add to Vercel:**
+
+1. Go to project settings
+2. Click "Domains"
+3. Click "Add"
+4. Enter your domain: `mybookingapp.com`
+5. Click "Add"
+
+</Step>
+
+<Step>
+
+**Configure DNS:**
+
+Vercel provides DNS records to add at your registrar:
+
+```
+Type:  A
+Name:  @
+Value: 76.76.21.21
+
+Type:  CNAME  
+Name:  www
+Value: cname.vercel-dns.com
+```
+
+</Step>
+
+<Step>
+
+**Wait for verification:**
+
+DNS propagation takes 24-48 hours max (usually ~1 hour).
+
+Once verified, your custom domain works! 🎉
+
+</Step>
+
+</Steps>
+
+## Monitoring and Analytics
+
+Vercel provides built-in analytics:
+
+<Accordions>
+
+<Accordion title="View Deployment Status">
+
+**Dashboard shows:**
+
+```
+Recent Deployments
+├─ Production     ✓ Ready      2 minutes ago
+├─ Preview #23    ✓ Ready      1 hour ago  
+└─ Preview #22    ✗ Error      2 hours ago
+```
+
+**Click any deployment to see:**
+- Build logs
+- Function logs
+- Source code (if public)
+- Performance metrics
+- Request headers
+
+</Accordion>
+
+<Accordion title="Analytics Dashboard">
+
+**Free tier includes:**
+
+- Page views
+- Visitors count
+- Top pages
+- Devices (mobile/desktop)
+- Browsers
+- Countries
+
+**Access:**
+1. Go to project
+2. Click "Analytics" tab
+3. View metrics
+
+**Example data:**
+
+```
+Last 7 days
+├─ 1,234 page views
+├─ 567 unique visitors
+├─ 2.3 avg. pages/session
+└─ 1:45 avg. session duration
+
+Top Pages
+1. /             789 views
+2. /venues       234 views
+3. /venues/123   156 views
+```
+
+</Accordion>
+
+<Accordion title="Performance Insights">
+
+**Web Vitals tracking:**
+
+```
+Core Web Vitals (Average)
+├─ LCP: 1.2s  ✓ Good
+├─ FID: 45ms  ✓ Good
+└─ CLS: 0.05  ✓ Good
+```
+
+**What these mean:**
+
+- **LCP** (Largest Contentful Paint): Load performance
+- **FID** (First Input Delay): Interactivity
+- **CLS** (Cumulative Layout Shift): Visual stability
+
+**Good scores help SEO!**
+
+</Accordion>
+
+<Accordion title="Error Tracking">
+
+**Build errors:**
+
+Vercel shows build failures with detailed logs:
+
+```
+× Build failed
+
+  Error: Cannot find module 'react'
+  
+  To debug, run:
+  vercel logs [deployment-url]
+```
+
+**Runtime errors:**
+
+Check Function logs for server-side errors:
+
+```
+[GET] /api/venues → 500
+TypeError: Cannot read property 'map' of undefined
+  at handler.js:23:18
+```
+
+**Fix and redeploy:**
+
+```bash
+# Fix code
+# Then redeploy
+vercel --prod
+```
+
+</Accordion>
+
+</Accordions>
+
+## Troubleshooting Common Issues
+
+<Accordions>
+
+<Accordion title="Build succeeds locally but fails on Vercel">
+
+**Possible causes:**
+
+1. **Missing dependencies:**
+
+   Check `package.json` has all required packages:
+
+   ```bash
+   npm install
+   git add package.json package-lock.json
+   git commit -m "Update dependencies"
+   vercel --prod
+   ```
+
+2. **Environment variables:**
+
+   Add missing variables in Vercel dashboard.
+
+3. **Node version:**
+
+   Specify in `package.json`:
+
+   ```json
+   {
+     "engines": {
+       "node": "18.x"
+     }
+   }
+   ```
+
+4. **Case-sensitive imports:**
+
+   Filenames must match exactly (Vercel uses Linux):
+
+   ```jsx
+   // ❌ Fails
+   import Button from './Button';  // File: button.jsx
+
+   // ✅ Works
+   import Button from './button';
+   ```
+
+</Accordion>
+
+<Accordion title="Application shows blank page">
+
+**Check these:**
+
+1. **Console errors:**
+
+   Open browser DevTools (F12) and check Console tab.
+
+2. **Incorrect base path:**
+
+   If deploying to subdirectory, configure in `vite.config.js`:
+
+   ```js
+   export default {
+     base: '/subdirectory/'
+   }
+   ```
+
+3. **API calls failing:**
+
+   Check Network tab for failed requests. Update API base URL.
+
+4. **Missing environment variables:**
+
+   Add them in Vercel dashboard and redeploy.
+
+</Accordion>
+
+<Accordion title="Changes not appearing after deploy">
+
+**Solutions:**
+
+1. **Hard refresh browser:**
+
+   - Windows/Linux: `Ctrl + Shift + R`
+   - macOS: `Cmd + Shift + R`
+
+2. **Check deployment URL:**
+
+   Make sure you're visiting the correct URL (production not preview).
+
+3. **Wait for propagation:**
+
+   CDN updates can take 30-60 seconds.
+
+4. **Verify deployment:**
+
+   Check dashboard to ensure deployment succeeded.
+
+</Accordion>
+
+<Accordion title="API requests failing (CORS errors)">
+
+**Problem:** Your API rejects requests from Vercel domain
+
+**Solution:** Update API CORS settings:
+
+```js
+// Backend API (Express example)
+app.use(cors({
+  origin: [
+    'http://localhost:5173',           // Development
+    'https://booking-app.vercel.app'   // Production
+  ],
+  credentials: true
+}));
+```
+
+**For external APIs:**
+
+Some APIs require domain whitelisting in their dashboard.
+
+</Accordion>
+
+<Accordion title="Environment variables not working">
+
+**Checklist:**
+
+1. **Vite prefix:**
+
+   ```bash
+   # ✅ Correct
+   VITE_API_URL=https://api.example.com
+
+   # ❌ Won't work
+   API_URL=https://api.example.com
+   ```
+
+2. **Redeploy after adding:**
+
+   Variables only apply to new builds:
+
+   ```bash
+   vercel --prod
+   ```
+
+3. **Check environment:**
+
+   Ensure variable is enabled for "Production".
+
+4. **Access correctly:**
+
+   ```jsx
+   // ✅ Correct
+   import.meta.env.VITE_API_URL
+
+   // ❌ Wrong
+   process.env.VITE_API_URL
+   ```
+
+</Accordion>
+
+</Accordions>
+
+## Next Steps After Deployment
+
+**Your application is live! Now what?**
+
+<Steps>
+
+<Step>
+
+**Share your work:**
+
+- Add to your resume
+- Post on LinkedIn
+- Share with friends/family
+- Submit to portfolio sites
+
+**Example post:**
+
+```
+🎉 Just deployed my React booking application!
+
+Built with:
+- React 18
+- React Router
+- Redux Toolkit  
+- React Hook Form
+- Tailwind CSS
+
+Check it out: https://booking-app.vercel.app
+
+#React #WebDev #JavaScript
+```
+
+</Step>
+
+<Step>
+
+**Get feedback:**
+
+- Ask friends to test
+- Post in developer communities
+- Share in course forums
+- Reddit (r/webdev, r/reactjs)
+
+**Use feedback to improve!**
+
+</Step>
+
+<Step>
+
+**Monitor performance:**
+
+- Check Vercel Analytics weekly
+- Review Web Vitals
+- Track user behavior
+- Identify popular pages
+
+</Step>
+
+<Step>
+
+**Continue improving:**
+
+**Ideas for enhancements:**
+
+- Add more features
+- Improve performance
+- Better error handling
+- Accessibility improvements
+- SEO optimization
+- Internationalization (i18n)
+- Dark mode
+- Progressive Web App (PWA)
+- Social sharing
+- Email notifications
+
+**Deploy updates easily:**
+
+```bash
+# Make changes
+git commit -m "Add new feature"
+git push origin main
+# Auto-deploys!
+```
+
+</Step>
+
+<Step>
+
+**Set up monitoring:**
+
+**Free tools:**
+
+- **Sentry**: Error tracking
+- **Google Analytics**: User analytics
+- **Hotjar**: User recordings
+- **Lighthouse**: Performance audits
+
+</Step>
+
+</Steps>
+
+## Module 8 Complete! 🎉
+
+<Callout type="success">
+**Congratulations!** You've completed Module 8 and deployed your React application to production!
+</Callout>
+
+**What you accomplished:**
+
+✅ Installed and configured Vercel CLI
+
+✅ Deployed application to production
+
+✅ Configured environment variables
+
+✅ Learned deployment best practices
+
+✅ Understanding of monitoring and analytics
+
+✅ Your app is LIVE on the internet!
+
+## 🏆 Course Complete! 🏆
+
+**You've finished the entire React course!**
+
+**Your journey (8 modules):**
+
+```
+Module 0: Introduction
+  └─ Learned platform navigation
+
+Module 1: React Fundamentals  
+  └─ Built component foundation
+
+Module 2: State & Events
+  └─ Added interactivity
+
+Module 3: Effects & Data
+  └─ Connected to APIs
+
+Module 4: Routes & Navigation
+  └─ Multi-page application
+
+Module 5: Hooks & Performance
+  └─ Optimized performance
+
+Module 6: State Management
+  └─ Global state with Redux
+
+Module 7: Forms & Authentication
+  └─ User authentication system
+
+Module 8: Deployment
+  └─ Deployed to production! ✨
+```
+
+**Skills you've mastered:**
+
+- ✅ React fundamentals (JSX, components, props)
+- ✅ State management (useState, Redux Toolkit)
+- ✅ Side effects (useEffect, API calls)
+- ✅ Routing (React Router v6)
+- ✅ Performance (custom hooks, memoization)
+- ✅ Forms (React Hook Form, validation)
+- ✅ Authentication (JWT, protected routes)
+- ✅ Deployment (Vercel, production)
+
+**You are now a React developer!** 🚀
+
+## What's Next?
+
+**Continue your React journey:**
+
+1. **Build more projects:**
+   - E-commerce store
+   - Social media app
+   - Dashboard application
+   - Blog platform
+   - Chat application
+
+2. **Learn advanced topics:**
+   - Server-side rendering (Next.js)
+   - Testing (Jest, React Testing Library)
+   - TypeScript with React
+   - GraphQL
+   - React Native (mobile apps)
+
+3. **Join the community:**
+   - React Discord servers
+   - Reddit (r/reactjs)
+   - Twitter #ReactJS
+   - Local meetups
+   - Conferences
+
+4. **Keep building:**
+   - Contribute to open source
+   - Freelance projects
+   - Job applications
+   - Personal projects
+
+**Resources:**
+
+- [React Documentation](https://react.dev)
+- [React Router Docs](https://reactrouter.com)
+- [Redux Toolkit Docs](https://redux-toolkit.js.org)
+- [Vercel Docs](https://vercel.com/docs)
+- [MDN Web Docs](https://developer.mozilla.org)
+
+## Key Takeaways
+
+- ✅ **Deployment is easy** with modern platforms like Vercel
+- ✅ **One command** (`vercel`) deploys your entire application
+- ✅ **Environment variables** keep secrets secure
+- ✅ **Git integration** enables automatic deployments
+- ✅ **Free tier** is perfect for personal projects
+- ✅ **Global CDN** makes your app fast worldwide
+- ✅ **HTTPS automatic** for security
+- ✅ **Analytics included** for tracking users
+- ✅ **Updates are instant** - just redeploy
+- ✅ **Professional workflow** from development to production
+
+**Thank you for completing this course!** 🎉
+
+You've worked hard, built an amazing project, and gained valuable skills. We're proud of your achievement!
+
+**Now go build something amazing!** 🚀
+
+---
+
+**Share your deployed project with the course community!**
+
+Post your Vercel URL and get feedback from other students. We'd love to see what you built! 💙

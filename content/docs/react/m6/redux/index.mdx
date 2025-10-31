@@ -1,0 +1,165 @@
+---
+title: "Redux Toolkit Path"
+description: "Learn state management with Redux Toolkit - the industry standard solution"
+---
+
+# Redux Toolkit Path
+
+Welcome to the Redux Toolkit learning path! 🔴
+
+## What You'll Learn
+
+Redux Toolkit is the **official, recommended way** to write Redux logic. It provides:
+
+- ✅ **Simplified Setup** - 70% less boilerplate than vanilla Redux
+- ✅ **Best Practices** - Built-in patterns for common use cases
+- ✅ **Powerful DevTools** - Excellent debugging experience
+- ✅ **Industry Standard** - Used by companies worldwide
+- ✅ **Great Documentation** - Extensive resources and community
+
+## Course Structure
+
+This path contains **15 comprehensive lessons** covering:
+
+### Phase 1: Redux Foundation (Lessons 1-4)
+1. **Setup Redux Store** - Configure the store
+2. **Connect Redux to React** - Add Provider
+3. **Create Listings Slice** - Define state and reducers
+4. **Add Slice to Store** - Register your slice
+
+### Phase 2: Async Operations (Lessons 5-6)
+5. **Async Thunk for Fetching** - Handle API calls
+6. **Extra Reducers** - Manage async states
+
+### Phase 3: Component Integration (Lesson 7)
+7. **Refactor HomePage** - Use Redux in components
+
+### Phase 4: Favorites Feature (Lessons 8-14)
+8. **Favorites Setup** - Test the toggle reducer
+9. **Favorites Page** - Display favorited listings
+10. **Navbar Component** - Add navigation
+11. **Add Navbar to App** - Integrate layout
+12. **Update Router** - Configure routes
+13. **Favorite Button Component** - Create toggle button
+14. **Add to ListingCard** - Complete integration
+
+### Phase 5: Review (Lesson 15)
+15. **Module Review** - Complete Redux patterns review
+
+## Why Redux Toolkit?
+
+<Accordions>
+
+<Accordion title="Industry Standard">
+
+Redux is the **most popular** state management library in the React ecosystem:
+
+- ✅ Used by Facebook, Airbnb, Netflix, and thousands of companies
+- ✅ Extensive job market demand
+- ✅ Large community and ecosystem
+- ✅ Proven patterns for large-scale applications
+- ✅ Comprehensive documentation and learning resources
+
+**Great for:** Enterprise applications, team projects, complex state logic
+
+</Accordion>
+
+<Accordion title="Redux Toolkit Benefits">
+
+Redux Toolkit modernizes Redux with:
+
+```js
+// Old Redux (verbose)
+const INCREMENT = 'counter/increment';
+const increment = () => ({ type: INCREMENT });
+const counterReducer = (state = 0, action) => {
+  switch (action.type) {
+    case INCREMENT:
+      return state + 1;
+    default:
+      return state;
+  }
+};
+
+// Redux Toolkit (simple!)
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: 0,
+  reducers: {
+    increment: (state) => state + 1
+  }
+});
+```
+
+**70% less boilerplate!** ✨
+
+</Accordion>
+
+<Accordion title="Powerful DevTools">
+
+Redux DevTools provide **incredible debugging capabilities**:
+
+- ✅ Time-travel debugging (go back/forward through actions)
+- ✅ Action history with full state snapshots
+- ✅ State diff visualization
+- ✅ Action replay and testing
+- ✅ Performance monitoring
+
+**See every state change in your app!**
+
+</Accordion>
+
+<Accordion title="Perfect For">
+
+**Choose Redux Toolkit if you:**
+
+- 🏢 Building enterprise or large-scale applications
+- 👥 Working in a team environment
+- 📚 Need extensive middleware (saga, observable)
+- 🔍 Want powerful debugging tools
+- 📖 Prefer established patterns and conventions
+- 💼 Building for your resume/career
+
+**Bundle size:** ~8KB (gzipped)
+**Learning curve:** Steep but rewarding
+
+</Accordion>
+
+</Accordions>
+
+## What You'll Build
+
+By the end of this path, you'll have built a complete **Favorites System**:
+
+```
+✅ Global state management
+✅ Async data fetching with thunks
+✅ Favorites toggle functionality
+✅ Dedicated favorites page
+✅ Navigation with counter badge
+✅ Reusable favorite button component
+✅ Complete UI integration
+```
+
+## Prerequisites
+
+Before starting this path, you should have completed:
+
+- ✅ Module 5: Hooks & Performance
+- ✅ Understanding of `useEffect` and `useState`
+- ✅ Familiarity with async/await
+- ✅ React Router basics
+
+## Time Commitment
+
+**Duration:** 5-6 hours
+**Difficulty:** Advanced
+**Lessons:** 15
+
+## Ready to Start?
+
+Let's begin with Lesson 1: Setup Redux Store!
+
+<Callout type="info">
+**Tip:** Keep Redux DevTools open while learning to visualize state changes in real-time!
+</Callout>

@@ -1,0 +1,728 @@
+---
+title: "L14: Update Routes with Protection"
+description: "Apply route guards across your application"
+---
+
+# Update Routes with Protection
+
+Let's protect all routes that require authentication! 🛡️
+
+## Route Organization Strategy
+
+**Good practice: Group routes by access level:**
+
+```jsx
+<Routes>
+  {/* ===== PUBLIC ROUTES ===== */}
+  <Route path="/" element={<HomePage />} />
+  <Route path="/about" element={<AboutPage />} />
+  <Route path="/venues/:id" element={<VenueDetailPage />} />
+  
+  {/* ===== AUTH ROUTES ===== */}
+  <Route path="/sign-in" element={<SignInPage />} />
+  <Route path="/sign-up" element={<SignUpPage />} />
+  
+  {/* ===== PROTECTED ROUTES ===== */}
+  <Route path="/favorites" element={<Protected><FavoritesPage /></Protected>} />
+  <Route path="/bookings" element={<Protected><BookingsPage /></Protected>} />
+  <Route path="/profile" element={<Protected><ProfilePage /></Protected>} />
+  
+  {/* ===== 404 ===== */}
+  <Route path="*" element={<NotFoundPage />} />
+</Routes>
+```
+
+## Complete App with Protected Routes
+
+Update your App component with all routes:
+
+```jsx title="src/App.jsx"
+import { Routes, Route } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import Protected from '@/components/Protected';
+
+// Public pages
+import HomePage from '@/pages/HomePage';
+import AboutPage from '@/pages/AboutPage';
+import VenueDetailPage from '@/pages/VenueDetailPage';
+
+// Auth pages
+import SignInPage from '@/pages/SignInPage';
+import SignUpPage from '@/pages/SignUpPage';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+
+// Protected pages
+import FavoritesPage from '@/pages/FavoritesPage';
+import BookingsPage from '@/pages/BookingsPage';
+import ProfilePage from '@/pages/ProfilePage';
+import CreateVenuePage from '@/pages/CreateVenuePage';
+import MyVenuesPage from '@/pages/MyVenuesPage';
+import SettingsPage from '@/pages/SettingsPage';
+
+// Other
+import NotFoundPage from '@/pages/NotFoundPage';
+
+function AppContent() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading application...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app">
+      {user && <Navbar />}
+      
+      <main className="main-content">
+        <Routes>
+          {/* ===== PUBLIC ROUTES ===== */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/venues/:id" element={<VenueDetailPage />} />
+          
+          {/* ===== AUTHENTICATION ROUTES ===== */}
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/sign-up" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          
+          {/* ===== PROTECTED ROUTES ===== */}
+          {/* User Account */}
+          <Route 
+            path="/profile" 
+            element={
+              <Protected>
+                <ProfilePage />
+              </Protected>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <Protected>
+                <SettingsPage />
+              </Protected>
+            } 
+          />
+          
+          {/* User Actions */}
+          <Route 
+            path="/favorites" 
+            element={
+              <Protected>
+                <FavoritesPage />
+              </Protected>
+            } 
+          />
+          <Route 
+            path="/bookings" 
+            element={
+              <Protected>
+                <BookingsPage />
+              </Protected>
+            } 
+          />
+          
+          {/* Venue Management */}
+          <Route 
+            path="/venues/create" 
+            element={
+              <Protected>
+                <CreateVenuePage />
+              </Protected>
+            } 
+          />
+          <Route 
+            path="/venues/mine" 
+            element={
+              <Protected>
+                <MyVenuesPage />
+              </Protected>
+            } 
+          />
+          
+          {/* ===== 404 NOT FOUND ===== */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;
+```
+
+## Route Structure Breakdown
+
+<Tabs items={['Public Routes', 'Auth Routes', 'Protected Routes', 'Route Patterns']}>
+
+<Tab value="Public Routes">
+
+**Routes anyone can access:**
+
+```jsx
+{/* ===== PUBLIC ROUTES ===== */}
+<Route path="/" element={<HomePage />} />
+<Route path="/about" element={<AboutPage />} />
+<Route path="/contact" element={<ContactPage />} />
+<Route path="/venues" element={<VenuesPage />} />
+<Route path="/venues/:id" element={<VenueDetailPage />} />
+```
+
+**Characteristics:**
+
+- ✅ No authentication required
+- ✅ Accessible to everyone
+- ✅ Good for marketing/info pages
+- ✅ Search engines can index
+
+**Use cases:**
+
+```
+Homepage: Landing, hero, features
+About: Company info, team
+Venues: Browse all venues (public gallery)
+Venue Detail: View specific venue
+Contact: Contact form
+Terms: Legal documents
+```
+
+**Conditional content within public pages:**
+
+```jsx
+function HomePage() {
+  const { user } = useAuth();
+  
+  return (
+    <div>
+      <h1>Welcome to Holidaze</h1>
+      
+      {/* Public content */}
+      <VenueGrid venues={allVenues} />
+      
+      {/* Show different CTAs based on auth */}
+      {user ? (
+        <Button to="/venues/create">List Your Venue</Button>
+      ) : (
+        <Button to="/sign-up">Get Started</Button>
+      )}
+    </div>
+  );
+}
+```
+
+</Tab>
+
+<Tab value="Auth Routes">
+
+**Routes for authentication flow:**
+
+```jsx
+{/* ===== AUTHENTICATION ROUTES ===== */}
+<Route path="/sign-in" element={<SignInPage />} />
+<Route path="/sign-up" element={<SignUpPage />} />
+<Route path="/forgot-password" element={<ForgotPasswordPage />} />
+<Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+<Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+```
+
+**Special behavior: Redirect if already signed in**
+
+```jsx
+function SignInPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      // Already signed in, redirect to home
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
+
+  if (user) {
+    return null; // or <Navigate to="/" />
+  }
+
+  return <SignInForm />;
+}
+```
+
+**Why redirect?**
+
+```
+User is signed in → Visits /sign-in
+Without redirect: Shows sign-in form (confusing)
+With redirect: Sends to home (makes sense)
+```
+
+**Auth route patterns:**
+
+```
+/sign-in        → Sign in to existing account
+/sign-up        → Create new account
+/forgot-password → Request password reset
+/reset-password/:token → Set new password
+/verify-email/:token → Verify email address
+/logout         → Sign out (redirect to home)
+```
+
+</Tab>
+
+<Tab value="Protected Routes">
+
+**Routes requiring authentication:**
+
+```jsx
+{/* ===== PROTECTED ROUTES ===== */}
+
+{/* User Profile */}
+<Route path="/profile" element={<Protected><ProfilePage /></Protected>} />
+<Route path="/profile/edit" element={<Protected><EditProfilePage /></Protected>} />
+<Route path="/settings" element={<Protected><SettingsPage /></Protected>} />
+
+{/* User Content */}
+<Route path="/favorites" element={<Protected><FavoritesPage /></Protected>} />
+<Route path="/bookings" element={<Protected><BookingsPage /></Protected>} />
+<Route path="/bookings/:id" element={<Protected><BookingDetailPage /></Protected>} />
+
+{/* Venue Management */}
+<Route path="/venues/create" element={<Protected><CreateVenuePage /></Protected>} />
+<Route path="/venues/mine" element={<Protected><MyVenuesPage /></Protected>} />
+<Route path="/venues/:id/edit" element={<Protected><EditVenuePage /></Protected>} />
+
+{/* Messages/Notifications */}
+<Route path="/messages" element={<Protected><MessagesPage /></Protected>} />
+<Route path="/notifications" element={<Protected><NotificationsPage /></Protected>} />
+```
+
+**Route organization tips:**
+
+```
+By feature:
+  /profile, /profile/edit, /settings  → User management
+  /favorites, /bookings               → User content
+  /venues/create, /venues/mine        → Venue management
+
+By hierarchy:
+  /dashboard                         → Main dashboard
+  /dashboard/analytics              → Sub-section
+  /dashboard/analytics/reports      → Nested section
+```
+
+</Tab>
+
+<Tab value="Route Patterns">
+
+**Common route patterns:**
+
+**1. Resource routes:**
+
+```jsx
+<Route path="/venues" element={<VenuesPage />} />          // List
+<Route path="/venues/:id" element={<VenueDetailPage />} /> // Detail
+<Route path="/venues/create" element={<CreateVenuePage />} /> // Create
+<Route path="/venues/:id/edit" element={<EditVenuePage />} /> // Edit
+```
+
+**Order matters:**
+
+```jsx
+// ✅ Correct order
+<Route path="/venues/create" />  // Matches first
+<Route path="/venues/:id" />     // Matches after
+
+// ❌ Wrong order
+<Route path="/venues/:id" />     // Matches "create" as id!
+<Route path="/venues/create" />  // Never matches
+```
+
+**2. Nested routes:**
+
+```jsx
+<Route path="/dashboard" element={<DashboardLayout />}>
+  <Route index element={<DashboardHome />} />
+  <Route path="analytics" element={<Analytics />} />
+  <Route path="reports" element={<Reports />} />
+</Route>
+
+// URLs:
+// /dashboard           → DashboardHome
+// /dashboard/analytics → Analytics
+// /dashboard/reports   → Reports
+```
+
+**3. Optional parameters:**
+
+```jsx
+<Route path="/search" element={<SearchPage />} />
+// URL: /search?q=beach&guests=4
+
+function SearchPage() {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get('q');
+  const guests = searchParams.get('guests');
+}
+```
+
+**4. Multiple parameters:**
+
+```jsx
+<Route path="/venues/:venueId/reviews/:reviewId" />
+
+function ReviewPage() {
+  const { venueId, reviewId } = useParams();
+  // venueId = "123"
+  // reviewId = "456"
+}
+```
+
+**5. Catch-all routes:**
+
+```jsx
+<Route path="/docs/*" element={<DocsLayout />}>
+  <Route path="*" element={<DocPage />} />
+</Route>
+
+// Matches:
+// /docs/getting-started
+// /docs/api/reference
+// /docs/any/nested/path
+```
+
+</Tab>
+
+</Tabs>
+
+## Update Navbar with Protected Links
+
+Show different links based on authentication:
+
+```jsx title="src/components/Navbar.jsx"
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+
+function Navbar() {
+  const { user } = useAuth();
+
+  return (
+    <nav className="navbar">
+      <Link to="/" className="nav-brand">
+        🏖️ Holidaze
+      </Link>
+
+      <div className="nav-links">
+        {/* Always visible */}
+        <Link to="/">Home</Link>
+        <Link to="/venues">Venues</Link>
+
+        {user ? (
+          // Signed in: Show protected links
+          <>
+            <Link to="/bookings">My Bookings</Link>
+            <Link to="/favorites">Favorites</Link>
+            <Link to="/venues/create">List Venue</Link>
+            
+            <div className="nav-user">
+              <Link to="/profile">
+                <img src={user.avatar?.url} alt={user.name} />
+                <span>{user.name}</span>
+              </Link>
+            </div>
+          </>
+        ) : (
+          // Not signed in: Show auth links
+          <>
+            <Link to="/sign-in" className="nav-link-secondary">
+              Sign In
+            </Link>
+            <Link to="/sign-up" className="nav-link-primary">
+              Sign Up
+            </Link>
+          </>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+```
+
+## Handle 404 on Protected Routes
+
+Make 404 page aware of authentication:
+
+```jsx title="src/pages/NotFoundPage.jsx"
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+
+function NotFoundPage() {
+  const { user } = useAuth();
+
+  return (
+    <div className="not-found-page">
+      <div className="not-found-content">
+        <h1>404</h1>
+        <h2>Page Not Found</h2>
+        <p>The page you're looking for doesn't exist.</p>
+
+        <div className="not-found-actions">
+          <Link to="/" className="button-primary">
+            Go Home
+          </Link>
+
+          {user ? (
+            <Link to="/profile" className="button-secondary">
+              View Profile
+            </Link>
+          ) : (
+            <Link to="/sign-in" className="button-secondary">
+              Sign In
+            </Link>
+          )}
+        </div>
+
+        {/* Helpful links */}
+        <div className="not-found-links">
+          <h3>You might be looking for:</h3>
+          <ul>
+            <Link to="/venues">Browse Venues</Link>
+            {user && <Link to="/bookings">My Bookings</Link>}
+            {user && <Link to="/favorites">My Favorites</Link>}
+            <Link to="/about">About Us</Link>
+            <Link to="/contact">Contact</Link>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default NotFoundPage;
+```
+
+## Testing All Routes
+
+<Steps>
+
+<Step>
+
+**Test public routes (signed out):**
+
+Visit these URLs while signed out:
+- `/` → HomePage ✅
+- `/about` → AboutPage ✅
+- `/venues` → VenuesPage ✅
+- `/venues/123` → VenueDetailPage ✅
+
+All should work without redirecting.
+
+</Step>
+
+<Step>
+
+**Test protected routes (signed out):**
+
+Visit these URLs while signed out:
+- `/favorites` → Redirects to `/sign-in` ✅
+- `/bookings` → Redirects to `/sign-in` ✅
+- `/profile` → Redirects to `/sign-in` ✅
+- `/venues/create` → Redirects to `/sign-in` ✅
+
+All should redirect to sign-in page.
+
+</Step>
+
+<Step>
+
+**Test auth routes (signed in):**
+
+Sign in, then visit:
+- `/sign-in` → Redirects to `/` ✅
+- `/sign-up` → Redirects to `/` ✅
+
+Should redirect away from auth pages.
+
+</Step>
+
+<Step>
+
+**Test protected routes (signed in):**
+
+Visit these URLs while signed in:
+- `/favorites` → FavoritesPage ✅
+- `/bookings` → BookingsPage ✅
+- `/profile` → ProfilePage ✅
+- `/venues/create` → CreateVenuePage ✅
+
+All should show without redirecting.
+
+</Step>
+
+<Step>
+
+**Test 404 handling:**
+
+Visit invalid URLs:
+- `/invalid` → NotFoundPage ✅
+- `/venues/invalid/nested` → NotFoundPage ✅
+
+Should show 404 page with helpful links.
+
+</Step>
+
+</Steps>
+
+## Route Protection Best Practices
+
+<Accordions>
+
+<Accordion title="DRY: Don't Repeat Yourself">
+
+**❌ Repetitive:**
+
+```jsx
+<Route path="/favorites" element={<Protected><FavoritesPage /></Protected>} />
+<Route path="/bookings" element={<Protected><BookingsPage /></Protected>} />
+<Route path="/profile" element={<Protected><ProfilePage /></Protected>} />
+<Route path="/settings" element={<Protected><SettingsPage /></Protected>} />
+```
+
+**✅ Use nested routes:**
+
+```jsx
+<Route element={<Protected><Outlet /></Protected>}>
+  <Route path="/favorites" element={<FavoritesPage />} />
+  <Route path="/bookings" element={<BookingsPage />} />
+  <Route path="/profile" element={<ProfilePage />} />
+  <Route path="/settings" element={<SettingsPage />} />
+</Route>
+```
+
+All nested routes automatically protected!
+
+</Accordion>
+
+<Accordion title="Shared Layouts">
+
+**Protected routes with shared layout:**
+
+```jsx
+// Layout component
+function DashboardLayout() {
+  return (
+    <div className="dashboard">
+      <Sidebar />
+      <main>
+        <Outlet />  {/* Nested routes render here */}
+      </main>
+    </div>
+  );
+}
+
+// Routes
+<Route element={<Protected><DashboardLayout /></Protected>}>
+  <Route path="/dashboard" element={<DashboardHome />} />
+  <Route path="/dashboard/analytics" element={<Analytics />} />
+  <Route path="/dashboard/reports" element={<Reports />} />
+</Route>
+```
+
+**Result:**
+
+- All routes protected
+- All routes share Sidebar
+- Only content area changes
+
+</Accordion>
+
+<Accordion title="Route Organization">
+
+**Group by feature:**
+
+```jsx
+// src/routes/index.jsx
+import publicRoutes from './publicRoutes';
+import authRoutes from './authRoutes';
+import protectedRoutes from './protectedRoutes';
+
+export function AppRoutes() {
+  return (
+    <Routes>
+      {publicRoutes}
+      {authRoutes}
+      {protectedRoutes}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}
+```
+
+```jsx
+// src/routes/protectedRoutes.jsx
+import Protected from '@/components/Protected';
+
+export default [
+  <Route 
+    key="favorites"
+    path="/favorites" 
+    element={<Protected><FavoritesPage /></Protected>} 
+  />,
+  <Route 
+    key="bookings"
+    path="/bookings" 
+    element={<Protected><BookingsPage /></Protected>} 
+  />,
+  // ...
+];
+```
+
+**Benefits:**
+
+- Easier to maintain
+- Clear separation of concerns
+- Scalable structure
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+In Lesson 15, we'll:
+1. Add redirect logic after sign-in
+2. Handle redirect back to intended page
+3. Improve user experience with smart redirects
+4. Handle edge cases (already signed in, etc.)
+
+<Callout type="success">
+**✅ Lesson Complete!** All routes properly protected!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Organize routes** by access level (public, auth, protected)
+- ✅ **Wrap protected routes** with `<Protected>` component
+- ✅ **Use nested routes** to avoid repetition
+- ✅ **Conditional Navbar** shows different links based on auth
+- ✅ **Auth routes redirect** if already signed in
+- ✅ **404 page** adapts to authentication state
+- ✅ **Route order matters** (specific before dynamic)
+- ✅ **Shared layouts** work with protected routes
+- ✅ **Feature-based organization** improves maintainability
+- ✅ **Test all scenarios** (signed in, signed out, invalid routes)

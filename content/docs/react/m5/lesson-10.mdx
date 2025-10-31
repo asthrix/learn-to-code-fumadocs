@@ -1,0 +1,707 @@
+---
+title: "L10: M5 Review"
+description: "Review all optimization patterns and best practices"
+---
+
+# Module 5 Review
+
+Let's review everything you've learned about React performance optimization and advanced patterns!
+
+## What You've Learned
+
+<Steps>
+
+<Step>
+
+### Custom Hooks (Lessons 1-3)
+
+**Created useFetch hook** to eliminate duplicate code:
+
+```jsx
+// Before: 30+ lines in every component
+const [data, setData] = useState();
+const [isLoading, setIsLoading] = useState(true);
+useEffect(() => { /* ... */ }, []);
+
+// After: 1 line
+const { data, isLoading, error } = useFetch('/api/endpoint');
+```
+
+**Benefits:**
+- 50% less code
+- Consistent error handling
+- Automatic cleanup
+- Reusable across app
+
+</Step>
+
+<Step>
+
+### useMemo (Lessons 4-5)
+
+**Optimized expensive calculations:**
+
+```jsx
+// Memoize filtered listings
+const filteredListings = useMemo(() => {
+  return listings.filter(listing => {
+    // Complex filtering logic
+  });
+}, [listings, search, dates, guests]);
+```
+
+**Benefits:**
+- Only recalculates when dependencies change
+- 85% faster filtering
+- No wasted CPU cycles
+
+</Step>
+
+<Step>
+
+### useCallback (Lesson 6)
+
+**Memoized callback functions:**
+
+```jsx
+// Stable function reference
+const handleSearch = useCallback((value) => {
+  setSearch(value);
+}, []);
+
+// Pass to memoized children
+<MemoizedFilters onSearch={handleSearch} />
+```
+
+**Benefits:**
+- Prevents unnecessary re-renders
+- Works with React.memo
+- Stable function references
+
+</Step>
+
+<Step>
+
+### React.memo (Lesson 7)
+
+**Prevented component re-renders:**
+
+```jsx
+// Only re-renders when props change
+const ListingCard = React.memo(function ListingCard({ listing }) {
+  return <div>{listing.title}</div>;
+});
+```
+
+**Benefits:**
+- 80% fewer renders
+- Smoother scrolling
+- Better performance
+
+</Step>
+
+<Step>
+
+### Performance Profiling (Lesson 8)
+
+**Measured optimization impact:**
+
+- Used React DevTools Profiler
+- Identified slow components
+- Measured before/after
+- Achieved 73% improvement
+
+</Step>
+
+<Step>
+
+### Caching (Lesson 9)
+
+**Eliminated duplicate API requests:**
+
+```jsx
+// Cached responses in memory
+const { data } = useFetch('/listings');  // First call: fetch
+const { data } = useFetch('/listings');  // Second call: cached!
+```
+
+**Benefits:**
+- 50% faster navigation
+- 50% fewer API requests
+- Better user experience
+
+</Step>
+
+</Steps>
+
+## Complete Optimized Example
+
+Here's how all optimizations work together:
+
+```jsx title="src/pages/HomePage.jsx"
+import React, { useState, useMemo, useCallback } from 'react';
+import { useFetch } from '@/hooks/useFetch';
+import ListingList from '@/components/ListingList';
+import ListingFilters from '@/components/ListingFilters';
+
+export function HomePage() {
+  // 1. Custom hook - eliminates boilerplate
+  const { data: listings, isLoading, error } = useFetch('/listings');
+  
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  // 2. useCallback - stable function references
+  const handleSearchChange = useCallback((value) => {
+    setSearch(value);
+  }, []);
+  
+  const handleDatesChange = useCallback((newDates) => {
+    setDates(newDates);
+  }, []);
+  
+  const handleGuestsChange = useCallback((value) => {
+    setGuests(value);
+  }, []);
+  
+  // 3. useMemo - optimize filtering
+  const filteredListings = useMemo(() => {
+    if (!listings) return [];
+    
+    return listings.filter(listing => {
+      const matchesSearch = listing.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      
+      const matchesGuests = listing.maxGuests >= guests;
+      
+      const matchesDates = dates.from && dates.to
+        ? isAvailable(listing, dates.from, dates.to)
+        : true;
+      
+      return matchesSearch && matchesGuests && matchesDates;
+    });
+  }, [listings, search, dates, guests]);
+  
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spinner />
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorMessage message={error} />
+      </div>
+    );
+  }
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* 4. React.memo - prevents unnecessary renders */}
+      <ListingFilters
+        search={search}
+        onSearchChange={handleSearchChange}
+        dates={dates}
+        onDatesChange={handleDatesChange}
+        guests={guests}
+        onGuestsChange={handleGuestsChange}
+      />
+      <ListingList listings={filteredListings} />
+    </div>
+  );
+}
+
+function isAvailable(listing, from, to) {
+  // Date availability logic
+  return true;
+}
+```
+
+```jsx title="src/components/ListingList.jsx"
+import React from 'react';
+import { ListingCard } from './ListingCard';
+
+// Memoized - doesn't re-render unless listings change
+const ListingList = React.memo(function ListingList({ listings }) {
+  if (listings.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No listings found
+      </div>
+    );
+  }
+  
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {listings.map(listing => (
+        <ListingCard key={listing.id} listing={listing} />
+      ))}
+    </div>
+  );
+});
+
+export default ListingList;
+```
+
+```jsx title="src/components/ListingCard.jsx"
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+// Memoized - only re-renders when listing prop changes
+const ListingCard = React.memo(function ListingCard({ listing }) {
+  return (
+    <Link 
+      to={`/listings/${listing.id}`}
+      className="block border rounded-lg overflow-hidden hover:shadow-lg transition"
+    >
+      <img 
+        src={listing.images[0]} 
+        alt={listing.title}
+        className="w-full h-48 object-cover"
+      />
+      <div className="p-4">
+        <h3 className="font-semibold text-lg">{listing.title}</h3>
+        <p className="text-gray-600">{listing.location}</p>
+        <div className="mt-2 flex justify-between items-center">
+          <span className="text-xl font-bold">${listing.price}/night</span>
+          <span className="text-sm text-gray-500">⭐ {listing.rating}</span>
+        </div>
+      </div>
+    </Link>
+  );
+});
+
+export default ListingCard;
+```
+
+```jsx title="src/hooks/useFetch.js"
+import { useState, useEffect } from 'react';
+import api from '@/api';
+
+// Cache outside hook - shared across all components
+const cache = {};
+const CACHE_DURATION = 5 * 60 * 1000;
+
+export function useFetch(url, options = {}) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const {
+    cacheTime = CACHE_DURATION,
+    enableCache = true
+  } = options;
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchData = async () => {
+      // Check cache
+      if (enableCache && cache[url]) {
+        const cached = cache[url];
+        const age = Date.now() - cached.timestamp;
+        
+        if (age < cacheTime) {
+          setData(cached.data);
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      // Fetch from API
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await api.get(url, {
+          signal: controller.signal
+        });
+        
+        // Update cache
+        if (enableCache) {
+          cache[url] = {
+            data: response.data,
+            timestamp: Date.now()
+          };
+        }
+        
+        setData(response.data);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+    
+    return () => controller.abort();
+  }, [url, cacheTime, enableCache]);
+  
+  return { data, isLoading, error };
+}
+
+export function clearCache(url) {
+  if (url) {
+    delete cache[url];
+  } else {
+    Object.keys(cache).forEach(key => delete cache[key]);
+  }
+}
+```
+
+## Optimization Checklist
+
+Use this checklist for optimizing React apps:
+
+<Accordions>
+
+<Accordion title="1. Custom Hooks">
+
+**When to create:**
+- [ ] Duplicate useState + useEffect patterns
+- [ ] Logic used in multiple components
+- [ ] Complex state management
+- [ ] API fetching logic
+
+**Example patterns:**
+```jsx
+useFetch(url)          // Data fetching
+useLocalStorage(key)   // Persistent state
+useDebounce(value)     // Debounced values
+useMediaQuery(query)   // Responsive design
+```
+
+</Accordion>
+
+<Accordion title="2. useMemo">
+
+**When to use:**
+- [ ] Expensive calculations (> 5ms)
+- [ ] Large array operations (100+ items)
+- [ ] Complex filtering/sorting
+- [ ] Derived state from props
+
+**Don't use for:**
+- ❌ Simple math (a + b)
+- ❌ String formatting
+- ❌ Small arrays (< 50 items)
+- ❌ Premature optimization
+
+</Accordion>
+
+<Accordion title="3. useCallback">
+
+**When to use:**
+- [ ] Passing callbacks to memoized children
+- [ ] Functions in dependency arrays
+- [ ] Event handlers passed as props
+- [ ] Custom hooks returning functions
+
+**Don't use for:**
+- ❌ Inline event handlers
+- ❌ Functions not passed as props
+- ❌ Children not memoized
+
+</Accordion>
+
+<Accordion title="4. React.memo">
+
+**When to use:**
+- [ ] Pure components (same props → same output)
+- [ ] Expensive render logic
+- [ ] Lists of components
+- [ ] Deeply nested components
+
+**Don't use for:**
+- ❌ Props change frequently
+- ❌ Has children prop
+- ❌ Lightweight components
+- ❌ Without useCallback for function props
+
+</Accordion>
+
+<Accordion title="5. Performance Profiling">
+
+**Always do:**
+- [ ] Profile before optimizing
+- [ ] Test in production mode
+- [ ] Measure real user scenarios
+- [ ] Focus on slow, frequent renders
+- [ ] Compare before/after metrics
+
+</Accordion>
+
+<Accordion title="6. Caching">
+
+**When to cache:**
+- [ ] Frequently accessed data
+- [ ] Expensive API calls
+- [ ] Rarely changing data
+- [ ] Shared across components
+
+**Cache strategies:**
+- Time-based expiration
+- Manual invalidation
+- Stale-while-revalidate
+- Tag-based invalidation
+
+</Accordion>
+
+</Accordions>
+
+## Performance Targets
+
+| Metric | Target | Good | Needs Work |
+|--------|--------|------|------------|
+| **Render time** | < 16ms | < 10ms | > 20ms |
+| **Time to Interactive** | < 1s | < 500ms | > 2s |
+| **First Contentful Paint** | < 1.8s | < 1s | > 3s |
+| **Lighthouse Score** | > 90 | > 95 | < 80 |
+| **Cache hit rate** | > 70% | > 80% | < 50% |
+| **API requests** | Minimal | Cached | Duplicates |
+
+## Common Patterns
+
+<Tabs items={['Data Fetching', 'Lists', 'Forms', 'Context']}>
+
+<Tab value="Data Fetching">
+
+```jsx
+// Optimized data fetching pattern
+function DataPage() {
+  // 1. Use custom hook with caching
+  const { data, isLoading, error } = useFetch('/api/data');
+  
+  // 2. Memoize derived data
+  const processedData = useMemo(() => {
+    return data?.map(item => ({
+      ...item,
+      computed: expensiveComputation(item)
+    }));
+  }, [data]);
+  
+  // 3. Memoize callbacks
+  const handleRefresh = useCallback(() => {
+    clearCache('/api/data');
+    window.location.reload();
+  }, []);
+  
+  if (isLoading) return <Spinner />;
+  if (error) return <Error message={error} />;
+  
+  // 4. Pass to memoized component
+  return <MemoizedDataDisplay data={processedData} onRefresh={handleRefresh} />;
+}
+```
+
+</Tab>
+
+<Tab value="Lists">
+
+```jsx
+// Optimized list rendering
+function ListPage({ items, onItemClick }) {
+  // 1. Memoize filtered/sorted items
+  const displayedItems = useMemo(() => {
+    return items
+      .filter(item => item.active)
+      .sort((a, b) => b.date - a.date);
+  }, [items]);
+  
+  // 2. Memoize item callback
+  const handleClick = useCallback((id) => {
+    onItemClick(id);
+  }, [onItemClick]);
+  
+  return (
+    <div>
+      {displayedItems.map(item => (
+        <MemoizedListItem
+          key={item.id}
+          item={item}
+          onClick={handleClick}
+        />
+      ))}
+    </div>
+  );
+}
+
+// 3. Memoize list item
+const MemoizedListItem = React.memo(ListItem);
+```
+
+</Tab>
+
+<Tab value="Forms">
+
+```jsx
+// Optimized form handling
+function FormPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: ''
+  });
+  
+  // 1. Memoize field change handler
+  const handleFieldChange = useCallback((field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  }, []);
+  
+  // 2. Memoize submit handler
+  const handleSubmit = useCallback(async (e) => {
+    e.preventDefault();
+    await api.post('/submit', formData);
+  }, [formData]);
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <MemoizedInput
+        value={formData.name}
+        onChange={(v) => handleFieldChange('name', v)}
+      />
+      <MemoizedInput
+        value={formData.email}
+        onChange={(v) => handleFieldChange('email', v)}
+      />
+    </form>
+  );
+}
+```
+
+</Tab>
+
+<Tab value="Context">
+
+```jsx
+// Optimized context usage
+function AppProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState('light');
+  
+  // 1. Memoize context value
+  const value = useMemo(() => ({
+    user,
+    theme,
+    setUser,
+    setTheme
+  }), [user, theme]);
+  
+  return (
+    <AppContext.Provider value={value}>
+      {children}
+    </AppContext.Provider>
+  );
+}
+
+// 2. Split contexts for granular updates
+function UserProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const value = useMemo(() => ({ user, setUser }), [user]);
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+}
+
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('light');
+  const value = useMemo(() => ({ theme, setTheme }), [theme]);
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Before & After Metrics
+
+| Aspect | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| **Code lines** | ~200 lines | ~100 lines | 50% reduction |
+| **HomePage render** | 45ms | 12ms | 73% faster |
+| **Typing latency** | 50ms | 10ms | 80% faster |
+| **API requests** | 4 per page | 2 per page | 50% fewer |
+| **Cache hit rate** | 0% | 78% | New capability |
+| **Bundle size** | Same | Same | No increase |
+
+**Total improvement: 3-4x faster perceived performance!** 🚀
+
+## Next Steps
+
+Now that you've mastered performance optimization, you're ready for:
+
+1. **Module 6: State Management** - Global state with Redux Toolkit
+2. **Module 7: Forms & Auth** - React Hook Form and authentication
+3. **Module 8: Deployment** - Ship your app to production!
+
+## Key Takeaways
+
+<Steps>
+
+<Step>
+
+### Measure First, Optimize Second
+
+Don't guess what's slow - use React DevTools Profiler to identify actual bottlenecks.
+
+</Step>
+
+<Step>
+
+### Optimize What Matters
+
+Focus on:
+- Expensive operations (> 5ms)
+- Frequent renders (many times per second)
+- User-facing interactions (typing, scrolling, clicking)
+
+</Step>
+
+<Step>
+
+### Use the Right Tool
+
+- **Custom hooks** - Reusable logic
+- **useMemo** - Expensive calculations
+- **useCallback** - Stable function references
+- **React.memo** - Component memoization
+- **Caching** - Eliminate duplicate work
+
+</Step>
+
+<Step>
+
+### Don't Over-Optimize
+
+Premature optimization adds complexity. Only optimize when you have:
+- Measured performance problem
+- Profiler evidence
+- Slow user experience
+
+</Step>
+
+</Steps>
+
+## Congratulations! 🎉
+
+You've completed Module 5 and learned:
+
+- ✅ Custom hooks for code reuse
+- ✅ useMemo for expensive calculations
+- ✅ useCallback for stable functions
+- ✅ React.memo for component optimization
+- ✅ Performance profiling techniques
+- ✅ In-memory caching strategies
+
+**You're now a React performance expert!** Your apps will be fast, efficient, and provide excellent user experiences. 🚀
+
+Keep these patterns in mind as you build, and remember: **measure, optimize, measure again!**

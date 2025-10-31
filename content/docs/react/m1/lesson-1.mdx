@@ -1,0 +1,222 @@
+---
+title: "L1: Project Setup"
+description:
+   "Clean up the Vite starter project and prepare for building the booking
+   application."
+module: 1
+lesson: 1
+---
+
+# Lesson 1: Project Setup
+
+Before building new features, let's clean up the default Vite project and set up
+a proper structure for our booking app.
+
+---
+
+## Current State
+
+Right now, your project shows the default Vite + React page with:
+
+-  Vite and React logos
+-  A counter button
+-  Some example text
+
+We'll replace this with a clean starting point for our booking application.
+
+---
+
+## Step 1: Clean Up App.jsx
+
+Open `src/App.jsx` and replace everything with this clean starting point:
+
+```jsx
+// src/App.jsx
+function App() {
+   return (
+      <div className='app'>
+         <h1>StayScape</h1>
+         <p>Find your perfect stay</p>
+      </div>
+   );
+}
+
+export default App;
+```
+
+**What we did:**
+
+-  Removed the counter logic
+-  Removed all the starter content
+-  Created a simple welcome message
+-  Kept the basic structure (function component with JSX return)
+
+Save the file and check your browser - you should see just "StayScape" and "Find
+your perfect stay".
+
+---
+
+## Step 2: Clean Up the Styles
+
+Let's simplify the CSS files.
+
+### Update index.css
+
+Open `src/index.css` and replace with:
+
+```css
+/* src/index.css */
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+
+body {
+   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+      "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+      "Helvetica Neue", sans-serif;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+}
+```
+
+This provides:
+
+-  CSS reset (removes browser defaults)
+-  Clean typography
+-  Box-sizing for easier layouts
+
+### Delete App.css
+
+We don't need `App.css` anymore. Delete the file:
+
+-  Right-click on `src/App.css` in VS Code
+-  Select "Delete"
+-  Confirm
+
+Also remove the import from `App.jsx` if it's still there.
+
+---
+
+## Step 3: Create Folders Structure
+
+Let's organize our project properly from the start.
+
+In the `src` folder, create two new folders:
+
+<Files>
+   <Folder name='src' defaultOpen>
+      <Folder name='pages'>
+         <File name='(components for full pages)' />
+      </Folder>
+      <Folder name='components'>
+         <File name='(reusable UI components)' />
+      </Folder>
+   </Folder>
+</Files>
+
+### Using VS Code Terminal:
+
+```bash
+cd src
+mkdir pages components
+```
+
+### Or Using VS Code GUI:
+
+1. Right-click on the `src` folder
+2. Select "New Folder"
+3. Name it `pages`
+4. Repeat for `components`
+
+---
+
+## Understanding the Structure
+
+This organization follows React best practices:
+
+<Accordions type='single'>
+   <Accordion id='pages' title='pages/ Folder' value='pages'>
+      **Purpose:** Components that represent entire pages or routes
+      **Examples:** - `HomePage.jsx` - The main landing page -
+      `PropertyDetailsPage.jsx` - Individual property view - `LoginPage.jsx` -
+      User login page **Rule:** One page = one route in your application
+   </Accordion>
+
+   <Accordion id='components' title='components/ Folder' value='components'>
+      **Purpose:** Reusable UI components used across pages **Examples:** -
+      `PropertyCard.jsx` - Single property display card - `Navbar.jsx` -
+      Navigation bar - `SearchBar.jsx` - Search input component **Rule:** Should
+      be reusable and not page-specific
+   </Accordion>
+</Accordions>
+
+---
+
+## Step 4: Verify the Setup
+
+Your project structure should now look like:
+
+<Files>
+   <Folder name='src' defaultOpen>
+      <Folder name='pages'>
+         <File name='(empty for now)' />
+      </Folder>
+      <Folder name='components'>
+         <File name='(empty for now)' />
+      </Folder>
+      <File name='App.jsx' />
+      <File name='main.jsx' />
+      <File name='index.css' />
+   </Folder>
+   <File name='index.html' />
+   <File name='package.json' />
+   <File name='vite.config.js' />
+</Files>
+
+---
+
+## What You Learned
+
+<Steps>
+   <Step>
+      ### Component Structure Every React component is a function that returns
+      JSX
+   </Step>
+   <Step>
+      ### Project Organization Separate pages from reusable components for
+      better maintainability
+   </Step>
+   <Step>
+      ### Clean Slate Starting with a minimal setup makes it easier to
+      understand what you build
+   </Step>
+</Steps>
+
+---
+
+## Checkpoint ✅
+
+Before continuing, make sure:
+
+-  ✅ Your browser shows "StayScape" and "Find your perfect stay"
+-  ✅ No console errors in browser DevTools (F12)
+-  ✅ `pages` and `components` folders exist in `src`
+-  ✅ `App.jsx` contains the clean starting code
+
+---
+
+## Next Up
+
+Now that we have a clean project, we'll create our first custom component: the
+`HomePage`!
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m1'>← Back to Module Intro</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m1/lesson-2'>Next: Creating HomePage →</a>
+   </Button>
+</div>

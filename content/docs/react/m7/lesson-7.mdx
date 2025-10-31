@@ -1,0 +1,798 @@
+---
+title: "L7: Create SignInForm with React Hook Form"
+description: "Build a validated form with React Hook Form and Zod"
+---
+
+# Create SignInForm with React Hook Form
+
+Time to build a powerful, validated form using React Hook Form and Zod! 📝
+
+## Why React Hook Form?
+
+**Traditional forms are painful:**
+
+```jsx
+// ❌ Manual state management (tedious)
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+const [emailError, setEmailError] = useState('');
+const [passwordError, setPasswordError] = useState('');
+const [touched, setTouched] = useState({});
+
+// Lots of boilerplate...
+```
+
+**React Hook Form is better:**
+
+```jsx
+// ✅ Simple, powerful
+const { register, handleSubmit, formState: { errors } } = useForm();
+
+<input {...register('email')} />
+// That's it!
+```
+
+**Benefits:**
+
+- ✅ **Less code:** No manual state
+- ✅ **Better performance:** Fewer re-renders
+- ✅ **Built-in validation:** Integrated with Zod
+- ✅ **Error handling:** Automatic
+- ✅ **TypeScript support:** Full type safety
+
+## Why Zod?
+
+**Zod provides schema validation:**
+
+```jsx
+// Define what valid data looks like
+const schema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Must be 8+ characters'),
+});
+
+// Validate data
+schema.parse({ email: 'test@test.com', password: '12345678' });
+// ✅ Valid!
+
+schema.parse({ email: 'bad-email', password: '123' });
+// ❌ Throws error with messages
+```
+
+**Benefits:**
+
+- ✅ **Type safety:** TypeScript infers types
+- ✅ **Reusable schemas:** Use in forms, APIs, databases
+- ✅ **Clear error messages:** User-friendly
+- ✅ **Composable:** Build complex validations
+
+## Install Dependencies
+
+<Steps>
+
+<Step>
+
+**Install React Hook Form and Zod:**
+
+```bash
+npm install react-hook-form zod @hookform/resolvers
+```
+
+**What each does:**
+- `react-hook-form`: Form state and validation
+- `zod`: Schema validation
+- `@hookform/resolvers`: Connects Zod to React Hook Form
+
+</Step>
+
+<Step>
+
+**Verify installation:**
+
+```bash
+npm list react-hook-form zod
+```
+
+Should show installed versions (v7.x+ for react-hook-form, v3.x+ for zod).
+
+</Step>
+
+</Steps>
+
+## Create Validation Schema
+
+Define what valid sign-in data looks like:
+
+```jsx title="src/schemas/signInSchema.js"
+import { z } from 'zod';
+
+export const signInSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email is required')
+    .email('Please enter a valid email address'),
+  
+  password: z
+    .string()
+    .min(1, 'Password is required')
+    .min(8, 'Password must be at least 8 characters'),
+});
+```
+
+## Create SignInForm Component
+
+Build the form with validation:
+
+```jsx title="src/components/SignInForm.jsx"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { signInSchema } from '@/schemas/signInSchema';
+
+function SignInForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(signInSchema),
+  });
+
+  const onSubmit = async (data) => {
+    console.log('Form data:', data);
+    // TODO: Implement sign-in logic in Lesson 9
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="sign-in-form">
+      {/* Email Field */}
+      <div className="form-field">
+        <label htmlFor="email" className="form-label">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          {...register('email')}
+          className={`form-input ${errors.email ? 'form-input-error' : ''}`}
+          placeholder="you@example.com"
+        />
+        {errors.email && (
+          <p className="form-error">{errors.email.message}</p>
+        )}
+      </div>
+
+      {/* Password Field */}
+      <div className="form-field">
+        <label htmlFor="password" className="form-label">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          {...register('password')}
+          className={`form-input ${errors.password ? 'form-input-error' : ''}`}
+          placeholder="••••••••"
+        />
+        {errors.password && (
+          <p className="form-error">{errors.password.message}</p>
+        )}
+      </div>
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="submit-button"
+      >
+        {isSubmitting ? 'Signing in...' : 'Sign In'}
+      </button>
+    </form>
+  );
+}
+
+export default SignInForm;
+```
+
+## Add Form Styling
+
+Create beautiful, accessible form styles:
+
+```css title="src/app/global.css"
+/* Form Container */
+.sign-in-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Form Field */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Label */
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+}
+
+/* Input */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  color: #1f2937;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Input Error State */
+.form-input-error {
+  border-color: #ef4444;
+}
+
+.form-input-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Error Message */
+.form-error {
+  font-size: 0.875rem;
+  color: #ef4444;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.form-error::before {
+  content: '⚠️';
+  font-size: 1rem;
+}
+
+/* Submit Button */
+.submit-button {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Focus Visible (Accessibility) */
+.form-input:focus-visible,
+.submit-button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+```
+
+## Understanding the Code
+
+<Tabs items={['useForm Hook', 'register Function', 'Form Validation', 'Error Handling']}>
+
+<Tab value="useForm Hook">
+
+**The `useForm` hook provides everything:**
+
+```jsx
+const {
+  register,       // Register inputs
+  handleSubmit,   // Handle form submission
+  formState,      // Form state (errors, isSubmitting, etc.)
+} = useForm({
+  resolver: zodResolver(signInSchema),  // Use Zod for validation
+});
+```
+
+**Breaking down `formState`:**
+
+```jsx
+const { errors, isSubmitting } = formState;
+
+// errors: Object with validation errors
+// {
+//   email: { message: 'Invalid email' },
+//   password: { message: 'Too short' }
+// }
+
+// isSubmitting: Boolean
+// true → Form is submitting
+// false → Form is idle
+```
+
+**`resolver` connects Zod:**
+
+```jsx
+// Without resolver (manual validation)
+useForm({
+  // You'd have to validate manually
+});
+
+// With resolver (automatic validation)
+useForm({
+  resolver: zodResolver(signInSchema),  // Zod handles it!
+});
+```
+
+**When validation happens:**
+
+```
+User types → onChange validation (optional)
+User blurs field → onBlur validation (default)
+User submits → onSubmit validation (always)
+```
+
+Configure with `mode`:
+
+```jsx
+useForm({
+  mode: 'onChange',  // Validate on every change
+  mode: 'onBlur',    // Validate when field loses focus (default)
+  mode: 'onSubmit',  // Only validate on submit
+});
+```
+
+</Tab>
+
+<Tab value="register Function">
+
+**`register` connects inputs to form:**
+
+```jsx
+<input {...register('email')} />
+```
+
+**What `{...register('email')}` does:**
+
+Spreads these props onto the input:
+
+```jsx
+<input
+  name="email"
+  ref={/* React Hook Form's internal ref */}
+  onChange={/* Internal change handler */}
+  onBlur={/* Internal blur handler */}
+/>
+```
+
+**Manual expansion (don't do this):**
+
+```jsx
+// ❌ Don't do this (use {...register('email')} instead)
+const emailProps = register('email');
+
+<input
+  name={emailProps.name}
+  ref={emailProps.ref}
+  onChange={emailProps.onChange}
+  onBlur={emailProps.onBlur}
+/>
+```
+
+**Spread syntax is cleaner:**
+
+```jsx
+// ✅ Do this
+<input {...register('email')} />
+```
+
+**Register with options:**
+
+```jsx
+<input
+  {...register('email', {
+    required: 'Email is required',
+    pattern: {
+      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+      message: 'Invalid email',
+    },
+  })}
+/>
+```
+
+But with Zod, options aren't needed (Zod handles validation).
+
+</Tab>
+
+<Tab value="Form Validation">
+
+**Two-step validation:**
+
+**Step 1: Schema definition**
+
+```jsx
+const signInSchema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Must be 8+ characters'),
+});
+```
+
+**Step 2: Apply to form**
+
+```jsx
+useForm({
+  resolver: zodResolver(signInSchema),
+});
+```
+
+**Validation flow:**
+
+```
+User fills form
+  ↓
+User submits
+  ↓
+handleSubmit runs
+  ↓
+Zod validates data
+  ↓
+Valid? → onSubmit runs
+Invalid? → Errors show
+```
+
+**Example validation:**
+
+```jsx
+// User enters:
+email: 'bad-email'
+password: '123'
+
+// Zod validates:
+email: 'bad-email'  → ❌ Not a valid email
+password: '123'     → ❌ Less than 8 characters
+
+// Errors object:
+{
+  email: { message: 'Please enter a valid email address' },
+  password: { message: 'Password must be at least 8 characters' }
+}
+
+// UI shows both errors
+// onSubmit does NOT run
+```
+
+</Tab>
+
+<Tab value="Error Handling">
+
+**Errors are automatic:**
+
+```jsx
+const { formState: { errors } } = useForm();
+
+// Check if field has error
+if (errors.email) {
+  // Show error message
+  <p>{errors.email.message}</p>
+}
+```
+
+**Conditional styling:**
+
+```jsx
+<input
+  className={`form-input ${errors.email ? 'form-input-error' : ''}`}
+/>
+```
+
+**Result:**
+
+```
+No error:  class="form-input"
+Has error: class="form-input form-input-error"
+```
+
+**Error display pattern:**
+
+```jsx
+{errors.email && (
+  <p className="form-error">{errors.email.message}</p>
+)}
+```
+
+**Timeline:**
+
+```
+Initial state: errors = {}
+  → No error message shown
+
+User submits with invalid email
+  → errors = { email: { message: 'Invalid email' } }
+  → Error message shown
+
+User fixes email
+  → errors = {}
+  → Error message hidden
+```
+
+**Multiple errors:**
+
+```jsx
+// Field has multiple validation rules
+z.string()
+  .min(1, 'Required')
+  .email('Invalid email')
+  .max(100, 'Too long')
+
+// Zod shows FIRST error that fails:
+''          → 'Required'
+'short'     → 'Invalid email'
+'test@x.com' → (no error)
+'test@...(very long)' → 'Too long'
+```
+
+</Tab>
+
+</Tabs>
+
+## Zod Schema Deep Dive
+
+<Accordions>
+
+<Accordion title="Basic Zod Validation">
+
+**Common validators:**
+
+```jsx
+import { z } from 'zod';
+
+// String
+z.string()
+  .min(1, 'Required')           // Not empty
+  .min(8, 'Too short')          // Minimum length
+  .max(50, 'Too long')          // Maximum length
+  .email('Invalid email')       // Email format
+  .url('Invalid URL')           // URL format
+  .regex(/^[a-z]+$/, 'Lowercase only')  // Custom pattern
+
+// Number
+z.number()
+  .min(0, 'Must be positive')   // Minimum value
+  .max(100, 'Too large')        // Maximum value
+  .int('Must be integer')       // No decimals
+
+// Boolean
+z.boolean();
+
+// Optional fields
+z.string().optional();  // Can be undefined
+z.string().nullable();  // Can be null
+
+// With default value
+z.string().default('default value');
+```
+
+</Accordion>
+
+<Accordion title="Complex Validations">
+
+**Conditional validation:**
+
+```jsx
+const schema = z.object({
+  hasAccount: z.boolean(),
+  email: z.string().email(),
+  password: z.string().min(8),
+}).refine(
+  data => {
+    // If has account, password required
+    if (data.hasAccount) {
+      return data.password.length >= 8;
+    }
+    return true;
+  },
+  {
+    message: 'Password required for existing accounts',
+    path: ['password'],  // Error shows on password field
+  }
+);
+```
+
+**Confirm password:**
+
+```jsx
+const signUpSchema = z.object({
+  password: z.string().min(8),
+  confirmPassword: z.string(),
+}).refine(
+  data => data.password === data.confirmPassword,
+  {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],  // Error shows on confirm field
+  }
+);
+```
+
+**Custom validation:**
+
+```jsx
+const schema = z.object({
+  username: z.string().refine(
+    async (username) => {
+      // Check if username available (API call)
+      const response = await checkUsername(username);
+      return response.available;
+    },
+    {
+      message: 'Username already taken',
+    }
+  ),
+});
+```
+
+</Accordion>
+
+<Accordion title="TypeScript Integration">
+
+**Infer types from schema:**
+
+```typescript
+const signInSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+// TypeScript type inferred from schema
+type SignInData = z.infer<typeof signInSchema>;
+// Result:
+// {
+//   email: string;
+//   password: string;
+// }
+
+// Use in function
+const onSubmit = (data: SignInData) => {
+  console.log(data.email);     // ✅ TypeScript knows this exists
+  console.log(data.password);  // ✅ TypeScript knows this exists
+  console.log(data.unknown);   // ❌ TypeScript error
+};
+```
+
+**With React Hook Form:**
+
+```typescript
+const { register, handleSubmit } = useForm<SignInData>({
+  resolver: zodResolver(signInSchema),
+});
+
+// Full type safety!
+```
+
+</Accordion>
+
+</Accordions>
+
+## Testing the Form
+
+<Steps>
+
+<Step>
+
+**Test valid submission:**
+
+1. Enter valid email: `test@example.com`
+2. Enter valid password: `password123`
+3. Click "Sign In"
+4. Check console: Should log form data
+
+✅ **No errors, data logged!**
+
+</Step>
+
+<Step>
+
+**Test email validation:**
+
+1. Enter invalid email: `bad-email`
+2. Enter any password
+3. Click "Sign In"
+4. Should see error: "Please enter a valid email address"
+
+✅ **Error shown, form NOT submitted!**
+
+</Step>
+
+<Step>
+
+**Test password validation:**
+
+1. Enter valid email
+2. Enter short password: `123`
+3. Click "Sign In"
+4. Should see error: "Password must be at least 8 characters"
+
+✅ **Error shown, form NOT submitted!**
+
+</Step>
+
+<Step>
+
+**Test empty fields:**
+
+1. Leave both fields empty
+2. Click "Sign In"
+3. Should see errors on both fields:
+   - Email: "Email is required"
+   - Password: "Password is required"
+
+✅ **Multiple errors shown!**
+
+</Step>
+
+<Step>
+
+**Test disabled state:**
+
+1. Fill form with valid data
+2. Click "Sign In"
+3. Button should show "Signing in..." and be disabled
+4. After console.log, button returns to "Sign In"
+
+✅ **Button disabled during submission!**
+
+</Step>
+
+</Steps>
+
+## What's Next?
+
+In Lesson 8, we'll:
+1. Add the SignInForm to SignInPage
+2. Remove the placeholder
+3. Test the complete sign-in page
+4. Add finishing touches (remember me, forgot password)
+
+<Callout type="success">
+**✅ Lesson Complete!** You've created a powerful, validated form!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **React Hook Form** reduces boilerplate code significantly
+- ✅ **Zod schemas** provide type-safe validation
+- ✅ **`register`** connects inputs to form state
+- ✅ **`handleSubmit`** validates before calling onSubmit
+- ✅ **`errors`** object shows validation errors automatically
+- ✅ **`isSubmitting`** tracks submission state
+- ✅ **Spread syntax** `{...register('name')}` registers fields
+- ✅ **Conditional CSS** shows error states visually
+- ✅ **Error messages** come from Zod schema
+- ✅ **Type safety** with TypeScript integration

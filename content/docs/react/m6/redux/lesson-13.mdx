@@ -1,0 +1,715 @@
+---
+title: "L13: Favorite Button Component"
+description: "Create a ListingFavoriteButton component to toggle favorites"
+---
+
+# Create Favorite Button Component
+
+Let's build a heart button that lets users favorite/unfavorite listings!
+
+## What We're Building
+
+A `ListingFavoriteButton` component that:
+
+1. Shows filled heart (❤️) if favorited
+2. Shows outline heart (🤍) if not favorited
+3. Toggles state on click
+4. Dispatches Redux action
+5. Works anywhere in the app
+
+## Step 1: Create the Component File
+
+Create a new file:
+
+```bash
+touch src/components/ListingFavoriteButton.jsx
+```
+
+## Step 2: Build the Component
+
+Add the basic structure:
+
+```jsx title="src/components/ListingFavoriteButton.jsx"
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+import { Heart } from 'lucide-react';
+
+function ListingFavoriteButton({ listingId }) {
+  const dispatch = useDispatch();
+  const isFavorited = useSelector((state) => 
+    state.listings.favorites.includes(listingId)
+  );
+  
+  const handleClick = () => {
+    dispatch(toggleFavorite(listingId));
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      className={`p-2 rounded-full transition-colors ${
+        isFavorited 
+          ? 'text-red-500 hover:text-red-600' 
+          : 'text-gray-400 hover:text-gray-500'
+      }`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      <Heart 
+        size={24} 
+        fill={isFavorited ? 'currentColor' : 'none'}
+      />
+    </button>
+  );
+}
+
+export default ListingFavoriteButton;
+```
+
+**Let's break this down:**
+
+<Steps>
+
+<Step>
+
+### Imports
+
+```jsx
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+import { Heart } from 'lucide-react';
+```
+
+- `useSelector` - Read from Redux
+- `useDispatch` - Dispatch actions
+- `toggleFavorite` - Action to toggle favorite
+- `Heart` - Heart icon from lucide-react
+
+</Step>
+
+<Step>
+
+### Component Props
+
+```jsx
+function ListingFavoriteButton({ listingId }) {
+```
+
+Takes `listingId` as prop to know which listing to favorite.
+
+**Usage:**
+```jsx
+<ListingFavoriteButton listingId={listing.id} />
+<ListingFavoriteButton listingId={5} />
+```
+
+</Step>
+
+<Step>
+
+### Get Dispatch Function
+
+```jsx
+const dispatch = useDispatch();
+```
+
+Get the dispatch function to send actions to Redux.
+
+</Step>
+
+<Step>
+
+### Check if Favorited
+
+```jsx
+const isFavorited = useSelector((state) => 
+  state.listings.favorites.includes(listingId)
+);
+```
+
+**What's happening:**
+- Get `favorites` array from Redux: `[1, 5, 9]`
+- Check if our `listingId` is in the array
+- Returns `true` if favorited, `false` if not
+
+**Examples:**
+```js
+// favorites = [1, 5, 9]
+// listingId = 5
+[1, 5, 9].includes(5)  // true → isFavorited = true
+
+// listingId = 3
+[1, 5, 9].includes(3)  // false → isFavorited = false
+```
+
+</Step>
+
+<Step>
+
+### Handle Click
+
+```jsx
+const handleClick = () => {
+  dispatch(toggleFavorite(listingId));
+};
+```
+
+When clicked:
+1. Call `toggleFavorite(listingId)` - creates action
+2. Dispatch action to Redux
+3. Reducer adds/removes ID from favorites
+4. Component re-renders with new state
+
+</Step>
+
+<Step>
+
+### Render Button
+
+```jsx
+<button
+  onClick={handleClick}
+  className={`p-2 rounded-full transition-colors ${
+    isFavorited 
+      ? 'text-red-500 hover:text-red-600' 
+      : 'text-gray-400 hover:text-gray-500'
+  }`}
+  aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+>
+  <Heart 
+    size={24} 
+    fill={isFavorited ? 'currentColor' : 'none'}
+  />
+</button>
+```
+
+**Conditional styling:**
+- **If favorited:** Red color, filled heart
+- **If not favorited:** Gray color, outline heart
+
+**Accessibility:**
+- `aria-label` describes action for screen readers
+
+</Step>
+
+</Steps>
+
+## Understanding the Fill Logic
+
+The heart icon changes based on state:
+
+<Tabs items={['Not Favorited', 'Favorited', 'How Fill Works']}>
+
+<Tab value="Not Favorited">
+
+**When `isFavorited = false`:**
+
+```jsx
+<Heart 
+  size={24} 
+  fill="none"  // Outline heart
+/>
+```
+
+**Result:** 🤍 Outline heart
+
+```jsx
+className="text-gray-400 hover:text-gray-500"
+```
+
+**Color:** Gray (not active)
+
+</Tab>
+
+<Tab value="Favorited">
+
+**When `isFavorited = true`:**
+
+```jsx
+<Heart 
+  size={24} 
+  fill="currentColor"  // Filled heart
+/>
+```
+
+**Result:** ❤️ Filled heart
+
+```jsx
+className="text-red-500 hover:text-red-600"
+```
+
+**Color:** Red (active)
+
+</Tab>
+
+<Tab value="How Fill Works">
+
+The `fill` prop controls the heart's interior:
+
+**`fill="none"`:**
+```
+┌─────┐
+│ ♡   │  Outline only
+│  ♡  │  Transparent inside
+└─────┘
+```
+
+**`fill="currentColor"`:**
+```
+┌─────┐
+│ ♥   │  Filled with current text color
+│  ♥  │  Solid inside
+└─────┘
+```
+
+**currentColor** means "use the current `color` CSS property"
+
+So when `text-red-500` is applied, `fill="currentColor"` fills with red!
+
+</Tab>
+
+</Tabs>
+
+## Conditional Styling Breakdown
+
+Let's understand the ternary operators:
+
+```jsx
+className={`p-2 rounded-full transition-colors ${
+  isFavorited 
+    ? 'text-red-500 hover:text-red-600' 
+    : 'text-gray-400 hover:text-gray-500'
+}`}
+```
+
+<Accordions>
+
+<Accordion title="Template Literal with Ternary">
+
+**Pattern:**
+```jsx
+className={`always-applied ${condition ? 'if-true' : 'if-false'}`}
+```
+
+**Our code:**
+```jsx
+// Always applied:
+'p-2 rounded-full transition-colors'
+
+// Conditionally applied:
+isFavorited 
+  ? 'text-red-500 hover:text-red-600'   // If favorited
+  : 'text-gray-400 hover:text-gray-500' // If not favorited
+```
+
+**Result when favorited:**
+```
+'p-2 rounded-full transition-colors text-red-500 hover:text-red-600'
+```
+
+**Result when not favorited:**
+```
+'p-2 rounded-full transition-colors text-gray-400 hover:text-gray-500'
+```
+
+</Accordion>
+
+<Accordion title="Always Applied Classes">
+
+```jsx
+'p-2 rounded-full transition-colors'
+```
+
+- `p-2` - Padding on all sides (8px)
+- `rounded-full` - Fully rounded (circle)
+- `transition-colors` - Smooth color transitions
+
+These apply regardless of favorite state!
+
+</Accordion>
+
+<Accordion title="Conditional Classes">
+
+**If favorited:**
+```jsx
+'text-red-500 hover:text-red-600'
+```
+- `text-red-500` - Red color (medium red)
+- `hover:text-red-600` - Darker red on hover
+
+**If not favorited:**
+```jsx
+'text-gray-400 hover:text-gray-500'
+```
+- `text-gray-400` - Light gray
+- `hover:text-gray-500` - Darker gray on hover
+
+</Accordion>
+
+</Accordions>
+
+## Adding Click Feedback
+
+Let's add visual feedback when clicking:
+
+```jsx title="src/components/ListingFavoriteButton.jsx"
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+import { Heart } from 'lucide-react';
+
+function ListingFavoriteButton({ listingId }) {
+  const dispatch = useDispatch();
+  const isFavorited = useSelector((state) => 
+    state.listings.favorites.includes(listingId)
+  );
+  
+  const handleClick = (e) => {
+    e.stopPropagation(); // Prevent parent click handlers
+    dispatch(toggleFavorite(listingId));
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      className={`p-2 rounded-full transition-all hover:scale-110 active:scale-95 ${
+        isFavorited 
+          ? 'text-red-500 hover:text-red-600 hover:bg-red-50' 
+          : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
+      }`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      <Heart 
+        size={24} 
+        fill={isFavorited ? 'currentColor' : 'none'}
+      />
+    </button>
+  );
+}
+
+export default ListingFavoriteButton;
+```
+
+**What changed?**
+
+<Steps>
+
+<Step>
+
+### Stop Propagation
+
+```jsx
+const handleClick = (e) => {
+  e.stopPropagation();
+  dispatch(toggleFavorite(listingId));
+};
+```
+
+`e.stopPropagation()` prevents the click from bubbling up.
+
+**Why?** If the button is inside a clickable card:
+
+```jsx
+<div onClick={goToDetails}>  {/* Card click → navigate */}
+  <h3>Beach House</h3>
+  <ListingFavoriteButton />   {/* Button click → favorite */}
+</div>
+```
+
+Without `stopPropagation()`, clicking the button would:
+1. Toggle favorite ✅
+2. Navigate to details ❌ (unwanted!)
+
+With `stopPropagation()`, clicking the button only toggles favorite!
+
+</Step>
+
+<Step>
+
+### Scale on Hover/Click
+
+```jsx
+className="transition-all hover:scale-110 active:scale-95"
+```
+
+- `transition-all` - Smooth all transitions
+- `hover:scale-110` - Grow to 110% on hover
+- `active:scale-95` - Shrink to 95% when clicking
+
+**Visual feedback:**
+- Hover: Button slightly grows
+- Click: Button slightly shrinks (bounce effect)
+
+</Step>
+
+<Step>
+
+### Background on Hover
+
+```jsx
+isFavorited 
+  ? 'hover:bg-red-50'   // Light red background
+  : 'hover:bg-gray-100' // Light gray background
+```
+
+Adds subtle background color on hover for better feedback!
+
+</Step>
+
+</Steps>
+
+## Complete Component Variations
+
+<Tabs items={['Simple Version', 'With Feedback', 'Compact Version', 'With Text']}>
+
+<Tab value="Simple Version">
+
+**Basic version (what we started with):**
+
+```jsx title="src/components/ListingFavoriteButton.jsx"
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+import { Heart } from 'lucide-react';
+
+function ListingFavoriteButton({ listingId }) {
+  const dispatch = useDispatch();
+  const isFavorited = useSelector((state) => 
+    state.listings.favorites.includes(listingId)
+  );
+  
+  const handleClick = () => {
+    dispatch(toggleFavorite(listingId));
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      className={`p-2 rounded-full transition-colors ${
+        isFavorited 
+          ? 'text-red-500 hover:text-red-600' 
+          : 'text-gray-400 hover:text-gray-500'
+      }`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      <Heart 
+        size={24} 
+        fill={isFavorited ? 'currentColor' : 'none'}
+      />
+    </button>
+  );
+}
+
+export default ListingFavoriteButton;
+```
+
+**Pros:** Simple, clean, minimal
+
+</Tab>
+
+<Tab value="With Feedback">
+
+**Enhanced version with all feedback:**
+
+```jsx title="src/components/ListingFavoriteButton.jsx"
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+import { Heart } from 'lucide-react';
+
+function ListingFavoriteButton({ listingId }) {
+  const dispatch = useDispatch();
+  const isFavorited = useSelector((state) => 
+    state.listings.favorites.includes(listingId)
+  );
+  
+  const handleClick = (e) => {
+    e.stopPropagation();
+    dispatch(toggleFavorite(listingId));
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      className={`p-2 rounded-full transition-all hover:scale-110 active:scale-95 ${
+        isFavorited 
+          ? 'text-red-500 hover:text-red-600 hover:bg-red-50' 
+          : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
+      }`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      <Heart 
+        size={24} 
+        fill={isFavorited ? 'currentColor' : 'none'}
+      />
+    </button>
+  );
+}
+
+export default ListingFavoriteButton;
+```
+
+**Pros:** Better UX, visual feedback, prevents issues
+
+**Recommended for production!**
+
+</Tab>
+
+<Tab value="Compact Version">
+
+**Smaller button for tight spaces:**
+
+```jsx title="src/components/ListingFavoriteButton.jsx"
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+import { Heart } from 'lucide-react';
+
+function ListingFavoriteButton({ listingId, size = 'normal' }) {
+  const dispatch = useDispatch();
+  const isFavorited = useSelector((state) => 
+    state.listings.favorites.includes(listingId)
+  );
+  
+  const handleClick = (e) => {
+    e.stopPropagation();
+    dispatch(toggleFavorite(listingId));
+  };
+  
+  const sizeClasses = {
+    small: 'p-1',
+    normal: 'p-2',
+    large: 'p-3'
+  };
+  
+  const iconSizes = {
+    small: 16,
+    normal: 24,
+    large: 32
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      className={`${sizeClasses[size]} rounded-full transition-all hover:scale-110 active:scale-95 ${
+        isFavorited 
+          ? 'text-red-500 hover:text-red-600 hover:bg-red-50' 
+          : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
+      }`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      <Heart 
+        size={iconSizes[size]} 
+        fill={isFavorited ? 'currentColor' : 'none'}
+      />
+    </button>
+  );
+}
+
+export default ListingFavoriteButton;
+```
+
+**Usage:**
+```jsx
+<ListingFavoriteButton listingId={1} size="small" />
+<ListingFavoriteButton listingId={2} />  {/* Normal */}
+<ListingFavoriteButton listingId={3} size="large" />
+```
+
+</Tab>
+
+<Tab value="With Text">
+
+**Button with text label:**
+
+```jsx title="src/components/ListingFavoriteButton.jsx"
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+import { Heart } from 'lucide-react';
+
+function ListingFavoriteButton({ listingId, showText = false }) {
+  const dispatch = useDispatch();
+  const isFavorited = useSelector((state) => 
+    state.listings.favorites.includes(listingId)
+  );
+  
+  const handleClick = (e) => {
+    e.stopPropagation();
+    dispatch(toggleFavorite(listingId));
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      className={`flex items-center space-x-2 px-3 py-2 rounded-full transition-all hover:scale-105 active:scale-95 ${
+        isFavorited 
+          ? 'text-red-500 hover:text-red-600 hover:bg-red-50' 
+          : 'text-gray-600 hover:text-gray-700 hover:bg-gray-100'
+      }`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      <Heart 
+        size={20} 
+        fill={isFavorited ? 'currentColor' : 'none'}
+      />
+      {showText && (
+        <span className="text-sm font-medium">
+          {isFavorited ? 'Favorited' : 'Favorite'}
+        </span>
+      )}
+    </button>
+  );
+}
+
+export default ListingFavoriteButton;
+```
+
+**Usage:**
+```jsx
+<ListingFavoriteButton listingId={1} showText />
+// Renders: ❤️ Favorited
+```
+
+</Tab>
+
+</Tabs>
+
+## Usage Example
+
+Here's how you'll use the button:
+
+```jsx title="Example Usage"
+import ListingFavoriteButton from '@/components/ListingFavoriteButton';
+
+function SomeComponent() {
+  return (
+    <div>
+      <h3>Beach House</h3>
+      <ListingFavoriteButton listingId={1} />
+    </div>
+  );
+}
+```
+
+**The button handles everything:**
+- ✅ Checks if listing is favorited
+- ✅ Shows correct icon state
+- ✅ Dispatches Redux action on click
+- ✅ Updates automatically when state changes
+
+## What's Next?
+
+Perfect! The button is ready. In the next lesson, we'll:
+
+1. **Add button to ListingCard** - Show on listing cards
+2. **Position properly** - Top-right corner
+3. **Add to DetailsPage** - Also show on details page
+
+<Callout type="success">
+**✅ Lesson Complete!** You've created a reusable favorite button component!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **useSelector** checks if listing is in favorites array
+- ✅ **useDispatch** sends toggleFavorite action
+- ✅ **Conditional styling** based on `isFavorited` state
+- ✅ **fill prop** controls heart icon fill (none vs currentColor)
+- ✅ **e.stopPropagation()** prevents parent click handlers
+- ✅ **Reusable component** works anywhere with just `listingId` prop
+- ✅ **Accessibility** with aria-label for screen readers

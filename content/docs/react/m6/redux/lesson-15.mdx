@@ -1,0 +1,1137 @@
+---
+title: "L15: Module Review"
+description: "Complete review of Redux Toolkit patterns and the favorites feature"
+---
+
+# Module 6 Review: State Management
+
+Congratulations! You've completed Module 6 and built a complete Redux-powered favorites system! 🎉
+
+Let's review everything you learned and see the complete picture.
+
+## What We Built
+
+A full-featured favorites system with Redux Toolkit:
+
+✅ Global state management with Redux store
+✅ Listings slice with actions and reducers
+✅ Async data fetching with thunks
+✅ Favorites toggle functionality
+✅ Dedicated favorites page
+✅ Navigation with counter badge
+✅ Favorite button component
+✅ Complete UI integration
+
+## Redux Toolkit Architecture
+
+### The Complete Flow
+
+```
+┌─────────────────────────────────────────────┐
+│              Redux Store                    │
+│                                             │
+│  state: {                                   │
+│    listings: {                              │
+│      items: [...],                          │
+│      favorites: [1, 5, 9],                  │
+│      status: 'succeeded',                   │
+│      error: null                            │
+│    }                                        │
+│  }                                          │
+└─────────────────────────────────────────────┘
+           ↑                    ↓
+        dispatch()          useSelector()
+           ↑                    ↓
+┌──────────┴────────────────────┴─────────────┐
+│           React Components                   │
+│                                             │
+│  HomePage → reads items, status             │
+│  FavoritesPage → reads favorites            │
+│  Navbar → reads favorites.length            │
+│  FavoriteButton → reads & dispatches        │
+└─────────────────────────────────────────────┘
+```
+
+### Core Concepts Review
+
+<Tabs items={['Store', 'Slices', 'Thunks', 'Hooks', 'Flow']}>
+
+<Tab value="Store">
+
+**The Single Source of Truth:**
+
+```js title="src/state/store.js"
+import { configureStore } from '@reduxjs/toolkit';
+import listingsReducer from './slices/listingsSlice';
+
+export const store = configureStore({
+  reducer: {
+    listings: listingsReducer
+  }
+});
+```
+
+**What we learned:**
+- `configureStore()` - Easy store setup
+- Automatic Redux DevTools integration
+- Automatic thunk middleware
+- Single global state object
+
+**Key insight:** 70% less boilerplate than traditional Redux!
+
+</Tab>
+
+<Tab value="Slices">
+
+**Feature-Based State Organization:**
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+// Async thunk for API calls
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async (filters) => {
+    const data = await api.listings.getAll(filters);
+    return data;
+  }
+);
+
+// Slice with state, reducers, and extraReducers
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState: {
+    items: [],
+    favorites: [],
+    status: 'idle',
+    error: null
+  },
+  reducers: {
+    toggleFavorite: (state, action) => {
+      const id = action.payload;
+      if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(fav => fav !== id);
+      } else {
+        state.favorites.push(id);
+      }
+    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchListings.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchListings.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.items = action.payload;
+      })
+      .addCase(fetchListings.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      });
+  }
+});
+
+export const { toggleFavorite } = listingsSlice.actions;
+export default listingsSlice.reducer;
+```
+
+**What we learned:**
+- `createSlice()` - Combines actions and reducers
+- Immer for "mutable" updates (actually immutable)
+- `reducers` - Synchronous actions
+- `extraReducers` - Handle external actions (thunks)
+- Automatic action creators
+
+</Tab>
+
+<Tab value="Thunks">
+
+**Async Operations Made Easy:**
+
+```js
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async (filters) => {
+    const data = await api.listings.getAll(filters);
+    return data;
+  }
+);
+```
+
+**What we learned:**
+- `createAsyncThunk` - Handle async operations
+- Automatically dispatches 3 actions:
+  - `pending` - When starting
+  - `fulfilled` - When successful
+  - `rejected` - When error occurs
+- Return value becomes `fulfilled` payload
+- Errors automatically handled
+
+**Pattern:**
+```
+User action → dispatch thunk → API call
+  → pending → loading state
+  → fulfilled → success state + data
+  OR
+  → rejected → error state + message
+```
+
+</Tab>
+
+<Tab value="Hooks">
+
+**Reading and Writing State:**
+
+**useSelector - Read State:**
+```jsx
+import { useSelector } from 'react-redux';
+
+// Read entire slice
+const listings = useSelector((state) => state.listings);
+
+// Read specific fields
+const items = useSelector((state) => state.listings.items);
+const favorites = useSelector((state) => state.listings.favorites);
+const status = useSelector((state) => state.listings.status);
+
+// Computed values
+const favoriteCount = useSelector((state) => 
+  state.listings.favorites.length
+);
+```
+
+**useDispatch - Write State:**
+```jsx
+import { useDispatch } from 'react-redux';
+import { toggleFavorite, fetchListings } from '@/state/slices/listingsSlice';
+
+function Component() {
+  const dispatch = useDispatch();
+  
+  // Dispatch sync action
+  const handleFavorite = () => {
+    dispatch(toggleFavorite(id));
+  };
+  
+  // Dispatch async action
+  useEffect(() => {
+    dispatch(fetchListings());
+  }, []);
+}
+```
+
+**What we learned:**
+- `useSelector` - Subscribe to state
+- `useDispatch` - Send actions
+- Components re-render when selected state changes
+- Hooks make Redux simple!
+
+</Tab>
+
+<Tab value="Flow">
+
+**Complete Data Flow:**
+
+**1. User clicks favorite button:**
+```jsx
+<button onClick={() => dispatch(toggleFavorite(listingId))}>
+  ❤️
+</button>
+```
+
+**2. Action dispatched:**
+```js
+{
+  type: 'listings/toggleFavorite',
+  payload: 1
+}
+```
+
+**3. Reducer updates state:**
+```js
+// Before: favorites = []
+// After:  favorites = [1]
+```
+
+**4. Components re-render:**
+```jsx
+// All these update automatically!
+<FavoriteButton />      // Heart fills
+<Navbar />             // Counter increases
+<FavoritesPage />      // Shows new favorite
+```
+
+**Redux DevTools shows everything!**
+
+</Tab>
+
+</Tabs>
+
+## Complete Code Review
+
+Let's see how everything connects:
+
+### Store Setup
+
+```js title="src/state/store.js"
+import { configureStore } from '@reduxjs/toolkit';
+import listingsReducer from './slices/listingsSlice';
+
+export const store = configureStore({
+  reducer: {
+    listings: listingsReducer
+  }
+});
+```
+
+### Provider Integration
+
+```jsx title="src/App.jsx"
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import Navbar from './components/Navbar';
+import { Router } from './components/Router';
+
+export function App() {
+  return (
+    <Provider store={store}>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1">
+          <Router />
+        </main>
+      </div>
+    </Provider>
+  );
+}
+```
+
+### Slice Implementation
+
+```js title="src/state/slices/listingsSlice.js"
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { api } from '@/api';
+
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async (filters) => {
+    const data = await api.listings.getAll(filters);
+    return data;
+  }
+);
+
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState: {
+    items: [],
+    favorites: [],
+    status: 'idle',
+    error: null
+  },
+  reducers: {
+    toggleFavorite: (state, action) => {
+      const id = action.payload;
+      if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(fav => fav !== id);
+      } else {
+        state.favorites.push(id);
+      }
+    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchListings.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchListings.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.items = action.payload;
+      })
+      .addCase(fetchListings.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      });
+  }
+});
+
+export const { toggleFavorite } = listingsSlice.actions;
+export default listingsSlice.reducer;
+```
+
+### Component Integration Examples
+
+<Tabs items={['HomePage', 'FavoritesPage', 'Navbar', 'FavoriteButton', 'ListingCard']}>
+
+<Tab value="HomePage">
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchListings } from '@/state/slices/listingsSlice';
+import ListingList from '@/components/ListingList';
+import SearchBar from '@/components/SearchBar';
+
+function HomePage() {
+  const dispatch = useDispatch();
+  const { items, status, error } = useSelector((state) => state.listings);
+  
+  // Local state for filters (UI-specific)
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ checkIn: '', checkOut: '' });
+  const [guests, setGuests] = useState(1);
+  
+  // Fetch on mount
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchListings());
+    }
+  }, [status, dispatch]);
+  
+  // Filter listings locally
+  const filteredListings = items.filter((listing) => {
+    const matchesSearch = listing.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesGuests = listing.maxGuests >= guests;
+    return matchesSearch && matchesGuests;
+  });
+  
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
+  
+  if (status === 'failed') {
+    return <div>Error: {error}</div>;
+  }
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <SearchBar 
+        search={search}
+        setSearch={setSearch}
+        dates={dates}
+        setDates={setDates}
+        guests={guests}
+        setGuests={setGuests}
+      />
+      <ListingList listings={filteredListings} />
+    </div>
+  );
+}
+
+export default HomePage;
+```
+
+**Key points:**
+- ✅ Redux for listings data (global)
+- ✅ Local state for filters (UI-specific)
+- ✅ Fetch once on mount
+- ✅ Filter locally for performance
+
+</Tab>
+
+<Tab value="FavoritesPage">
+
+```jsx title="src/pages/ListingFavoritesPage.jsx"
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
+import ListingList from '@/components/ListingList';
+
+function ListingFavoritesPage() {
+  const items = useSelector((state) => state.listings.items);
+  const favoriteIds = useSelector((state) => state.listings.favorites);
+  
+  const favoriteListings = items.filter((listing) =>
+    favoriteIds.includes(listing.id)
+  );
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        Your Favorites ({favoriteListings.length})
+      </h1>
+      
+      {favoriteListings.length === 0 ? (
+        <div className="text-center py-12">
+          <Heart size={64} className="mx-auto mb-4 text-gray-300" />
+          <h2 className="text-xl font-semibold mb-2 text-gray-700">
+            No favorites yet
+          </h2>
+          <p className="text-gray-500 mb-6">
+            Start exploring and save your favorite listings!
+          </p>
+          <Link 
+            to="/" 
+            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Browse Listings
+          </Link>
+        </div>
+      ) : (
+        <ListingList listings={favoriteListings} />
+      )}
+    </div>
+  );
+}
+
+export default ListingFavoritesPage;
+```
+
+**Key points:**
+- ✅ Filter items by favorite IDs
+- ✅ Reuse ListingList component
+- ✅ Handle empty state
+- ✅ Show count in header
+
+</Tab>
+
+<Tab value="Navbar">
+
+```jsx title="src/components/Navbar.jsx"
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Home, Heart } from 'lucide-react';
+
+function Navbar() {
+  const favoriteCount = useSelector((state) => 
+    state.listings.favorites.length
+  );
+  
+  return (
+    <nav className="bg-white border-b border-gray-200">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          <Link to="/" className="text-xl font-bold text-gray-900">
+            StayScape
+          </Link>
+          
+          <div className="flex items-center space-x-6">
+            <Link 
+              to="/" 
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+            >
+              <Home size={20} />
+              <span>Home</span>
+            </Link>
+            
+            <Link 
+              to="/favorites" 
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 relative"
+            >
+              <Heart size={20} />
+              <span>Favorites</span>
+              {favoriteCount > 0 && (
+                <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {favoriteCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+```
+
+**Key points:**
+- ✅ Read favorites count from Redux
+- ✅ Conditional badge rendering
+- ✅ Navigation links
+- ✅ Auto-updates when favorites change
+
+</Tab>
+
+<Tab value="FavoriteButton">
+
+```jsx title="src/components/ListingFavoriteButton.jsx"
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleFavorite } from '@/state/slices/listingsSlice';
+import { Heart } from 'lucide-react';
+
+function ListingFavoriteButton({ listingId }) {
+  const dispatch = useDispatch();
+  const isFavorited = useSelector((state) => 
+    state.listings.favorites.includes(listingId)
+  );
+  
+  const handleClick = (e) => {
+    e.stopPropagation();
+    dispatch(toggleFavorite(listingId));
+  };
+  
+  return (
+    <button
+      onClick={handleClick}
+      className={`p-2 rounded-full transition-all hover:scale-110 active:scale-95 ${
+        isFavorited 
+          ? 'text-red-500 hover:text-red-600 hover:bg-red-50' 
+          : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
+      }`}
+      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      <Heart 
+        size={24} 
+        fill={isFavorited ? 'currentColor' : 'none'}
+      />
+    </button>
+  );
+}
+
+export default ListingFavoriteButton;
+```
+
+**Key points:**
+- ✅ Check if favorited with `.includes()`
+- ✅ Dispatch toggle action
+- ✅ Conditional styling (red/gray, filled/outline)
+- ✅ Stop propagation to prevent parent clicks
+- ✅ Reusable anywhere with just `listingId`
+
+</Tab>
+
+<Tab value="ListingCard">
+
+```jsx title="src/components/ListingCard.jsx"
+import { Link } from 'react-router-dom';
+import ListingFavoriteButton from './ListingFavoriteButton';
+
+function ListingCard({ listing }) {
+  return (
+    <Link 
+      to={`/listings/${listing.id}`}
+      className="block border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+    >
+      <div className="relative">
+        <img 
+          src={listing.images[0]} 
+          alt={listing.title}
+          className="w-full h-48 object-cover"
+        />
+        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md">
+          <ListingFavoriteButton listingId={listing.id} />
+        </div>
+      </div>
+      <div className="p-4">
+        <h3 className="font-semibold text-lg mb-2">{listing.title}</h3>
+        <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+          {listing.description}
+        </p>
+        <p className="text-lg font-bold">${listing.price}/night</p>
+      </div>
+    </Link>
+  );
+}
+
+export default ListingCard;
+```
+
+**Key points:**
+- ✅ Relative + absolute positioning
+- ✅ Button in top-right corner
+- ✅ Semi-transparent background for visibility
+- ✅ Works inside Link component
+
+</Tab>
+
+</Tabs>
+
+## Redux vs Local State Decision Tree
+
+When to use Redux vs `useState`:
+
+```
+Need to share data across multiple components?
+├─ YES → Use Redux
+│   Examples:
+│   - User authentication
+│   - Shopping cart
+│   - Favorites
+│   - Fetched data (listings, products)
+│   - Theme settings
+│
+└─ NO → Use Local State
+    Examples:
+    - Form inputs
+    - Toggle states (modal open/closed)
+    - Temporary UI state
+    - Search/filter values (unless shared)
+    - Hover states
+```
+
+<Accordions>
+
+<Accordion title="Perfect for Redux">
+
+**Global data that multiple components need:**
+
+```jsx
+// ✅ Redux - Shared across pages
+const favorites = useSelector((state) => state.listings.favorites);
+
+// Used in:
+// - HomePage (show which are favorited)
+// - FavoritesPage (display favorited listings)
+// - Navbar (show count)
+// - ListingCard (show favorite status)
+// - DetailsPage (show favorite status)
+```
+
+**Data from API that should persist:**
+
+```jsx
+// ✅ Redux - Fetched once, used everywhere
+const listings = useSelector((state) => state.listings.items);
+
+// Benefits:
+// - Fetch once
+// - Cache in Redux
+// - All pages use same data
+// - No refetching
+```
+
+</Accordion>
+
+<Accordion title="Perfect for Local State">
+
+**Component-specific UI state:**
+
+```jsx
+// ✅ Local state - Only this component needs it
+const [isOpen, setIsOpen] = useState(false);
+const [search, setSearch] = useState('');
+const [hovered, setHovered] = useState(false);
+
+// No other component cares about these values!
+```
+
+**Form inputs (unless form data needed globally):**
+
+```jsx
+// ✅ Local state - Form only used here
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+
+const handleSubmit = () => {
+  // Send to API
+  api.login(email, password);
+  
+  // If successful, user info goes to Redux
+  dispatch(setUser(userData));
+};
+```
+
+</Accordion>
+
+<Accordion title="Mixed Approach (What We Did)">
+
+**Combine Redux + local state:**
+
+```jsx
+function HomePage() {
+  // Redux - Global data
+  const { items, status } = useSelector((state) => state.listings);
+  
+  // Local state - UI-specific filters
+  const [search, setSearch] = useState('');
+  const [guests, setGuests] = useState(1);
+  
+  // Filter locally
+  const filtered = items.filter(
+    (listing) => listing.title.includes(search)
+  );
+}
+```
+
+**Benefits:**
+- Redux for data that matters globally
+- Local state for temporary UI
+- Best of both worlds!
+
+</Accordion>
+
+</Accordions>
+
+## Performance Considerations
+
+### Selector Optimization
+
+**Create reusable selectors:**
+
+```js title="src/state/slices/listingsSlice.js"
+// Export selectors for reuse
+export const selectAllListings = (state) => state.listings.items;
+export const selectFavoriteIds = (state) => state.listings.favorites;
+export const selectListingsStatus = (state) => state.listings.status;
+
+// Computed selector
+export const selectFavoriteListings = (state) => {
+  const items = state.listings.items;
+  const favoriteIds = state.listings.favorites;
+  return items.filter(listing => favoriteIds.includes(listing.id));
+};
+
+export const selectFavoriteCount = (state) => 
+  state.listings.favorites.length;
+```
+
+**Use in components:**
+
+```jsx
+import { selectFavoriteCount, selectFavoriteListings } from '@/state/slices/listingsSlice';
+
+function Component() {
+  const count = useSelector(selectFavoriteCount);
+  const favorites = useSelector(selectFavoriteListings);
+}
+```
+
+**Benefits:**
+- ✅ Reusable across components
+- ✅ Easy to test
+- ✅ Single source of truth
+- ✅ Can be memoized with Reselect
+
+### Advanced: Memoized Selectors
+
+For expensive computations, use `createSelector` from Reselect:
+
+```js
+import { createSelector } from '@reduxjs/toolkit';
+
+const selectListingsItems = (state) => state.listings.items;
+const selectFavoriteIds = (state) => state.listings.favorites;
+
+// Memoized - only recomputes when inputs change
+export const selectFavoriteListings = createSelector(
+  [selectListingsItems, selectFavoriteIds],
+  (items, favoriteIds) => {
+    console.log('Computing favorite listings...');
+    return items.filter(listing => favoriteIds.includes(listing.id));
+  }
+);
+```
+
+**When to use:**
+- Complex filtering/sorting
+- Expensive calculations
+- Computed values used in multiple components
+
+## Testing Redux
+
+### Testing Reducers
+
+```js
+import listingsReducer, { toggleFavorite } from './listingsSlice';
+
+test('toggleFavorite adds ID to favorites', () => {
+  const initialState = {
+    items: [],
+    favorites: [],
+    status: 'idle',
+    error: null
+  };
+  
+  const action = toggleFavorite(1);
+  const newState = listingsReducer(initialState, action);
+  
+  expect(newState.favorites).toEqual([1]);
+});
+
+test('toggleFavorite removes ID from favorites', () => {
+  const initialState = {
+    items: [],
+    favorites: [1, 2, 3],
+    status: 'idle',
+    error: null
+  };
+  
+  const action = toggleFavorite(2);
+  const newState = listingsReducer(initialState, action);
+  
+  expect(newState.favorites).toEqual([1, 3]);
+});
+```
+
+### Testing Components with Redux
+
+```jsx
+import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import listingsReducer from './state/slices/listingsSlice';
+import Navbar from './components/Navbar';
+
+test('Navbar shows favorite count', () => {
+  const store = configureStore({
+    reducer: {
+      listings: listingsReducer
+    },
+    preloadedState: {
+      listings: {
+        items: [],
+        favorites: [1, 2, 3],
+        status: 'idle',
+        error: null
+      }
+    }
+  });
+  
+  render(
+    <Provider store={store}>
+      <Navbar />
+    </Provider>
+  );
+  
+  expect(screen.getByText('3')).toBeInTheDocument();
+});
+```
+
+## Best Practices Summary
+
+<Steps>
+
+<Step>
+
+### Structure Your Redux
+
+```
+src/
+  state/
+    store.js              # Configure store
+    slices/
+      listingsSlice.js    # Listings feature
+      userSlice.js        # User feature
+      cartSlice.js        # Cart feature
+```
+
+**One slice per feature!**
+
+</Step>
+
+<Step>
+
+### Use Redux Toolkit
+
+**Always prefer Redux Toolkit over vanilla Redux:**
+
+- ✅ `configureStore()` instead of `createStore()`
+- ✅ `createSlice()` instead of action creators + reducers
+- ✅ `createAsyncThunk()` for async operations
+- ✅ Immer for immutable updates
+
+**70% less code!**
+
+</Step>
+
+<Step>
+
+### Create Selector Functions
+
+```js
+// ✅ Do this
+export const selectFavorites = (state) => state.listings.favorites;
+
+// Then use
+const favorites = useSelector(selectFavorites);
+
+// ❌ Not this
+const favorites = useSelector((state) => state.listings.favorites);
+```
+
+**Reusable, testable, maintainable!**
+
+</Step>
+
+<Step>
+
+### Keep Local State Local
+
+**Don't put everything in Redux!**
+
+```jsx
+// ✅ Good
+const [isOpen, setIsOpen] = useState(false);  // Local
+
+// ❌ Bad
+const isOpen = useSelector((state) => state.ui.modalOpen);  // Overkill!
+```
+
+**Redux for shared data, useState for local UI.**
+
+</Step>
+
+<Step>
+
+### Use Redux DevTools
+
+**Essential for debugging:**
+
+1. See all state changes
+2. Time-travel debugging
+3. Action history
+4. State snapshots
+
+**Install Redux DevTools browser extension!**
+
+</Step>
+
+</Steps>
+
+## Common Patterns
+
+### Loading Pattern
+
+```jsx
+const { data, status, error } = useSelector((state) => state.feature);
+
+if (status === 'loading') return <Spinner />;
+if (status === 'failed') return <Error message={error} />;
+if (status === 'succeeded') return <Data items={data} />;
+```
+
+### Optimistic Updates
+
+```jsx
+const handleToggleFavorite = (id) => {
+  // Update UI immediately
+  dispatch(toggleFavorite(id));
+  
+  // Sync with backend in background
+  api.favorites.toggle(id).catch((error) => {
+    // Revert if fails
+    dispatch(toggleFavorite(id));
+    showError('Failed to update favorite');
+  });
+};
+```
+
+### Pagination
+
+```jsx
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState: {
+    items: [],
+    page: 1,
+    hasMore: true
+  },
+  reducers: {
+    appendListings: (state, action) => {
+      state.items.push(...action.payload);
+      state.page += 1;
+    },
+    setHasMore: (state, action) => {
+      state.hasMore = action.payload;
+    }
+  }
+});
+```
+
+## What's Next?
+
+You've mastered Redux Toolkit! Here's what you can explore:
+
+### Immediate Next Steps
+
+1. **Module 7: Forms & Authentication** - User login with Redux
+2. **Module 8: Deployment** - Deploy your app
+3. **Module X: Advanced Topics** - Hooks, testing, optimization
+
+### Advanced Redux Topics
+
+- **RTK Query** - Auto-generated API hooks
+- **Redux Persist** - Save state to localStorage
+- **Reselect** - Memoized selectors for performance
+- **Redux Saga** - Complex async workflows
+- **Normalization** - Flat state shape for performance
+
+### Practice Projects
+
+Build more features with Redux:
+
+1. **Shopping Cart** - Add items, update quantities, checkout
+2. **Authentication** - Login, logout, protected routes
+3. **Notifications** - Global toast messages
+4. **Dark Mode** - Theme toggle across app
+5. **Multi-step Form** - Complex form with state
+
+## Key Takeaways
+
+<Callout type="success">
+
+**🎯 You've learned:**
+
+✅ **Redux Store** - Single source of truth for global state
+✅ **Slices** - Feature-based state organization with createSlice()
+✅ **Thunks** - Async operations with createAsyncThunk()
+✅ **Reducers** - Pure functions that update state (with Immer!)
+✅ **Actions** - Auto-generated action creators
+✅ **Hooks** - useSelector and useDispatch for components
+✅ **Integration** - Connect Redux to React with Provider
+✅ **DevTools** - Debug state changes with time travel
+✅ **Patterns** - Loading states, computed values, toggles
+✅ **Best Practices** - When to use Redux vs local state
+
+</Callout>
+
+## Complete Favorites Feature
+
+Here's what you built - a production-ready favorites system:
+
+```
+User Flow:
+1. Browse listings on HomePage
+2. Click heart icon on ListingCard
+3. Redux updates favorites array
+4. All components re-render:
+   - Heart fills on clicked card ✅
+   - Navbar counter increases ✅
+   - Favorites page updates ✅
+5. Navigate to Favorites page
+6. See all favorited listings
+7. Unfavorite from anywhere
+8. State stays synchronized everywhere
+
+Technical Implementation:
+- Store with listings slice ✅
+- fetchListings async thunk ✅
+- toggleFavorite reducer ✅
+- Selectors for reusability ✅
+- HomePage with Redux ✅
+- FavoritesPage component ✅
+- Navbar with counter ✅
+- FavoriteButton component ✅
+- Integrated in ListingCard ✅
+- Complete routing ✅
+```
+
+## Congratulations! 🎉
+
+You've completed **Module 6: State Management**!
+
+You now have a solid foundation in Redux Toolkit and can:
+- Build scalable state management systems
+- Handle async operations professionally
+- Integrate Redux with React components
+- Create reusable, testable code
+- Debug state issues effectively
+
+**Ready for the next challenge?** Let's continue building! 🚀
+
+---
+
+<Callout type="info">
+**Need Help?**
+- Review Redux DevTools for state issues
+- Check lesson 8-14 for implementation details
+- Practice by adding more Redux features
+- Reference this review anytime!
+</Callout>
+

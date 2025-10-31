@@ -1,0 +1,383 @@
+---
+title: "Create HomePage Component"
+description:
+   "Build your first React component - the main landing page of your application"
+---
+
+# Create HomePage Component
+
+<div className='flex gap-2 mb-4 flex-wrap'>
+   <Badge variant='primary'>Lesson 1 of 7</Badge>
+   <Badge>15 min</Badge>
+</div>
+
+Let's create your first React component! The **HomePage** will be the main
+landing page where users browse property listings.
+
+## What We're Building
+
+The `HomePage` component will serve as the entry point for our booking
+application. For now, it will display a simple heading, but in future lessons
+we'll add:
+
+-  Property listing cards
+-  Search filters
+-  Date range picker
+-  Guest selector
+
+## Understanding Components
+
+In React, **components** are the building blocks of your application. Think of
+them as custom HTML elements that you create.
+
+### Why Components?
+
+**Without components (traditional approach):**
+
+```html
+<div class="homepage">
+   <h1>Find your next stay</h1>
+   <div class="search">...</div>
+   <div class="listings">...</div>
+</div>
+```
+
+Everything in one HTML file - hard to maintain and reuse.
+
+**With components (React approach):**
+
+```jsx
+<HomePage>
+   <SearchBar />
+   <ListingList />
+</HomePage>
+```
+
+Each piece is self-contained, reusable, and easy to understand.
+
+## Component Structure
+
+React components are just JavaScript functions that return JSX:
+
+```jsx title="Basic Component Structure"
+function ComponentName() {
+   return <div>{/* Your JSX here */}</div>;
+}
+
+export default ComponentName;
+```
+
+## Creating the HomePage
+
+<Steps>
+   <Step>
+      ### Create pages directory Organize page components separately from other
+      components
+   </Step>
+   <Step>### Create HomePage.jsx file Create the HomePage component file</Step>
+   <Step>### Write the component Implement the HomePage function</Step>
+   <Step>### Export the component Make it available for import</Step>
+</Steps>
+
+### Step-by-Step Instructions
+
+**1. Create the `pages` directory:**
+
+In your `src` folder, create a new folder called `pages`. Your structure should
+look like:
+
+<Files>
+   <Folder name='src' defaultOpen>
+      <Folder name='pages' defaultOpen>
+         <File name='HomePage.jsx' icon='⚛️' />
+      </Folder>
+      <File name='App.jsx' icon='⚛️' />
+      <File name='main.jsx' icon='⚛️' />
+   </Folder>
+</Files>
+
+**2. Create `src/pages/HomePage.jsx`:**
+
+```jsx title="src/pages/HomePage.jsx"
+function HomePage() {
+   return (
+      <div className='home-page'>
+         <h1>Find your next stay</h1>
+         <p>Discover amazing places to book for your next adventure</p>
+      </div>
+   );
+}
+
+export default HomePage;
+```
+
+## Code Breakdown
+
+Let's understand every part of this component:
+
+### 1. Function Declaration
+
+```jsx
+function HomePage() {
+   // Component logic here
+}
+```
+
+**Key points:**
+
+-  Component names must start with a **capital letter** (HomePage, not homePage)
+-  It's just a regular JavaScript function
+-  Modern React uses functional components (not class components)
+
+### 2. Return Statement
+
+```jsx
+return <div className='home-page'>{/* JSX content */}</div>;
+```
+
+**Key points:**
+
+-  Components must return JSX
+-  Wrap multiple elements in a parent (like `<div>`)
+-  Use parentheses for multi-line returns
+
+### 3. JSX Content
+
+```jsx
+<div className='home-page'>
+   <h1>Find your next stay</h1>
+   <p>Discover amazing places to book for your next adventure</p>
+</div>
+```
+
+**Key points:**
+
+-  JSX looks like HTML but is JavaScript
+-  Use `className` instead of `class` (class is a JavaScript keyword)
+-  Can include any valid HTML elements
+
+### 4. Export Statement
+
+```jsx
+export default HomePage;
+```
+
+**Key points:**
+
+-  Makes the component available to other files
+-  `default` means it's the main export from this file
+-  Other files can now `import HomePage from './pages/HomePage'`
+
+## Understanding JSX
+
+JSX (JavaScript XML) is a syntax extension that lets you write HTML-like code in
+JavaScript.
+
+### JSX vs HTML
+
+<Tabs items={["JSX", "HTML"]}>
+<Tab value="JSX">
+
+```jsx
+// React Component with JSX
+function Button() {
+   const handleClick = () => alert("Clicked!");
+
+   return (
+      <button className='btn-primary' onClick={handleClick}>
+         Click me
+      </button>
+   );
+}
+```
+
+</Tab>
+  
+<Tab value="HTML">
+
+```html
+<!-- Traditional HTML -->
+<button class="btn-primary" onclick="alert('Clicked!')">Click me</button>
+```
+
+</Tab>
+</Tabs>
+
+### Key Differences
+
+| Feature                | JSX                | HTML           |
+| ---------------------- | ------------------ | -------------- |
+| Class attribute        | `className`        | `class`        |
+| Event handlers         | `onClick`          | `onclick`      |
+| JavaScript expressions | `{variable}`       | Not supported  |
+| Self-closing tags      | `<img />`          | `<img>`        |
+| Style attribute        | `{{color: 'red'}}` | `"color: red"` |
+
+### JSX Rules
+
+1. **Single root element:**
+
+```jsx
+// ✅ Correct - single root
+return (
+  <div>
+    <h1>Title</h1>
+    <p>Content</p>
+  </div>
+);
+
+// ❌ Wrong - multiple roots
+return (
+  <h1>Title</h1>
+  <p>Content</p>
+);
+```
+
+2. **Close all tags:**
+
+```jsx
+// ✅ Correct
+<img src="photo.jpg" />
+<br />
+
+// ❌ Wrong
+<img src="photo.jpg">
+<br>
+```
+
+3. **Use camelCase for attributes:**
+
+```jsx
+// ✅ Correct
+<div className="container" onClick={handleClick}>
+
+// ❌ Wrong
+<div class="container" onclick={handleClick}>
+```
+
+## Component Naming Conventions
+
+Follow these naming conventions for React components:
+
+### File Names
+
+-  **PascalCase:** `HomePage.jsx`, `ListingCard.jsx`
+-  Match the component name
+-  Use `.jsx` extension for files containing JSX
+
+### Component Names
+
+-  **PascalCase:** `HomePage`, `UserProfile`, `ListingCard`
+-  Descriptive and clear
+-  Indicate what the component does
+
+```jsx title="Good Examples"
+// ✅ Good names
+function HomePage() {}
+function UserProfile() {}
+function ListingCard() {}
+function SearchBar() {}
+```
+
+```jsx title="Bad Examples"
+// ❌ Bad names
+function homePage() {} // Should be PascalCase
+function UP() {} // Not descriptive
+function Listing() {} // Too generic
+function page1() {} // Not meaningful
+```
+
+## Verification
+
+After creating `HomePage.jsx`, verify:
+
+-  ✅ File exists at `src/pages/HomePage.jsx`
+-  ✅ Component function is defined
+-  ✅ Component returns JSX with a heading
+-  ✅ Component is exported as default
+-  ✅ No syntax errors in your editor
+
+**Note:** The component won't display in your browser yet - we'll connect it in
+the next lesson!
+
+## Common Mistakes
+
+<Steps>
+  <Step>
+    ### Lowercase component name
+    
+    **Wrong:**
+    ```jsx
+    function homePage() { }
+    ```
+    
+    **Correct:**
+    ```jsx
+    function HomePage() { }
+    ```
+    
+    React components must start with a capital letter.
+  </Step>
+  
+  <Step>
+    ### Missing export
+    
+    **Wrong:**
+    ```jsx
+    function HomePage() {
+      return <div>Content</div>;
+    }
+    // No export!
+    ```
+    
+    **Correct:**
+    ```jsx
+    function HomePage() {
+      return <div>Content</div>;
+    }
+    export default HomePage;
+    ```
+  </Step>
+  
+  <Step>
+    ### Multiple root elements
+    
+    **Wrong:**
+    ```jsx
+    return (
+      <h1>Title</h1>
+      <p>Text</p>
+    );
+    ```
+    
+    **Correct:**
+    ```jsx
+    return (
+      <div>
+        <h1>Title</h1>
+        <p>Text</p>
+      </div>
+    );
+    ```
+  </Step>
+</Steps>
+
+## Next Steps
+
+Great! You've created your first React component. In the next lesson, we'll
+import this component into `App.jsx` so it displays in your browser.
+
+<div className='flex gap-2 mt-6 flex-wrap'>
+   <a
+      href='/docs/react/m1'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4'
+   >
+      ← Back to Module
+   </a>
+   <a
+      href='/docs/react/m1/2_add-homepage-to-app'
+      className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4'
+   >
+      Lesson 2: Add HomePage to App →
+   </a>
+</div>

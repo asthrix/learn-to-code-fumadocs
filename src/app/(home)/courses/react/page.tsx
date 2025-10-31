@@ -11,7 +11,7 @@ export default function ReactCoursePage() {
       reactCourseDetail;
 
    return (
-      <main className='relative flex flex-1 flex-col bg-slate-50 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-100'>
+      <main className='relative flex flex-1 flex-col bg-background text-foreground transition-colors'>
          <CourseDetailHeroSection hero={hero} />
          <CourseDifferentiatorsSection differentiators={differentiators} />
          <CourseTechnologySection technology={technology} />

@@ -1,0 +1,621 @@
+---
+title: "L4: useMemo Introduction"
+description: "Optimize expensive calculations with React's useMemo hook"
+---
+
+# useMemo Introduction
+
+Learn how to prevent expensive calculations from running on every render with React's `useMemo` hook!
+
+## What You'll Learn
+
+- What useMemo is and why it matters
+- When to use useMemo
+- When NOT to use useMemo
+- Memoization concept
+- Performance optimization patterns
+- Prevent unnecessary recalculations
+
+## The Performance Problem
+
+Every time a component re-renders, **ALL** its code runs again:
+
+```jsx
+function HomePage() {
+  const { data: listings } = useFetch('/listings');
+  const [search, setSearch] = useState('');
+  
+  // This runs on EVERY render!
+  const expensiveCalculation = () => {
+    console.log('Calculating...');
+    let result = 0;
+    for (let i = 0; i < 1000000; i++) {
+      result += i;
+    }
+    return result;
+  };
+  
+  const value = expensiveCalculation(); // Called every render!
+  
+  return <div>{value}</div>;
+}
+```
+
+**Problem:** When you type in the search box:
+1. `search` state changes
+2. Component re-renders
+3. `expensiveCalculation` runs again
+4. Returns same result (wasteful!)
+
+<Callout type="warning">
+Unnecessary calculations slow down your app, especially with complex operations like filtering large arrays, sorting data, or computing derived values.
+</Callout>
+
+## What is useMemo?
+
+<Callout type="info">
+**useMemo** is a React hook that **memoizes** (caches) the result of a calculation. It only recalculates when dependencies change.
+</Callout>
+
+**Memoization** = Remember previous result, reuse it if inputs haven't changed
+
+Think of it like a smart calculator:
+- First time: Does the math, saves the answer
+- Next times: Checks if numbers changed
+  - If same: Returns saved answer (fast! ⚡)
+  - If different: Does math again, saves new answer
+
+## useMemo Syntax
+
+```jsx
+const memoizedValue = useMemo(() => {
+  // Expensive calculation here
+  return result;
+}, [dependencies]);
+```
+
+**Parts:**
+
+1. **Function** - Returns the value to memoize
+2. **Dependencies** - Array of values to watch
+3. **Return value** - The memoized result
+
+**How it works:**
+
+```jsx
+// First render
+const result = useMemo(() => compute(a, b), [a, b]);
+// Runs compute(a, b), saves result
+
+// Second render (a and b unchanged)
+const result = useMemo(() => compute(a, b), [a, b]);
+// Returns saved result, doesn't run compute!
+
+// Third render (a changed)
+const result = useMemo(() => compute(a, b), [a, b]);
+// Runs compute again because a changed
+```
+
+## Simple Example
+
+<Tabs items={['Without useMemo', 'With useMemo']}>
+
+<Tab value="Without useMemo">
+
+```jsx
+function Component() {
+  const [count, setCount] = useState(0);
+  const [search, setSearch] = useState('');
+  
+  // Runs on every render (even when search changes!)
+  const doubledCount = count * 2;
+  console.log('Calculated:', doubledCount);
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <p>Doubled: {doubledCount}</p>
+      <button onClick={() => setCount(count + 1)}>
+        Increment
+      </button>
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+    </div>
+  );
+}
+```
+
+**Problem:** Typing in search box triggers calculation, even though count didn't change!
+
+</Tab>
+
+<Tab value="With useMemo">
+
+```jsx
+function Component() {
+  const [count, setCount] = useState(0);
+  const [search, setSearch] = useState('');
+  
+  // Only recalculates when count changes
+  const doubledCount = useMemo(() => {
+    console.log('Calculated:', count * 2);
+    return count * 2;
+  }, [count]); // Only depends on count
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <p>Doubled: {doubledCount}</p>
+      <button onClick={() => setCount(count + 1)}>
+        Increment
+      </button>
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+    </div>
+  );
+}
+```
+
+**Solution:** Typing in search box doesn't trigger calculation - count unchanged!
+
+</Tab>
+
+</Tabs>
+
+## When to Use useMemo
+
+Use `useMemo` for:
+
+<Accordions>
+
+<Accordion title="1. Expensive Calculations">
+
+```jsx
+function DataAnalysis({ data }) {
+  // Expensive: Sorting large array
+  const sorted = useMemo(() => {
+    return [...data].sort((a, b) => b.value - a.value);
+  }, [data]);
+  
+  // Expensive: Complex filtering
+  const filtered = useMemo(() => {
+    return data.filter(item => {
+      // Complex logic here
+      return complexCondition(item);
+    });
+  }, [data]);
+  
+  // Expensive: Heavy computation
+  const statistics = useMemo(() => {
+    return {
+      avg: average(data),
+      median: median(data),
+      stdDev: standardDeviation(data)
+    };
+  }, [data]);
+  
+  return <Chart data={statistics} />;
+}
+```
+
+**Why:** These operations are slow. Avoid repeating them unnecessarily.
+
+</Accordion>
+
+<Accordion title="2. Derived State">
+
+```jsx
+function ShoppingCart({ items }) {
+  // Derived from items - only recalculate when items change
+  const total = useMemo(() => {
+    return items.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+    }, 0);
+  }, [items]);
+  
+  const itemCount = useMemo(() => {
+    return items.reduce((count, item) => {
+      return count + item.quantity;
+    }, 0);
+  }, [items]);
+  
+  return (
+    <div>
+      <p>Items: {itemCount}</p>
+      <p>Total: ${total}</p>
+    </div>
+  );
+}
+```
+
+**Why:** Derived values should only update when source data changes.
+
+</Accordion>
+
+<Accordion title="3. Preventing Dependency Changes">
+
+```jsx
+function ParentComponent() {
+  const [count, setCount] = useState(0);
+  
+  // This object is recreated every render
+  const config = { theme: 'dark', lang: 'en' };
+  
+  // ChildComponent will re-render every time!
+  return <ChildComponent config={config} />;
+}
+
+// Better: Memoize the object
+function ParentComponent() {
+  const [count, setCount] = useState(0);
+  
+  // Object only recreated if dependencies change
+  const config = useMemo(() => {
+    return { theme: 'dark', lang: 'en' };
+  }, []); // Empty array = never changes
+  
+  // ChildComponent only re-renders when config actually changes
+  return <ChildComponent config={config} />;
+}
+```
+
+**Why:** Objects/arrays are recreated every render, triggering child re-renders.
+
+</Accordion>
+
+<Accordion title="4. Large List Operations">
+
+```jsx
+function ProductList({ products, filters }) {
+  // Filter + sort large list
+  const displayedProducts = useMemo(() => {
+    let result = products;
+    
+    // Apply filters
+    if (filters.category) {
+      result = result.filter(p => p.category === filters.category);
+    }
+    if (filters.minPrice) {
+      result = result.filter(p => p.price >= filters.minPrice);
+    }
+    
+    // Sort
+    result = result.sort((a, b) => {
+      return b.rating - a.rating;
+    });
+    
+    return result;
+  }, [products, filters]);
+  
+  return (
+    <div>
+      {displayedProducts.map(product => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Why:** Filtering and sorting thousands of items is expensive.
+
+</Accordion>
+
+</Accordions>
+
+## When NOT to Use useMemo
+
+Don't use `useMemo` for:
+
+<Callout type="warning">
+**Premature optimization** - Only use `useMemo` when you have a performance problem. Adding it everywhere makes code harder to read and maintain.
+</Callout>
+
+**Avoid for:**
+
+```jsx
+// ❌ Simple calculations
+const double = useMemo(() => count * 2, [count]);
+// Just do: const double = count * 2;
+
+// ❌ Single operations
+const uppercase = useMemo(() => name.toUpperCase(), [name]);
+// Just do: const uppercase = name.toUpperCase();
+
+// ❌ Small arrays
+const filtered = useMemo(() => items.filter(i => i.active), [items]);
+// Only optimize if items has 1000+ elements
+
+// ❌ Primitive values
+const formatted = useMemo(() => `$${price}`, [price]);
+// String formatting is already fast
+```
+
+**Rule of thumb:** Only use `useMemo` when:
+- Calculation takes > 5ms
+- You're processing large datasets (100+ items)
+- You've measured a performance problem
+
+## useMemo Best Practices
+
+<Steps>
+
+<Step>
+
+### Always specify dependencies
+
+```jsx
+// ✅ Good - all dependencies listed
+const result = useMemo(() => {
+  return calculate(a, b, c);
+}, [a, b, c]);
+
+// ❌ Bad - missing dependencies
+const result = useMemo(() => {
+  return calculate(a, b, c);
+}, [a]); // b and c changes won't trigger recalculation!
+```
+
+</Step>
+
+<Step>
+
+### Don't mutate dependencies
+
+```jsx
+// ❌ Bad - mutating array
+const sorted = useMemo(() => {
+  return items.sort();
+}, [items]); // Mutates original array!
+
+// ✅ Good - create new array
+const sorted = useMemo(() => {
+  return [...items].sort();
+}, [items]); // Doesn't mutate original
+```
+
+</Step>
+
+<Step>
+
+### Keep memoized functions pure
+
+```jsx
+// ❌ Bad - has side effects
+const result = useMemo(() => {
+  console.log('Calculating...'); // Side effect!
+  saveToLocalStorage(data); // Side effect!
+  return process(data);
+}, [data]);
+
+// ✅ Good - pure function
+const result = useMemo(() => {
+  return process(data);
+}, [data]);
+```
+
+</Step>
+
+<Step>
+
+### Use for expensive operations only
+
+```jsx
+// ❌ Bad - simple operation
+const double = useMemo(() => count * 2, [count]);
+
+// ✅ Good - expensive operation
+const filtered = useMemo(() => {
+  return largeArray
+    .filter(complexFilter)
+    .sort(complexSort)
+    .map(complexTransform);
+}, [largeArray]);
+```
+
+</Step>
+
+</Steps>
+
+## Measuring Performance
+
+How do you know if useMemo helps?
+
+<Tabs items={['React DevTools', 'Console Timing', 'Performance API']}>
+
+<Tab value="React DevTools">
+
+Use React DevTools Profiler:
+
+1. Open React DevTools
+2. Click "Profiler" tab
+3. Click record button
+4. Interact with your app
+5. Stop recording
+6. Review render times
+
+**Look for:**
+- Components taking > 10ms
+- Frequent re-renders
+- Identical re-renders (wasted work)
+
+</Tab>
+
+<Tab value="Console Timing">
+
+Add console timing:
+
+```jsx
+function Component() {
+  const result = useMemo(() => {
+    console.time('Expensive Calculation');
+    const result = expensiveOperation();
+    console.timeEnd('Expensive Calculation');
+    return result;
+  }, [deps]);
+  
+  return <div>{result}</div>;
+}
+```
+
+Check browser console:
+- First render: Shows time (e.g., "5.2ms")
+- Later renders: No output (cached!)
+
+</Tab>
+
+<Tab value="Performance API">
+
+Use Performance API:
+
+```jsx
+function Component() {
+  const result = useMemo(() => {
+    const start = performance.now();
+    const result = expensiveOperation();
+    const end = performance.now();
+    console.log(`Took ${end - start}ms`);
+    return result;
+  }, [deps]);
+  
+  return <div>{result}</div>;
+}
+```
+
+More accurate than `console.time` for micro-benchmarks.
+
+</Tab>
+
+</Tabs>
+
+## Real Example: Filtering Data
+
+```jsx
+function DataTable({ data, searchTerm }) {
+  // Without useMemo - runs on EVERY render
+  const filteredData = data.filter(item => {
+    return item.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+  
+  // With useMemo - only when data or searchTerm change
+  const filteredData = useMemo(() => {
+    return data.filter(item => {
+      return item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [data, searchTerm]);
+  
+  return (
+    <table>
+      {filteredData.map(item => (
+        <tr key={item.id}>
+          <td>{item.name}</td>
+        </tr>
+      ))}
+    </table>
+  );
+}
+```
+
+**Performance comparison** (with 10,000 items):
+
+| Scenario | Without useMemo | With useMemo |
+|----------|----------------|--------------|
+| First render | 15ms | 15ms |
+| Re-render (same data) | 15ms | 0.1ms |
+| Re-render (new data) | 15ms | 15ms |
+
+**Benefit:** 99% faster for unchanged data! ⚡
+
+## Common Mistakes
+
+<Accordions>
+
+<Accordion title="Missing dependencies">
+
+```jsx
+// ❌ Wrong - missing dependency
+const filtered = useMemo(() => {
+  return items.filter(item => item.category === category);
+}, [items]); // category is missing!
+
+// ✅ Correct - all dependencies
+const filtered = useMemo(() => {
+  return items.filter(item => item.category === category);
+}, [items, category]);
+```
+
+Enable `eslint-plugin-react-hooks` to catch this!
+
+</Accordion>
+
+<Accordion title="Premature optimization">
+
+```jsx
+// ❌ Overkill - simple calculation
+const Component = () => {
+  const sum = useMemo(() => a + b, [a, b]);
+  const difference = useMemo(() => a - b, [a, b]);
+  const product = useMemo(() => a * b, [a, b]);
+  return <div>{sum} {difference} {product}</div>;
+};
+
+// ✅ Better - just calculate
+const Component = () => {
+  const sum = a + b;
+  const difference = a - b;
+  const product = a * b;
+  return <div>{sum} {difference} {product}</div>;
+};
+```
+
+Don't memoize simple math!
+
+</Accordion>
+
+<Accordion title="Memoizing everything">
+
+```jsx
+// ❌ Too much memoization
+function Component({ name, age, email }) {
+  const uppercaseName = useMemo(() => name.toUpperCase(), [name]);
+  const ageString = useMemo(() => String(age), [age]);
+  const emailLower = useMemo(() => email.toLowerCase(), [email]);
+  
+  return <div>{uppercaseName} {ageString} {emailLower}</div>;
+}
+
+// ✅ These are too simple to memoize
+function Component({ name, age, email }) {
+  const uppercaseName = name.toUpperCase();
+  const ageString = String(age);
+  const emailLower = email.toLowerCase();
+  
+  return <div>{uppercaseName} {ageString} {emailLower}</div>;
+}
+```
+
+Memoization has overhead - only use when needed!
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+In **Lesson 5**, we'll **apply useMemo** to optimize our `HomePage` filtering logic. We'll see real performance improvements when filtering large lists! 🚀
+
+## Summary
+
+- ✅ useMemo memoizes expensive calculations
+- ✅ Only recalculates when dependencies change
+- ✅ Use for expensive operations on large data
+- ✅ Don't use for simple calculations
+- ✅ Always specify all dependencies
+- ✅ Measure before optimizing
+- ✅ Keep memoized functions pure
+
+**Key concept:** useMemo = Smart caching for expensive calculations. Use it wisely!

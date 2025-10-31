@@ -1,17 +1,16 @@
 {
-   "title": "M3 · Effects & Data",
+   "title": "Module 3: Effects & Data",
    "pages": [
-      "0_index",
-      "1_introduction-effects",
-      "2_effects-in-react",
-      "3_use-effect-deep-dive",
-      "4_use-ref-hook",
-      "5_introduction-data-fetching",
-      "6_data-fetching-part-1",
-      "7_data-fetching-part-2",
-      "8_data-fetching-part-3",
-      "9_data-fetching-best-practices",
-      "10_implementation",
-      "11_validation"
+      "index",
+      "lesson-1",
+      "lesson-2",
+      "lesson-3",
+      "lesson-4",
+      "lesson-5",
+      "lesson-6",
+      "lesson-7",
+      "lesson-8",
+      "lesson-9",
+      "lesson-10"
    ]
 }

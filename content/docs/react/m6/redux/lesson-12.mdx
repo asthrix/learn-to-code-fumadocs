@@ -1,0 +1,528 @@
+---
+title: "L12: Update Router"
+description: "Add the favorites route to enable navigation to the Favorites page"
+---
+
+# Update Router
+
+Now that we have the Navbar and FavoritesPage, let's connect them by adding the route!
+
+## Current Router Setup
+
+Let's check our current Router configuration:
+
+```jsx title="src/components/Router.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import ListingDetailsPage from '@/pages/ListingDetailsPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+
+export function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/listings/:id" element={<ListingDetailsPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+**Current routes:**
+- `/` - HomePage
+- `/listings/:id` - ListingDetailsPage
+- `*` - NotFoundPage (catch-all)
+
+We need to add `/favorites`!
+
+## Step 1: Import FavoritesPage
+
+Add the import at the top:
+
+```jsx title="src/components/Router.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import ListingDetailsPage from '@/pages/ListingDetailsPage';
+import ListingFavoritesPage from '@/pages/ListingFavoritesPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+
+export function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/listings/:id" element={<ListingDetailsPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+## Step 2: Add Favorites Route
+
+Add the new route **before** the catch-all route:
+
+```jsx title="src/components/Router.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import ListingDetailsPage from '@/pages/ListingDetailsPage';
+import ListingFavoritesPage from '@/pages/ListingFavoritesPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+
+export function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/listings/:id" element={<ListingDetailsPage />} />
+        <Route path="/favorites" element={<ListingFavoritesPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+**That's it!** The favorites page is now accessible at `/favorites`! 🎉
+
+## Complete Router Code
+
+Here's the complete updated Router:
+
+```jsx title="src/components/Router.jsx"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import ListingDetailsPage from '@/pages/ListingDetailsPage';
+import ListingFavoritesPage from '@/pages/ListingFavoritesPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+
+export function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/listings/:id" element={<ListingDetailsPage />} />
+        <Route path="/favorites" element={<ListingFavoritesPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+Only **2 lines changed!** Clean and simple. ✨
+
+## Understanding Route Order
+
+The order of routes matters!
+
+<Accordions>
+
+<Accordion title="Why Order Matters">
+
+React Router checks routes **from top to bottom**:
+
+```jsx
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/favorites" element={<FavoritesPage />} />
+  <Route path="/listings/:id" element={<DetailsPage />} />
+  <Route path="*" element={<NotFoundPage />} />  {/* Must be last! */}
+</Routes>
+```
+
+**If you visit `/favorites`:**
+1. Check `/` - no match ❌
+2. Check `/favorites` - match! ✅
+3. Render `<FavoritesPage />`
+
+**If you visit `/unknown`:**
+1. Check `/` - no match ❌
+2. Check `/favorites` - no match ❌
+3. Check `/listings/:id` - no match ❌
+4. Check `*` - match! ✅ (catches everything)
+5. Render `<NotFoundPage />`
+
+</Accordion>
+
+<Accordion title="Catch-All Route Must Be Last">
+
+The `*` route matches **everything**, so it must be last:
+
+**❌ Wrong:**
+```jsx
+<Routes>
+  <Route path="*" element={<NotFoundPage />} />  {/* First! */}
+  <Route path="/" element={<HomePage />} />
+  <Route path="/favorites" element={<FavoritesPage />} />
+</Routes>
+```
+
+**Problem:** Every route matches `*` first → always shows NotFoundPage!
+
+**✅ Correct:**
+```jsx
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/favorites" element={<FavoritesPage />} />
+  <Route path="*" element={<NotFoundPage />} />  {/* Last! */}
+</Routes>
+```
+
+**Result:** Only shows NotFoundPage when no other route matches!
+
+</Accordion>
+
+<Accordion title="Specific Before Dynamic">
+
+Put specific routes before dynamic ones:
+
+**Best practice:**
+```jsx
+<Routes>
+  <Route path="/favorites" element={<FavoritesPage />} />  {/* Specific */}
+  <Route path="/listings/:id" element={<DetailsPage />} /> {/* Dynamic */}
+</Routes>
+```
+
+**Why?**
+- `/favorites` is checked first
+- If URL is `/favorites`, it matches immediately
+- If URL is `/listings/123`, first route doesn't match, second one does
+
+**If reversed:**
+```jsx
+<Routes>
+  <Route path="/:id" element={<ProfilePage />} />  {/* Too general! */}
+  <Route path="/favorites" element={<FavoritesPage />} />
+</Routes>
+```
+
+**Problem:** `/favorites` would match `/:id` with `id = "favorites"`!
+
+</Accordion>
+
+</Accordions>
+
+## Route Patterns
+
+Here are common route patterns:
+
+<Tabs items={['Static Routes', 'Dynamic Routes', 'Nested Routes', 'Optional Params']}>
+
+<Tab value="Static Routes">
+
+**Fixed URL paths:**
+
+```jsx
+<Route path="/" element={<HomePage />} />
+<Route path="/about" element={<AboutPage />} />
+<Route path="/contact" element={<ContactPage />} />
+<Route path="/favorites" element={<FavoritesPage />} />
+```
+
+**Matches exactly:**
+- `/` → HomePage
+- `/about` → AboutPage
+- `/contact` → ContactPage
+- `/favorites` → FavoritesPage
+
+</Tab>
+
+<Tab value="Dynamic Routes">
+
+**Routes with parameters:**
+
+```jsx
+<Route path="/listings/:id" element={<ListingDetailsPage />} />
+<Route path="/users/:userId" element={<UserProfile />} />
+<Route path="/posts/:postId/comments/:commentId" element={<Comment />} />
+```
+
+**Access params in component:**
+
+```jsx
+import { useParams } from 'react-router-dom';
+
+function ListingDetailsPage() {
+  const { id } = useParams();
+  // If URL is /listings/123, id = "123"
+}
+```
+
+**Matches:**
+- `/listings/123` → id = "123"
+- `/listings/abc` → id = "abc"
+- `/users/456` → userId = "456"
+
+</Tab>
+
+<Tab value="Nested Routes">
+
+**Routes inside routes:**
+
+```jsx
+<Route path="/dashboard" element={<DashboardLayout />}>
+  <Route index element={<DashboardHome />} />
+  <Route path="profile" element={<Profile />} />
+  <Route path="settings" element={<Settings />} />
+</Route>
+```
+
+**DashboardLayout must include `<Outlet />`:**
+
+```jsx
+import { Outlet } from 'react-router-dom';
+
+function DashboardLayout() {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <Outlet />  {/* Child routes render here */}
+    </div>
+  );
+}
+```
+
+**Matches:**
+- `/dashboard` → DashboardHome
+- `/dashboard/profile` → Profile
+- `/dashboard/settings` → Settings
+
+</Tab>
+
+<Tab value="Optional Params">
+
+**Optional segments:**
+
+```jsx
+<Route path="/listings/:id?" element={<ListingsPage />} />
+```
+
+**Matches both:**
+- `/listings` → id = undefined
+- `/listings/123` → id = "123"
+
+**Usage:**
+
+```jsx
+function ListingsPage() {
+  const { id } = useParams();
+  
+  if (id) {
+    // Show specific listing
+  } else {
+    // Show all listings
+  }
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Testing the Route
+
+Let's verify the route works:
+
+<Steps>
+
+<Step>
+
+### Navigate to Favorites
+
+Click the "Favorites" link in the Navbar.
+
+**Expected:**
+- URL changes to `/favorites`
+- FavoritesPage renders
+- Navbar stays visible
+
+</Step>
+
+<Step>
+
+### Check URL
+
+Look at the browser address bar:
+
+```
+http://localhost:5173/favorites
+```
+
+The URL should show `/favorites`!
+
+</Step>
+
+<Step>
+
+### Refresh Page
+
+Press F5 to refresh the page.
+
+**Expected:**
+- Page reloads
+- Still shows FavoritesPage
+- URL is still `/favorites`
+
+If this works, routing is configured correctly! ✅
+
+</Step>
+
+<Step>
+
+### Navigate Back
+
+Click "Home" in the Navbar.
+
+**Expected:**
+- URL changes to `/`
+- HomePage renders
+- Smooth navigation (no page reload)
+
+</Step>
+
+</Steps>
+
+## Complete Application Flow
+
+Now the full navigation flow works:
+
+```
+HomePage (/)
+  ↓ Click listing
+ListingDetailsPage (/listings/:id)
+  ↓ Click Favorites in Navbar
+FavoritesPage (/favorites)
+  ↓ Click Home in Navbar
+HomePage (/)
+```
+
+**All connected!** 🎉
+
+## Route Visualization
+
+Here's how all routes connect:
+
+```
+┌──────────────────────────────────────────┐
+│           Navbar (always visible)        │
+│  [StayScape]  [Home]  [Favorites (0)]   │
+└──────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────┐
+│                 Routes                   │
+│                                          │
+│  /            → HomePage                 │
+│  /listings/1  → ListingDetailsPage       │
+│  /favorites   → ListingFavoritesPage     │
+│  /unknown     → NotFoundPage             │
+│                                          │
+└──────────────────────────────────────────┘
+```
+
+## Common Router Issues
+
+<Accordions>
+
+<Accordion title="404 on Refresh">
+
+**Problem:** Favorites page works when clicking link, but shows 404 when refreshing.
+
+**Cause:** Server doesn't know about `/favorites` route.
+
+**Solution:** Configure dev server for SPA:
+
+**Vite (vite.config.js):**
+```js
+export default {
+  server: {
+    historyApiFallback: true
+  }
+}
+```
+
+Or update your hosting (Netlify, Vercel) with redirect rules.
+
+</Accordion>
+
+<Accordion title="Blank Page">
+
+**Problem:** Clicking Favorites shows blank page.
+
+**Possible causes:**
+
+1. **Missing import:**
+   ```jsx
+   import ListingFavoritesPage from '@/pages/ListingFavoritesPage';
+   ```
+
+2. **Wrong path:**
+   ```jsx
+   // Wrong file path
+   import ListingFavoritesPage from '@/pages/FavoritesPage';
+   ```
+
+3. **Component not exported:**
+   ```jsx
+   // In ListingFavoritesPage.jsx
+   export default ListingFavoritesPage;  // Must be default export
+   ```
+
+**Check console for errors!**
+
+</Accordion>
+
+<Accordion title="Route Not Matching">
+
+**Problem:** Route doesn't match when it should.
+
+**Common mistakes:**
+
+1. **Extra slash:**
+   ```jsx
+   <Route path="//favorites" element={<Page />} />  // ❌
+   <Route path="/favorites" element={<Page />} />   // ✅
+   ```
+
+2. **Missing slash:**
+   ```jsx
+   <Route path="favorites" element={<Page />} />   // Nested route
+   <Route path="/favorites" element={<Page />} />  // Root route
+   ```
+
+3. **Catch-all too early:**
+   ```jsx
+   <Route path="*" element={<NotFound />} />       // First - catches all!
+   <Route path="/favorites" element={<Page />} />  // Never reached
+   ```
+
+**Fix:** Check spelling, slashes, and order!
+
+</Accordion>
+
+</Accordions>
+
+## What's Next?
+
+Perfect! The routing is complete. In the next lesson, we'll:
+
+1. **Create Favorite Button** - Heart icon toggle button
+2. **Connect to Redux** - Dispatch toggleFavorite action
+3. **Show state** - Filled/unfilled based on favorites
+
+<Callout type="success">
+**✅ Lesson Complete!** The favorites route is now configured and navigation works!
+</Callout>
+
+## Key Takeaways
+
+- ✅ **Import page component** before using in route
+- ✅ **Add route** with `<Route path="/favorites" element={...} />`
+- ✅ **Route order matters** - specific before general, `*` last
+- ✅ **Test with refresh** - Ensures routing configured correctly
+- ✅ **Only 2 lines added** - One import, one route
+- ✅ **Client-side routing** - No page reloads when navigating

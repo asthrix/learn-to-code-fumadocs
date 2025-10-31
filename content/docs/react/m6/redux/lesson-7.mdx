@@ -1,0 +1,771 @@
+---
+title: "L7: Refactor HomePage"
+description: "Replace local state with Redux in HomePage component"
+---
+
+# Refactor HomePage with Redux
+
+Time to put Redux to work! Let's refactor `HomePage` to use Redux instead of local state.
+
+## Current HomePage State
+
+Currently, `HomePage` manages its own state with `useState` and `useEffect`:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState, useEffect } from 'react';
+import { useFetch } from '@/hooks/useFetch';
+
+function HomePage() {
+  const { data: listings, isLoading, error } = useFetch('/listings');
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  // Filter listings locally
+  const filteredListings = useMemo(() => {
+    if (!listings) return [];
+    
+    return listings.filter(/* filtering logic */);
+  }, [listings, search, dates, guests]);
+  
+  // Render...
+}
+```
+
+**Problems:**
+- Listings data lives only in this component
+- Other pages can't access listings
+- Duplicate fetch logic if other pages need listings
+- Can't share favorites across pages
+
+**Solution:** Move listings to Redux!
+
+## What We're Building
+
+We'll refactor `HomePage` to:
+
+1. **Remove useFetch** - Replace with Redux
+2. **Dispatch fetchListings** - Load data from Redux
+3. **Select from Redux** - Read listings/status/error from store
+4. **Keep filters local** - Search/dates/guests stay in component
+
+Why keep filters local? They're **UI-specific** state that only `HomePage` needs!
+
+## Redux vs Local State Decision
+
+<Tabs items={['Global State (Redux)', 'Local State (useState)', 'Decision Tree']}>
+
+<Tab value="Global State (Redux)">
+
+**Put in Redux when:**
+- ✅ Multiple components need the data
+- ✅ Data persists across page changes
+- ✅ Complex state updates
+- ✅ Needs to be cached
+- ✅ Fetched from API
+
+**Examples:**
+- User profile
+- Listings data
+- Favorites
+- Shopping cart
+- Notifications
+
+</Tab>
+
+<Tab value="Local State (useState)">
+
+**Keep in local state when:**
+- ✅ Only one component uses it
+- ✅ Temporary/transient data
+- ✅ UI-specific (modals, toggles, form input)
+- ✅ Resets on unmount
+
+**Examples:**
+- Form input values
+- Modal open/closed
+- Selected tab
+- Search filters
+- Accordion expanded state
+
+</Tab>
+
+<Tab value="Decision Tree">
+
+```
+Does multiple components need this data?
+├─ Yes → Redux
+└─ No
+    └─ Does it persist across pages?
+        ├─ Yes → Redux
+        └─ No
+            └─ Is it fetched from API?
+                ├─ Yes → Redux (usually)
+                └─ No → Local State
+```
+
+**For HomePage:**
+- Listings → Redux (shared, cached, API)
+- Favorites → Redux (shared across pages)
+- Search/dates/guests → Local (UI-specific, temporary)
+
+</Tab>
+
+</Tabs>
+
+## Step 1: Remove useFetch
+
+Open `src/pages/HomePage.jsx` and remove the `useFetch` import and call:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState, useMemo } from 'react';
+import ListingList from '@/components/ListingList';
+import ListingFilters from '@/components/ListingFilters';
+
+function HomePage() {
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  // Removed: const { data: listings, isLoading, error } = useFetch('/listings');
+  
+  // ... rest of component
+}
+```
+
+## Step 2: Import Redux Hooks
+
+Import `useSelector`, `useDispatch`, and `fetchListings`:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchListings } from '@/state/slices/listingsSlice';
+import ListingList from '@/components/ListingList';
+import ListingFilters from '@/components/ListingFilters';
+
+function HomePage() {
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  // Redux next...
+}
+```
+
+**What are we importing?**
+
+<Accordions>
+
+<Accordion title="useSelector Hook">
+
+```jsx
+import { useSelector } from 'react-redux';
+```
+
+**Reads data from Redux store:**
+
+```jsx
+const listings = useSelector((state) => state.listings.items);
+```
+
+- Takes a **selector function**: `(state) => value`
+- Returns the **selected value**
+- Component **re-renders** when selected value changes
+- Multiple `useSelector` calls are fine!
+
+</Accordion>
+
+<Accordion title="useDispatch Hook">
+
+```jsx
+import { useDispatch } from 'react-redux';
+```
+
+**Dispatches actions to Redux:**
+
+```jsx
+const dispatch = useDispatch();
+dispatch(fetchListings());
+```
+
+- Returns the `dispatch` function
+- Call it to dispatch actions
+- Usually called once per component
+
+</Accordion>
+
+<Accordion title="fetchListings Thunk">
+
+```jsx
+import { fetchListings } from '@/state/slices/listingsSlice';
+```
+
+This is the async thunk we created:
+
+```jsx
+export const fetchListings = createAsyncThunk(
+  'listings/fetchListings',
+  async (filters) => {/* API call */}
+);
+```
+
+**Usage:**
+```jsx
+dispatch(fetchListings());              // No filters
+dispatch(fetchListings({ search: 'beach' }));  // With filters
+```
+
+</Accordion>
+
+</Accordions>
+
+## Step 3: Get dispatch and Select State
+
+Add `useDispatch` and `useSelector`:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchListings } from '@/state/slices/listingsSlice';
+import ListingList from '@/components/ListingList';
+import ListingFilters from '@/components/ListingFilters';
+
+function HomePage() {
+  const dispatch = useDispatch();
+  const { items, status, error } = useSelector((state) => state.listings);
+  
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  // useEffect next...
+}
+```
+
+**What's happening?**
+
+<Steps>
+
+<Step>
+
+### Get Dispatch Function
+
+```jsx
+const dispatch = useDispatch();
+```
+
+This gives us the function to dispatch actions.
+
+</Step>
+
+<Step>
+
+### Select from Redux
+
+```jsx
+const { items, status, error } = useSelector((state) => state.listings);
+```
+
+This reads three fields from `state.listings`:
+- `items` - Array of listings
+- `status` - 'idle' | 'loading' | 'succeeded' | 'failed'
+- `error` - Error message (if any)
+
+**Why destructure?**
+
+More readable than:
+```jsx
+const listings = useSelector((state) => state.listings);
+const items = listings.items;
+const status = listings.status;
+```
+
+</Step>
+
+</Steps>
+
+## Step 4: Dispatch fetchListings on Mount
+
+Add a `useEffect` to fetch listings when component mounts:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchListings } from '@/state/slices/listingsSlice';
+import ListingList from '@/components/ListingList';
+import ListingFilters from '@/components/ListingFilters';
+
+function HomePage() {
+  const dispatch = useDispatch();
+  const { items, status, error } = useSelector((state) => state.listings);
+  
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchListings());
+    }
+  }, [status, dispatch]);
+  
+  // Filtering logic next...
+}
+```
+
+**Why check `status === 'idle'`?**
+
+<Accordions>
+
+<Accordion title="Prevent Duplicate Fetches">
+
+Without the check:
+
+```jsx
+useEffect(() => {
+  dispatch(fetchListings());  // ❌ Fetches on EVERY render!
+}, [dispatch]);
+```
+
+**Problem:**
+- Runs on mount
+- Re-runs if dependency changes
+- Could cause infinite loops
+
+With the check:
+
+```jsx
+useEffect(() => {
+  if (status === 'idle') {  // ✅ Only fetch if not already loaded
+    dispatch(fetchListings());
+  }
+}, [status, dispatch]);
+```
+
+**Behavior:**
+- Initial: `status = 'idle'` → fetch starts
+- After fetch: `status = 'succeeded'` → no more fetches
+- Efficient! Only fetches once.
+
+</Accordion>
+
+<Accordion title="Alternative: Empty Dependency Array">
+
+You could also use empty array:
+
+```jsx
+useEffect(() => {
+  dispatch(fetchListings());
+}, []);  // Only runs once on mount
+```
+
+**Pros:**
+- Simpler
+- Guaranteed single fetch
+
+**Cons:**
+- React warns about missing dependencies
+- Harder to trigger refetch later
+
+**Recommendation:** Use the `status === 'idle'` pattern for flexibility!
+
+</Accordion>
+
+</Accordions>
+
+## Step 5: Update Filtering Logic
+
+Update the `useMemo` to use `items` instead of `listings`:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchListings } from '@/state/slices/listingsSlice';
+import ListingList from '@/components/ListingList';
+import ListingFilters from '@/components/ListingFilters';
+
+function HomePage() {
+  const dispatch = useDispatch();
+  const { items, status, error } = useSelector((state) => state.listings);
+  
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchListings());
+    }
+  }, [status, dispatch]);
+  
+  const filteredListings = useMemo(() => {
+    return items.filter((listing) => {
+      const matchesSearch = listing.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      
+      const matchesGuests = listing.maxGuests >= guests;
+      
+      // Simplified date checking for now
+      const matchesDates = true;
+      
+      return matchesSearch && matchesGuests && matchesDates;
+    });
+  }, [items, search, guests]);
+  
+  // Render next...
+}
+```
+
+**Changed:** `listings.filter` → `items.filter`
+
+## Step 6: Update Render Logic
+
+Update the rendering to use `status` and `error`:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchListings } from '@/state/slices/listingsSlice';
+import ListingList from '@/components/ListingList';
+import ListingFilters from '@/components/ListingFilters';
+import Spinner from '@/components/Spinner';
+import ErrorMessage from '@/components/ErrorMessage';
+
+function HomePage() {
+  const dispatch = useDispatch();
+  const { items, status, error } = useSelector((state) => state.listings);
+  
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchListings());
+    }
+  }, [status, dispatch]);
+  
+  const filteredListings = useMemo(() => {
+    return items.filter((listing) => {
+      const matchesSearch = listing.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      
+      const matchesGuests = listing.maxGuests >= guests;
+      
+      const matchesDates = true;
+      
+      return matchesSearch && matchesGuests && matchesDates;
+    });
+  }, [items, search, guests]);
+  
+  if (status === 'loading') {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spinner />
+      </div>
+    );
+  }
+  
+  if (status === 'failed') {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorMessage message={error} />
+      </div>
+    );
+  }
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <ListingFilters
+        search={search}
+        onSearchChange={setSearch}
+        dates={dates}
+        onDatesChange={setDates}
+        guests={guests}
+        onGuestsChange={setGuests}
+      />
+      <ListingList listings={filteredListings} />
+    </div>
+  );
+}
+
+export default HomePage;
+```
+
+## Complete Refactored Code
+
+Here's the complete refactored `HomePage`:
+
+```jsx title="src/pages/HomePage.jsx"
+import { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchListings } from '@/state/slices/listingsSlice';
+import ListingList from '@/components/ListingList';
+import ListingFilters from '@/components/ListingFilters';
+import Spinner from '@/components/Spinner';
+import ErrorMessage from '@/components/ErrorMessage';
+
+function HomePage() {
+  const dispatch = useDispatch();
+  const { items, status, error } = useSelector((state) => state.listings);
+  
+  const [search, setSearch] = useState('');
+  const [dates, setDates] = useState({ from: null, to: null });
+  const [guests, setGuests] = useState(1);
+  
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchListings());
+    }
+  }, [status, dispatch]);
+  
+  const filteredListings = useMemo(() => {
+    return items.filter((listing) => {
+      const matchesSearch = listing.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      
+      const matchesGuests = listing.maxGuests >= guests;
+      
+      const matchesDates = true;
+      
+      return matchesSearch && matchesGuests && matchesDates;
+    });
+  }, [items, search, guests]);
+  
+  if (status === 'loading') {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spinner />
+      </div>
+    );
+  }
+  
+  if (status === 'failed') {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorMessage message={error} />
+      </div>
+    );
+  }
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <ListingFilters
+        search={search}
+        onSearchChange={setSearch}
+        dates={dates}
+        onDatesChange={setDates}
+        guests={guests}
+        onGuestsChange={setGuests}
+      />
+      <ListingList listings={filteredListings} />
+    </div>
+  );
+}
+
+export default HomePage;
+```
+
+## Before vs After
+
+<Tabs items={['Before (useFetch)', 'After (Redux)', 'Benefits']}>
+
+<Tab value="Before (useFetch)">
+
+```jsx
+function HomePage() {
+  const { data: listings, isLoading, error } = useFetch('/listings');
+  const [search, setSearch] = useState('');
+  
+  const filteredListings = useMemo(() => {
+    if (!listings) return [];
+    return listings.filter(/* ... */);
+  }, [listings, search]);
+  
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+  
+  return <ListingList listings={filteredListings} />;
+}
+```
+
+**Issues:**
+- Data lives only in `HomePage`
+- Other components can't access listings
+- Duplicate fetches if multiple components need data
+
+</Tab>
+
+<Tab value="After (Redux)">
+
+```jsx
+function HomePage() {
+  const dispatch = useDispatch();
+  const { items, status, error } = useSelector((state) => state.listings);
+  const [search, setSearch] = useState('');
+  
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchListings());
+    }
+  }, [status, dispatch]);
+  
+  const filteredListings = useMemo(() => {
+    return items.filter(/* ... */);
+  }, [items, search]);
+  
+  if (status === 'loading') return <Spinner />;
+  if (status === 'failed') return <ErrorMessage message={error} />;
+  
+  return <ListingList listings={filteredListings} />;
+}
+```
+
+**Benefits:**
+- Data stored in Redux
+- Any component can access listings
+- Single source of truth
+- Better caching
+
+</Tab>
+
+<Tab value="Benefits">
+
+**What we gained:**
+
+✅ **Shared State**
+- Other pages can read `state.listings.items`
+- No duplicate API calls
+
+✅ **Better Structure**
+- Clear separation: Redux (global) vs local (UI)
+- Easier to test
+
+✅ **Redux DevTools**
+- See all state changes
+- Time-travel debugging
+- Action history
+
+✅ **Scalability**
+- Easy to add more features
+- Favorites, cart, etc. follow same pattern
+
+✅ **Performance**
+- Redux caches data
+- Only fetches once
+- Efficient re-renders
+
+</Tab>
+
+</Tabs>
+
+## Testing the Refactor
+
+<Steps>
+
+<Step>
+
+### Open the App
+
+Navigate to HomePage - you should see listings load!
+
+</Step>
+
+<Step>
+
+### Check Redux DevTools
+
+Open Redux DevTools - you should see:
+
+**Actions:**
+1. `listings/fetchListings/pending`
+2. `listings/fetchListings/fulfilled`
+
+**State:**
+```json
+{
+  "listings": {
+    "items": [/* listings */],
+    "favorites": [],
+    "status": "succeeded",
+    "error": null
+  }
+}
+```
+
+</Step>
+
+<Step>
+
+### Test Filtering
+
+Type in search box - filtering should work as before!
+
+The difference? Now listings data is in Redux! 🎉
+
+</Step>
+
+</Steps>
+
+## Common Issues
+
+### Issue: "Cannot read property 'items' of undefined"
+
+**Problem:** Trying to access state before store is set up
+
+**Solution:** Make sure Provider wraps your app:
+
+```jsx
+// In App.jsx
+<Provider store={store}>
+  <Router />
+</Provider>
+```
+
+### Issue: Infinite Loop of Fetches
+
+**Problem:** Missing status check in useEffect
+
+```jsx
+// ❌ BAD
+useEffect(() => {
+  dispatch(fetchListings());  // Runs forever!
+}, [dispatch]);
+```
+
+**Solution:** Check status:
+
+```jsx
+// ✅ GOOD
+useEffect(() => {
+  if (status === 'idle') {
+    dispatch(fetchListings());
+  }
+}, [status, dispatch]);
+```
+
+## What's Next?
+
+Perfect! HomePage is now using Redux. In the next lesson, we'll:
+
+1. **Add favorites feature** - Already have `toggleFavorite` reducer!
+2. **Test favorites** - Make sure state updates correctly
+3. **Prepare for UI** - Get ready to show favorites
+
+<Callout type="success">
+**✅ Lesson Complete!** HomePage now uses Redux for listings data! Other components can access the same data without duplicate fetches!
+</Callout>
+
+## Key Takeaways
+
+- ✅ Use **`useSelector`** to read from Redux store
+- ✅ Use **`useDispatch`** to dispatch actions
+- ✅ Check **`status === 'idle'`** before fetching
+- ✅ Keep **UI-specific state local** (search, filters)
+- ✅ Move **shared data to Redux** (listings, favorites)
+- ✅ Redux provides **single source of truth**
+- ✅ Benefits: caching, shared state, DevTools

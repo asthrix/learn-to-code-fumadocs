@@ -1,0 +1,343 @@
+---
+title: "L3: Development Environment Setup"
+description:
+   "Get your computer ready for React development with all necessary tools."
+module: 0
+lesson: 3
+---
+
+# Lesson 3: Development Environment Setup
+
+Before writing React code, you need the right tools. This lesson guides you
+through setting up a professional development environment.
+
+---
+
+## Required Tools
+
+You'll need four main tools for React development:
+
+<Steps>
+   <Step>### Node.js & npm JavaScript runtime and package manager</Step>
+   <Step>
+      ### Code Editor Where you'll write your code (VS Code recommended)
+   </Step>
+   <Step>### Git Version control system</Step>
+   <Step>### Web Browser For viewing and testing your application</Step>
+</Steps>
+
+---
+
+## 1. Installing Node.js
+
+Node.js includes npm (Node Package Manager) which you'll use to install React
+and other libraries.
+
+### Download Node.js
+
+<Accordions type='single'>
+   <Accordion id='windows' title='Windows Installation' value='windows'>
+      1. Visit [nodejs.org](https://nodejs.org/) 2. Download the **LTS version**
+      (Long Term Support) 3. Run the installer 4. Follow the installation wizard
+      (use default settings) 5. Restart your computer
+   </Accordion>
+
+   <Accordion id='macos' title='macOS Installation' value='macos'>
+      **Option 1: Direct Download** 1. Visit [nodejs.org](https://nodejs.org/)
+      2. Download the **LTS version** 3. Run the `.pkg` installer 4. Follow the
+      installation wizard **Option 2: Using Homebrew** (if you have it) ```bash
+      brew install node ```
+   </Accordion>
+
+   <Accordion id='linux' title='Linux Installation' value='linux'>
+      **Ubuntu/Debian:** ```bash curl -fsSL
+      https://deb.nodesource.com/setup_lts.x | sudo -E bash - sudo apt-get
+      install -y nodejs ``` **Fedora:** ```bash sudo dnf install nodejs ```
+   </Accordion>
+</Accordions>
+
+### Verify Installation
+
+Open your terminal (Command Prompt on Windows, Terminal on Mac/Linux) and run:
+
+```bash
+node --version
+npm --version
+```
+
+You should see version numbers:
+
+```
+v18.17.0
+9.6.7
+```
+
+Your versions might be different - that's okay as long as Node.js is v18 or
+higher!
+
+---
+
+## 2. Installing VS Code
+
+Visual Studio Code is the most popular editor for React development.
+
+### Download VS Code
+
+1. Visit [code.visualstudio.com](https://code.visualstudio.com/)
+2. Download for your operating system
+3. Install using the installer
+4. Launch VS Code
+
+### Recommended Extensions
+
+Install these VS Code extensions for the best React experience:
+
+<Files>
+   <Folder name='Essential Extensions' defaultOpen>
+      <File name='ES7+ React/Redux/React-Native snippets' />
+      <File name='Prettier - Code formatter' />
+      <File name='ESLint' />
+   </Folder>
+   <Folder name='Optional but Helpful'>
+      <File name='Auto Rename Tag' />
+      <File name='Path Intellisense' />
+      <File name='GitLens' />
+   </Folder>
+</Files>
+
+To install extensions:
+
+1. Click the Extensions icon in VS Code (or press `Ctrl+Shift+X` /
+   `Cmd+Shift+X`)
+2. Search for each extension name
+3. Click "Install"
+
+---
+
+## 3. Installing Git
+
+Git helps you track changes and collaborate on projects.
+
+### Download Git
+
+<Accordions type='single'>
+   <Accordion id='git-windows' title='Windows' value='git-windows'>
+      1. Visit [git-scm.com](https://git-scm.com/) 2. Download Git for Windows
+      3. Run the installer 4. Use default settings (recommended)
+   </Accordion>
+
+   <Accordion id='git-macos' title='macOS' value='git-macos'>
+      **Option 1:** Download from [git-scm.com](https://git-scm.com/) **Option
+      2:** Install Xcode Command Line Tools: ```bash xcode-select --install ```
+      **Option 3:** Using Homebrew: ```bash brew install git ```
+   </Accordion>
+
+   <Accordion id='git-linux' title='Linux' value='git-linux'>
+      **Ubuntu/Debian:** ```bash sudo apt-get install git ``` **Fedora:**
+      ```bash sudo dnf install git ```
+   </Accordion>
+</Accordions>
+
+### Verify Git Installation
+
+```bash
+git --version
+```
+
+Should output something like:
+
+```
+git version 2.39.0
+```
+
+### Configure Git
+
+Set your name and email (used for commit history):
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+```
+
+---
+
+## 4. Choose Your Browser
+
+You'll need a modern browser with developer tools. Any of these work great:
+
+-  **Chrome** (recommended) - Best React DevTools
+-  **Firefox** - Excellent developer tools
+-  **Edge** - Built on Chromium, same tools as Chrome
+-  **Safari** - Good for Mac users
+
+### Install React Developer Tools
+
+These browser extensions help debug React applications:
+
+-  [Chrome Extension](https://chrome.google.com/webstore/detail/react-developer-tools/)
+-  [Firefox Extension](https://addons.mozilla.org/en-US/firefox/addon/react-devtools/)
+
+We'll use these starting in Module 1!
+
+---
+
+## Creating Your First React Project
+
+Now that you have all the tools, let's create your project!
+
+### Using Vite (Recommended)
+
+Vite is the modern build tool we'll use for this course. Open your terminal and
+run:
+
+```bash
+npm create vite@latest my-booking-app -- --template react
+```
+
+When prompted:
+
+1. **Project name:** Accept default or change it
+2. **Framework:** Select "React"
+3. **Variant:** Select "JavaScript"
+
+### Navigate to Your Project
+
+```bash
+cd my-booking-app
+```
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+This downloads all necessary packages. It might take a minute.
+
+### Start the Development Server
+
+```bash
+npm run dev
+```
+
+You should see:
+
+```
+  VITE v5.0.0  ready in 500 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+```
+
+### View Your App
+
+Open your browser and visit `http://localhost:5173/`
+
+You should see the default Vite + React page! 🎉
+
+---
+
+## Project Structure
+
+Your new project has this structure:
+
+<Files>
+   <Folder name='my-booking-app' defaultOpen>
+      <Folder name='node_modules'>
+         <File name='(installed packages)' />
+      </Folder>
+      <Folder name='public'>
+         <File name='vite.svg' />
+      </Folder>
+      <Folder name='src' defaultOpen>
+         <File name='App.jsx' />
+         <File name='App.css' />
+         <File name='main.jsx' />
+         <File name='index.css' />
+      </Folder>
+      <File name='index.html' />
+      <File name='package.json' />
+      <File name='vite.config.js' />
+   </Folder>
+</Files>
+
+**Key files to know:**
+
+-  `src/App.jsx` - Main component (we'll work here a lot!)
+-  `src/main.jsx` - Entry point
+-  `package.json` - Project configuration and dependencies
+-  `index.html` - HTML template
+
+---
+
+## Verify Everything Works
+
+Let's make a small change to confirm everything is set up correctly:
+
+1. Open `src/App.jsx` in VS Code
+2. Find the line that says `<h1>Vite + React</h1>`
+3. Change it to `<h1>My Booking App</h1>`
+4. Save the file (`Ctrl+S` / `Cmd+S`)
+
+Your browser should automatically refresh and show "My Booking App"! This is
+called **Hot Module Replacement (HMR)** - changes appear instantly without full
+page reloads.
+
+---
+
+## Troubleshooting
+
+<Accordions type='single'>
+   <Accordion id='port-in-use' title='Port Already in Use' value='port-in-use'>
+      If you see "Port 5173 is already in use": 1. Stop the running server
+      (`Ctrl+C` in terminal) 2. Try again, or 3. Vite will automatically use a
+      different port
+   </Accordion>
+
+   <Accordion
+      id='npm-not-found'
+      title="'npm' is not recognized"
+      value='npm-not-found'
+   >
+      This means Node.js isn't installed correctly: 1. Reinstall Node.js from
+      [nodejs.org](https://nodejs.org/) 2. Restart your computer 3. Try again
+   </Accordion>
+
+   <Accordion
+      id='permission-error'
+      title='Permission Errors (Mac/Linux)'
+      value='permission-error'
+   >
+      If you get permission errors when installing: ```bash sudo chown -R $USER
+      ~/.npm ``` Then try the npm commands again (without sudo).
+   </Accordion>
+</Accordions>
+
+---
+
+## Checkpoint ✅
+
+Before moving on, confirm:
+
+-  ✅ Node.js and npm are installed
+-  ✅ VS Code is installed with extensions
+-  ✅ Git is installed and configured
+-  ✅ You created a React project with Vite
+-  ✅ The development server runs successfully
+-  ✅ You can edit code and see changes in the browser
+
+---
+
+## Next Up
+
+Your development environment is ready! Next, we'll explore the project you'll be
+building throughout this course.
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m0/lesson-2'>← Previous: Reading Code</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m0/lesson-4'>Next: Project Overview →</a>
+   </Button>
+</div>

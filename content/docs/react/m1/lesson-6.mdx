@@ -1,0 +1,488 @@
+---
+title: "L6: Styling with Tailwind CSS"
+description:
+   "Transform your components with Tailwind CSS utility classes for a
+   professional look."
+module: 1
+lesson: 6
+---
+
+# Lesson 6: Styling with Tailwind CSS
+
+Your components work, but they need visual polish! Let's add **Tailwind CSS** -
+a utility-first CSS framework that makes styling fast and consistent.
+
+---
+
+## Why Tailwind CSS?
+
+Instead of writing custom CSS:
+
+```css title="Traditional CSS Approach"
+/* Traditional CSS */
+.property-card {
+   padding: 16px;
+   border-radius: 8px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+```
+
+Tailwind uses utility classes directly in JSX:
+
+```jsx title="Tailwind Utility Classes"
+<div className="p-4 rounded-lg shadow-md">
+```
+
+**Benefits:**
+
+-  Faster development
+-  Consistent design system
+-  No naming conflicts
+-  Responsive by default
+-  Smaller bundle size (unused styles removed)
+
+---
+
+## Step 1: Install Tailwind CSS
+
+If Vite doesn't have Tailwind yet, install it:
+
+```bash title="Install Tailwind"
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+### Configure Tailwind
+
+Update `tailwind.config.js`:
+
+```javascript title="tailwind.config.js"
+/** @type {import('tailwindcss').Config} */
+export default {
+   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+   theme: {
+      extend: {},
+   },
+   plugins: [],
+};
+```
+
+### Add Tailwind Directives
+
+Update `src/index.css`:
+
+```css title="src/index.css"
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+      sans-serif;
+}
+```
+
+Restart your dev server after these changes!
+
+---
+
+## Step 2: Style the PropertyCard
+
+Update your PropertyCard component with Tailwind classes:
+
+```jsx title="src/components/PropertyCard.jsx"
+// src/components/PropertyCard.jsx
+
+function PropertyCard({ title, location, price, rating, image }) {
+   return (
+      <div className='bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer'>
+         {/* Image */}
+         <div className='relative h-64 w-full'>
+            <img
+               src={image}
+               alt={title}
+               className='w-full h-full object-cover'
+            />
+         </div>
+
+         {/* Content */}
+         <div className='p-4'>
+            <div className='flex items-start justify-between mb-2'>
+               <h3 className='text-lg font-semibold text-gray-900 line-clamp-1'>
+                  {title}
+               </h3>
+               <span className='flex items-center text-sm font-medium'>
+                  <span className='text-yellow-500 mr-1'>⭐</span>
+                  <span className='text-gray-900'>{rating}</span>
+               </span>
+            </div>
+
+            <p className='text-gray-600 text-sm mb-3'>{location}</p>
+
+            <div className='flex items-center justify-between'>
+               <div>
+                  <span className='text-xl font-bold text-gray-900'>
+                     ${price}
+                  </span>
+                  <span className='text-gray-600 text-sm'> / night</span>
+               </div>
+            </div>
+         </div>
+      </div>
+   );
+}
+
+export default PropertyCard;
+```
+
+---
+
+## Understanding Tailwind Classes
+
+Let's break down the key classes:
+
+<Accordions type='single'>
+   <Accordion id='layout' title='Layout & Spacing' value='layout'>
+      ```jsx title="Layout Classes"
+      className="p-4 mb-3 w-full h-64"
+      ```
+      
+      - `p-4` - Padding on all sides (1rem)
+      - `mb-3` - Margin bottom (0.75rem)
+      - `w-full` - Width 100%
+      - `h-64` - Height 16rem
+   </Accordion>
+
+   <Accordion id='colors' title='Colors' value='colors'>
+      ```jsx title="Color Classes"
+      className="bg-white text-gray-900"
+      className="text-yellow-500"
+      ```
+      
+      - `bg-white` - Background color white
+      - `text-gray-900` - Text color dark gray
+      - `text-yellow-500` - Text color yellow (for stars)
+   </Accordion>
+
+   <Accordion id='typography' title='Typography' value='typography'>
+      ```jsx title="Typography Classes"
+      className="text-lg font-semibold"
+      ```
+      
+      - `text-lg` - Font size large (1.125rem)
+      - `text-sm` - Font size small (0.875rem)
+      - `font-semibold` - Font weight 600
+      - `font-bold` - Font weight 700
+   </Accordion>
+
+   <Accordion id='effects' title='Effects & Transitions' value='effects'>
+      ```jsx title="Effect Classes"
+      className="rounded-xl shadow-md hover:shadow-xl transition-shadow"
+      ```
+      
+      - `rounded-xl` - Border radius 0.75rem
+      - `shadow-md` - Drop shadow
+      - `hover:shadow-xl` - Larger shadow on hover
+      - `transition-shadow` - Smooth shadow animation
+      - `duration-300` - Animation duration 300ms
+   </Accordion>
+
+   <Accordion id='flexbox' title='Flexbox' value='flexbox'>
+      ```jsx title="Flexbox Classes"
+      className="flex items-center justify-between"
+      ```
+      
+      - `flex` - Display flex
+      - `items-center` - Align items vertically centered
+      - `items-start` - Align items to start
+      - `justify-between` - Space between items
+   </Accordion>
+</Accordions>
+
+---
+
+## Step 3: Style the PropertyList
+
+Update PropertyList to use a responsive grid:
+
+```jsx title="src/components/PropertyList.jsx"
+// src/components/PropertyList.jsx
+import PropertyCard from "./PropertyCard";
+
+function PropertyList({ properties }) {
+   return (
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+         {properties.map((property) => (
+            <PropertyCard
+               key={property.id}
+               title={property.title}
+               location={property.location}
+               price={property.price}
+               rating={property.rating}
+               image={property.image}
+            />
+         ))}
+      </div>
+   );
+}
+
+export default PropertyList;
+```
+
+**Grid classes explained:**
+
+-  `grid` - CSS Grid layout
+-  `grid-cols-1` - 1 column on mobile
+-  `sm:grid-cols-2` - 2 columns on small screens (640px+)
+-  `lg:grid-cols-3` - 3 columns on large screens (1024px+)
+-  `xl:grid-cols-4` - 4 columns on extra-large screens (1280px+)
+-  `gap-6` - Gap between grid items (1.5rem)
+
+---
+
+## Step 4: Style the HomePage
+
+Complete the styling with hero section and page layout:
+
+```jsx title="src/pages/HomePage.jsx"
+// src/pages/HomePage.jsx
+import PropertyList from "../components/PropertyList";
+
+function HomePage() {
+   const properties = [
+      // ... your properties array
+   ];
+
+   return (
+      <div className='min-h-screen bg-gray-50'>
+         {/* Hero Section */}
+         <header className='bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20'>
+            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center'>
+               <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold mb-4'>
+                  Find Your Perfect Stay
+               </h1>
+               <p className='text-xl md:text-2xl text-blue-100'>
+                  Discover amazing places to stay around the world
+               </p>
+            </div>
+         </header>
+
+         {/* Listings Section */}
+         <section className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+            <h2 className='text-3xl font-bold text-gray-900 mb-8'>
+               Featured Properties
+            </h2>
+            <PropertyList properties={properties} />
+         </section>
+      </div>
+   );
+}
+
+export default HomePage;
+```
+
+---
+
+## Responsive Design
+
+Tailwind makes responsive design easy with breakpoint prefixes:
+
+```jsx title="Responsive Text Sizes"
+className = "text-base sm:text-lg md:text-xl lg:text-2xl";
+```
+
+**Breakpoints:**
+
+-  Default (0px+) - Mobile first
+-  `sm:` (640px+) - Small tablets
+-  `md:` (768px+) - Tablets
+-  `lg:` (1024px+) - Desktops
+-  `xl:` (1280px+) - Large desktops
+-  `2xl:` (1536px+) - Extra large screens
+
+---
+
+## Hover Effects
+
+Add interactivity with hover states:
+
+```jsx title="Hover Effects"
+className = "hover:shadow-xl hover:scale-105 transition-all duration-300";
+```
+
+This creates a smooth lift effect when hovering over property cards!
+
+---
+
+## Verify in Browser
+
+Save all files and check your browser. You should see:
+
+✨ **Visual improvements:**
+
+-  Gradient hero section with large heading
+-  Property cards with shadows and rounded corners
+-  Responsive grid layout
+-  Hover effects on cards
+-  Professional typography
+-  Proper spacing and colors
+
+Try resizing your browser to see the responsive grid in action!
+
+---
+
+## Common Tailwind Patterns
+
+<Accordions type='single'>
+   <Accordion id='centering' title='Centering Content' value='centering'>
+      ```jsx title="Centering Techniques"
+      {/* Horizontal center */}
+      <div className='flex justify-center'>
+         <p>Centered horizontally</p>
+      </div>
+      
+      {/* Vertical center */}
+      <div className='flex items-center h-screen'>
+         <p>Centered vertically</p>
+      </div>
+      
+      {/* Both */}
+      <div className='flex items-center justify-center h-screen'>
+         <p>Perfectly centered</p>
+      </div>
+      ```
+   </Accordion>
+
+   <Accordion id='container' title='Container Pattern' value='container'>
+      ```jsx title="Container Pattern"
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+         {/* Content stays within max width and centered */}
+      </div>
+      ```
+      
+      This is the standard content wrapper pattern.
+   </Accordion>
+
+   <Accordion id='card' title='Card Pattern' value='card'>
+      ```jsx title="Card Pattern"
+      <div className='bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow'>
+         {/* Card content */}
+      </div>
+      ```
+   </Accordion>
+</Accordions>
+
+---
+
+## Customizing Colors
+
+Want to use your brand colors? Update `tailwind.config.js`:
+
+```javascript title="tailwind.config.js"
+export default {
+   theme: {
+      extend: {
+         colors: {
+            primary: {
+               50: "#eff6ff",
+               100: "#dbeafe",
+               500: "#3b82f6",
+               600: "#2563eb",
+               900: "#1e3a8a",
+            },
+         },
+      },
+   },
+};
+```
+
+Then use:
+
+```jsx title="Using Custom Colors"
+className = "bg-primary-500 text-primary-900";
+```
+
+---
+
+## Practice Challenges
+
+<Accordions type='single'>
+   <Accordion id='chal1' title='Challenge 1: Add Dark Mode Toggle' value='chal1'>
+      Tailwind supports dark mode out of the box:
+      
+      ```jsx title="Dark Mode Support"
+      <div className='bg-white dark:bg-gray-900 text-gray-900 dark:text-white'>
+         This adapts to system dark mode preference
+      </div>
+      ```
+   </Accordion>
+
+   <Accordion id='chal2' title='Challenge 2: Add a Favorite Button' value='chal2'>
+      Add a heart icon to each property card:
+      
+      ```jsx title="Favorite Button"
+      <button className='absolute top-4 right-4 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors'>
+         <span className='text-red-500 text-xl'>♥</span>
+      </button>
+      ```
+   </Accordion>
+
+   <Accordion id='chal3' title='Challenge 3: Add Loading Skeleton' value='chal3'>
+      Create a loading placeholder:
+      
+      ```jsx title="Loading Skeleton"
+      <div className='bg-white rounded-xl shadow-md overflow-hidden'>
+         <div className='h-64 bg-gray-200 animate-pulse'></div>
+         <div className='p-4 space-y-3'>
+            <div className='h-4 bg-gray-200 rounded animate-pulse'></div>
+            <div className='h-3 bg-gray-200 rounded w-3/4 animate-pulse'></div>
+         </div>
+      </div>
+      ```
+   </Accordion>
+</Accordions>
+
+---
+
+## What You Learned
+
+<Badge variant='success'>Concepts Mastered</Badge>
+
+-  ✅ Installing and configuring Tailwind CSS
+-  ✅ Using utility classes for styling
+-  ✅ Creating responsive layouts with grid
+-  ✅ Implementing hover effects and transitions
+-  ✅ Building professional-looking components
+-  ✅ Understanding Tailwind's design system
+-  ✅ Responsive breakpoints and mobile-first design
+
+---
+
+## Checkpoint ✅
+
+Before continuing, verify:
+
+-  ✅ Tailwind CSS is installed and configured
+-  ✅ Property cards have rounded corners and shadows
+-  ✅ Hero section has gradient background
+-  ✅ Grid layout adjusts on different screen sizes
+-  ✅ Hover effects work on property cards
+-  ✅ Typography looks professional
+-  ✅ Colors and spacing are consistent
+
+---
+
+## Next Up
+
+Excellent work! Your homepage looks fantastic. In the final lesson of this
+module, we'll review everything you've learned and explore component composition
+patterns.
+
+<div className='mt-6 flex gap-4'>
+   <Button variant='outline' asChild>
+      <a href='/docs/react/m1/lesson-5'>← Previous: PropertyList with Map</a>
+   </Button>
+   <Button asChild>
+      <a href='/docs/react/m1/lesson-7'>Next: Module Review →</a>
+   </Button>
+</div>

@@ -1,0 +1,196 @@
+---
+title: "M7: Forms & Authentication"
+description: "Build secure authentication with React Hook Form, Zod validation, and JWT tokens"
+module: 7
+totalSteps: 16
+duration: "5-6 hours"
+difficulty: "advanced"
+prerequisites: ["module-6"]
+---
+
+
+# Module 7: Forms & Authentication
+
+Build a complete authentication system with secure forms, validation, and protected routes! 🔐
+
+## Overview
+
+In this module, you'll implement a production-ready authentication system for your Holidaze application. You'll learn how to handle forms with React Hook Form, validate user input with Zod schemas, manage JWT tokens securely, and protect routes that require authentication.
+
+By the end of this module, users will be able to sign in, stay authenticated across page refreshes, and access protected features. You'll also learn security best practices like in-memory token storage and automatic token refresh.
+
+## What You'll Build
+
+**Complete Authentication System:**
+- 🔐 **Secure sign-in form** with validation
+- 🎯 **JWT token management** (access & refresh tokens)
+- 🛡️ **Protected routes** requiring authentication
+- 🔄 **Automatic token refresh** when expired
+- 👤 **User session** persisted across page reloads
+- 🚪 **Sign-out functionality** clearing user state
+- 🎨 **Conditional UI** based on auth state
+
+## Why Authentication Matters
+
+Most real-world applications need to:
+- **Identify users** - Know who's using your app
+- **Protect data** - Restrict access to user-specific information
+- **Personalize experience** - Show relevant content per user
+- **Secure API calls** - Verify user identity on backend
+
+Without authentication, everyone sees the same content and anyone can access any data. Authentication makes your app secure and personalized.
+
+## Learning Objectives
+
+By completing this module, you will:
+
+- ✅ **Master React Hook Form** - Handle complex forms efficiently
+- ✅ **Validate with Zod** - Create type-safe validation schemas
+- ✅ **Implement JWT auth** - Secure token-based authentication
+- ✅ **Use Context API** - Share auth state across components
+- ✅ **Create protected routes** - Guard routes requiring authentication
+- ✅ **Handle token refresh** - Keep users signed in automatically
+- ✅ **Manage auth flow** - Complete sign-in/sign-out lifecycle
+- ✅ **Secure best practices** - In-memory tokens, interceptors, error handling
+
+## Prerequisites
+
+Before starting Module 7, you should have completed:
+
+- ✅ **Module 6: State Management** (Redux or Zustand)
+  - Understanding global state
+  - Context patterns (if using Zustand)
+  - Async actions
+
+You should also be comfortable with:
+- React hooks (useState, useEffect, useContext)
+- React Router navigation
+- API calls with async/await
+- Form handling basics
+
+## Module Structure
+
+This module contains **16 comprehensive lessons** organized in 4 phases:
+
+### Phase 1: Auth Provider Setup (L1-L4)
+Build the foundation with `AuthProvider` component to manage auth state globally.
+
+**Lessons:**
+- **L1:** Create AuthProvider component
+- **L2:** Add AuthProvider to app
+- **L3:** Fetch access token on mount
+- **L4:** Hide Navbar when not signed in
+
+### Phase 2: Sign In Page & Form (L5-L8)
+Create the sign-in page with React Hook Form and Zod validation.
+
+**Lessons:**
+- **L5:** Create SignInPage component
+- **L6:** Add SignInPage to Router
+- **L7:** Create SignInForm component
+- **L8:** Add SignInForm to SignInPage
+
+### Phase 3: Form Handling & Tokens (L9-L12)
+Handle form submission, store tokens, and set up automatic refresh.
+
+**Lessons:**
+- **L9:** Handle SignInForm submission
+- **L10:** Enable authentication and sign in
+- **L11:** Add user token to all requests
+- **L12:** Refresh token when expired
+
+### Phase 4: Protected Routes & Sign Out (L13-L16)
+Protect routes and implement sign-out functionality.
+
+**Lessons:**
+- **L13:** Create Route component (guard)
+- **L14:** Update all routes with protection
+- **L15:** Redirect to home when signed in
+- **L16:** Create sign-out button in Navbar
+
+## Technologies Used
+
+**React Hook Form:**
+- Performant form state management
+- Built-in validation support
+- Minimal re-renders
+- Easy integration with validation libraries
+
+**Zod:**
+- TypeScript-first schema validation
+- Composable validation rules
+- Type inference
+- Great error messages
+
+**JWT (JSON Web Tokens):**
+- Stateless authentication
+- Access & refresh token pattern
+- Secure token transmission
+- Industry standard
+
+**Context API:**
+- Share auth state globally
+- No prop drilling
+- React built-in solution
+
+## Authentication Flow
+
+Here's how the complete authentication system works:
+
+```
+1. App Loads
+   ↓
+2. AuthProvider checks for refresh token
+   ↓
+3. If valid token exists:
+   → Fetch user data
+   → Set authenticated state
+   → Show app with Navbar
+   
+   If no token:
+   → Show sign-in page
+   ↓
+4. User signs in with email/password
+   ↓
+5. API returns access token + refresh token
+   ↓
+6. Store tokens in memory (secure)
+   ↓
+7. Add access token to all API requests
+   ↓
+8. When access token expires:
+   → Automatically refresh using refresh token
+   → Get new access token
+   → Continue using app
+   ↓
+9. User signs out:
+   → Clear tokens from memory
+   → Redirect to sign-in page
+```
+
+## Security Best Practices
+
+This module teaches **production-ready security patterns:**
+
+✅ **In-memory token storage** - No localStorage (XSS protection)  
+✅ **HTTP-only cookies** - Refresh tokens in secure cookies  
+✅ **Automatic token refresh** - Seamless user experience  
+✅ **Request interceptors** - Add tokens to every request  
+✅ **Response interceptors** - Handle 401 errors globally  
+✅ **Protected routes** - Server-side validation  
+✅ **Secure forms** - Client-side validation before submission  
+
+## Time Estimate
+
+⏱️ **5-6 hours** to complete all 16 lessons
+
+- Phase 1 (L1-L4): ~1.5 hours
+- Phase 2 (L5-L8): ~1.5 hours
+- Phase 3 (L9-L12): ~1.5 hours
+- Phase 4 (L13-L16): ~1.5 hours
+
+## Ready to Begin?
+
+Start with Lesson 1 to create the AuthProvider component that will manage authentication state across your entire application!
+
+

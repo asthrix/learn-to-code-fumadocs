@@ -1,0 +1,790 @@
+---
+title: "L8: Image Carousel Component"
+description: "Build an interactive image carousel with auto-play functionality using useEffect"
+---
+
+
+# Image Carousel Component
+
+In this lesson, we'll build an interactive image carousel that auto-plays through images using `useEffect`. This brings together everything you've learned about state, effects, and cleanup functions!
+
+## What You'll Learn
+
+- Build a reusable carousel component with state
+- Implement auto-play using `useEffect` and timers
+- Handle cleanup for intervals to prevent memory leaks
+- Add user interactions (pause on hover, manual navigation)
+- Use proper accessibility patterns for carousels
+
+## Why Carousels Need useEffect
+
+Image carousels are a perfect example of when you need side effects:
+
+- **Auto-play requires timers** - You need `setInterval` to change slides automatically
+- **Timers need cleanup** - Intervals must be cleared to prevent memory leaks
+- **User interactions affect timers** - Hovering should pause, leaving should resume
+- **Component lifecycle matters** - Timer should stop when component unmounts
+
+All of these are side effects that happen outside the normal React render flow!
+
+## Step 1: Create Basic Carousel Structure
+
+Let's start with a simple carousel component that displays images and tracks the current slide.
+
+<Steps>
+
+<Step>
+
+### Create the Carousel Component File
+
+Create a new file for our carousel:
+
+```bash title="Terminal"
+touch src/components/ImageCarousel.jsx
+```
+
+</Step>
+
+<Step>
+
+### Build the Basic Structure
+
+```jsx title="src/components/ImageCarousel.jsx"
+// [!code word:useState]
+import { useState } from 'react';
+
+export default function ImageCarousel({ images = [] }) {
+  // Track which image is currently shown
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Handle case with no images
+  if (images.length === 0) {
+    return (
+      <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
+        <p className="text-gray-500">No images available</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-64 overflow-hidden rounded-lg bg-gray-900">
+      {/* Display current image */}
+      <img
+        src={images[currentIndex]}
+        alt={`Slide ${currentIndex + 1}`}
+        className="w-full h-full object-cover"
+      />
+      
+      {/* We'll add controls here */}
+    </div>
+  );
+}
+```
+
+**What's happening:**
+- `currentIndex` tracks which image is shown (starts at 0)
+- Graceful fallback for empty image arrays
+- Basic image display with proper styling
+
+</Step>
+
+</Steps>
+
+## Step 2: Add Navigation Controls
+
+Now let's add buttons to navigate between images manually.
+
+<Steps>
+
+<Step>
+
+### Create Navigation Functions
+
+```jsx title="src/components/ImageCarousel.jsx" {8-20,33-54}
+// [!code word:useState]
+import { useState } from 'react';
+
+export default function ImageCarousel({ images = [] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Navigate to previous image
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) => {
+      // Wrap around to last image if at first
+      return prevIndex === 0 ? images.length - 1 : prevIndex - 1;
+    });
+  };
+
+  // Navigate to next image
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => {
+      // Wrap around to first image if at last
+      return prevIndex === images.length - 1 ? 0 : prevIndex + 1;
+    });
+  };
+
+  if (images.length === 0) {
+    return (
+      <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
+        <p className="text-gray-500">No images available</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-64 overflow-hidden rounded-lg bg-gray-900">
+      {/* Previous Button */}
+      <button
+        onClick={goToPrevious}
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 transition-colors"
+        aria-label="Previous image"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <img
+        src={images[currentIndex]}
+        alt={`Slide ${currentIndex + 1} of ${images.length}`}
+        className="w-full h-full object-cover"
+      />
+
+      {/* Next Button */}
+      <button
+        onClick={goToNext}
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 transition-colors"
+        aria-label="Next image"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+```
+
+**Key points:**
+- **Circular navigation**: Wraps around at both ends
+- **Functional updates**: Using `prevIndex` prevents stale closure issues
+- **Accessibility**: Buttons have `aria-label` for screen readers
+- **Positioning**: Absolute positioning centers buttons on each side
+
+</Step>
+
+</Steps>
+
+## Step 3: Implement Auto-Play with useEffect
+
+Now for the exciting part! Let's make the carousel auto-play using `useEffect` and `setInterval`.
+
+<Steps>
+
+<Step>
+
+### Add Auto-Play Logic
+
+```jsx title="src/components/ImageCarousel.jsx" {2,7-21}
+// [!code word:useEffect]
+import { useState, useEffect } from 'react';
+
+export default function ImageCarousel({ images = [], autoPlayInterval = 3000 }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Auto-play effect
+  useEffect(() => {
+    // Don't auto-play if there's only one image
+    if (images.length <= 1) return;
+
+    // Set up interval to advance to next slide
+    const intervalId = setInterval(() => {
+      goToNext();
+    }, autoPlayInterval);
+
+    // Cleanup: Clear interval when component unmounts or deps change
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [images.length, autoPlayInterval]); // Re-run if these change
+
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  // ... rest of component
+}
+```
+
+</Step>
+
+<Step>
+
+### Understanding the Auto-Play Code
+
+<Accordions>
+
+<Accordion title="Why setInterval?">
+
+**`setInterval`** runs a function repeatedly at a fixed time delay:
+
+```javascript
+// Run every 3 seconds (3000 milliseconds)
+const intervalId = setInterval(() => {
+  console.log('This runs every 3 seconds');
+}, 3000);
+
+// Stop the interval
+clearInterval(intervalId);
+```
+
+Perfect for auto-advancing slides!
+
+</Accordion>
+
+<Accordion title="Why check images.length?">
+
+If there's only one image (or zero), auto-playing doesn't make sense:
+
+```javascript
+if (images.length <= 1) return;
+```
+
+This **early return** prevents setting up the interval unnecessarily. The effect does nothing when there's nothing to auto-play!
+
+</Accordion>
+
+<Accordion title="Why cleanup is critical">
+
+Without cleanup, intervals continue running even after the component unmounts:
+
+```javascript
+// ❌ BAD - Memory leak!
+useEffect(() => {
+  setInterval(() => {
+    goToNext();
+  }, 3000);
+  // No cleanup - interval runs forever!
+}, []);
+
+// ✅ GOOD - Interval is cleaned up
+useEffect(() => {
+  const intervalId = setInterval(() => {
+    goToNext();
+  }, 3000);
+  
+  return () => clearInterval(intervalId); // Stops interval
+}, []);
+```
+
+</Accordion>
+
+<Accordion title="Functional update in goToNext">
+
+**Problem**: `goToNext` used in `setInterval` will have a stale closure over `currentIndex`.
+
+**Solution**: Use functional form of `setState`:
+
+```javascript
+// ❌ This creates a stale closure
+setCurrentIndex(currentIndex + 1);
+
+// ✅ This always has the latest value
+setCurrentIndex((prevIndex) => prevIndex + 1);
+```
+
+The functional form receives the **most recent state value** as an argument, avoiding stale closures!
+
+</Accordion>
+
+</Accordions>
+
+</Step>
+
+</Steps>
+
+## Step 4: Add Pause on Hover
+
+Users should be able to pause auto-play by hovering over the carousel. Let's add that functionality!
+
+<Steps>
+
+<Step>
+
+### Track Hover State
+
+```jsx title="src/components/ImageCarousel.jsx" {5,9-11,18-19,27-28}
+// [!code word:useEffect]
+import { useState, useEffect } from 'react';
+
+export default function ImageCarousel({ images = [], autoPlayInterval = 3000 }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    // Don't auto-play if only one image OR if user is hovering
+    if (images.length <= 1 || isHovered) return;
+
+    const intervalId = setInterval(() => {
+      goToNext();
+    }, autoPlayInterval);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [images.length, autoPlayInterval, isHovered]); // Add isHovered to deps
+
+  // ... navigation functions ...
+
+  return (
+    <div 
+      className="relative w-full h-64 overflow-hidden rounded-lg bg-gray-900"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* ... rest of carousel ... */}
+    </div>
+  );
+}
+```
+
+**What's happening:**
+- `isHovered` state tracks whether mouse is over carousel
+- `onMouseEnter`/`onMouseLeave` update the state
+- `useEffect` checks `isHovered` - if true, it returns early (no interval)
+- When user hovers, interval is cleared and effect re-runs
+- When user stops hovering, effect creates a new interval
+
+</Step>
+
+</Steps>
+
+## Step 5: Add Slide Indicators
+
+Visual indicators help users see how many images there are and which one is active.
+
+<Steps>
+
+<Step>
+
+### Add Indicator Dots
+
+```jsx title="src/components/ImageCarousel.jsx" {11-33}
+// ... imports and component logic ...
+
+  return (
+    <div 
+      className="relative w-full h-64 overflow-hidden rounded-lg bg-gray-900"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Previous Button */}
+      {/* ... button code ... */}
+
+      <img
+        src={images[currentIndex]}
+        alt={`Slide ${currentIndex + 1} of ${images.length}`}
+        className="w-full h-full object-cover"
+      />
+
+      {/* Next Button */}
+      {/* ... button code ... */}
+
+      {/* Slide Indicators */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-colors ${
+              index === currentIndex 
+                ? 'bg-white' 
+                : 'bg-white/50 hover:bg-white/75'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+```
+
+**Features:**
+- **One dot per image**: Map over images array
+- **Visual feedback**: Active dot is fully white, others are translucent
+- **Clickable**: Each dot jumps to its slide
+- **Centered**: Positioned at bottom center with Tailwind
+- **Accessible**: Each button has descriptive label
+
+</Step>
+
+</Steps>
+
+## Step 6: Integrate with ListingCard
+
+Now let's use our carousel in the `ListingCard` component to display listing images!
+
+<Steps>
+
+<Step>
+
+### Update ListingCard
+
+```jsx title="src/components/ListingCard.jsx" {2,10-15}
+// [!code ++]import ImageCarousel from './ImageCarousel';
+
+export default function ListingCard({ listing }) {
+  const { title, location, price, rating, reviews, images } = listing;
+
+  return (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+      {/* Replace static image with carousel */}
+      {/* [!code --]<img */}
+      {/* [!code --]  src={images[0]} */}
+      {/* [!code --]  alt={title} */}
+      {/* [!code --]  className="w-full h-48 object-cover" */}
+      {/* [!code --]/> */}
+      
+      <ImageCarousel images={images} autoPlayInterval={3500} />
+
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">{title}</h3>
+        
+        <p className="text-sm text-gray-600 mb-2">{location}</p>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <span className="text-yellow-500">★</span>
+            <span className="font-medium">{rating}</span>
+            <span className="text-gray-500 text-sm">({reviews} reviews)</span>
+          </div>
+          
+          <div className="text-right">
+            <span className="text-lg font-bold text-gray-900">${price}</span>
+            <span className="text-gray-600 text-sm"> / night</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+</Step>
+
+<Step>
+
+### Test It Out!
+
+Save your files and check the browser. You should now see:
+
+- ✅ Image carousel with navigation buttons
+- ✅ Auto-playing every 3.5 seconds
+- ✅ Pauses when you hover
+- ✅ Clickable indicator dots
+- ✅ Smooth transitions between images
+
+</Step>
+
+</Steps>
+
+## Complete Carousel Component
+
+Here's the full, polished carousel component:
+
+```jsx title="src/components/ImageCarousel.jsx"
+// [!code word:useEffect]
+import { useState, useEffect } from 'react';
+
+export default function ImageCarousel({ 
+  images = [], 
+  autoPlayInterval = 3000 
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Auto-play effect with cleanup
+  useEffect(() => {
+    // Don't auto-play if only one image or user is hovering
+    if (images.length <= 1 || isHovered) return;
+
+    const intervalId = setInterval(() => {
+      goToNext();
+    }, autoPlayInterval);
+
+    // Cleanup interval on unmount or when dependencies change
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [images.length, autoPlayInterval, isHovered]);
+
+  // Navigate to previous image (circular)
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+
+  // Navigate to next image (circular)
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  // Handle case with no images
+  if (images.length === 0) {
+    return (
+      <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
+        <p className="text-gray-500">No images available</p>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="relative w-full h-64 overflow-hidden rounded-lg bg-gray-900 group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Previous Button - shows on hover */}
+      <button
+        onClick={goToPrevious}
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white 
+                   rounded-full p-2 transition-all opacity-0 group-hover:opacity-100 z-10"
+        aria-label="Previous image"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      {/* Current Image */}
+      <img
+        src={images[currentIndex]}
+        alt={`Slide ${currentIndex + 1} of ${images.length}`}
+        className="w-full h-full object-cover transition-opacity duration-500"
+      />
+
+      {/* Next Button - shows on hover */}
+      <button
+        onClick={goToNext}
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white 
+                   rounded-full p-2 transition-all opacity-0 group-hover:opacity-100 z-10"
+        aria-label="Next image"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+
+      {/* Slide Indicators */}
+      {images.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`w-3 h-3 rounded-full transition-colors ${
+                index === currentIndex 
+                  ? 'bg-white' 
+                  : 'bg-white/50 hover:bg-white/75'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+              aria-current={index === currentIndex ? 'true' : 'false'}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## Best Practices & Accessibility
+
+<Accordions>
+
+<Accordion title="Keyboard Navigation">
+
+Make the carousel keyboard accessible:
+
+```jsx
+// Add keyboard event handler
+const handleKeyDown = (e) => {
+  if (e.key === 'ArrowLeft') {
+    goToPrevious();
+  } else if (e.key === 'ArrowRight') {
+    goToNext();
+  }
+};
+
+// Add to carousel div
+<div 
+  onKeyDown={handleKeyDown}
+  tabIndex="0"  // Make focusable
+  role="region"
+  aria-label="Image carousel"
+>
+```
+
+</Accordion>
+
+<Accordion title="Reduce Motion for Accessibility">
+
+Respect user's motion preferences:
+
+```jsx
+useEffect(() => {
+  // Check if user prefers reduced motion
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
+  // Don't auto-play if user prefers reduced motion
+  if (prefersReducedMotion || images.length <= 1 || isHovered) return;
+  
+  // ... rest of auto-play logic
+}, [images.length, autoPlayInterval, isHovered]);
+```
+
+</Accordion>
+
+<Accordion title="Performance: Image Preloading">
+
+Preload next/previous images for smoother transitions:
+
+```jsx
+useEffect(() => {
+  // Preload adjacent images
+  const preloadIndexes = [
+    currentIndex === 0 ? images.length - 1 : currentIndex - 1,  // Previous
+    currentIndex === images.length - 1 ? 0 : currentIndex + 1   // Next
+  ];
+  
+  preloadIndexes.forEach(index => {
+    const img = new Image();
+    img.src = images[index];
+  });
+}, [currentIndex, images]);
+```
+
+</Accordion>
+
+<Accordion title="Touch/Swipe Gestures">
+
+Add mobile swipe support:
+
+```jsx
+const [touchStart, setTouchStart] = useState(0);
+const [touchEnd, setTouchEnd] = useState(0);
+
+const handleTouchStart = (e) => {
+  setTouchStart(e.touches[0].clientX);
+};
+
+const handleTouchMove = (e) => {
+  setTouchEnd(e.touches[0].clientX);
+};
+
+const handleTouchEnd = () => {
+  if (touchStart - touchEnd > 50) {
+    // Swiped left - go to next
+    goToNext();
+  }
+  if (touchStart - touchEnd < -50) {
+    // Swiped right - go to previous
+    goToPrevious();
+  }
+};
+
+// Add to carousel div
+<div 
+  onTouchStart={handleTouchStart}
+  onTouchMove={handleTouchMove}
+  onTouchEnd={handleTouchEnd}
+>
+```
+
+</Accordion>
+
+</Accordions>
+
+## Testing the Carousel
+
+<Steps>
+
+<Step>
+
+### Manual Testing Checklist
+
+Test these scenarios:
+
+1. **Auto-play**: Images should advance every 3.5 seconds
+2. **Hover pause**: Auto-play should stop when hovering
+3. **Navigation buttons**: Previous/next buttons should work
+4. **Circular navigation**: Should wrap around at both ends
+5. **Indicators**: Dots should highlight current slide and be clickable
+6. **Single image**: Should not auto-play or show indicators
+7. **No images**: Should show "No images available" message
+
+</Step>
+
+<Step>
+
+### Check for Memory Leaks
+
+Open React DevTools and watch for:
+
+1. Hover over carousel, then navigate away
+2. Interval should be cleared (check with console.log in cleanup)
+3. No errors in console
+4. Component properly unmounts
+
+```jsx
+// Add logging to verify cleanup
+useEffect(() => {
+  console.log('Interval started');
+  
+  const intervalId = setInterval(() => {
+    goToNext();
+  }, autoPlayInterval);
+
+  return () => {
+    console.log('Interval cleaned up'); // Should see this on unmount
+    clearInterval(intervalId);
+  };
+}, [images.length, autoPlayInterval, isHovered]);
+```
+
+</Step>
+
+</Steps>
+
+<Callout type="success" title="Key Takeaways">
+
+- **Timers are side effects** - `setInterval` requires `useEffect` and cleanup
+- **Always cleanup intervals** - Use `clearInterval` in the cleanup function
+- **Functional state updates** - Use `prevState` to avoid stale closures
+- **Pause on interaction** - Respect user control over auto-play
+- **Accessibility matters** - Add ARIA labels, keyboard support, and respect motion preferences
+- **Test cleanup thoroughly** - Verify intervals are cleared on unmount
+
+</Callout>
+
+## What's Next?
+
+You've mastered useEffect by building a real-world component! In the next lesson, we'll **review everything you've learned** in Module 3:
+
+- useEffect patterns and best practices
+- Common pitfalls and how to avoid them
+- When to use (and not use) useEffect
+- Self-assessment quiz
+
+Then you'll tackle a comprehensive module challenge to solidify your skills!

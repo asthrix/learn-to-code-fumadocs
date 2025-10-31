@@ -1,0 +1,470 @@
+---
+title: "L6: M2 Review & Next Steps"
+description: "Consolidate your learning and prepare for Module 3"
+module: 2
+lesson: 6
+---
+
+
+# Module 2 Review & Next Steps
+
+<Badge variant="blue">Review</Badge>
+<Badge variant="green">Best Practices</Badge>
+
+Congratulations on completing Module 2! Let's review everything you've learned and prepare for the next phase of StaySense development.
+
+---
+
+## 🎯 What You Built
+
+You transformed StaySense from a static prototype into an **interactive application** with:
+
+### Features Implemented
+
+✅ **Dynamic Data Management** - Converted hardcoded listings to React state
+✅ **Filter Component** - Built `ListingFilters` with search, dates, and guest controls
+✅ **Controlled Inputs** - Implemented proper form input handling
+✅ **State Lifting** - Shared state between HomePage and ListingFilters
+✅ **Real-time Filtering** - Filtered listings based on multiple criteria
+✅ **Empty States** - Handled no-results scenarios gracefully
+✅ **Results Counter** - Displayed filtered listing count
+
+---
+
+## 📚 Key Concepts Mastered
+
+### 1. useState Hook
+
+The foundation of React state management:
+
+```jsx
+// [!code word:useState]
+import { useState } from 'react';
+
+const [value, setValue] = useState(initialValue);
+```
+
+**Remember:**
+- State triggers re-renders when updated
+- Never mutate state directly
+- Always use the setter function
+- Initial value only used once
+
+---
+
+### 2. Controlled Components
+
+Inputs controlled by React state:
+
+```jsx
+<input 
+  value={state}                        // React controls value
+  onChange={(e) => setState(e.target.value)} // Update on change
+/>
+```
+
+**Benefits:**
+- Single source of truth
+- Easy validation
+- Can reset programmatically
+- Predictable behavior
+
+---
+
+### 3. Event Handling
+
+Responding to user interactions:
+
+```jsx
+// Text input
+<input onChange={(e) => handleChange(e)} />
+
+// Button click
+<button onClick={() => handleClick()} />
+
+// With parameters
+<button onClick={() => handleClick(id)} />
+```
+
+**Patterns:**
+- Inline arrow functions for simple cases
+- Named functions for complex logic
+- Pass function reference, not result
+
+---
+
+### 4. Lifting State Up
+
+Sharing state between components:
+
+```jsx
+// Parent owns state
+function Parent() {
+  const [value, setValue] = useState('');
+  
+  return (
+    <Child 
+      value={value}           // Pass value down
+      onChange={setValue}     // Pass updater down
+    />
+  );
+}
+
+// Child uses props
+function Child({ value, onChange }) {
+  return (
+    <input 
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+```
+
+**When to lift:**
+- Multiple components need same data
+- Parent needs to react to child changes
+- Sibling components need to communicate
+
+---
+
+### 5. Array Filtering
+
+Dynamic list manipulation:
+
+```jsx
+const filtered = array.filter(item => condition);
+
+// Multiple conditions
+const filtered = array.filter(item => {
+  return (
+    condition1 &&
+    condition2 &&
+    condition3
+  );
+});
+```
+
+**Common Patterns:**
+- `.filter()` - Remove items
+- `.map()` - Transform items
+- `.find()` - Find single item
+- `.some()` - Check if any match
+- `.every()` - Check if all match
+
+---
+
+## 🏗️ Component Architecture
+
+Your current component structure:
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="pages">
+      <File name="HomePage.jsx">
+        ```
+        - Manages listings state
+        - Manages filter state
+        - Filters listings
+        - Renders layout
+        ```
+      </File>
+    </Folder>
+    <Folder name="components">
+      <File name="ListingCard.jsx">
+        ```
+        - Displays single listing
+        - Receives props
+        - Presentational
+        ```
+      </File>
+      <File name="ListingFilters.jsx">
+        ```
+        - Filter UI
+        - Receives filter values as props
+        - Receives callback props
+        - Calls parent updaters
+        ```
+      </File>
+    </Folder>
+  </Folder>
+</Files>
+
+**Data Flow:**
+```
+HomePage (State) 
+    ↓ Props
+ListingFilters (UI)
+    ↑ Callbacks
+HomePage (Updates State)
+    ↓ Re-render
+Updated UI
+```
+
+---
+
+## 💡 Best Practices You Applied
+
+### 1. State Management
+
+✅ **Keep state close** - Only lift when needed
+✅ **Single source of truth** - Don't duplicate state
+✅ **Immutability** - Never mutate state directly
+✅ **Descriptive names** - `search`, not `s`
+
+### 2. Props
+
+✅ **Destructure props** - Clean function signatures
+✅ **Callback naming** - Use `on[Action]` convention
+✅ **PropTypes/TypeScript** - Type your props (next modules)
+
+### 3. Components
+
+✅ **Single Responsibility** - Each component has one job
+✅ **Composable** - Small, reusable pieces
+✅ **Presentational vs Container** - Separate UI from logic
+
+### 4. Performance
+
+✅ **Avoid unnecessary renders** - Stable callback functions
+✅ **Key props** - Unique keys for lists
+✅ **Conditional rendering** - Show/hide efficiently
+
+---
+
+## 🐛 Common Pitfalls (And How to Avoid Them)
+
+### Pitfall 1: Mutating State
+
+```jsx
+// ❌ Wrong
+const [items, setItems] = useState([1, 2, 3]);
+items.push(4);
+setItems(items);
+
+// ✅ Correct
+setItems([...items, 4]);
+```
+
+### Pitfall 2: Calling Function Instead of Passing It
+
+```jsx
+// ❌ Wrong: Calls immediately
+<button onClick={handleClick()}>Click</button>
+
+// ✅ Correct: Passes reference
+<button onClick={handleClick}>Click</button>
+<button onClick={() => handleClick(id)}>Click</button>
+```
+
+### Pitfall 3: Forgetting Value Prop
+
+```jsx
+// ❌ Wrong: Uncontrolled
+<input onChange={(e) => setValue(e.target.value)} />
+
+// ✅ Correct: Controlled
+<input 
+  value={value}
+  onChange={(e) => setValue(e.target.value)} 
+/>
+```
+
+### Pitfall 4: Stale State in Callbacks
+
+```jsx
+// ❌ Wrong: May use old state
+setCount(count + 1);
+setCount(count + 1); // Might not work as expected
+
+// ✅ Correct: Use updater function
+setCount(prev => prev + 1);
+setCount(prev => prev + 1); // Always correct
+```
+
+---
+
+## 🎓 React Mental Model
+
+### How React Works
+
+1. **Initial Render**
+   - Component function runs
+   - JSX converted to elements
+   - React creates DOM
+
+2. **State Update**
+   - `setState` called
+   - React schedules re-render
+   - Component function runs again
+
+3. **Re-render**
+   - New JSX generated
+   - React compares old vs new (diffing)
+   - Only changed elements updated in DOM
+
+4. **Repeat**
+   - Process continues with each state change
+
+### Unidirectional Data Flow
+
+```
+State Changes
+    ↓
+Component Re-renders
+    ↓
+New JSX Generated
+    ↓
+React Updates DOM
+    ↓
+User Sees Changes
+    ↓
+User Interaction
+    ↓
+Event Handler Fires
+    ↓
+State Changes (loop back to top)
+```
+
+---
+
+## 📊 Module Statistics
+
+**Lessons Completed:** 6  
+**Concepts Learned:** 15+  
+**Components Created:** 2  
+**State Variables:** 5  
+**Event Handlers:** 5+  
+**Lines of Code:** ~200+
+
+---
+
+## 🚀 What's Coming in Module 3
+
+### Effects & Data Fetching
+
+In the next module, you'll learn:
+
+**🔄 useEffect Hook**
+- Side effects in React
+- Lifecycle events
+- Cleanup functions
+
+**📡 API Integration**
+- Fetching data from APIs
+- Async/await patterns
+- Error handling
+
+**⏳ Loading States**
+- Show spinners during fetch
+- Handle errors gracefully
+- Retry logic
+
+**🎠 Advanced Components**
+- Image carousel
+- Pagination
+- Infinite scroll
+
+**Project Evolution:**
+- Replace mock data with API
+- Add loading indicators
+- Handle network errors
+- Cache responses
+
+---
+
+## ✅ Self-Assessment
+
+<Accordions>
+  <Accordion title="Can you explain...">
+    **Test your understanding:**
+    
+    1. What is the difference between props and state?
+    2. Why do we need controlled components?
+    3. What does "lifting state up" mean?
+    4. When should you lift state vs keep it local?
+    5. How does array.filter() work?
+    6. What triggers a re-render in React?
+    7. Why is state immutability important?
+    8. What is the purpose of event.target.value?
+    
+    If you can answer these confidently, you're ready for Module 3!
+  </Accordion>
+  
+  <Accordion title="Practice Exercises">
+    **Challenge yourself:**
+    
+    1. **Add Price Range Filter**
+       - Add min/max price inputs
+       - Filter listings by price
+       
+    2. **Add Sort Options**
+       - Sort by price (low to high, high to low)
+       - Sort by guest capacity
+       - Sort alphabetically
+       
+    3. **Add Filter Chips**
+       - Show active filters as removable chips
+       - Click chip to remove that filter
+       
+    4. **Add URL Query Params**
+       - Store filters in URL
+       - Allow sharing filtered results
+       
+    5. **Add Filter Persistence**
+       - Save filters to localStorage
+       - Restore on page reload
+  </Accordion>
+  
+  <Accordion title="Resources for Deeper Learning">
+    **React Documentation:**
+    - [useState Hook](https://react.dev/reference/react/useState)
+    - [Controlled Components](https://react.dev/learn/sharing-state-between-components)
+    - [Lifting State Up](https://react.dev/learn/sharing-state-between-components#lifting-state-up)
+    
+    **Array Methods:**
+    - [Array.filter()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+    - [Array.map()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
+    
+    **Best Practices:**
+    - [Thinking in React](https://react.dev/learn/thinking-in-react)
+    - [Component Composition](https://react.dev/learn/passing-props-to-a-component)
+  </Accordion>
+</Accordions>
+
+---
+
+## 🎉 Congratulations!
+
+You've completed Module 2 and transformed StaySense into an interactive application! You now understand:
+
+- ✅ React state management fundamentals
+- ✅ Event handling and user interaction
+- ✅ Component communication patterns
+- ✅ Real-time data filtering
+- ✅ Best practices for React development
+
+### Your Progress
+
+```
+Module 0: Setup              ✅ Complete
+Module 1: Components & Props ✅ Complete
+Module 2: State & Events     ✅ Complete
+Module 3: Effects & Data     ⬅️ Next!
+```
+
+---
+
+## 🎯 Ready for Module 3?
+
+In the next module, you'll:
+- Learn the useEffect hook
+- Fetch data from APIs
+- Handle async operations
+- Manage loading and error states
+- Build advanced components
+
+**Take a break, review if needed, then continue to Module 3 when ready!**
+
+Great work! 🚀
+

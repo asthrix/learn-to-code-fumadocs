@@ -1,0 +1,552 @@
+---
+title: "L9: Adding Navigation Links"
+description: "Use Link components to navigate between pages without page reload"
+---
+
+
+# Adding Navigation Links
+
+Right now, users have to manually type URLs to navigate between pages. Let's fix that by adding clickable links to listing cards!
+
+React Router provides the `Link` component for navigation without page reloads - it's faster and preserves application state.
+
+## What You'll Learn
+
+- Use the Link component for navigation
+- Understand Link vs `<a>` tags
+- Add click handlers to navigate
+- Build dynamic link URLs
+- Navigate from card to details page
+
+## Link vs Anchor Tag
+
+<Tabs items={['Link Component', 'Anchor Tag', 'Comparison']}>
+
+<Tab value="Link Component">
+
+**React Router Link:**
+
+```jsx
+import { Link } from 'react-router-dom';
+
+<Link to="/listing/42">View Listing</Link>
+```
+
+**How it works:**
+- Prevents page reload
+- Uses History API
+- Preserves React state
+- Updates URL
+- Fast navigation
+
+**Perfect for internal navigation!**
+
+</Tab>
+
+<Tab value="Anchor Tag">
+
+**Regular HTML `<a>` tag:**
+
+```jsx
+<a href="/listing/42">View Listing</a>
+```
+
+**How it works:**
+- Full page reload
+- Loses React state
+- Re-downloads JavaScript
+- Re-initializes app
+- Slower
+
+**Use for external links only!**
+
+</Tab>
+
+<Tab value="Comparison">
+
+| Feature | Link | `<a>` tag |
+|---------|------|-----------|
+| Page reload | ❌ No | ✅ Yes |
+| Speed | ⚡ Fast | 🐌 Slow |
+| State preserved | ✅ Yes | ❌ No |
+| React Router | ✅ Yes | ❌ No |
+| External sites | ❌ No | ✅ Yes |
+
+**Rule of thumb:**
+- Internal navigation → `<Link>`
+- External sites → `<a>`
+
+</Tab>
+
+</Tabs>
+
+## Step 1: Update ListingCard
+
+Let's make listing cards clickable:
+
+<Steps>
+
+<Step>
+
+### Add Link to ListingCard
+
+Open `ListingCard.jsx` and import Link:
+
+```jsx title="src/components/ListingCard.jsx"
+// [!code word:Link]
+import { Link } from 'react-router-dom'; // [!code ++]
+
+export default function ListingCard({ listing }) {
+  return (
+    <Link to={`/listing/${listing.id}`} className="block"> {/* [!code ++] */}
+      <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+        {/* Image */}
+        <div className="h-48 bg-gray-200"></div>
+
+        {/* Content */}
+        <div className="p-4">
+          <h3 className="font-semibold text-lg mb-1">{listing.title}</h3>
+          <p className="text-gray-600 text-sm mb-2">{listing.location}</p>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-900 font-semibold">
+              ${listing.price} / night
+            </span>
+            <span className="text-sm text-gray-600">
+              ⭐ {listing.rating}
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link> {/* [!code ++] */}
+  );
+}
+```
+
+**What changed:**
+
+- Wrapped entire card in `<Link>` component
+- Used template literal for dynamic URL: `/listing/${listing.id}`
+- Added `block` class for proper styling
+- Removed old click handler (if any)
+
+</Step>
+
+<Step>
+
+### Test Navigation
+
+1. Go to homepage (`http://localhost:5173/`)
+2. Click any listing card
+3. Should navigate to listing details
+4. Notice: **No page reload!**
+5. Browser back button works
+6. URL updates in address bar
+
+</Step>
+
+</Steps>
+
+## Building Dynamic URLs
+
+The key part is the `to` prop with template literal:
+
+```jsx
+<Link to={`/listing/${listing.id}`}>
+```
+
+**How it works:**
+
+```jsx
+// If listing.id = 1
+to={`/listing/${listing.id}`}  // → "/listing/1"
+
+// If listing.id = 42
+to={`/listing/${listing.id}`}  // → "/listing/42"
+
+// If listing.id = 999
+to={`/listing/${listing.id}`}  // → "/listing/999"
+```
+
+**Each card links to its own details page!**
+
+## Styling Interactive Links
+
+Add hover effects to show cards are clickable:
+
+```jsx title="Enhanced ListingCard with Hover"
+// [!code word:hover]
+<Link to={`/listing/${listing.id}`} className="block group">
+  <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+    {/* Content */}
+    <div className="p-4">
+      <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-600 transition-colors">
+        {listing.title}
+      </h3>
+      <p className="text-gray-600 text-sm mb-2">{listing.location}</p>
+      {/* ... */}
+    </div>
+  </div>
+</Link>
+```
+
+**Hover effects:**
+
+- Shadow increases on hover
+- Title changes color
+- Cursor becomes pointer
+- Smooth transitions
+
+## Link Props and Options
+
+<Accordions>
+
+<Accordion title="Basic to Prop">
+
+```jsx
+<Link to="/listing/42">View Details</Link>
+```
+
+Simple string path.
+
+</Accordion>
+
+<Accordion title="Dynamic to Prop">
+
+```jsx
+<Link to={`/listing/${id}`}>View Details</Link>
+```
+
+Template literal for variable values.
+
+</Accordion>
+
+<Accordion title="With State">
+
+```jsx
+<Link 
+  to="/listing/42" 
+  state={{ from: 'homepage' }}
+>
+  View Details
+</Link>
+
+// Access in destination component
+const location = useLocation();
+console.log(location.state.from); // "homepage"
+```
+
+Pass extra data without URL params.
+
+</Accordion>
+
+<Accordion title="Replace History">
+
+```jsx
+<Link to="/listing/42" replace>
+  View Details
+</Link>
+```
+
+Replaces current history entry instead of adding new one.
+
+</Accordion>
+
+<Accordion title="With className">
+
+```jsx
+<Link 
+  to="/listing/42"
+  className="text-blue-500 hover:underline"
+>
+  View Details
+</Link>
+```
+
+Style like any element.
+
+</Accordion>
+
+</Accordions>
+
+## Common Link Patterns
+
+<Accordions>
+
+<Accordion title="Pattern 1: Card Links">
+
+```jsx
+function ProductCard({ product }) {
+  return (
+    <Link to={`/product/${product.id}`} className="block">
+      <div className="card">
+        <img src={product.image} alt={product.name} />
+        <h3>{product.name}</h3>
+        <p>${product.price}</p>
+      </div>
+    </Link>
+  );
+}
+```
+
+Entire card clickable.
+
+</Accordion>
+
+<Accordion title="Pattern 2: Button-style Links">
+
+```jsx
+<Link 
+  to="/booking"
+  className="bg-blue-500 text-white px-6 py-2 rounded-lg inline-block"
+>
+  Book Now
+</Link>
+```
+
+Looks like button, acts like link.
+
+</Accordion>
+
+<Accordion title="Pattern 3: Breadcrumb Navigation">
+
+```jsx
+<nav className="flex gap-2 text-sm">
+  <Link to="/" className="text-blue-500">Home</Link>
+  <span>/</span>
+  <Link to="/listings" className="text-blue-500">Listings</Link>
+  <span>/</span>
+  <span className="text-gray-600">Details</span>
+</nav>
+```
+
+Hierarchical navigation.
+
+</Accordion>
+
+<Accordion title="Pattern 4: Active Link Styling">
+
+```jsx
+import { NavLink } from 'react-router-dom';
+
+<NavLink 
+  to="/profile"
+  className={({ isActive }) => 
+    isActive ? 'text-pink-600 font-bold' : 'text-gray-600'
+  }
+>
+  Profile
+</NavLink>
+```
+
+Different style when link is active.
+
+</Accordion>
+
+</Accordions>
+
+## Navigation in Action
+
+**User flow:**
+
+```
+1. User on homepage (/)
+   ↓
+2. Clicks listing card (#42)
+   ↓
+3. Link navigates to /listing/42
+   ↓
+4. No page reload!
+   ↓
+5. ListingDetailsPage loads
+   ↓
+6. useParams extracts id = "42"
+   ↓
+7. Fetches listing #42 data
+   ↓
+8. Displays listing details
+```
+
+**All in-app, no full page reloads!**
+
+## Link vs useNavigate
+
+<Tabs items={['Link Component', 'useNavigate Hook', 'When to Use']}>
+
+<Tab value="Link Component">
+
+**For user-initiated clicks:**
+
+```jsx
+<Link to="/listing/42">
+  <button>View Details</button>
+</Link>
+```
+
+**Best for:**
+- Clickable elements
+- Cards, buttons, text links
+- Standard navigation
+- Keyboard accessible
+
+</Tab>
+
+<Tab value="useNavigate Hook">
+
+**For programmatic navigation:**
+
+```jsx
+import { useNavigate } from 'react-router-dom';
+
+function Component() {
+  const navigate = useNavigate();
+
+  const handleSubmit = () => {
+    // Do something
+    navigate('/success');
+  };
+
+  return <button onClick={handleSubmit}>Submit</button>;
+}
+```
+
+**Best for:**
+- After form submissions
+- Conditional redirects
+- After API calls
+- Timeout-based navigation
+
+</Tab>
+
+<Tab value="When to Use">
+
+**Use Link when:**
+- User clicks to navigate
+- Need crawlable links (SEO)
+- Standard navigation patterns
+- Want right-click → open in new tab
+
+**Use useNavigate when:**
+- After form submission
+- Conditional logic (if/else)
+- Redirect after login
+- Navigate after timer
+
+**Example:**
+
+```jsx
+// ✅ Link - user click
+<Link to="/profile">Go to Profile</Link>
+
+// ✅ useNavigate - after action
+function LoginForm() {
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    await login();
+    navigate('/dashboard'); // Redirect after login
+  };
+
+  return <button onClick={handleLogin}>Login</button>;
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Debugging Link Issues
+
+<Accordions>
+
+<Accordion title="Link doesn't navigate">
+
+**Check:**
+
+1. Is Link imported from `react-router-dom`?
+
+```jsx
+import { Link } from 'react-router-dom'; // ✅
+```
+
+2. Is `to` prop spelled correctly?
+
+```jsx
+<Link to="/listing/42"> // ✅
+<Link too="/listing/42"> // ❌ Typo
+```
+
+3. Is component inside Router?
+
+```jsx
+<BrowserRouter>
+  <Routes>
+    <Route path="/" element={<HomePage />} />
+  </Routes>
+</BrowserRouter>
+```
+
+</Accordion>
+
+<Accordion title="Page reloads instead of client-side navigation">
+
+**Cause:** Using `<a>` instead of `<Link>`
+
+```jsx
+// ❌ Full reload
+<a href="/listing/42">View</a>
+
+// ✅ Client-side navigation
+<Link to="/listing/42">View</Link>
+```
+
+</Accordion>
+
+<Accordion title="404 on Link click">
+
+**Cause:** Route doesn't exist
+
+```jsx
+// Link
+<Link to="/listing/42">
+
+// But no matching route!
+<Routes>
+  <Route path="/" element={<HomePage />} />
+  {/* Missing /listing/:id route! */}
+</Routes>
+
+// Fix: Add route
+<Route path="/listing/:id" element={<DetailsPage />} />
+```
+
+</Accordion>
+
+</Accordions>
+
+<Callout type="success" title="Navigation Complete!">
+
+Users can now click listing cards to view details! Your app has proper navigation without page reloads - it feels like a real single-page application.
+
+</Callout>
+
+## Quick Recap
+
+**What we accomplished:**
+
+- ✅ Added Link components to listing cards
+- ✅ Built dynamic URLs with template literals
+- ✅ Enabled click-to-navigate functionality
+- ✅ Preserved app state during navigation
+- ✅ Added hover effects for better UX
+
+**Key concepts:**
+
+- **Link component** - Client-side navigation
+- **to prop** - Destination path
+- **Dynamic URLs** - Template literals with IDs
+- **No page reload** - Faster, preserves state
+- **Link vs `<a>`** - Internal vs external
+
+## What's Next?
+
+In **Lesson 10**, we'll create a **NotFoundPage** component for handling 404 errors when users visit invalid routes. Every app needs graceful error handling! 🚫

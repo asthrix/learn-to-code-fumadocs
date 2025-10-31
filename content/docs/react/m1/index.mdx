@@ -1,0 +1,236 @@
+---
+title: "React Fundamentals"
+description:
+   "Learn JSX, components, and props by building the homepage with property
+   listing cards."
+module: 1
+totalSteps: 7
+duration: "2-3 hours"
+difficulty: "beginner"
+prerequisites: ["module-0"]
+objectives:
+   - "Understand JSX syntax and how it differs from HTML"
+   - "Create functional React components"
+   - "Pass data between components using props"
+   - "Compose components to build complex UIs"
+   - "Structure a React project with organized folders"
+   - "Build a homepage with property listings"
+tags: ["react", "jsx", "components", "props", "fundamentals"]
+---
+
+# Module 1 - React Fundamentals
+
+Welcome to your first React module! This is where your journey truly begins. 🚀
+
+In this module, you'll learn the building blocks of every React application:
+**components, JSX, and props**. By the end, you'll have a working homepage
+displaying property listings.
+
+---
+
+## Overview
+
+React applications are built from **components** - reusable pieces of UI. Think
+of components like LEGO blocks: small, independent pieces that snap together to
+create something bigger.
+
+In this module, you'll build:
+
+-  A `HomePage` component (the main page)
+-  A `PropertyList` component (container for all listings)
+-  A `PropertyCard` component (individual property display)
+
+---
+
+## What You'll Build
+
+By the end of this module, your app will display a grid of property listings,
+each showing:
+
+-  Property image
+-  Property title
+-  Location
+-  Price per night
+-  Rating
+
+It won't be interactive yet (that's Module 2!), but it will look like a real
+booking website.
+
+---
+
+## Key Concepts
+
+### JSX - JavaScript XML
+
+JSX lets you write HTML-like code in JavaScript:
+
+```jsx
+const element = <h1>Hello, React!</h1>;
+```
+
+**It looks like HTML, but it's actually JavaScript.** React transforms it into
+regular JavaScript function calls.
+
+### Components
+
+Components are JavaScript functions that return JSX:
+
+```jsx
+function Welcome() {
+   return <h1>Welcome to StayScape!</h1>;
+}
+```
+
+Every piece of UI in React is a component!
+
+### Props
+
+Props (short for "properties") let you pass data to components:
+
+```jsx
+function Greeting({ name }) {
+   return <h1>Hello, {name}!</h1>;
+}
+
+// Usage:
+<Greeting name='Sarah' />;
+// Renders: <h1>Hello, Sarah!</h1>
+```
+
+---
+
+## Learning Objectives
+
+In this module, you will:
+
+<Steps>
+   <Step>
+      ### Understand JSX Syntax Learn the rules and capabilities of JSX,
+      including expressions, attributes, and styling
+   </Step>
+   <Step>
+      ### Create React Components Build functional components that return JSX
+      elements
+   </Step>
+   <Step>
+      ### Use Props Pass data from parent components to child components
+   </Step>
+   <Step>
+      ### Compose Components Combine small components to build complex UIs
+   </Step>
+   <Step>
+      ### Structure Your Project Organize files and folders following React best
+      practices
+   </Step>
+   <Step>### Build Real UI Create a homepage with property listing cards</Step>
+</Steps>
+
+---
+
+## Module Roadmap
+
+Here's what we'll build step by step:
+
+| Lesson | What You'll Create     | New Concepts                 |
+| ------ | ---------------------- | ---------------------------- |
+| **1**  | Clean up Vite starter  | Project structure            |
+| **2**  | HomePage component     | Components, JSX basics       |
+| **3**  | Property data array    | JavaScript in JSX            |
+| **4**  | PropertyCard component | Props, destructuring         |
+| **5**  | PropertyList component | Mapping arrays, keys         |
+| **6**  | Styling with Tailwind  | className, responsive design |
+| **7**  | Composition & review   | Component architecture       |
+
+---
+
+## Prerequisites
+
+Before starting this module, ensure you:
+
+-  ✅ Completed Module 0
+-  ✅ Have a React project running with Vite
+-  ✅ Can see the default Vite page in your browser
+-  ✅ Have VS Code open with your project
+
+---
+
+## Project Structure
+
+By the end of this module, your project will look like:
+
+<Files>
+   <Folder name='src' defaultOpen>
+      <Folder name='pages' defaultOpen>
+         <File name='HomePage.jsx' />
+      </Folder>
+      <Folder name='components' defaultOpen>
+         <File name='PropertyList.jsx' />
+         <File name='PropertyCard.jsx' />
+      </Folder>
+      <File name='App.jsx' />
+      <File name='main.jsx' />
+   </Folder>
+</Files>
+
+---
+
+## Quick Refresher: JavaScript You'll Need
+
+This module uses these JavaScript concepts:
+
+<Accordions type="single">
+  <Accordion id="destructuring" title="Object Destructuring" value="destructuring">
+    ```javascript
+    // Instead of this:
+    function greet(props) {
+      return props.name;
+    }
+    
+    // We use this:
+    function greet({ name }) {
+      return name;
+    }
+    ```
+  </Accordion>
+  
+  <Accordion id="arrow" title="Arrow Functions" value="arrow">
+    ```javascript
+    // Traditional function:
+    function add(a, b) {
+      return a + b;
+    }
+    
+    // Arrow function:
+    const add = (a, b) => a + b;
+    ```
+  </Accordion>
+  
+  <Accordion id="template" title="Template Literals" value="template">
+    ```javascript
+    const name = "John";
+    const greeting = `Hello, ${name}!`;
+    // Result: "Hello, John!"
+    ```
+  </Accordion>
+  
+  <Accordion id="map" title="Array.map()" value="map">
+    ```javascript
+    const numbers = [1, 2, 3];
+    const doubled = numbers.map(num => num * 2);
+    // Result: [2, 4, 6]
+    ```
+  </Accordion>
+</Accordions>
+
+---
+
+## Let's Begin!
+
+Ready to write your first React component? Let's start by cleaning up the Vite
+starter project!
+
+<div className='mt-6'>
+   <Button asChild>
+      <a href='/docs/react/m1/lesson-1'>Start Lesson 1: Project Setup →</a>
+   </Button>
+</div>

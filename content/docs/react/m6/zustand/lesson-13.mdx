@@ -1,0 +1,887 @@
+---
+title: "L13: Module Review"
+description: "Complete recap of the Zustand state management path"
+---
+
+# Module Review: Zustand State Management
+
+Let's review everything we built! 🎉
+
+## What We Built
+
+**Complete Holidaze application with:**
+- ✅ Global state management (Zustand)
+- ✅ Data fetching from API
+- ✅ Filtering system (search, price, guests)
+- ✅ Favorites feature (add/remove)
+- ✅ Navigation with React Router
+- ✅ Responsive design
+- ✅ Real-time UI updates
+
+## Lesson-by-Lesson Recap
+
+<Accordions>
+
+<Accordion title="Lessons 1-3: Core Concepts">
+
+**L1: Setup Zustand**
+- Installed Zustand (1KB!)
+- Understood state management basics
+- Compared with Redux
+
+**L2: Create Store**
+- Created `useListingsStore` with `create()`
+- Added state: items, favorites, status, error
+- Added actions: setItems, toggleFavorite, setStatus
+- Learned `set()` and `get()` functions
+
+**L3: Connect Components**
+- Used store hooks in HomePage
+- Understood selectors
+- Saw automatic re-renders
+- Learned optimization techniques
+
+**Key concept:** Zustand = simple, hook-based state management
+
+</Accordion>
+
+<Accordion title="Lesson 4: Async Actions">
+
+**L4: Fetch Data from API**
+- Added `fetchListings` async action
+- Implemented loading/error states
+- Called API on component mount
+- Used `useEffect` hook
+
+**Key concept:** Async actions in Zustand are just regular async functions
+
+</Accordion>
+
+<Accordion title="Lessons 5-7: Main Features">
+
+**L5: Refactor HomePage**
+- Replaced useFetch with Zustand
+- Added filter state (searchQuery, maxPrice, maxGuests)
+- Created filter form with local state
+- Built `getFilteredItems()` computed selector
+- Added active filters display
+
+**L6: Favorites Setup**
+- Created FavoritesTest component
+- Understood `toggleFavorite` logic
+- Learned ID-based storage pattern
+- Explored immutable updates
+- Added favorite button to ListingCard
+
+**L7: Create Favorites Page**
+- Built FavoritesPage component
+- Implemented empty state handling
+- Reused ListingCard component
+- Learned computed selectors
+- Saw real-time updates in action
+
+**Key concept:** Zustand makes sharing data between pages trivial
+
+</Accordion>
+
+<Accordion title="Lessons 8-10: Navigation">
+
+**L8: Create Navbar**
+- Built Navbar with logo and links
+- Added favorites count badge
+- Implemented active link highlighting
+- Styled responsive navbar
+
+**L9: Add Navbar to App**
+- Integrated Navbar into App layout
+- Set up persistent navbar
+- Configured flexbox layout
+- Tested complete navigation
+
+**L10: Router Configuration**
+- Created NotFoundPage for 404 errors
+- Added catch-all route (*)
+- Learned route matching
+- Explored navigation methods
+
+**Key concept:** State persists across route changes automatically
+
+</Accordion>
+
+<Accordion title="Lessons 11-12: Component Refinement">
+
+**L11: FavoriteButton Component**
+- Extracted reusable FavoriteButton
+- Added multiple sizes (small, medium, large)
+- Implemented proper event handling
+- Added accessibility features (aria-label, title)
+- Created animations (heartbeat effect)
+
+**L12: Complete ListingCard**
+- Integrated FavoriteButton with positioning
+- Added hover effects (lift card, zoom image)
+- Implemented text clamping (2 lines max)
+- Optimized performance (memoization, lazy loading)
+- Ensured accessibility (keyboard, screen readers)
+
+**Key concept:** Extract reusable components for better code organization
+
+</Accordion>
+
+</Accordions>
+
+## Complete Store Structure
+
+**Final `useListingsStore`:**
+
+```js title="src/store/listings.js"
+import { create } from 'zustand';
+
+const useListingsStore = create((set, get) => ({
+  // State
+  items: [],
+  favorites: [],
+  status: 'idle',  // 'idle' | 'loading' | 'succeeded' | 'failed'
+  error: null,
+  searchQuery: '',
+  maxPrice: null,
+  maxGuests: null,
+  
+  // Sync Actions
+  setItems: (items) => set({ items }),
+  setStatus: (status) => set({ status }),
+  setError: (error) => set({ error }),
+  
+  toggleFavorite: (id) => set((state) => ({
+    favorites: state.favorites.includes(id)
+      ? state.favorites.filter(favId => favId !== id)
+      : [...state.favorites, id]
+  })),
+  
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  setMaxPrice: (price) => set({ maxPrice: price }),
+  setMaxGuests: (guests) => set({ maxGuests: guests }),
+  clearFilters: () => set({ searchQuery: '', maxPrice: null, maxGuests: null }),
+  
+  // Async Actions
+  fetchListings: async () => {
+    set({ status: 'loading', error: null });
+    try {
+      const response = await fetch('https://v2.api.noroff.dev/holidaze/venues');
+      if (!response.ok) throw new Error('Failed to fetch');
+      const result = await response.json();
+      set({ items: result.data, status: 'succeeded' });
+    } catch (error) {
+      set({ error: error.message, status: 'failed' });
+    }
+  },
+  
+  // Computed Selectors
+  getFilteredItems: () => {
+    const { items, searchQuery, maxPrice, maxGuests } = get();
+    return items.filter((item) => {
+      if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      if (maxPrice && item.price > maxPrice) {
+        return false;
+      }
+      if (maxGuests && item.maxGuests < maxGuests) {
+        return false;
+      }
+      return true;
+    });
+  },
+  
+  getFavoritedItems: () => {
+    const { items, favorites } = get();
+    return items.filter((item) => favorites.includes(item.id));
+  },
+}));
+
+export default useListingsStore;
+```
+
+**~150 lines of code for complete state management!** ✨
+
+## Complete Component List
+
+**Components we built:**
+
+```
+src/
+├── components/
+│   ├── FavoriteButton.jsx       (Reusable favorite button)
+│   ├── ListingCard.jsx          (Display listing)
+│   ├── Navbar.jsx               (Navigation with badge)
+│   └── NotFoundPage.jsx         (404 error)
+├── pages/
+│   ├── HomePage.jsx             (Main listings page)
+│   └── FavoritesPage.jsx        (Favorited listings)
+├── store/
+│   └── listings.js              (Zustand store)
+└── App.jsx                      (Root component)
+```
+
+**8 files, ~800 lines of code total!** 🚀
+
+## Zustand vs Redux Comparison
+
+<Tabs items={['Setup', 'State Updates', 'Async Actions', 'Components']}>
+
+<Tab value="Setup">
+
+**Zustand (Simple):**
+
+```js
+import { create } from 'zustand';
+
+const useStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+}));
+
+// That's it! Ready to use.
+```
+
+**Redux (Complex):**
+
+```js
+// 1. Install multiple packages
+npm install @reduxjs/toolkit react-redux
+
+// 2. Create slice
+import { createSlice } from '@reduxjs/toolkit';
+
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { count: 0 },
+  reducers: {
+    increment: (state) => { state.count += 1; },
+  },
+});
+
+// 3. Create store
+import { configureStore } from '@reduxjs/toolkit';
+
+const store = configureStore({
+  reducer: { counter: counterSlice.reducer },
+});
+
+// 4. Wrap app with Provider
+import { Provider } from 'react-redux';
+
+<Provider store={store}>
+  <App />
+</Provider>
+```
+
+**Zustand wins on simplicity!** ✅
+
+</Tab>
+
+<Tab value="State Updates">
+
+**Zustand:**
+
+```js
+// Direct state updates
+const useStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 })),
+  reset: () => set({ count: 0 }),
+}));
+
+// Use anywhere
+const increment = useStore((state) => state.increment);
+increment();  // Done!
+```
+
+**Redux:**
+
+```js
+// Create actions
+const { increment, decrement, reset } = counterSlice.actions;
+
+// Dispatch actions
+import { useDispatch } from 'react-redux';
+
+function Component() {
+  const dispatch = useDispatch();
+  
+  const handleClick = () => {
+    dispatch(increment());  // Extra boilerplate
+  };
+}
+```
+
+**Zustand is more direct!** ✅
+
+</Tab>
+
+<Tab value="Async Actions">
+
+**Zustand (Simple):**
+
+```js
+const useStore = create((set) => ({
+  items: [],
+  status: 'idle',
+  
+  fetchItems: async () => {
+    set({ status: 'loading' });
+    try {
+      const response = await fetch('/api/items');
+      const data = await response.json();
+      set({ items: data, status: 'succeeded' });
+    } catch (error) {
+      set({ status: 'failed' });
+    }
+  },
+}));
+
+// Use it
+const fetchItems = useStore((state) => state.fetchItems);
+fetchItems();  // That's it!
+```
+
+**Redux (Complex):**
+
+```js
+import { createAsyncThunk } from '@reduxjs/toolkit';
+
+// Create thunk
+const fetchItems = createAsyncThunk(
+  'items/fetch',
+  async () => {
+    const response = await fetch('/api/items');
+    return response.json();
+  }
+);
+
+// Add to slice
+const itemsSlice = createSlice({
+  name: 'items',
+  initialState: { items: [], status: 'idle' },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchItems.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchItems.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.status = 'succeeded';
+      })
+      .addCase(fetchItems.rejected, (state) => {
+        state.status = 'failed';
+      });
+  },
+});
+
+// Dispatch
+const dispatch = useDispatch();
+dispatch(fetchItems());
+```
+
+**Zustand: 15 lines. Redux: 30+ lines!** 🎯
+
+</Tab>
+
+<Tab value="Components">
+
+**Zustand:**
+
+```jsx
+import useListingsStore from '@/store/listings';
+
+function HomePage() {
+  const items = useListingsStore((state) => state.items);
+  const fetchListings = useListingsStore((state) => state.fetchListings);
+  
+  useEffect(() => {
+    fetchListings();
+  }, [fetchListings]);
+  
+  return <div>{items.map(...)}</div>;
+}
+```
+
+**Redux:**
+
+```jsx
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchListings } from '@/store/listingsSlice';
+
+function HomePage() {
+  const items = useSelector((state) => state.listings.items);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(fetchListings());
+  }, [dispatch]);
+  
+  return <div>{items.map(...)}</div>;
+}
+```
+
+**Very similar! But Zustand setup was easier.** ✅
+
+</Tab>
+
+</Tabs>
+
+## When to Use Zustand vs Redux
+
+<Tabs items={['Use Zustand When', 'Use Redux When', 'Migration Path']}>
+
+<Tab value="Use Zustand When">
+
+**Zustand is perfect for:**
+
+✅ **Small to medium apps**
+- Under 50 components
+- Simple state shape
+- Few developers
+
+✅ **Rapid prototyping**
+- Need to move fast
+- Don't want boilerplate
+- Quick experiments
+
+✅ **Learning state management**
+- First time with global state
+- Want simple concepts
+- Prefer minimal setup
+
+✅ **Modern React patterns**
+- Hook-based components
+- Functional patterns
+- TypeScript support
+
+✅ **Small bundle size matters**
+- 1KB vs 13KB (Redux Toolkit)
+- Mobile-first apps
+- Performance-critical
+
+**Example projects:**
+- Personal projects
+- Startups/MVPs
+- Portfolio sites
+- Small business apps
+
+</Tab>
+
+<Tab value="Use Redux When">
+
+**Redux is better for:**
+
+✅ **Large enterprise apps**
+- 100+ components
+- Complex state shape
+- Multiple teams
+
+✅ **Time-travel debugging**
+- Need to replay actions
+- Complex debugging needs
+- DevTools integration essential
+
+✅ **Predictable state changes**
+- Strict patterns required
+- Audit trail needed
+- Compliance requirements
+
+✅ **Middleware ecosystem**
+- Redux Saga for complex async
+- Redux Persist for storage
+- Many third-party tools
+
+✅ **Team familiarity**
+- Team knows Redux well
+- Existing Redux codebase
+- Enterprise standards
+
+**Example projects:**
+- Banking apps
+- E-commerce platforms
+- Social media apps
+- Enterprise SaaS
+
+</Tab>
+
+<Tab value="Migration Path">
+
+**Can start with Zustand, migrate to Redux later:**
+
+**Phase 1: Zustand (Weeks 1-8)**
+```js
+// Quick setup, rapid development
+const useStore = create((set) => ({
+  users: [],
+  posts: [],
+  // ... simple state
+}));
+```
+
+**Phase 2: Growth (Months 3-6)**
+```js
+// App grows, still manageable
+const useUsersStore = create(...);
+const usePostsStore = create(...);
+const useAuthStore = create(...);
+// Multiple stores, still simple
+```
+
+**Phase 3: Redux Migration (Month 7+)**
+```js
+// When complexity demands it:
+// - 50+ components
+// - 10+ developers
+// - Need DevTools
+// - Require middleware
+
+// Migrate gradually:
+// 1. Keep Zustand for simple state
+// 2. Add Redux for complex state
+// 3. Slowly migrate over time
+```
+
+**You're not locked in!** Both can coexist. 🔄
+
+</Tab>
+
+</Tabs>
+
+## Key Patterns We Learned
+
+<Accordions>
+
+<Accordion title="Computed Selectors">
+
+**Derive data from state:**
+
+```js
+const useStore = create((set, get) => ({
+  items: [],
+  searchQuery: '',
+  
+  // Computed selector
+  getFilteredItems: () => {
+    const { items, searchQuery } = get();
+    return items.filter(item =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  },
+}));
+
+// Use in component
+const filteredItems = useListingsStore((state) => state.getFilteredItems());
+```
+
+**Benefits:**
+- Don't store derived data
+- Always up-to-date
+- Single source of truth
+
+</Accordion>
+
+<Accordion title="ID-Based Relationships">
+
+**Store IDs, not full objects:**
+
+```js
+// ✅ Good: Store IDs
+const useStore = create((set) => ({
+  items: [
+    { id: 1, name: 'Item 1', price: 100 },
+    { id: 2, name: 'Item 2', price: 200 },
+  ],
+  favorites: [1],  // Just IDs!
+  
+  // Get full objects when needed
+  getFavoritedItems: () => {
+    const { items, favorites } = get();
+    return items.filter(item => favorites.includes(item.id));
+  },
+}));
+
+// ❌ Bad: Duplicate objects
+const useStore = create((set) => ({
+  items: [...],
+  favorites: [
+    { id: 1, name: 'Item 1', price: 100 },  // Duplicated!
+  ],
+}));
+```
+
+**Why?**
+- Single source of truth
+- Memory efficient
+- Easier updates
+
+</Accordion>
+
+<Accordion title="Local vs Store State">
+
+**Choose the right state location:**
+
+```jsx
+function FilterForm() {
+  // ✅ Local state: Form inputs (temporary)
+  const [localSearch, setLocalSearch] = useState('');
+  const [localPrice, setLocalPrice] = useState('');
+  
+  // ✅ Store state: Active filters (global)
+  const setSearchQuery = useListingsStore((state) => state.setSearchQuery);
+  const setMaxPrice = useListingsStore((state) => state.setMaxPrice);
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Transfer local → store on submit
+    setSearchQuery(localSearch);
+    setMaxPrice(Number(localPrice));
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input 
+        value={localSearch} 
+        onChange={(e) => setLocalSearch(e.target.value)} 
+      />
+      <button type="submit">Apply Filters</button>
+    </form>
+  );
+}
+```
+
+**Rule of thumb:**
+- **Local state:** Temporary UI state (form inputs, modals)
+- **Store state:** Shared data (items, favorites, filters)
+
+</Accordion>
+
+<Accordion title="Immutable Updates">
+
+**Always create new arrays/objects:**
+
+```js
+// ✅ Good: Immutable
+toggleFavorite: (id) => set((state) => ({
+  favorites: state.favorites.includes(id)
+    ? state.favorites.filter(favId => favId !== id)  // New array
+    : [...state.favorites, id]  // New array
+}));
+
+// ❌ Bad: Mutating
+toggleFavorite: (id) => set((state) => {
+  if (state.favorites.includes(id)) {
+    state.favorites.splice(state.favorites.indexOf(id), 1);  // MUTATES!
+  } else {
+    state.favorites.push(id);  // MUTATES!
+  }
+  return { favorites: state.favorites };
+});
+```
+
+**Why?**
+- React detects changes properly
+- Predictable updates
+- Easier debugging
+
+</Accordion>
+
+<Accordion title="Selective Re-renders">
+
+**Only subscribe to what you need:**
+
+```jsx
+// ✅ Good: Selective
+function FavoriteButton({ listingId }) {
+  const favorites = useListingsStore((state) => state.favorites);
+  // Only re-renders when favorites changes
+}
+
+function SearchBar() {
+  const searchQuery = useListingsStore((state) => state.searchQuery);
+  // Only re-renders when searchQuery changes
+}
+
+// ❌ Bad: Subscribe to everything
+function Component() {
+  const store = useListingsStore();  // Re-renders on ANY change!
+  return <div>{store.favorites.length}</div>;
+}
+```
+
+**Optimize!** Only select what you need. 🚀
+
+</Accordion>
+
+</Accordions>
+
+## Best Practices Recap
+
+**State Management:**
+- ✅ Keep store flat and simple
+- ✅ Use computed selectors for derived data
+- ✅ Store IDs for relationships
+- ✅ Make updates immutable
+- ✅ Choose local vs store state wisely
+
+**Components:**
+- ✅ Extract reusable components (FavoriteButton)
+- ✅ Use selective selectors (only what you need)
+- ✅ Handle loading/error states
+- ✅ Add proper event handling (preventDefault, stopPropagation)
+- ✅ Include accessibility features (aria-label, keyboard nav)
+
+**Performance:**
+- ✅ Memoize expensive calculations (useMemo)
+- ✅ Lazy load images (loading="lazy")
+- ✅ Code split routes (React.lazy)
+- ✅ Optimize selectors (select primitives when possible)
+
+**Styling:**
+- ✅ Responsive design (mobile-first)
+- ✅ Smooth animations (transitions, transforms)
+- ✅ Consistent spacing (rem units)
+- ✅ Accessible colors (WCAG contrast ratios)
+
+## What You've Learned
+
+After completing this module, you can:
+
+**Zustand:**
+- ✅ Install and set up Zustand
+- ✅ Create stores with `create()`
+- ✅ Use `set()` and `get()` for state updates
+- ✅ Write async actions
+- ✅ Build computed selectors
+- ✅ Optimize re-renders with selective subscriptions
+
+**React Patterns:**
+- ✅ Custom hooks for state management
+- ✅ Component composition
+- ✅ Local vs global state decisions
+- ✅ Event handling best practices
+- ✅ Accessibility implementation
+
+**Application Architecture:**
+- ✅ Organize store structure
+- ✅ Separate concerns (components, store, pages)
+- ✅ Create reusable components
+- ✅ Handle async data flow
+- ✅ Manage navigation with React Router
+
+## Project Stats
+
+**Final application:**
+
+```
+📦 Bundle Size: ~50KB (with React, Router, Zustand)
+  ├── React: ~40KB
+  ├── React Router: ~9KB
+  └── Zustand: ~1KB ✨
+
+📁 Files: 8 files
+  ├── 3 pages (HomePage, FavoritesPage, NotFoundPage)
+  ├── 3 components (Navbar, ListingCard, FavoriteButton)
+  ├── 1 store (listings)
+  └── 1 root (App)
+
+📝 Lines of Code: ~800 total
+  ├── Components: ~400 lines
+  ├── Store: ~150 lines
+  ├── Styling: ~250 lines
+  └── Config: minimal
+
+⚡ Performance: Excellent
+  ✅ Selective re-renders
+  ✅ Lazy image loading
+  ✅ Memoized computations
+  ✅ Small bundle size
+
+♿ Accessibility: AAA
+  ✅ Keyboard navigation
+  ✅ Screen reader support
+  ✅ Color contrast
+  ✅ ARIA labels
+```
+
+## Next Steps
+
+**Continue learning:**
+
+1. **Module 7: Forms & Auth**
+   - User registration/login
+   - Protected routes
+   - Form validation
+   - Auth tokens
+
+2. **Module 8: Deployment**
+   - Build for production
+   - Deploy to Vercel/Netlify
+   - Environment variables
+   - Performance optimization
+
+3. **Advanced Zustand:**
+   - Middleware (persist, devtools)
+   - TypeScript integration
+   - Immer for nested updates
+   - Multiple stores pattern
+
+4. **Testing:**
+   - Unit tests with Vitest
+   - Component tests with Testing Library
+   - E2E tests with Playwright
+   - Store testing strategies
+
+## Congratulations! 🎉
+
+You've completed the Zustand path for Module 6!
+
+**What you built:**
+- ✅ Complete state management system
+- ✅ Real-time UI synchronization
+- ✅ Favorites feature
+- ✅ Filtering system
+- ✅ Navigation with Router
+- ✅ Responsive, accessible UI
+
+**Skills gained:**
+- ✅ Zustand state management
+- ✅ Component architecture
+- ✅ Performance optimization
+- ✅ Accessibility best practices
+- ✅ Modern React patterns
+
+**You're now ready to:**
+- Build production-ready React apps
+- Choose between Zustand and Redux
+- Implement complex state management
+- Create scalable application architecture
+
+<Callout type="success">
+**🎓 Module 6 Complete!** You're a Zustand expert! Ready for Module 7?
+</Callout>
+
+## Resources
+
+**Zustand:**
+- [Official Docs](https://docs.pmnd.rs/zustand/getting-started/introduction)
+- [GitHub](https://github.com/pmndrs/zustand)
+- [Examples](https://docs.pmnd.rs/zustand/getting-started/comparison)
+
+**React Router:**
+- [Official Docs](https://reactrouter.com/)
+- [Tutorial](https://reactrouter.com/en/main/start/tutorial)
+
+**Accessibility:**
+- [WCAG Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [MDN ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA)
+
+**Performance:**
+- [React DevTools Profiler](https://react.dev/learn/react-developer-tools)
+- [Web Vitals](https://web.dev/vitals/)
+
+Keep building amazing things! 🚀
