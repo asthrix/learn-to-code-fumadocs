@@ -57,7 +57,7 @@ function TestimonialCard({ testimonial }: TestimonialCardProps) {
 
          {/* Testimonial Quote */}
          <blockquote className='mb-6 flex-1 text-sm text-muted-foreground'>
-            "{testimonial.quote}"
+            &ldquo;{testimonial.quote}&rdquo;
          </blockquote>
 
          {/* Author Info */}
