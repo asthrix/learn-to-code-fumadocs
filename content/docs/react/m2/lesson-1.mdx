@@ -6,10 +6,9 @@ lesson: 1
 ---
 
 
-# Lesson 1: Converting Listings to State
 
-<Badge variant="blue">State Management</Badge>
-<Badge variant="green">useState Hook</Badge>
+<Badge variant="primary">State Management</Badge>
+<Badge variant="success">useState Hook</Badge>
 
 In Module 1, we built StaySense with hardcoded listings data. Now it's time to make our application **dynamic** and **interactive** by introducing **React state**.
 
@@ -237,10 +236,12 @@ function Component() {
 
 **Solution:** Calling `setCount` tells React to re-render with the new value.
 
+<Card variant='info'>
 > **React's Golden Rule:** Components re-render when:
 > 1. State changes (via setState functions)
 > 2. Props change (parent passes new props)
 > 3. Parent re-renders (React re-renders children)
+</Card>
 
 ---
 

@@ -7,7 +7,6 @@ module: 1
 lesson: 5
 ---
 
-# Lesson 5: PropertyList with Array.map()
 
 Instead of manually creating a `PropertyCard` for each property, let's render
 them dynamically using JavaScript's `.map()` method. This is a fundamental React
@@ -60,7 +59,7 @@ const cards = properties.map((property) => (
 Let's create a component that handles the list rendering:
 
 <Files>
-   <Folder name='src'>
+   <Folder name='src' defaultOpen>
       <Folder name='components' defaultOpen>
          <File name='PropertyCard.jsx' />
          <File name='PropertyList.jsx ← CREATE THIS FILE' />
@@ -111,18 +110,17 @@ Let's break down the mapping logic:
 ```
 
 <Steps>
-   <Step>### properties.map() Loop through each property in the array</Step>
-   <Step>
-      ### (property) =>
-      Each item is called `property` (you can name it anything)
+   <Step> 
+   ### properties.map() Loop through each property in the array
    </Step>
    <Step>
-      ### Return JSX
-      For each property, return a `PropertyCard` component
+      ### (property) => Each item is called `property` (you can name it anything)
    </Step>
    <Step>
-      ### Pass Props
-      Extract data from `property` object and pass as props
+      ### Return JSX For each property, return a `PropertyCard` component
+   </Step>
+   <Step>
+      ### Pass Props Extract data from `property` object and pass as props
    </Step>
 </Steps>
 
@@ -165,9 +163,11 @@ This helps React update the DOM efficiently.
    <Accordion id='key-warning' title='What Happens Without Keys?' value='key-warning'>
       If you forget `key`, React shows this warning:
       
-      ```
-      Warning: Each child in a list should have a unique "key" prop.
-      ```
+      <Callout type="warning" title="Warning: Key Missing">
+
+      Each child in a list should have a unique "key" prop.
+      </Callout>
+      
       
       Your app will still work, but React can't optimize updates efficiently. Always include keys!
    </Accordion>
@@ -273,15 +273,18 @@ export default HomePage;
 
 Your app structure now looks like:
 
-```
-App
- └─ HomePage
-     └─ PropertyList
-         ├─ PropertyCard (Beach House)
-         ├─ PropertyCard (Downtown Loft)
-         ├─ PropertyCard (Mountain Cabin)
-         └─ PropertyCard (Lakefront Villa)
-```
+<Files>
+   <Folder name='App' defaultOpen>
+      <Folder name='HomePage' defaultOpen>
+      <Folder name='PropertyList' defaultOpen>
+         <File name='PropertyCard (Beach House)' />
+         <File name='PropertyCard  (Downtown Loft)' />
+         <File name='PropertyCard  (Mountain Cabin)' />
+         <File name='PropertyCard  (Lakefront Villa)' />
+      </Folder>
+      </Folder>
+   </Folder>
+</Files>
 
 **PropertyList** is a "container component" that manages the list of
 **PropertyCard** children.
@@ -462,11 +465,3 @@ Before moving on, confirm:
 Your components work, but they need styling! Next, we'll add **Tailwind CSS** to
 make everything look beautiful.
 
-<div className='mt-6 flex gap-4'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m1/lesson-4'>← Previous: PropertyCard Component</a>
-   </Button>
-   <Button asChild>
-      <a href='/docs/react/m1/lesson-6'>Next: Styling with Tailwind →</a>
-   </Button>
-</div>

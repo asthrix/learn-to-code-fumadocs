@@ -5,7 +5,6 @@ module: 1
 lesson: 2
 ---
 
-# Lesson 2: Creating the HomePage Component
 
 Let's create your first React component from scratch! The `HomePage` will be the
 main landing page of our booking application.
@@ -32,7 +31,7 @@ export default ComponentName;
 In the `src/pages` folder, create a new file called `HomePage.jsx`:
 
 <Files>
-   <Folder name='src'>
+   <Folder name='src' defaultOpen>
       <Folder name='pages' defaultOpen>
          <File name='HomePage.jsx ← CREATE THIS FILE' />
       </Folder>
@@ -51,9 +50,7 @@ In the `src/pages` folder, create a new file called `HomePage.jsx`:
 
 Add this code to `HomePage.jsx`:
 
-```jsx
-// src/pages/HomePage.jsx
-
+```jsx title="src/pages/HomePage.jsx"
 function HomePage() {
    return (
       <div className='home-page'>
@@ -112,8 +109,7 @@ export default HomePage;
 
 Now let's use the HomePage component in App.jsx:
 
-```jsx
-// src/App.jsx
+```jsx title="src/App.jsx"
 import HomePage from "./pages/HomePage"; // ← NEW: Import the component
 
 function App() {
@@ -140,12 +136,14 @@ export default App;
 
 We just composed two components together:
 
-```
-App
- └─ HomePage
-     ├─ header (hero section)
-     └─ section (listings area)
-```
+<Files>
+   <Folder name='App' defaultOpen>
+      <Folder name='HomePage' defaultOpen>
+         <File name='header (hero section)' />
+         <File name='section (listing area)' />
+      </Folder>
+   </Folder>
+</Files>
 
 **App** is the root component that renders **HomePage**. Later, HomePage will
 render more child components like PropertyList and PropertyCard.
@@ -355,11 +353,4 @@ Try this before moving on:
 Great job! You've created your first custom component. Next, we'll add real
 property data to display on the home page.
 
-<div className='mt-6 flex gap-4'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m1/lesson-1'>← Previous: Project Setup</a>
-   </Button>
-   <Button asChild>
-      <a href='/docs/react/m1/lesson-3'>Next: Adding Property Data →</a>
-   </Button>
-</div>
+

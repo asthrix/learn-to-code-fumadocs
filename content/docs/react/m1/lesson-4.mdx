@@ -7,7 +7,6 @@ module: 1
 lesson: 4
 ---
 
-# Lesson 4: PropertyCard Component with Props
 
 Time to create your first reusable component! The `PropertyCard` will display
 individual property information and introduce you to **props** - React's way of
@@ -44,7 +43,7 @@ Props make components **reusable** - same component, different data!
 Create a new file in the `components` folder:
 
 <Files>
-   <Folder name='src'>
+   <Folder name='src' defaultOpen>
       <Folder name='components' defaultOpen>
          <File name='PropertyCard.jsx ← CREATE THIS FILE' />
       </Folder>
@@ -287,11 +286,14 @@ architecture.
 
 Look at your component hierarchy now:
 
-```
-App
- └─ HomePage
-     └─ PropertyCard (displays first property)
-```
+<Files>
+   <Folder name='App' defaultOpen>
+      <Folder name='HomePage' defaultOpen>
+         <File name='PropertyCard (display first property)' />
+      </Folder>
+   </Folder>
+</Files>
+
 
 We're building a tree of components, each handling a specific piece of the UI!
 
@@ -471,11 +473,3 @@ Before continuing, ensure:
 You've mastered props! Next, we'll create a `PropertyList` component that uses
 `.map()` to display **all** properties dynamically. No more manual duplication!
 
-<div className='mt-6 flex gap-4'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m1/lesson-3'>← Previous: Adding Property Data</a>
-   </Button>
-   <Button asChild>
-      <a href='/docs/react/m1/lesson-5'>Next: PropertyList with Map →</a>
-   </Button>
-</div>
