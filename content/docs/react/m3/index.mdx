@@ -8,23 +8,331 @@ totalSteps: 10
 duration: "3-4 hours"
 difficulty: "intermediate"
 prerequisites: ["module-2"]
+objectives:
+   - "Master useEffect hook for side effects and lifecycle"
+   - "Fetch data from APIs with async/await"
+   - "Handle loading and error states gracefully"
+   - "Prevent race conditions with AbortController"
+   - "Build image carousels for property photos"
+   - "Refactor code for better organization"
+tags: ["react", "useEffect", "api", "async", "hooks", "data-fetching"]
 ---
 
 
-Move beyond static data! Learn to fetch real data from APIs, handle loading
-states, and manage side effects with useEffect. 🌐
+Move beyond static data! Learn to fetch real data from APIs, handle loading states, and manage side effects with useEffect. 🌐
 
-## Coming Soon
+---
 
-This module teaches:
+## Overview
 
--  useEffect hook fundamentals
--  Async/await and Promises
--  API integration with fetch/axios
--  Loading and error states
--  Race condition prevention
--  Image carousels
+In Module 2, you worked with static data arrays. Now it's time to connect to a **real API** and fetch dynamic data!
 
-<div className='mt-6'>
-   <Badge variant='primary'>Module 3 lessons coming soon</Badge>
-</div>
+This module introduces **useEffect** - React's hook for side effects. You'll learn to fetch data from an API, show loading spinners, handle errors gracefully, and prevent common async bugs like race conditions.
+
+By the end, your app will display real property listings from a backend server instead of hardcoded arrays.
+
+---
+
+## What You'll Build
+
+Transform your static app into a dynamic, API-connected application:
+
+<Steps>
+   <Step>
+      ### 📡 API Integration
+      Connect to real backend and fetch property listings
+   </Step>
+   <Step>
+      ### ⏳ Loading States
+      Show spinner while data loads for better UX
+   </Step>
+   <Step>
+      ### ❌ Error Handling
+      Display helpful error messages when requests fail
+   </Step>
+   <Step>
+      ### 🎠 Image Carousel
+      Build interactive photo galleries for each property
+   </Step>
+   <Step>
+      ### 🛡️ Race Condition Prevention
+      Handle multiple concurrent requests safely
+   </Step>
+</Steps>
+
+---
+
+## Key Concepts
+
+### useEffect Hook
+
+The useEffect hook lets you perform **side effects** in functional components:
+
+```jsx
+import { useEffect } from 'react';
+
+function Component() {
+   useEffect(() => {
+      // Side effect code runs after render
+      console.log('Component mounted!');
+      
+      // Optional cleanup function
+      return () => {
+         console.log('Component unmounting!');
+      };
+   }, []); // Dependencies array
+   
+   return <div>Content</div>;
+}
+```
+
+**Common side effects:**
+- Fetching data from APIs
+- Setting up subscriptions
+- Manually changing the DOM
+- Setting up timers
+
+### Async/Await
+
+Modern JavaScript syntax for handling asynchronous operations:
+
+```jsx
+async function fetchData() {
+   try {
+      const response = await fetch('https://api.example.com/data');
+      const data = await response.json();
+      return data;
+   } catch (error) {
+      console.error('Failed to fetch:', error);
+   }
+}
+```
+
+### Loading & Error States
+
+Professional apps show feedback during async operations:
+
+```jsx
+const [data, setData] = useState(null);
+const [isLoading, setIsLoading] = useState(true);
+const [error, setError] = useState(null);
+
+if (isLoading) return <Spinner />;
+if (error) return <Error message={error} />;
+return <Data items={data} />;
+```
+
+---
+
+## Learning Objectives
+
+<Accordions type='single'>
+   <Accordion id='obj1' title='Lesson 1: Prepare for API Fetching' value='obj1'>
+      Refactor HomePage state to prepare for async data
+   </Accordion>
+
+   <Accordion id='obj2' title='Lesson 2: Fetch Listings Data' value='obj2'>
+      Use useEffect to fetch listings from API on mount
+   </Accordion>
+
+   <Accordion id='obj3' title='Lesson 3: Add Loading State' value='obj3'>
+      Track loading status and show spinner while fetching
+   </Accordion>
+
+   <Accordion id='obj4' title='Lesson 4: Show Loading Spinner' value='obj4'>
+      Display visual feedback during data loading
+   </Accordion>
+
+   <Accordion id='obj5' title='Lesson 5: Handle Errors' value='obj5'>
+      Catch and store API errors in state
+   </Accordion>
+
+   <Accordion id='obj6' title='Lesson 6: Display Error Messages' value='obj6'>
+      Show user-friendly error messages when requests fail
+   </Accordion>
+
+   <Accordion id='obj7' title='Lesson 7: Prevent Race Conditions' value='obj7'>
+      Use AbortController to cancel stale requests
+   </Accordion>
+
+   <Accordion id='obj8' title='Lesson 8: Refactor Render Logic' value='obj8'>
+      Clean up conditional rendering patterns
+   </Accordion>
+
+   <Accordion id='obj9' title='Lesson 9: Build Image Carousel' value='obj9'>
+      Create interactive photo gallery for property cards
+   </Accordion>
+
+   <Accordion id='obj10' title='Lesson 10: Review & Polish' value='obj10'>
+      Review concepts and add final touches
+   </Accordion>
+</Accordions>
+
+---
+
+## Module Roadmap
+
+| Lesson | What You'll Build | Concepts Introduced |
+|--------|-------------------|---------------------|
+| **1** | Async state setup | State initialization |
+| **2** | API fetching | useEffect, async/await |
+| **3** | Loading tracking | Loading state pattern |
+| **4** | Loading spinner | Conditional rendering |
+| **5** | Error handling | Try/catch, error state |
+| **6** | Error display | User feedback |
+| **7** | Race prevention | AbortController, cleanup |
+| **8** | Code refactoring | Clean code patterns |
+| **9** | Image carousel | Component composition |
+| **10** | Module review | Best practices |
+
+---
+
+## Prerequisites
+
+Before starting Module 3, ensure:
+
+- ✅ Completed Module 2
+- ✅ HomePage has filter functionality
+- ✅ Understand useState hook
+- ✅ Comfortable with array methods
+- ✅ Basic understanding of APIs and HTTP
+
+---
+
+## API We'll Use
+
+This module connects to the **Noroff Holidaze API**:
+
+```
+Base URL: https://v2.api.noroff.dev
+Endpoint: /holidaze/venues
+Method: GET
+```
+
+**Example response:**
+
+```json
+{
+  "data": [
+    {
+      "id": "abc123",
+      "name": "Cozy Beach House",
+      "description": "Perfect seaside getaway",
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-123",
+          "alt": "Beach house exterior"
+        }
+      ],
+      "price": 150,
+      "maxGuests": 4,
+      "rating": 4.8,
+      "location": {
+        "city": "Miami",
+        "country": "USA"
+      }
+    }
+  ]
+}
+```
+
+---
+
+## The useEffect Lifecycle
+
+Understanding when effects run is crucial:
+
+```jsx
+useEffect(() => {
+   // Effect runs after EVERY render
+});
+
+useEffect(() => {
+   // Effect runs ONCE on mount
+}, []);
+
+useEffect(() => {
+   // Effect runs when 'dependency' changes
+}, [dependency]);
+
+useEffect(() => {
+   // Setup
+   const subscription = subscribeToData();
+   
+   // Cleanup runs before next effect or unmount
+   return () => {
+      subscription.unsubscribe();
+   };
+}, []);
+```
+
+---
+
+## Common Pitfalls
+
+<Callout type="warning">
+**Missing dependency array** causes infinite loops:
+
+```jsx
+// ❌ BAD - runs after every render, causes infinite loop
+useEffect(() => {
+   fetch('/api/data').then(data => setData(data));
+});
+
+// ✅ GOOD - runs once on mount
+useEffect(() => {
+   fetch('/api/data').then(data => setData(data));
+}, []);
+```
+</Callout>
+
+<Callout type="info">
+**Race conditions** happen when multiple requests overlap:
+
+```jsx
+// ❌ PROBLEM: If user changes filters quickly,
+// old request might complete after new request
+useEffect(() => {
+   fetchListings(filters).then(setListings);
+}, [filters]);
+
+// ✅ SOLUTION: Cancel previous request
+useEffect(() => {
+   const controller = new AbortController();
+   fetchListings(filters, controller.signal).then(setListings);
+   return () => controller.abort();
+}, [filters]);
+```
+</Callout>
+
+---
+
+## What Makes This Module Important
+
+**Real-world applications need:**
+- Dynamic data from servers
+- Loading indicators for UX
+- Error handling for reliability
+- Proper async patterns
+
+**After this module, you'll be able to:**
+- Connect any React app to any API
+- Handle async operations confidently
+- Debug common useEffect issues
+- Build production-quality data fetching
+
+---
+
+## Time Estimate
+
+⏱️ **3-4 hours** to complete all 10 lessons
+
+- Lessons 1-4 (Basic fetching): ~1 hour
+- Lessons 5-8 (Error handling & cleanup): ~1.5 hours
+- Lessons 9-10 (Carousel & review): ~1 hour
+
+---
+
+## Let's Begin!
+
+Ready to connect your app to a real API? Let's start by preparing the HomePage for async data fetching!

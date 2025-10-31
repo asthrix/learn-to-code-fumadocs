@@ -1,5 +1,5 @@
 ---
-title: "Module 4: Routes & Navigation"
+title: "M4: Routes & Navigation"
 description:
    "Build a multi-page application with React Router v6, dynamic routes, and URL
    parameters."
@@ -8,24 +8,457 @@ totalSteps: 13
 duration: "3-4 hours"
 difficulty: "intermediate"
 prerequisites: ["module-3"]
+objectives:
+   - "Install and configure React Router v6"
+   - "Create multiple pages with client-side routing"
+   - "Build dynamic routes with URL parameters"
+   - "Extract and use URL params in components"
+   - "Navigate programmatically with useNavigate"
+   - "Create a 404 Not Found page"
+   - "Build a detailed property page with fetched data"
+tags: ["react", "react-router", "routing", "navigation", "spa"]
 ---
 
 
-Transform your single-page app into a multi-page experience with React Router!
-🚀
+Transform your single-page app into a multi-page experience with React Router! 🚀
 
-## Coming Soon
+---
 
-This module covers:
+## Overview
 
--  React Router v6 setup
--  Route configuration
--  Dynamic routes and URL params
--  Nested routes
--  Link component
--  404 handling
--  Property details page
+Right now, your app is a **single-page application (SPA)** - everything happens on one URL. But real websites have multiple pages: home, details, about, etc.
 
-<div className='mt-6'>
-   <Badge variant='primary'>Module 4 lessons coming soon</Badge>
-</div>
+**React Router** lets you create a multi-page feel while keeping the performance benefits of a SPA. Users can navigate between pages instantly without full page reloads!
+
+In this module, you'll add:
+- A home page (your existing listings page)
+- A details page for each property
+- A 404 Not Found page
+- Smooth navigation between pages
+
+---
+
+## What You'll Build
+
+<Steps>
+   <Step>
+      ### 🏠 Multi-Page Application
+      #### Transform your app into multiple routes/pages
+   </Step>
+   <Step>
+      ### 🔗 Dynamic Routes
+      #### Create routes that change based on URL parameters (like `/property/:id`)
+   </Step>
+   <Step>
+      ### 📄 Property Details Page
+      #### Show full information about a single property
+   </Step>
+   <Step>
+      ### 🧭 Navigation
+      #### Add links and programmatic navigation throughout the app
+   </Step>
+   <Step>
+      ### ❌ 404 Page
+      #### Handle invalid URLs gracefully
+   </Step>
+</Steps>
+
+---
+
+## Key Concepts
+
+### Client-Side Routing
+
+Traditional websites reload the entire page on navigation:
+
+```
+User clicks link → Browser requests new HTML → Full page reload
+```
+
+React Router changes URLs **without page reloads**:
+
+```
+User clicks link → React Router updates URL → React renders new component
+```
+
+**Benefits:**
+- ⚡ Instant navigation (no loading)
+- 🎨 Smooth transitions
+- 💾 Shared state between pages
+- 📱 App-like experience
+
+### React Router Setup
+
+```jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+function App() {
+   return (
+      <BrowserRouter>
+         <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/property/:id" element={<PropertyDetailsPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+         </Routes>
+      </BrowserRouter>
+   );
+}
+```
+
+### URL Parameters
+
+Extract dynamic values from URLs:
+
+```jsx
+// URL: /property/abc123
+import { useParams } from 'react-router-dom';
+
+function PropertyDetailsPage() {
+   const { id } = useParams(); // id = "abc123"
+   
+   // Fetch property with this id
+   useEffect(() => {
+      fetchProperty(id);
+   }, [id]);
+}
+```
+
+### Navigation
+
+**Link component** for navigation (like `<a>` tags but better):
+
+```jsx
+import { Link } from 'react-router-dom';
+
+<Link to="/property/abc123">View Details</Link>
+```
+
+**useNavigate hook** for programmatic navigation:
+
+```jsx
+import { useNavigate } from 'react-router-dom';
+
+function Component() {
+   const navigate = useNavigate();
+   
+   const handleClick = () => {
+      // Do something first
+      navigate('/property/abc123');
+   };
+}
+```
+
+---
+
+## Learning Objectives
+
+<Accordions type='single'>
+   <Accordion id='obj1' title='Lesson 1: Install React Router' value='obj1'>
+      Add react-router-dom package to your project
+   </Accordion>
+
+   <Accordion id='obj2' title='Lesson 2: Create Router Component' value='obj2'>
+      Set up BrowserRouter and Routes structure
+   </Accordion>
+
+   <Accordion id='obj3' title='Lesson 3: Add Router to App' value='obj3'>
+      Wrap your application with the router
+   </Accordion>
+
+   <Accordion id='obj4' title='Lesson 4: Configure HomePage Route' value='obj4'>
+      Set up the root route for your homepage
+   </Accordion>
+
+   <Accordion id='obj5' title='Lesson 5: Create PropertyDetailsPage' value='obj5'>
+      Build the new details page component
+   </Accordion>
+
+   <Accordion id='obj6' title='Lesson 6: Add Details Route with Param' value='obj6'>
+      Configure dynamic route with :id parameter
+   </Accordion>
+
+   <Accordion id='obj7' title='Lesson 7: Extract ID from URL' value='obj7'>
+      Use useParams to get property ID from URL
+   </Accordion>
+
+   <Accordion id='obj8' title='Lesson 8: Fetch Property Data' value='obj8'>
+      Load single property details from API
+   </Accordion>
+
+   <Accordion id='obj9' title='Lesson 9: Add Navigation Links' value='obj9'>
+      Convert PropertyCard to link to details page
+   </Accordion>
+
+   <Accordion id='obj10' title='Lesson 10: Create NotFound Page' value='obj10'>
+      Build 404 error page for invalid routes
+   </Accordion>
+
+   <Accordion id='obj11' title='Lesson 11: Add NotFound Route' value='obj11'>
+      Configure catch-all route for 404s
+   </Accordion>
+
+   <Accordion id='obj12' title='Lesson 12: Programmatic Navigation' value='obj12'>
+      Use useNavigate for button-based navigation
+   </Accordion>
+
+   <Accordion id='obj13' title='Lesson 13: Review & Polish' value='obj13'>
+      Add breadcrumbs, back buttons, and review routing concepts
+   </Accordion>
+</Accordions>
+
+---
+
+## Module Roadmap
+
+| Lesson | What You'll Build | Concepts Introduced |
+|--------|-------------------|---------------------|
+| **1-3** | Router setup | BrowserRouter, Routes, Route |
+| **4** | Home route | Path and element props |
+| **5-8** | Details page | useParams, dynamic routes, single item fetch |
+| **9** | Navigation links | Link component |
+| **10-11** | 404 page | Catch-all routes, error handling |
+| **12-13** | Polish | useNavigate, breadcrumbs, UX |
+
+---
+
+## Route Structure
+
+By the end of this module, your app will have:
+
+```
+/ (root)
+├─ HomePage
+│  └─ Display all property listings
+│
+├─ /property/:id
+│  └─ PropertyDetailsPage
+│     └─ Show single property details
+│
+└─ * (catch-all)
+   └─ NotFoundPage
+      └─ 404 error message
+```
+
+**Example URLs:**
+
+```
+https://yourapp.com/                    → HomePage
+https://yourapp.com/property/abc123     → PropertyDetailsPage (id: abc123)
+https://yourapp.com/invalid-page        → NotFoundPage
+```
+
+---
+
+## Prerequisites
+
+Before starting Module 4, ensure:
+
+- ✅ Completed Module 3
+- ✅ HomePage fetches and displays listings from API
+- ✅ Understand useEffect and async data fetching
+- ✅ Comfortable with array methods (find, filter)
+- ✅ PropertyCard component displays property information
+
+---
+
+## React Router v6 Features
+
+**What's new in v6:**
+
+```jsx
+// ✅ v6 (Current) - Cleaner API
+<Routes>
+   <Route path="/" element={<Home />} />
+   <Route path="/about" element={<About />} />
+</Routes>
+
+// ❌ v5 (Old) - More verbose
+<Switch>
+   <Route path="/" component={Home} />
+   <Route path="/about" component={About} />
+</Switch>
+```
+
+**Key improvements:**
+- Simpler `element` prop instead of `component`
+- Better TypeScript support
+- Nested routes are cleaner
+- Relative paths by default
+- Better bundle size
+
+---
+
+## Navigation Patterns
+
+### Declarative Navigation (Links)
+
+Use when users click to navigate:
+
+```jsx
+<Link to="/property/123">View Property</Link>
+```
+
+### Imperative Navigation (useNavigate)
+
+Use for programmatic navigation after actions:
+
+```jsx
+const navigate = useNavigate();
+
+function handleSave() {
+   saveData();
+   navigate('/success');
+}
+```
+
+### Navigation with State
+
+Pass data to the next route:
+
+```jsx
+navigate('/property/123', {
+   state: { from: 'search-results' }
+});
+
+// In PropertyDetailsPage:
+const location = useLocation();
+console.log(location.state.from); // 'search-results'
+```
+
+---
+
+## Common Patterns
+
+### Protected Routes (Preview)
+
+You'll implement this in Module 7:
+
+```jsx
+function ProtectedRoute({ children }) {
+   const { user } = useAuth();
+   
+   if (!user) {
+      return <Navigate to="/login" />;
+   }
+   
+   return children;
+}
+
+<Route 
+   path="/favorites" 
+   element={
+      <ProtectedRoute>
+         <FavoritesPage />
+      </ProtectedRoute>
+   } 
+/>
+```
+
+### Layout Routes (Preview)
+
+Share layout across multiple pages:
+
+```jsx
+<Route element={<Layout />}>
+   <Route path="/" element={<HomePage />} />
+   <Route path="/about" element={<AboutPage />} />
+   <Route path="/contact" element={<ContactPage />} />
+</Route>
+
+function Layout() {
+   return (
+      <>
+         <Navbar />
+         <Outlet /> {/* Child routes render here */}
+         <Footer />
+      </>
+   );
+}
+```
+
+---
+
+## Property Details Page Preview
+
+**What it will show:**
+
+```
+┌─────────────────────────────────────┐
+│ ← Back to Listings                  │
+├─────────────────────────────────────┤
+│ [Image Carousel]                    │
+├─────────────────────────────────────┤
+│ Beach House Paradise                │
+│ ⭐ 4.8 · Miami, USA                 │
+├─────────────────────────────────────┤
+│ Description:                        │
+│ Beautiful beachfront property...    │
+├─────────────────────────────────────┤
+│ Amenities:                          │
+│ • WiFi  • Pool  • Kitchen          │
+├─────────────────────────────────────┤
+│ Price: $150/night                   │
+│ Max Guests: 4                       │
+│ [Book Now Button]                   │
+└─────────────────────────────────────┘
+```
+
+---
+
+## URL Design Best Practices
+
+<Callout type="success">
+**Good URL patterns:**
+- `/` - Homepage
+- `/properties` - All properties
+- `/property/:id` - Single property
+- `/favorites` - User favorites
+- `/profile` - User profile
+
+**Characteristics:**
+- Descriptive and readable
+- RESTful conventions
+- Predictable structure
+- Easy to remember
+</Callout>
+
+<Callout type="warning">
+**Avoid these patterns:**
+- `/page1`, `/page2` - Not descriptive
+- `/p?id=123` - Query params for routes (use for filters instead)
+- `/propertyDetailsInformation` - Too verbose
+- `/prop` - Too abbreviated
+</Callout>
+
+---
+
+## Time Estimate
+
+⏱️ **3-4 hours** to complete all 13 lessons
+
+- Lessons 1-4 (Router setup): ~45 minutes
+- Lessons 5-8 (Details page): ~1.5 hours
+- Lessons 9-11 (Navigation & 404): ~1 hour
+- Lessons 12-13 (Polish & review): ~45 minutes
+
+---
+
+## What Makes This Module Important
+
+**Professional applications need:**
+- Multiple pages for different content
+- Shareable URLs for specific items
+- Browser back/forward button support
+- Bookmarkable pages
+
+**After this module, you'll understand:**
+- How SPAs handle routing
+- URL parameters and dynamic routes
+- Navigation best practices
+- React Router patterns used in production
+
+---
+
+## Let's Begin!
+
+Ready to transform your single-page app into a multi-page experience? Let's start by installing React Router!

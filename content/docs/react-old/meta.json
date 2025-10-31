@@ -1,6 +1,6 @@
 {
    "title": "Project React",
-   "root": true,
+   "root": false,
    "description": "Build TaskFlow Pro from scratch through short, focused lessons.",
    "pages": [
       "index",
