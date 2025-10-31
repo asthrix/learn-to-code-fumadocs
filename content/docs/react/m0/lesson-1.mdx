@@ -7,7 +7,6 @@ module: 0
 lesson: 1
 ---
 
-# Lesson 1: Understanding the Course Platform
 
 Welcome to your first lesson! Before we dive into React, let's make sure you
 know how to navigate this course effectively.
@@ -51,16 +50,13 @@ Every module follows this pattern:
 
 <Steps>
    <Step>
-      ### Module Introduction An overview page (like Module 0's intro)
-      explaining what you'll learn
+      ### Module Introduction An overview page (like Module 0's intro) explaining what you'll learn
    </Step>
    <Step>
-      ### Individual Lessons Step-by-step lessons teaching specific concepts
-      with code examples
+      ### Individual Lessons Step-by-step lessons teaching specific concepts with code examples
    </Step>
    <Step>
-      ### Module Completion A celebration page summarizing what you've
-      accomplished
+      ### Module Completion A celebration page summarizing what you've accomplished
    </Step>
 </Steps>
 
@@ -88,7 +84,7 @@ Throughout the course, you'll encounter code snippets. Here's how to read them:
 
 When we show a complete file, it looks like this:
 
-```jsx
+```jsx title="src/App.jsx"
 // src/App.jsx
 import React from "react";
 
@@ -109,7 +105,7 @@ The comment at the top tells you the file path.
 
 When we modify existing code, we'll show the full context:
 
-```jsx
+```jsx title="src/App.jsx"
 // src/App.jsx
 import React from "react";
 import HomePage from "./pages/HomePage"; // ← NEW
@@ -171,14 +167,17 @@ Before moving forward, ensure you have:
 
 <Steps>
    <Step>
-      ### Text Editor or IDE **VS Code** is recommended for its excellent React
-      support
+      ### Text Editor or IDE **VS Code** is recommended for its excellent React support
    </Step>
    <Step>
       ### Terminal Access You'll need to run commands to start your project
    </Step>
-   <Step>### Web Browser Chrome or Firefox with developer tools</Step>
-   <Step>### Note-taking Tool Keep notes on concepts you want to remember</Step>
+   <Step>
+      ### Web Browser Chrome or Firefox with developer tools
+   </Step>
+   <Step>
+      ### Note-taking Tool Keep notes on concepts you want to remember
+   </Step>
 </Steps>
 
 ---
@@ -188,11 +187,4 @@ Before moving forward, ensure you have:
 Now that you understand how to navigate the course, let's learn how to read and
 understand code snippets effectively!
 
-<div className='mt-6 flex gap-4'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m0'>← Back to Module Intro</a>
-   </Button>
-   <Button asChild>
-      <a href='/docs/react/m0/lesson-2'>Next: Reading Code Snippets →</a>
-   </Button>
-</div>
+

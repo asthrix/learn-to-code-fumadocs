@@ -7,7 +7,6 @@ module: 1
 lesson: 1
 ---
 
-# Lesson 1: Project Setup
 
 Before building new features, let's clean up the default Vite project and set up
 a proper structure for our booking app.
@@ -30,8 +29,7 @@ We'll replace this with a clean starting point for our booking application.
 
 Open `src/App.jsx` and replace everything with this clean starting point:
 
-```jsx
-// src/App.jsx
+```jsx title="src/App.jsx"
 function App() {
    return (
       <div className='app'>
@@ -64,8 +62,7 @@ Let's simplify the CSS files.
 
 Open `src/index.css` and replace with:
 
-```css
-/* src/index.css */
+```css title="src/index.css"
 * {
    margin: 0;
    padding: 0;
@@ -138,17 +135,25 @@ This organization follows React best practices:
 
 <Accordions type='single'>
    <Accordion id='pages' title='pages/ Folder' value='pages'>
-      **Purpose:** Components that represent entire pages or routes
-      **Examples:** - `HomePage.jsx` - The main landing page -
-      `PropertyDetailsPage.jsx` - Individual property view - `LoginPage.jsx` -
-      User login page **Rule:** One page = one route in your application
+      **Purpose:** Components that represent entire pages or routes 
+
+      **Examples:** 
+      1. `HomePage.jsx` - The main landing page
+      2. `PropertyDetailsPage.jsx` - Individual property view
+      3. `LoginPage.jsx` - User login page 
+
+      **Rule:** One page = one route in your application
    </Accordion>
 
    <Accordion id='components' title='components/ Folder' value='components'>
-      **Purpose:** Reusable UI components used across pages **Examples:** -
-      `PropertyCard.jsx` - Single property display card - `Navbar.jsx` -
-      Navigation bar - `SearchBar.jsx` - Search input component **Rule:** Should
-      be reusable and not page-specific
+      **Purpose:** Reusable UI components used across pages 
+      
+      **Examples:**
+      1.  `PropertyCard.jsx` - Single property display card
+      2. `Navbar.jsx` - Navigation bar
+      3. `SearchBar.jsx` - Search input component 
+      
+      **Rule:** Should be reusable and not page-specific
    </Accordion>
 </Accordions>
 
@@ -181,16 +186,13 @@ Your project structure should now look like:
 
 <Steps>
    <Step>
-      ### Component Structure Every React component is a function that returns
-      JSX
+      ### Component Structure Every React component is a function that returns JSX
    </Step>
    <Step>
-      ### Project Organization Separate pages from reusable components for
-      better maintainability
+      ### Project Organization Separate pages from reusable components for better maintainability
    </Step>
    <Step>
-      ### Clean Slate Starting with a minimal setup makes it easier to
-      understand what you build
+      ### Clean Slate Starting with a minimal setup makes it easier to understand what you build
    </Step>
 </Steps>
 
@@ -212,11 +214,4 @@ Before continuing, make sure:
 Now that we have a clean project, we'll create our first custom component: the
 `HomePage`!
 
-<div className='mt-6 flex gap-4'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m1'>← Back to Module Intro</a>
-   </Button>
-   <Button asChild>
-      <a href='/docs/react/m1/lesson-2'>Next: Creating HomePage →</a>
-   </Button>
-</div>
+

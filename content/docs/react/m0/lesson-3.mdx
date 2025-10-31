@@ -6,7 +6,6 @@ module: 0
 lesson: 3
 ---
 
-# Lesson 3: Development Environment Setup
 
 Before writing React code, you need the right tools. This lesson guides you
 through setting up a professional development environment.
@@ -18,12 +17,18 @@ through setting up a professional development environment.
 You'll need four main tools for React development:
 
 <Steps>
-   <Step>### Node.js & npm JavaScript runtime and package manager</Step>
+   <Step>
+      ### Node.js & npm JavaScript runtime and package manager
+   </Step>
    <Step>
       ### Code Editor Where you'll write your code (VS Code recommended)
    </Step>
-   <Step>### Git Version control system</Step>
-   <Step>### Web Browser For viewing and testing your application</Step>
+   <Step>
+      ### Git Version control system
+   </Step>
+   <Step>
+      ### Web Browser For viewing and testing your application
+   </Step>
 </Steps>
 
 ---
@@ -37,22 +42,37 @@ and other libraries.
 
 <Accordions type='single'>
    <Accordion id='windows' title='Windows Installation' value='windows'>
-      1. Visit [nodejs.org](https://nodejs.org/) 2. Download the **LTS version**
-      (Long Term Support) 3. Run the installer 4. Follow the installation wizard
-      (use default settings) 5. Restart your computer
+      1. Visit [nodejs.org](https://nodejs.org/) 
+      2. Download the **LTS version**
+      (Long Term Support) 
+      3. Run the installer 
+      4. Follow the installation wizard (use default settings) 
+      5. Restart your computer
    </Accordion>
 
    <Accordion id='macos' title='macOS Installation' value='macos'>
-      **Option 1: Direct Download** 1. Visit [nodejs.org](https://nodejs.org/)
-      2. Download the **LTS version** 3. Run the `.pkg` installer 4. Follow the
-      installation wizard **Option 2: Using Homebrew** (if you have it) ```bash
-      brew install node ```
+      **Option 1: Direct Download** 
+      1. Visit [nodejs.org](https://nodejs.org/)
+      2. Download the **LTS version** 
+      3. Run the `.pkg` installer 
+      4. Follow the installation wizard 
+
+      **Option 2: Using Homebrew** (if you have it) 
+      ```bash
+      brew install node 
+      ```
    </Accordion>
 
    <Accordion id='linux' title='Linux Installation' value='linux'>
-      **Ubuntu/Debian:** ```bash curl -fsSL
+      **Ubuntu/Debian:** 
+      ```bash curl -fsSL
       https://deb.nodesource.com/setup_lts.x | sudo -E bash - sudo apt-get
-      install -y nodejs ``` **Fedora:** ```bash sudo dnf install nodejs ```
+      install -y nodejs 
+      ``` 
+      **Fedora:** 
+      ```bash 
+      sudo dnf install nodejs 
+      ```
    </Accordion>
 </Accordions>
 
@@ -122,19 +142,33 @@ Git helps you track changes and collaborate on projects.
 
 <Accordions type='single'>
    <Accordion id='git-windows' title='Windows' value='git-windows'>
-      1. Visit [git-scm.com](https://git-scm.com/) 2. Download Git for Windows
-      3. Run the installer 4. Use default settings (recommended)
+      1. Visit [git-scm.com](https://git-scm.com/) 
+      2. Download Git for Windows
+      3. Run the installer 
+      4. Use default settings (recommended)
    </Accordion>
 
    <Accordion id='git-macos' title='macOS' value='git-macos'>
-      **Option 1:** Download from [git-scm.com](https://git-scm.com/) **Option
-      2:** Install Xcode Command Line Tools: ```bash xcode-select --install ```
-      **Option 3:** Using Homebrew: ```bash brew install git ```
+      **Option 1:** Download from [git-scm.com](https://git-scm.com/) 
+      **Option 2:** Install Xcode Command Line Tools: 
+      ```bash 
+         xcode-select --install 
+      ```
+      **Option 3:** Using Homebrew: 
+      ```
+      bash brew install git 
+      ```
    </Accordion>
 
    <Accordion id='git-linux' title='Linux' value='git-linux'>
-      **Ubuntu/Debian:** ```bash sudo apt-get install git ``` **Fedora:**
-      ```bash sudo dnf install git ```
+      **Ubuntu/Debian:** 
+      ```bash 
+      sudo apt-get install git 
+      ``` 
+      **Fedora:**
+      ```bash 
+      sudo dnf install git 
+      ```
    </Accordion>
 </Accordions>
 
@@ -289,9 +323,10 @@ page reloads.
 
 <Accordions type='single'>
    <Accordion id='port-in-use' title='Port Already in Use' value='port-in-use'>
-      If you see "Port 5173 is already in use": 1. Stop the running server
-      (`Ctrl+C` in terminal) 2. Try again, or 3. Vite will automatically use a
-      different port
+      If you see "Port 5173 is already in use": 
+      1. Stop the running server (`Ctrl+C` in terminal) 
+      2. Try again, or 
+      3. Vite will automatically use a different port
    </Accordion>
 
    <Accordion
@@ -299,8 +334,10 @@ page reloads.
       title="'npm' is not recognized"
       value='npm-not-found'
    >
-      This means Node.js isn't installed correctly: 1. Reinstall Node.js from
-      [nodejs.org](https://nodejs.org/) 2. Restart your computer 3. Try again
+      This means Node.js isn't installed correctly: 
+      1. Reinstall Node.js from [nodejs.org](https://nodejs.org/) 
+      2. Restart your computer 
+      3. Try again
    </Accordion>
 
    <Accordion
@@ -308,8 +345,11 @@ page reloads.
       title='Permission Errors (Mac/Linux)'
       value='permission-error'
    >
-      If you get permission errors when installing: ```bash sudo chown -R $USER
-      ~/.npm ``` Then try the npm commands again (without sudo).
+      If you get permission errors when installing: 
+      ```bash s
+      udo chown -R $USER ~/.npm 
+      ``` 
+      Then try the npm commands again (without sudo).
    </Accordion>
 </Accordions>
 
@@ -333,11 +373,4 @@ Before moving on, confirm:
 Your development environment is ready! Next, we'll explore the project you'll be
 building throughout this course.
 
-<div className='mt-6 flex gap-4'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m0/lesson-2'>← Previous: Reading Code</a>
-   </Button>
-   <Button asChild>
-      <a href='/docs/react/m0/lesson-4'>Next: Project Overview →</a>
-   </Button>
-</div>
+

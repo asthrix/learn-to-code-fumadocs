@@ -6,7 +6,6 @@ module: 1
 lesson: 7
 ---
 
-# Lesson 7: Module 1 Review
 
 Congratulations! You've completed Module 1. Let's review everything you've
 learned and see how far you've come.
@@ -138,12 +137,15 @@ function PropertyList({ properties }) {
 
 Build complex UIs by combining small components:
 
-```
-HomePage
-├── Header
-└── PropertyList
-    └── PropertyCard (×4)
-```
+
+<Files>
+   <Folder name='HomePage' defaultOpen>
+         <File name='Header.jsx' />
+      <Folder name='PropertyList' defaultOpen>
+         <File name='PropertyCard.jsx (x4)' />
+      </Folder>
+   </Folder>
+</Files>
 
 **Benefits:**
 
@@ -160,10 +162,10 @@ Let's visualize what you built:
 
 <Files>
    <Folder name='src' defaultOpen>
-      <Folder name='pages'>
+      <Folder name='pages' defaultOpen>
          <File name='HomePage.jsx' />
       </Folder>
-      <Folder name='components'>
+      <Folder name='components' defaultOpen>
          <File name='PropertyList.jsx' />
          <File name='PropertyCard.jsx' />
       </Folder>
@@ -175,16 +177,21 @@ Let's visualize what you built:
 **Data flow:**
 
 <Steps>
-   <Step>### Data Creation Properties array defined in `HomePage.jsx`</Step>
-
-   <Step>### Data Passing HomePage passes array to PropertyList via props</Step>
-
    <Step>
-      ### Data Transformation
-      PropertyList maps array to PropertyCard components
+      ### Data Creation Properties array defined in `HomePage.jsx`
    </Step>
 
-   <Step>### Data Display PropertyCard displays individual property data</Step>
+   <Step>
+      ### Data Passing HomePage passes array to PropertyList via props
+   </Step>
+
+   <Step>
+      ### Data Transformation PropertyList maps array to PropertyCard components
+   </Step>
+
+   <Step>
+      ### Data Display PropertyCard displays individual property data
+   </Step>
 </Steps>
 
 ---
@@ -316,9 +323,8 @@ You can now:
 
 ---
 
-## Debugging Tips You've Learned
-
-<Banner variant='warning'>**Common Issues & Solutions**</Banner>
+## Debugging Tips You've Learned 
+<Badge variant='primary'>Common Issues & Solutions</Badge>
 
 **"Cannot read property of undefined"**
 
@@ -347,12 +353,14 @@ You can now:
 
 <Accordions type='single'>
    <Accordion id='devtools' title='Install React DevTools' value='devtools'>
-      Browser extensions for debugging React: - **Chrome**: [React Developer
-      Tools](https://chrome.google.com/webstore/detail/react-developer-tools) -
-      **Firefox**: [React Developer
-      Tools](https://addons.mozilla.org/en-US/firefox/addon/react-devtools/)
-      **Features:** - Inspect component hierarchy - View props and state - Track
-      component updates - Profile performance
+      Browser extensions for debugging React:
+      - **Chrome**: [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools)
+      - **Firefox**: [React Developer Tools](https://addons.mozilla.org/en-US/firefox/addon/react-devtools/)
+      
+      **Features:** 
+      - Inspect component hierarchy 
+      - View props and state - Track component updates 
+      - Profile performance
    </Accordion>
 </Accordions>
 
@@ -478,17 +486,10 @@ Before moving to Module 2, ensure:
 Great work completing Module 1! You've built a solid foundation. In Module 2,
 you'll make your application interactive with state and events.
 
-<div className='mt-8 flex gap-4 justify-between'>
-   <Button variant='outline' asChild>
-      <a href='/docs/react/m1/lesson-6'>← Previous: Styling with Tailwind</a>
-   </Button>
-   <Button variant='default' asChild>
-      <a href='/docs/react/m2'>Next: Module 2 - State & Events →</a>
-   </Button>
-</div>
+
 
 ---
 
-<Banner variant='success'>
+<Card variant='success'>
    **Module 1 Complete!** You're officially a React developer. Keep building! 🚀
-</Banner>
+</Card>

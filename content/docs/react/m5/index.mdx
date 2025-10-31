@@ -1,5 +1,5 @@
 ---
-title: "Module 5: Hooks & Performance"
+title: "M5: Hooks & Performance"
 description:
    "Optimize your React app with custom hooks, useMemo, useCallback, and
    React.memo."
@@ -8,24 +8,504 @@ totalSteps: 10
 duration: "3-4 hours"
 difficulty: "advanced"
 prerequisites: ["module-4"]
+objectives:
+   - "Create custom hooks to extract reusable logic"
+   - "Optimize expensive calculations with useMemo"
+   - "Prevent unnecessary re-renders with useCallback"
+   - "Memoize components with React.memo"
+   - "Profile performance with React DevTools"
+   - "Identify and fix performance bottlenecks"
+   - "Refactor code for better organization"
+tags: ["react", "hooks", "performance", "optimization", "useMemo", "useCallback", "custom-hooks"]
 ---
 
-# Module 5 - Hooks & Performance
 
-Master advanced React patterns and optimize performance with custom hooks and
-memoization! ⚡
+Master advanced React patterns and optimize performance with custom hooks and memoization! ⚡
 
-## Coming Soon
+---
 
-Topics include:
+## Overview
 
--  Custom hooks creation
--  useMemo for expensive calculations
--  useCallback for function memoization
--  React.memo for component optimization
--  Performance profiling
--  Code refactoring
+Your app works great, but as it grows, you might notice:
+- Repeated logic across components
+- Slow filters or calculations
+- Unnecessary re-renders
+- Components that could be more efficient
 
-<div className='mt-6'>
-   <Badge variant='primary'>Module 5 lessons coming soon</Badge>
-</div>
+This module teaches **performance optimization** and **code reusability** - two essential skills for building production-quality React applications.
+
+You'll learn to extract logic into custom hooks, optimize expensive operations, and prevent unnecessary re-renders using React's performance tools.
+
+---
+
+## What You'll Build
+
+<Steps>
+   <Step>
+      ### 🪝 Custom Hooks
+      #### Extract data fetching logic into reusable `useFetch` hook
+   </Step>
+   <Step>
+      ### 🧮 Optimized Calculations
+      #### Use useMemo to cache expensive filter operations
+   </Step>
+   <Step>
+      ### 🔄 Stable Functions
+      #### Memoize callbacks with useCallback to prevent child re-renders
+   </Step>
+   <Step>
+      ### ⚡ Memoized Components
+      #### Wrap components with React.memo to skip unnecessary renders
+   </Step>
+   <Step>
+      ### 📊 Performance Profiling
+      #### Use React DevTools to measure and improve performance
+   </Step>
+</Steps>
+
+---
+
+## Key Concepts
+
+### Custom Hooks
+
+Extract reusable logic into custom hooks:
+
+```jsx
+// Before: Repeated fetch logic in every component
+function HomePage() {
+   const [data, setData] = useState(null);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState(null);
+   
+   useEffect(() => {
+      // Fetch logic...
+   }, []);
+}
+
+// After: Reusable custom hook
+function useFetch(url) {
+   const [data, setData] = useState(null);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState(null);
+   
+   useEffect(() => {
+      // Fetch logic...
+   }, [url]);
+   
+   return { data, loading, error };
+}
+
+// Usage
+function HomePage() {
+   const { data, loading, error } = useFetch('/api/listings');
+}
+```
+
+### useMemo
+
+Cache expensive calculations:
+
+```jsx
+// Without useMemo - recalculates every render
+function SearchPage({ listings, filters }) {
+   const filtered = listings.filter(item => 
+      item.price < filters.maxPrice &&
+      item.guests >= filters.guests
+   );
+   // If parent re-renders, this filtering runs again unnecessarily
+}
+
+// With useMemo - only recalculates when dependencies change
+function SearchPage({ listings, filters }) {
+   const filtered = useMemo(() => 
+      listings.filter(item => 
+         item.price < filters.maxPrice &&
+         item.guests >= filters.guests
+      ),
+      [listings, filters] // Only re-run when these change
+   );
+}
+```
+
+### useCallback
+
+Memoize functions to prevent child re-renders:
+
+```jsx
+// Without useCallback - new function every render
+function Parent() {
+   const handleClick = () => {
+      console.log('clicked');
+   };
+   
+   return <MemoizedChild onClick={handleClick} />;
+   // Child re-renders even if nothing changed
+}
+
+// With useCallback - stable function reference
+function Parent() {
+   const handleClick = useCallback(() => {
+      console.log('clicked');
+   }, []); // Function stays the same
+   
+   return <MemoizedChild onClick={handleClick} />;
+   // Child doesn't re-render unnecessarily
+}
+```
+
+### React.memo
+
+Prevent component re-renders when props haven't changed:
+
+```jsx
+// Without memo - re-renders every time parent renders
+function PropertyCard({ property }) {
+   return <div>{property.name}</div>;
+}
+
+// With memo - only re-renders if 'property' changes
+const PropertyCard = React.memo(function PropertyCard({ property }) {
+   return <div>{property.name}</div>;
+});
+```
+
+---
+
+## Learning Objectives
+
+<Accordions type='single'>
+   <Accordion id='obj1' title='Lesson 1: Create useFetch Hook' value='obj1'>
+      Extract data fetching logic into a reusable custom hook
+   </Accordion>
+
+   <Accordion id='obj2' title='Lesson 2: Use useFetch in HomePage' value='obj2'>
+      Refactor HomePage to use the custom hook
+   </Accordion>
+
+   <Accordion id='obj3' title='Lesson 3: Use useFetch in DetailsPage' value='obj3'>
+      Replace fetch logic in PropertyDetailsPage
+   </Accordion>
+
+   <Accordion id='obj4' title='Lesson 4: Optimize Filter with useMemo' value='obj4'>
+      Cache filtered listings to prevent recalculation
+   </Accordion>
+
+   <Accordion id='obj5' title='Lesson 5: Add useMemo for Search' value='obj5'>
+      Optimize search filtering with memoization
+   </Accordion>
+
+   <Accordion id='obj6' title='Lesson 6: Memoize Callbacks' value='obj6'>
+      Use useCallback for event handlers passed to children
+   </Accordion>
+
+   <Accordion id='obj7' title='Lesson 7: Wrap with React.memo' value='obj7'>
+      Memoize PropertyCard and PropertyList components
+   </Accordion>
+
+   <Accordion id='obj8' title='Lesson 8: Profile with DevTools' value='obj8'>
+      Use React DevTools Profiler to measure performance
+   </Accordion>
+
+   <Accordion id='obj9' title='Lesson 9: Identify Bottlenecks' value='obj9'>
+      Find and fix performance issues in your app
+   </Accordion>
+
+   <Accordion id='obj10' title='Lesson 10: Review & Best Practices' value='obj10'>
+      Review optimization patterns and when to use them
+   </Accordion>
+</Accordions>
+
+---
+
+## Module Roadmap
+
+| Lesson | What You'll Optimize | Tools/Hooks Used |
+|--------|---------------------|------------------|
+| **1-3** | Data fetching | Custom hooks (useFetch) |
+| **4-5** | Filter calculations | useMemo |
+| **6** | Event handlers | useCallback |
+| **7** | Component renders | React.memo |
+| **8-9** | Performance analysis | React DevTools Profiler |
+| **10** | Final review | Best practices |
+
+---
+
+## Prerequisites
+
+Before starting Module 5, ensure:
+
+- ✅ Completed Module 4
+- ✅ Understand useEffect and useState
+- ✅ Know how to fetch data from APIs
+- ✅ Comfortable with React components and props
+- ✅ Have React DevTools browser extension installed
+
+---
+
+## When to Optimize
+
+<Callout type="warning">
+**⚠️ Don't optimize prematurely!**
+
+Optimization adds complexity. Only optimize when you have:
+- **Measured performance issues** using profiler
+- **Identified the bottleneck** causing slowness
+- **A clear performance goal** to achieve
+
+**Premature optimization is the root of all evil** - Donald Knuth
+</Callout>
+
+<Callout type="success">
+**✅ Optimize when:**
+- Expensive calculations in render (complex filtering, sorting)
+- Large lists causing lag
+- Components re-rendering unnecessarily
+- React DevTools Profiler shows high render times
+- Users report sluggish interactions
+</Callout>
+
+---
+
+## Performance Checklist
+
+### When to use useMemo
+
+✅ Filtering or sorting large arrays  
+✅ Complex calculations in render  
+✅ Derived state from expensive operations  
+❌ Simple values or primitives  
+❌ Calculations that are already fast  
+
+### When to use useCallback
+
+✅ Functions passed to memoized child components  
+✅ Functions in useEffect dependencies  
+✅ Functions passed to many children  
+❌ Functions only used in the current component  
+❌ Event handlers not passed as props  
+
+### When to use React.memo
+
+✅ Components that re-render often with same props  
+✅ Components with expensive render logic  
+✅ List items rendered in .map()  
+❌ Components that rarely re-render  
+❌ Components with constantly changing props  
+
+---
+
+## Custom Hooks Best Practices
+
+**Naming convention:**
+
+```jsx
+// ✅ Always start with "use"
+function useFetch() {}
+function useLocalStorage() {}
+function useDebounce() {}
+
+// ❌ Don't skip "use" prefix
+function fetchData() {}
+function localStorage() {}
+```
+
+**Common custom hooks:**
+
+```jsx
+// Data fetching
+useFetch(url)
+useQuery(query)
+
+// Form handling
+useForm(initialValues)
+useField(name)
+
+// Browser APIs
+useLocalStorage(key, initialValue)
+useMediaQuery(query)
+useClickOutside(ref, handler)
+
+// Utilities
+useDebounce(value, delay)
+useToggle(initialValue)
+usePrevious(value)
+```
+
+---
+
+## React DevTools Profiler
+
+**How to use:**
+
+1. Install React DevTools browser extension
+2. Open DevTools → Profiler tab
+3. Click **Record** button
+4. Interact with your app
+5. Stop recording
+6. Analyze flame graph
+
+**What to look for:**
+
+```
+🟢 Green bars = Fast render (< 5ms)
+🟡 Yellow bars = Moderate (5-15ms)
+🔴 Red bars = Slow (> 15ms) - Optimize these!
+```
+
+**Optimization wins:**
+
+```
+Before:
+HomePage: 45ms (with 100 properties)
+PropertyCard × 100: 2ms each = 200ms total
+Total: 245ms 🔴
+
+After optimization:
+HomePage: 15ms (filtered cached with useMemo)
+PropertyCard × 100: memoized, skips re-render
+Total: 15ms 🟢
+
+16x faster! ⚡
+```
+
+---
+
+## Common Performance Pitfalls
+
+### Pitfall 1: Unnecessary State
+
+```jsx
+// ❌ BAD - derived state
+const [items, setItems] = useState([]);
+const [count, setCount] = useState(0);
+
+useEffect(() => {
+   setCount(items.length); // Unnecessary state
+}, [items]);
+
+// ✅ GOOD - calculate on demand
+const [items, setItems] = useState([]);
+const count = items.length; // Just calculate it!
+```
+
+### Pitfall 2: Inline Objects/Arrays
+
+```jsx
+// ❌ BAD - new object every render
+<Component style={{ color: 'red' }} />
+
+// ✅ GOOD - stable reference
+const style = { color: 'red' };
+<Component style={style} />
+
+// Or use useMemo for dynamic values
+const style = useMemo(() => ({
+   color: theme === 'dark' ? 'white' : 'black'
+}), [theme]);
+```
+
+### Pitfall 3: Large Lists Without Keys
+
+```jsx
+// ❌ BAD - no keys, React re-renders everything
+{items.map(item => <Card>{item.name}</Card>)}
+
+// ✅ GOOD - stable keys, React only updates changed items
+{items.map(item => <Card key={item.id}>{item.name}</Card>)}
+```
+
+---
+
+## Before vs After This Module
+
+**Before Module 5:**
+
+```jsx
+function HomePage() {
+   const [listings, setListings] = useState([]);
+   const [loading, setLoading] = useState(true);
+   const [filters, setFilters] = useState({});
+   
+   // Repeated fetch logic
+   useEffect(() => {
+      fetch('/api/listings')
+         .then(res => res.json())
+         .then(data => {
+            setListings(data);
+            setLoading(false);
+         });
+   }, []);
+   
+   // Re-filters every render (slow!)
+   const filtered = listings.filter(item =>
+      item.price < filters.maxPrice
+   );
+   
+   return <PropertyList properties={filtered} />;
+}
+```
+
+**After Module 5:**
+
+```jsx
+function HomePage() {
+   // Reusable custom hook
+   const { data: listings, loading } = useFetch('/api/listings');
+   const [filters, setFilters] = useState({});
+   
+   // Cached filtering (only recalculates when needed)
+   const filtered = useMemo(() =>
+      listings?.filter(item =>
+         item.price < filters.maxPrice
+      ) ?? [],
+      [listings, filters]
+   );
+   
+   return <PropertyList properties={filtered} />;
+}
+
+// Memoized component (skips re-renders)
+const PropertyList = React.memo(function PropertyList({ properties }) {
+   return properties.map(p => <PropertyCard key={p.id} property={p} />);
+});
+```
+
+**Results:**
+- ✅ Less code duplication
+- ✅ Better performance
+- ✅ Easier to maintain
+- ✅ Reusable logic
+
+---
+
+## Time Estimate
+
+⏱️ **3-4 hours** to complete all 10 lessons
+
+- Lessons 1-3 (Custom hooks): ~1.5 hours
+- Lessons 4-5 (useMemo): ~45 minutes
+- Lessons 6-7 (useCallback & React.memo): ~45 minutes
+- Lessons 8-10 (Profiling & review): ~1 hour
+
+---
+
+## What Makes This Module Important
+
+**Professional React developers must:**
+- Write reusable, maintainable code
+- Optimize performance for production
+- Use profiling tools to measure impact
+- Know when and how to optimize
+
+**After this module, you'll:**
+- Extract custom hooks confidently
+- Optimize intelligently (not prematurely)
+- Profile and debug performance issues
+- Write production-quality React code
+
+---
+
+## Let's Begin!
+
+Ready to level up your React skills with custom hooks and performance optimization? Let's start by creating a reusable `useFetch` hook!
