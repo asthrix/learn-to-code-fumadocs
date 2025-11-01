@@ -64,7 +64,7 @@ export const pricingPlans: PricingPlan[] = [
          "Downloadable exercise solutions",
       ],
       ctaLabel: "Start for free",
-      ctaHref: "/docs/html",
+      ctaHref: "/checkout?plan=starter",
    },
    {
       name: "Pro Builder",
@@ -79,7 +79,7 @@ export const pricingPlans: PricingPlan[] = [
          "Private Discord pods for accountability",
       ],
       ctaLabel: "Upgrade to Pro",
-      ctaHref: "/docs/react",
+      ctaHref: "/checkout?plan=pro",
       highlighted: true,
    },
    {
@@ -95,6 +95,6 @@ export const pricingPlans: PricingPlan[] = [
          "Quarterly curriculum updates and roadmap access",
       ],
       ctaLabel: "Talk to us",
-      ctaHref: "mailto:hello@learnfrontend.dev",
+      ctaHref: "/checkout?plan=team",
    },
 ];

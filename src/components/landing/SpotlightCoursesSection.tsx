@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import type { Course } from "@/lib/courses";
+import { AnimatedBlob } from "@/components/ui/AnimatedBlob";
 
 interface SpotlightCoursesSectionProps {
    spotlightCourses: Course[];
@@ -39,7 +40,7 @@ export function SpotlightCoursesSection({
                      href={`/courses/${course.id}`}
                      className='group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-[0_20px_40px_-25px_hsl(var(--color-primary)/0.3)] transition hover:-translate-y-2 hover:border-primary/35 hover:bg-primary/10'
                   >
-                     <div className='absolute -right-10 -top-10 h-28 w-28 rounded-full bg-primary/15 transition group-hover:scale-125' />
+                    <AnimatedBlob />
                      <span className='relative inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary/25 text-2xl shadow-[inset_0_1px_2px_hsl(var(--color-primary)/0.15)] transition group-hover:scale-105'>
                         {course.icon}
                      </span>

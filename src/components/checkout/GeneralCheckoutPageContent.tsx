@@ -10,30 +10,16 @@ import {
 
 import { Button } from "@/components/ui/button";
 import type { Course } from "@/lib/courses";
-import type {
-   CourseDetailContent,
-   CoursePricingTier,
-} from "@/lib/course-detail/types";
+import { pricingPlans, type PricingPlan } from "@/lib/home-content";
 import { cn } from "@/lib/utils";
 
 // ============================================================================
 // Types
 // ============================================================================
 
-interface CheckoutPageContentProps {
-   course: Course;
-   detail?: CheckoutDetailSnapshot;
+interface GeneralCheckoutPageContentProps {
+   courses: Course[];
    initialPlanSlug?: string;
-}
-
-type CheckoutDetailSnapshot = Pick<
-   CourseDetailContent,
-   "slug" | "hero" | "pricing" | "testimonials"
->;
-
-interface PlanOptionDescriptor {
-   tier: CoursePricingTier;
-   slug: string;
 }
 
 // ============================================================================
@@ -50,31 +36,22 @@ const TRUST_SIGNALS = [
 // Main Component
 // ============================================================================
 
-export function CheckoutPageContent({
-   course,
-   detail,
+export function GeneralCheckoutPageContent({
+   courses,
    initialPlanSlug,
-}: CheckoutPageContentProps) {
-   const pricingTiers = useMemo(() => detail?.pricing ?? [], [detail]);
-   const planOptions = useMemo(
-      () =>
-         pricingTiers.map((tier) => ({
-            tier,
-            slug: toPlanSlug(tier.name),
-         })),
-      [pricingTiers]
-   );
-
+}: GeneralCheckoutPageContentProps) {
    const resolvedInitialSlug = useMemo(() => {
-      if (planOptions.length === 0) return undefined;
       if (initialPlanSlug) {
-         const normalized = initialPlanSlug.toLowerCase();
-         const match = planOptions.find((option) => option.slug === normalized);
-         if (match) return match.slug;
+         const match = pricingPlans.find(
+            (plan) => toPlanSlug(plan.name) === initialPlanSlug.toLowerCase()
+         );
+         if (match) return toPlanSlug(match.name);
       }
-      const highlighted = planOptions.find((option) => option.tier.highlighted);
-      return highlighted?.slug ?? planOptions[0]?.slug;
-   }, [initialPlanSlug, planOptions]);
+      const highlighted = pricingPlans.find((plan) => plan.highlighted);
+      return highlighted
+         ? toPlanSlug(highlighted.name)
+         : toPlanSlug(pricingPlans[0]?.name);
+   }, [initialPlanSlug]);
 
    const [selectedPlanSlug, setSelectedPlanSlug] = useState(resolvedInitialSlug);
    const [isProcessing, setIsProcessing] = useState(false);
@@ -82,8 +59,29 @@ export function CheckoutPageContent({
 
    const selectedPlan = useMemo(() => {
       if (!selectedPlanSlug) return undefined;
-      return planOptions.find((option) => option.slug === selectedPlanSlug)?.tier;
-   }, [planOptions, selectedPlanSlug]);
+      return pricingPlans.find(
+         (plan) => toPlanSlug(plan.name) === selectedPlanSlug
+      );
+   }, [selectedPlanSlug]);
+
+   // Filter courses based on selected plan
+   const filteredCourses = useMemo(() => {
+      if (!selectedPlan) return courses;
+      
+      // Starter plan: Only HTML and CSS
+      if (selectedPlan.name === "Starter") {
+         return courses.filter((course) => 
+            course.id === "html" || course.id === "css"
+         );
+      }
+      
+      // Pro Builder and Team Studio: All courses
+      return courses;
+   }, [courses, selectedPlan]);
+
+   const handlePlanSelect = (slug?: string) => {
+      if (slug) setSelectedPlanSlug(slug);
+   };
 
    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -102,46 +100,44 @@ export function CheckoutPageContent({
             {/* Minimal Header */}
             <div className='mb-12'>
                <Link
-                  href={`/courses/${course.id}`}
+                  href='/'
                   className='group inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground'
                >
                   <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-                  <span>Back to course</span>
+                  <span>Back</span>
                </Link>
             </div>
 
             {/* Main Content - Side by Side Layout */}
             <div className='grid gap-12 lg:grid-cols-5'>
-               {/* Left - Order Summary */}
-               <div className='space-y-8 lg:col-span-3'>
+               {/* Left - Order Summary (Swapped) */}
+               <div className='space-y-8 col-span-3'>
                   <div>
                      <h1 className='text-3xl font-bold tracking-tight text-foreground'>
                         {isConfirmed ? "Purchase Complete" : "Your Order"}
                      </h1>
                      <p className='mt-2 text-muted-foreground'>
                         {isConfirmed 
-                           ? "Thank you for enrolling in " + course.title
-                           : course.title}
+                           ? "Thank you for your purchase"
+                           : "Review your selection and complete checkout"}
                      </p>
                   </div>
 
                   {!isConfirmed ? (
-                     <OrderSummary
-                        course={course}
-                        detail={detail}
+                     <CoursesSummary 
+                        courses={filteredCourses} 
                         selectedPlan={selectedPlan}
-                        planOptions={planOptions}
                         selectedPlanSlug={selectedPlanSlug}
-                        onPlanSelect={setSelectedPlanSlug}
+                        onPlanSelect={handlePlanSelect}
                      />
                   ) : (
-                     <SuccessMessage course={course} selectedPlan={selectedPlan} />
+                     <SuccessMessage selectedPlan={selectedPlan} />
                   )}
                </div>
 
                {/* Right - Contact Form */}
                {!isConfirmed && (
-                  <div className='lg:sticky lg:top-8 lg:self-start lg:col-span-2'>
+                  <div className='lg:sticky lg:top-8 lg:self-start col-span-2'>
                      <ContactForm
                         onSubmit={handleSubmit}
                         selectedPlan={selectedPlan}
@@ -162,7 +158,7 @@ export function CheckoutPageContent({
 
 interface ContactFormProps {
    onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-   selectedPlan?: CoursePricingTier;
+   selectedPlan?: PricingPlan;
    isProcessing: boolean;
 }
 
@@ -207,11 +203,6 @@ function ContactForm({
                      type='tel'
                      placeholder='+91 98765 43210'
                   />
-                  <InputField
-                     id='company'
-                     label='Company (Optional)'
-                     placeholder='Your Company'
-                  />
                </div>
             </div>
 
@@ -241,12 +232,6 @@ function ContactForm({
                         required
                      />
                   </div>
-                  
-                  {/* Security Badge - Inline */}
-                  <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-                     <ShieldCheck className='h-4 w-4 text-primary' />
-                     <span>Secure payment powered by Stripe</span>
-                  </div>
                </div>
             </div>
 
@@ -260,20 +245,22 @@ function ContactForm({
                {isProcessing
                   ? "Processing..."
                   : selectedPlan
-                  ? `Complete Purchase · ${selectedPlan.price}`
-                  : "Select a plan to continue"}
+                  ? `Pay ${selectedPlan.price}`
+                  : "Select a plan"}
             </Button>
-
-            <p className='text-center text-xs text-muted-foreground'>
-               By continuing, you agree to our Terms of Service
-            </p>
          </form>
+
+         {/* Trust Badge */}
+         <div className='flex items-center justify-center gap-2 text-xs text-muted-foreground'>
+            <ShieldCheck className='h-4 w-4 text-primary' />
+            <span>Secure payment via Stripe</span>
+         </div>
       </div>
    );
 }
 
 // ============================================================================
-// Reusable UI Components (DRY Principle)
+// Reusable UI Components
 // ============================================================================
 
 interface InputFieldProps {
@@ -292,10 +279,9 @@ function InputField({
    required,
 }: InputFieldProps) {
    return (
-      <div className='space-y-2'>
+      <div className='space-y-1.5'>
          <label htmlFor={id} className='text-sm font-medium text-foreground'>
             {label}
-            {required && <span className='ml-1 text-destructive'>*</span>}
          </label>
          <input
             id={id}
@@ -303,33 +289,28 @@ function InputField({
             type={type}
             placeholder={placeholder}
             required={required}
-            className={cn(
-               "w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm",
-               "text-foreground placeholder:text-muted-foreground",
-               "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20",
-               "transition-colors"
-            )}
+            className='w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary'
          />
       </div>
    );
 }
 
 interface MinimalPlanCardProps {
-   tier: CoursePricingTier;
+   plan: PricingPlan;
    slug: string;
    selected: boolean;
    onSelect: () => void;
 }
 
-function MinimalPlanCard({ tier, slug, selected, onSelect }: MinimalPlanCardProps) {
+function MinimalPlanCard({ plan, slug, selected, onSelect }: MinimalPlanCardProps) {
    return (
       <label
          htmlFor={`plan-${slug}`}
          className={cn(
-            "block cursor-pointer rounded-lg border-2 bg-card p-4 transition-all",
-            "hover:border-primary/50",
+            "block cursor-pointer rounded-xl border-2 bg-card p-4 transition-all",
+            "hover:border-primary/40",
             selected
-               ? "border-primary bg-primary/5"
+               ? "border-primary shadow-sm"
                : "border-border"
          )}
       >
@@ -342,23 +323,21 @@ function MinimalPlanCard({ tier, slug, selected, onSelect }: MinimalPlanCardProp
             checked={selected}
             onChange={onSelect}
          />
-         <div className='flex items-center justify-between gap-3'>
-            <div className='flex-1'>
+         <div className='flex items-start justify-between gap-4'>
+            <div className='flex-1 space-y-1'>
                <div className='flex items-center gap-2'>
-                  <h3 className='font-semibold text-foreground'>{tier.name}</h3>
-                  {tier.highlighted && (
-                     <span className='rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground'>
+                  <h3 className='font-semibold text-foreground'>{plan.name}</h3>
+                  {plan.highlighted && (
+                     <span className='rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary'>
                         Popular
                      </span>
                   )}
                </div>
-               <p className='mt-1 text-xs text-muted-foreground line-clamp-1'>{tier.description}</p>
+               <p className='text-xs text-muted-foreground'>{plan.description}</p>
             </div>
-            <div className='text-right'>
-               <p className='text-xl font-bold text-foreground'>{tier.price}</p>
-               <p className='text-xs text-muted-foreground'>
-                  {tier.cadence || "Once"}
-               </p>
+            <div className='flex flex-col items-end'>
+               <p className='text-xl font-bold text-foreground'>{plan.price}</p>
+               <p className='text-xs text-muted-foreground'>{plan.cadence}</p>
             </div>
          </div>
       </label>
@@ -369,87 +348,73 @@ function MinimalPlanCard({ tier, slug, selected, onSelect }: MinimalPlanCardProp
 // Sidebar Components
 // ============================================================================
 
-interface OrderSummaryProps {
-   course: Course;
-   detail?: CheckoutDetailSnapshot;
-   selectedPlan?: CoursePricingTier;
-   planOptions: PlanOptionDescriptor[];
+interface CoursesSummaryProps {
+   courses: Course[];
+   selectedPlan?: PricingPlan;
    selectedPlanSlug?: string;
    onPlanSelect: (slug?: string) => void;
 }
 
-function OrderSummary({ 
-   course, 
-   detail, 
+function CoursesSummary({ 
+   courses, 
    selectedPlan,
-   planOptions,
    selectedPlanSlug,
-   onPlanSelect
-}: OrderSummaryProps) {
-   const metrics = detail?.hero.metrics ?? [
-      { label: "Modules", value: `${course.modules}` },
-      { label: "Duration", value: course.duration },
-      { label: "Project", value: course.project },
-   ];
+   onPlanSelect 
+}: CoursesSummaryProps) {
+//    const totalModules = courses.reduce((sum, course) => sum + course.modules, 0);
 
    return (
       <div className='space-y-8'>
-         {/* Plan Selection & Course Info - Side by Side */}
+         {/* Plan Selection & Courses - Side by Side */}
          <div className='grid gap-6 lg:grid-cols-2'>
             {/* Left - Plan Selection */}
-            <div className='space-y-4'>
+            <div className='space-y-4 col-span-1'>
                <div>
                   <h2 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
                      Choose Plan
                   </h2>
                   {/* <p className='mt-1 text-xs text-muted-foreground'>
-                     Select your preferred option
+                     Select the plan that fits your needs
                   </p> */}
                </div>
                <div className='space-y-3'>
-                  {planOptions.map(({ tier, slug }) => (
-                     <MinimalPlanCard
-                        key={slug}
-                        tier={tier}
-                        slug={slug}
-                        selected={slug === selectedPlanSlug}
-                        onSelect={() => onPlanSelect(slug)}
-                     />
-                  ))}
-                  {planOptions.length === 0 && (
-                     <div className='rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center text-xs text-muted-foreground'>
-                        Pricing options coming soon
-                     </div>
-                  )}
+                  {pricingPlans.map((plan) => {
+                     const slug = toPlanSlug(plan.name);
+                     return (
+                        <MinimalPlanCard
+                           key={slug}
+                           plan={plan}
+                           slug={slug}
+                           selected={slug === selectedPlanSlug}
+                           onSelect={() => onPlanSelect(slug)}
+                        />
+                     );
+                  })}
                </div>
             </div>
 
-            {/* Right - Course Info */}
+            {/* Right - Courses */}
             {selectedPlan && (
                <div className='space-y-4'>
-                  <div>
+                  <div className='flex items-center justify-between'>
                      <h3 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
-                        Course Details
+                        Courses
                      </h3>
+                     <span className='text-xs text-muted-foreground'>{courses.length} total</span>
                   </div>
-                  <div className='rounded-lg border border-border bg-card p-4'>
-                     <div className='flex items-start gap-3'>
-                        <span className='text-3xl'>{course.icon}</span>
-                        <div className='flex-1 min-w-0'>
-                           <h3 className='font-semibold text-foreground'>{course.title}</h3>
-                           <p className='mt-1 text-xs text-muted-foreground line-clamp-2'>
-                              {detail?.hero.description ?? course.description}
-                           </p>
-                        </div>
-                     </div>
-                  </div>
-                  
-                  {/* Course Metrics */}
-                  <div className='grid grid-cols-3 gap-3'>
-                     {metrics.slice(0, 3).map((metric) => (
-                        <div key={metric.label} className='text-center'>
-                           <p className='text-lg font-bold text-foreground'>{metric.value}</p>
-                           <p className='text-xs text-muted-foreground'>{metric.label}</p>
+                  <div className='space-y-2'>
+                     {courses.map((course) => (
+                        <div
+                           key={course.id}
+                           className='flex items-center gap-3 rounded-lg border border-border bg-card p-3'
+                        >
+                           <span className='text-2xl'>{course.icon}</span>
+                           <div className='flex-1 min-w-0'>
+                              <p className='text-sm font-medium text-foreground truncate'>{course.title}</p>
+                              <p className='text-xs text-muted-foreground'>
+                                 {course.modules} modules
+                              </p>
+                           </div>
                         </div>
                      ))}
                   </div>
@@ -475,6 +440,26 @@ function OrderSummary({
                   </div>
                </div>
 
+               {/* Stats */}
+               {/* <div className='grid grid-cols-4 gap-3'>
+                  <div className='text-center'>
+                     <p className='text-lg font-bold text-foreground'>{courses.length}</p>
+                     <p className='text-xs text-muted-foreground'>Courses</p>
+                  </div>
+                  <div className='text-center'>
+                     <p className='text-lg font-bold text-foreground'>{totalModules}</p>
+                     <p className='text-xs text-muted-foreground'>Modules</p>
+                  </div>
+                  <div className='text-center'>
+                     <p className='text-lg font-bold text-foreground'>100+</p>
+                     <p className='text-xs text-muted-foreground'>Projects</p>
+                  </div>
+                  <div className='text-center'>
+                     <p className='text-lg font-bold text-foreground'>∞</p>
+                     <p className='text-xs text-muted-foreground'>Access</p>
+                  </div>
+               </div> */}
+
                {/* Total */}
                <div className='space-y-3 border-t border-border pt-6'>
                   <div className='flex items-center justify-between'>
@@ -486,14 +471,14 @@ function OrderSummary({
                      <span className='text-2xl font-bold text-primary'>{selectedPlan.price}</span>
                   </div>
                   <p className='text-xs text-center text-muted-foreground'>
-                     {selectedPlan.cadence || "One-time payment"} • Lifetime access included
+                     {selectedPlan.cadence} • Lifetime access included
                   </p>
                </div>
             </>
          )}
 
          {/* No Plan Selected State */}
-         {!selectedPlan && planOptions.length > 0 && (
+         {!selectedPlan && (
             <div className='rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center'>
                <p className='text-sm text-muted-foreground'>
                   Select a plan to see details
@@ -506,10 +491,13 @@ function OrderSummary({
 
 function TrustBadges() {
    return (
-      <div className='mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground'>
+      <div className='mt-8 space-y-3'>
          {TRUST_SIGNALS.map((signal) => (
-            <div key={signal} className='flex items-center gap-1.5'>
-               <CheckCircle2 className='h-3.5 w-3.5 text-primary' />
+            <div
+               key={signal}
+               className='flex items-center gap-2.5 text-xs text-muted-foreground'
+            >
+               <CheckCircle2 className='h-4 w-4 shrink-0 text-primary' />
                <span>{signal}</span>
             </div>
          ))}
@@ -522,63 +510,57 @@ function TrustBadges() {
 // ============================================================================
 
 interface SuccessMessageProps {
-   course: Course;
-   selectedPlan?: CoursePricingTier;
+   selectedPlan?: PricingPlan;
 }
 
-function SuccessMessage({ course, selectedPlan }: SuccessMessageProps) {
+function SuccessMessage({ selectedPlan }: SuccessMessageProps) {
    return (
       <div className='space-y-8'>
-         <div className='flex items-center justify-center'>
-            <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/10'>
-               <CheckCircle2 className='h-10 w-10 text-primary' />
+         <div className='space-y-4'>
+            <div className='inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10'>
+               <CheckCircle2 className='h-8 w-8 text-primary' />
             </div>
-         </div>
-         
-         <div className='space-y-3 text-center'>
-            <h2 className='text-3xl font-bold text-foreground'>
-               Payment Successful!
-            </h2>
-            <p className='text-lg text-muted-foreground'>
-               Thank you for enrolling in {course.title}
-            </p>
+            <div>
+               <h2 className='text-3xl font-bold text-foreground'>
+                  Payment Successful
+               </h2>
+               <p className='mt-2 text-muted-foreground'>
+                  Welcome to your learning journey
+               </p>
+            </div>
          </div>
 
          {selectedPlan && (
-            <div className='space-y-3 rounded-lg border border-border bg-card p-6'>
-               <h3 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
-                  Payment Details
-               </h3>
-               <div className='space-y-2 divide-y divide-border'>
-                  <div className='flex items-center justify-between py-2'>
-                     <span className='text-sm text-muted-foreground'>Plan</span>
-                     <span className='text-sm font-medium text-foreground'>{selectedPlan.name}</span>
-                  </div>
-                  <div className='flex items-center justify-between py-2'>
-                     <span className='text-sm text-muted-foreground'>Course</span>
-                     <span className='text-sm font-medium text-foreground'>{course.title}</span>
-                  </div>
-                  <div className='flex items-center justify-between py-2'>
-                     <span className='text-sm text-muted-foreground'>Amount Paid</span>
-                     <span className='text-lg font-bold text-primary'>{selectedPlan.price}</span>
-                  </div>
+            <div className='space-y-3 border-t border-b border-border py-6'>
+               <div className='flex items-center justify-between'>
+                  <span className='text-sm text-muted-foreground'>Plan</span>
+                  <span className='font-semibold text-foreground'>{selectedPlan.name}</span>
+               </div>
+               <div className='flex items-center justify-between'>
+                  <span className='text-sm text-muted-foreground'>Amount Paid</span>
+                  <span className='text-2xl font-bold text-foreground'>{selectedPlan.price}</span>
                </div>
             </div>
          )}
 
-         <div className='flex flex-col gap-3 sm:flex-row'>
-            <Link
-               href={`/docs/${course.id}`}
-               className='flex-1 inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90'
-            >
-               Start Learning
-            </Link>
-            <Link
-               href='/'
-               className='flex-1 inline-flex items-center justify-center rounded-md border border-border bg-background px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted'
-            >
-               Back to Home
-            </Link>
+         <div className='space-y-3'>
+            <p className='text-sm text-muted-foreground'>
+               Confirmation email has been sent with your access details and next steps.
+            </p>
+            <div className='flex flex-col gap-3'>
+               <Link
+                  href='/courses'
+                  className='inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90'
+               >
+                  Start Learning
+               </Link>
+               <Link
+                  href='/'
+                  className='inline-flex items-center justify-center rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground transition-colors hover:bg-muted'
+               >
+                  Back to Home
+               </Link>
+            </div>
          </div>
       </div>
    );
