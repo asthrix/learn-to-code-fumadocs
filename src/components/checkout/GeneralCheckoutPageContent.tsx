@@ -6,11 +6,6 @@ import {
    ArrowLeft,
    CheckCircle2,
    ShieldCheck,
-   CreditCard,
-   Mail,
-   User,
-   Building2,
-   BookOpen,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -366,7 +361,7 @@ function CoursesSummary({
    selectedPlanSlug,
    onPlanSelect 
 }: CoursesSummaryProps) {
-   const totalModules = courses.reduce((sum, course) => sum + course.modules, 0);
+//    const totalModules = courses.reduce((sum, course) => sum + course.modules, 0);
 
    return (
       <div className='space-y-8'>
@@ -433,7 +428,7 @@ function CoursesSummary({
                {/* What's Included */}
                <div className='space-y-4'>
                   <h3 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
-                     What's Included
+                     What&apos;s Included
                   </h3>
                   <div className='space-y-2'>
                      {selectedPlan.features.map((feature) => (

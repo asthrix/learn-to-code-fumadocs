@@ -6,10 +6,6 @@ import {
    ArrowLeft,
    CheckCircle2,
    ShieldCheck,
-   CreditCard,
-   Mail,
-   User,
-   Building2,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -467,7 +463,7 @@ function OrderSummary({
                {/* What's Included */}
                <div className='space-y-4'>
                   <h3 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
-                     What's Included
+                     What&apos;s Included
                   </h3>
                   <div className='space-y-2'>
                      {selectedPlan.features.map((feature) => (
