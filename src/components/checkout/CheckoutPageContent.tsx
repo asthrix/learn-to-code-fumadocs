@@ -113,26 +113,23 @@ export function CheckoutPageContent({
             </Link>
 
             {/* Header */}
-            <header className='mb-8'>
-               <h1 className='mb-2 text-3xl font-bold text-foreground'>
-                  {course.title}
+            <header className='mb-8 text-center'>
+               <h1 className='mb-3 text-4xl font-bold text-foreground'>
+                  Complete Your Enrollment
                </h1>
-               <p className='text-muted-foreground'>
-                  {detail?.hero.description ?? course.description}
+               <p className='text-lg text-muted-foreground'>
+                  {course.title}
                </p>
             </header>
 
             {/* Main Content Grid */}
             <div className='grid gap-8 lg:grid-cols-3'>
-               {/* Left Column - Form */}
+               {/* Left Column - Contact Form */}
                <div className='lg:col-span-2'>
                   {isConfirmed ? (
                      <SuccessMessage course={course} selectedPlan={selectedPlan} />
                   ) : (
-                     <CheckoutForm
-                        planOptions={planOptions}
-                        selectedPlanSlug={selectedPlanSlug}
-                        onPlanSelect={setSelectedPlanSlug}
+                     <ContactForm
                         onSubmit={handleSubmit}
                         selectedPlan={selectedPlan}
                         isProcessing={isProcessing}
@@ -140,12 +137,15 @@ export function CheckoutPageContent({
                   )}
                </div>
 
-               {/* Right Column - Summary */}
+               {/* Right Column - Summary with Plan Selection */}
                <aside className='space-y-6'>
                   <OrderSummary
                      course={course}
                      detail={detail}
                      selectedPlan={selectedPlan}
+                     planOptions={planOptions}
+                     selectedPlanSlug={selectedPlanSlug}
+                     onPlanSelect={setSelectedPlanSlug}
                   />
                   <TrustBadges />
                </aside>
@@ -159,74 +159,64 @@ export function CheckoutPageContent({
 // Form Components
 // ============================================================================
 
-interface CheckoutFormProps {
-   planOptions: PlanOptionDescriptor[];
-   selectedPlanSlug?: string;
-   onPlanSelect: (slug?: string) => void;
+interface ContactFormProps {
    onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
    selectedPlan?: CoursePricingTier;
    isProcessing: boolean;
 }
 
-function CheckoutForm({
-   planOptions,
-   selectedPlanSlug,
-   onPlanSelect,
+function ContactForm({
    onSubmit,
    selectedPlan,
    isProcessing,
-}: CheckoutFormProps) {
+}: ContactFormProps) {
    return (
-      <form onSubmit={onSubmit} className='space-y-8'>
-         {/* Plan Selection */}
-         <FormSection title='Select Plan'>
-            <div className='space-y-3'>
-               {planOptions.map(({ tier, slug }) => (
-                  <PlanCard
-                     key={slug}
-                     tier={tier}
-                     slug={slug}
-                     selected={slug === selectedPlanSlug}
-                     onSelect={() => onPlanSelect(slug)}
-                  />
-               ))}
-               {planOptions.length === 0 && (
-                  <div className='rounded-lg border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground'>
-                     Pricing options are being updated. Check back soon.
-                  </div>
-               )}
-            </div>
-         </FormSection>
-
+      <form onSubmit={onSubmit} className='space-y-6'>
          {/* Contact Information */}
-         <FormSection title='Contact Information'>
+         <FormSection title='Your Information'>
             <div className='grid gap-4 sm:grid-cols-2'>
                <InputField
-                  id='fullName'
-                  label='Full Name'
+                  id='firstName'
+                  label='First Name'
                   icon={User}
-                  placeholder='John Doe'
+                  placeholder='John'
                   required
                />
                <InputField
-                  id='email'
-                  label='Email'
-                  type='email'
-                  icon={Mail}
-                  placeholder='john@example.com'
+                  id='lastName'
+                  label='Last Name'
+                  icon={User}
+                  placeholder='Doe'
                   required
                />
             </div>
+            <div className='grid gap-4 sm:grid-cols-2'>
+            <InputField
+               id='email'
+               label='Email Address'
+               type='email'
+               icon={Mail}
+               placeholder='john@example.com'
+               required
+               />
+            <InputField
+               id='phone'
+               label='Phone Number (Optional)'
+               type='tel'
+               icon={Mail}
+               placeholder='+91 98765 43210'
+               />
+               </div>
             <InputField
                id='company'
-               label='Company (Optional)'
+               label='Company / Organization (Optional)'
                icon={Building2}
                placeholder='Company Name'
             />
          </FormSection>
 
          {/* Payment Information */}
-         <FormSection title='Payment Details'>
+         <FormSection title='Payment Information'>
             <InputField
                id='cardNumber'
                label='Card Number'
@@ -248,24 +238,31 @@ function CheckoutForm({
                   required
                />
             </div>
-            <p className='text-xs text-muted-foreground'>
-               Payments are securely processed by Stripe
-            </p>
+            <div className='flex items-start gap-3 rounded-lg bg-muted/30 p-4'>
+               <ShieldCheck className='mt-0.5 h-5 w-5 shrink-0 text-primary' />
+               <p className='text-xs text-muted-foreground'>
+                  Your payment information is secure and encrypted. We use Stripe for payment processing.
+               </p>
+            </div>
          </FormSection>
 
          {/* Submit Button */}
          <Button
             type='submit'
             size='lg'
-            className='w-full'
-            disabled={planOptions.length === 0 || isProcessing}
+            className='w-full text-base'
+            disabled={!selectedPlan || isProcessing}
          >
             {isProcessing
-               ? "Processing..."
+               ? "Processing Payment..."
                : selectedPlan
-               ? `Pay ${selectedPlan.price}`
+               ? `Complete Purchase · ${selectedPlan.price}`
                : "Select a plan to continue"}
          </Button>
+
+         <p className='text-center text-xs text-muted-foreground'>
+            By completing this purchase, you agree to our Terms of Service and Privacy Policy
+         </p>
       </form>
    );
 }
@@ -334,20 +331,20 @@ function InputField({
    );
 }
 
-interface PlanCardProps {
+interface MinimalPlanCardProps {
    tier: CoursePricingTier;
    slug: string;
    selected: boolean;
    onSelect: () => void;
 }
 
-function PlanCard({ tier, slug, selected, onSelect }: PlanCardProps) {
+function MinimalPlanCard({ tier, slug, selected, onSelect }: MinimalPlanCardProps) {
    return (
       <label
          htmlFor={`plan-${slug}`}
          className={cn(
             "block cursor-pointer rounded-lg border bg-card p-4 transition-all",
-            "hover:border-primary/50 hover:shadow-sm",
+            "hover:border-primary/50",
             selected
                ? "border-primary bg-primary/5 ring-2 ring-primary/20"
                : "border-border"
@@ -362,38 +359,30 @@ function PlanCard({ tier, slug, selected, onSelect }: PlanCardProps) {
             checked={selected}
             onChange={onSelect}
          />
-         <div className='flex items-start justify-between gap-4'>
-            <div className='flex-1 space-y-2'>
-               <div className='flex items-center gap-3'>
+         <div className='flex items-center justify-between gap-3'>
+            <div className='flex-1'>
+               <div className='flex items-center gap-2'>
+                  <div className={cn(
+                     "h-4 w-4 rounded-full border-2 flex items-center justify-center transition-colors",
+                     selected ? "border-primary bg-primary" : "border-border"
+                  )}>
+                     {selected && (
+                        <div className='h-1.5 w-1.5 rounded-full bg-primary-foreground' />
+                     )}
+                  </div>
                   <h3 className='font-semibold text-foreground'>{tier.name}</h3>
                   {tier.highlighted && (
-                     <span className='rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary'>
+                     <span className='rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground'>
                         Popular
                      </span>
                   )}
                </div>
-               <p className='text-sm text-muted-foreground'>{tier.description}</p>
-               <ul className='space-y-1'>
-                  {tier.features.slice(0, 3).map((feature) => (
-                     <li
-                        key={feature}
-                        className='flex items-start gap-2 text-sm text-muted-foreground'
-                     >
-                        <CheckCircle2 className='mt-0.5 h-4 w-4 shrink-0 text-primary' />
-                        <span>{feature}</span>
-                     </li>
-                  ))}
-                  {tier.features.length > 3 && (
-                     <li className='text-xs text-muted-foreground'>
-                        +{tier.features.length - 3} more features
-                     </li>
-                  )}
-               </ul>
+               <p className='mt-1 text-xs text-muted-foreground line-clamp-1'>{tier.description}</p>
             </div>
             <div className='text-right'>
-               <p className='text-2xl font-bold text-foreground'>{tier.price}</p>
+               <p className='text-lg font-bold text-foreground'>{tier.price}</p>
                <p className='text-xs text-muted-foreground'>
-                  {tier.cadence || "One-time"}
+                  {tier.cadence || "Once"}
                </p>
             </div>
          </div>
@@ -409,9 +398,19 @@ interface OrderSummaryProps {
    course: Course;
    detail?: CheckoutDetailSnapshot;
    selectedPlan?: CoursePricingTier;
+   planOptions: PlanOptionDescriptor[];
+   selectedPlanSlug?: string;
+   onPlanSelect: (slug?: string) => void;
 }
 
-function OrderSummary({ course, detail, selectedPlan }: OrderSummaryProps) {
+function OrderSummary({ 
+   course, 
+   detail, 
+   selectedPlan,
+   planOptions,
+   selectedPlanSlug,
+   onPlanSelect
+}: OrderSummaryProps) {
    const metrics = detail?.hero.metrics ?? [
       { label: "Modules", value: `${course.modules}` },
       { label: "Duration", value: course.duration },
@@ -419,38 +418,110 @@ function OrderSummary({ course, detail, selectedPlan }: OrderSummaryProps) {
    ];
 
    return (
-      <div className='space-y-4 rounded-lg border border-border bg-card p-6'>
-         <h2 className='text-lg font-semibold text-foreground'>Order Summary</h2>
-         
-         <div className='space-y-3 border-b border-border pb-4'>
-            <p className='text-sm font-medium text-foreground'>{course.title}</p>
-            <div className='grid grid-cols-2 gap-2'>
-               {metrics.slice(0, 4).map((metric) => (
-                  <div key={metric.label} className='text-xs'>
-                     <p className='text-muted-foreground'>{metric.label}</p>
-                     <p className='font-medium text-foreground'>{metric.value}</p>
-                  </div>
-               ))}
-            </div>
+      <div className='space-y-4 rounded-xl border border-border bg-card p-5 shadow-sm'>
+         <div>
+            <h2 className='text-lg font-semibold text-foreground'>Order Summary</h2>
+            {/* <p className='mt-1 text-sm text-muted-foreground'>{course.title}</p> */}
          </div>
 
-         {selectedPlan ? (
-            <div className='space-y-2'>
-               <div className='flex items-center justify-between text-sm'>
-                  <span className='text-muted-foreground'>Plan:</span>
-                  <span className='font-medium text-foreground'>{selectedPlan.name}</span>
+         {/* Plan Selection - Moved to Top */}
+         <div className='space-y-3'>
+            <h3 className='text-sm font-semibold text-foreground'>Select Plan</h3>
+            {planOptions.map(({ tier, slug }) => (
+               <MinimalPlanCard
+                  key={slug}
+                  tier={tier}
+                  slug={slug}
+                  selected={slug === selectedPlanSlug}
+                  onSelect={() => onPlanSelect(slug)}
+               />
+            ))}
+            {planOptions.length === 0 && (
+               <div className='rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center text-xs text-muted-foreground'>
+                  Pricing options coming soon
                </div>
-               <div className='flex items-center justify-between border-t border-border pt-2'>
-                  <span className='font-semibold text-foreground'>Total:</span>
-                  <span className='text-xl font-bold text-primary'>
-                     {selectedPlan.price}
-                  </span>
+            )}
+         </div>
+
+         {/* Order Details - Dynamic based on selected plan */}
+         {selectedPlan && (
+            <div className='space-y-4 border-t border-border pt-4'>
+               {/* Course Info Card */}
+               {/* <div className='rounded-lg bg-muted/30 p-4'>
+                  <div className='flex items-start gap-3'>
+                     <span className='text-3xl'>{course.icon}</span>
+                     <div className='flex-1'>
+                        <h3 className='font-semibold text-foreground'>{course.title}</h3>
+                        <p className='mt-1 text-xs text-muted-foreground line-clamp-2'>
+                           {detail?.hero.description ?? course.description}
+                        </p>
+                     </div>
+                  </div>
+               </div> */}
+
+               {/* Course Metrics - Dynamic Grid */}
+               {/* <div className='grid grid-cols-2 gap-2'>
+                  {metrics.slice(0, 4).map((metric) => (
+                     <div key={metric.label} className='rounded-lg border border-border bg-card p-3 text-center'>
+                        <p className='text-xs font-medium text-muted-foreground'>{metric.label}</p>
+                        <p className='mt-1 text-base font-bold text-foreground'>{metric.value}</p>
+                     </div>
+                  ))}
+               </div> */}
+
+               {/* What's Included in Plan */}
+               <div className='rounded-lg border border-border bg-card p-4'>
+                  <h3 className='mb-3 text-sm font-semibold text-foreground'>
+                     {selectedPlan.name} includes:
+                  </h3>
+                  <ul className='space-y-2'>
+                     {selectedPlan.features.map((feature, index) => (
+                        <li
+                           key={feature}
+                           className='flex items-start gap-2 text-xs text-muted-foreground'
+                        >
+                           <CheckCircle2 className='mt-0.5 h-3.5 w-3.5 shrink-0 text-primary' />
+                           <span>{feature}</span>
+                        </li>
+                     ))}
+                  </ul>
+               </div>
+
+               {/* Pricing Breakdown */}
+               <div className='space-y-3 border-t border-border pt-4'>
+                  <div className='flex items-center justify-between text-sm'>
+                     <span className='text-muted-foreground'>Selected Plan:</span>
+                     <span className='font-semibold text-foreground'>{selectedPlan.name}</span>
+                  </div>
+                  <div className='flex items-center justify-between text-sm'>
+                     <span className='text-muted-foreground'>Course:</span>
+                     <span className='font-medium text-foreground'>{course.title}</span>
+                  </div>
+                  <div className='flex items-center justify-between text-sm'>
+                     <span className='text-muted-foreground'>Price:</span>
+                     <span className='font-semibold text-foreground'>{selectedPlan.price}</span>
+                  </div>
+                  <div className='flex items-center justify-between rounded-lg bg-primary/10 p-3'>
+                     <span className='font-bold text-foreground'>Total Due:</span>
+                     <span className='text-2xl font-bold text-primary'>
+                        {selectedPlan.price}
+                     </span>
+                  </div>
+                  <div className='flex items-center justify-center gap-2 text-xs text-muted-foreground'>
+                     <CheckCircle2 className='h-3.5 w-3.5 text-primary' />
+                     <span>{selectedPlan.cadence || "One-time payment"} · Lifetime access</span>
+                  </div>
                </div>
             </div>
-         ) : (
-            <p className='text-sm text-muted-foreground'>
-               Select a plan to see pricing
-            </p>
+         )}
+
+         {/* No Plan Selected State */}
+         {!selectedPlan && (
+            <div className='rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center'>
+               <p className='text-sm text-muted-foreground'>
+                  Select a plan to see details
+               </p>
+            </div>
          )}
       </div>
    );
