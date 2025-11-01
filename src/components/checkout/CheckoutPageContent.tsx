@@ -101,54 +101,59 @@ export function CheckoutPageContent({
    };
 
    return (
-      <main className='min-h-screen bg-background'>
-         <div className='mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8'>
-            {/* Back Button */}
-            <Link
-               href={`/courses/${course.id}`}
-               className='group mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary'
-            >
-               <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-               Back to course
-            </Link>
+      <main className='min-h-screen bg-gradient-to-b from-background to-muted/20'>
+         <div className='mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8'>
+            {/* Minimal Header */}
+            <div className='mb-12'>
+               <Link
+                  href={`/courses/${course.id}`}
+                  className='group inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground'
+               >
+                  <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
+                  <span>Back to course</span>
+               </Link>
+            </div>
 
-            {/* Header */}
-            <header className='mb-8 text-center'>
-               <h1 className='mb-3 text-4xl font-bold text-foreground'>
-                  Complete Your Enrollment
-               </h1>
-               <p className='text-lg text-muted-foreground'>
-                  {course.title}
-               </p>
-            </header>
+            {/* Main Content - Side by Side Layout */}
+            <div className='grid gap-12 lg:grid-cols-5'>
+               {/* Left - Order Summary */}
+               <div className='space-y-8 lg:col-span-3'>
+                  <div>
+                     <h1 className='text-3xl font-bold tracking-tight text-foreground'>
+                        {isConfirmed ? "Purchase Complete" : "Your Order"}
+                     </h1>
+                     <p className='mt-2 text-muted-foreground'>
+                        {isConfirmed 
+                           ? "Thank you for enrolling in " + course.title
+                           : course.title}
+                     </p>
+                  </div>
 
-            {/* Main Content Grid */}
-            <div className='grid gap-8 lg:grid-cols-3'>
-               {/* Left Column - Contact Form */}
-               <div className='lg:col-span-2'>
-                  {isConfirmed ? (
-                     <SuccessMessage course={course} selectedPlan={selectedPlan} />
+                  {!isConfirmed ? (
+                     <OrderSummary
+                        course={course}
+                        detail={detail}
+                        selectedPlan={selectedPlan}
+                        planOptions={planOptions}
+                        selectedPlanSlug={selectedPlanSlug}
+                        onPlanSelect={setSelectedPlanSlug}
+                     />
                   ) : (
+                     <SuccessMessage course={course} selectedPlan={selectedPlan} />
+                  )}
+               </div>
+
+               {/* Right - Contact Form */}
+               {!isConfirmed && (
+                  <div className='lg:sticky lg:top-8 lg:self-start lg:col-span-2'>
                      <ContactForm
                         onSubmit={handleSubmit}
                         selectedPlan={selectedPlan}
                         isProcessing={isProcessing}
                      />
-                  )}
-               </div>
-
-               {/* Right Column - Summary with Plan Selection */}
-               <aside className='space-y-6'>
-                  <OrderSummary
-                     course={course}
-                     detail={detail}
-                     selectedPlan={selectedPlan}
-                     planOptions={planOptions}
-                     selectedPlanSlug={selectedPlanSlug}
-                     onPlanSelect={setSelectedPlanSlug}
-                  />
-                  <TrustBadges />
-               </aside>
+                     <TrustBadges />
+                  </div>
+               )}
             </div>
          </div>
       </main>
@@ -171,99 +176,103 @@ function ContactForm({
    isProcessing,
 }: ContactFormProps) {
    return (
-      <form onSubmit={onSubmit} className='space-y-6'>
-         {/* Contact Information */}
-         <FormSection title='Your Information'>
-            <div className='grid gap-4 sm:grid-cols-2'>
-               <InputField
-                  id='firstName'
-                  label='First Name'
-                  icon={User}
-                  placeholder='John'
-                  required
-               />
-               <InputField
-                  id='lastName'
-                  label='Last Name'
-                  icon={User}
-                  placeholder='Doe'
-                  required
-               />
-            </div>
-            <div className='grid gap-4 sm:grid-cols-2'>
-            <InputField
-               id='email'
-               label='Email Address'
-               type='email'
-               icon={Mail}
-               placeholder='john@example.com'
-               required
-               />
-            <InputField
-               id='phone'
-               label='Phone Number (Optional)'
-               type='tel'
-               icon={Mail}
-               placeholder='+91 98765 43210'
-               />
+      <div className='space-y-8'>
+         <form onSubmit={onSubmit} className='space-y-8'>
+            {/* Contact Information */}
+            <div className='space-y-6'>
+               <h3 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
+                  Contact Details
+               </h3>
+               <div className='space-y-4'>
+                  <div className='grid gap-4 sm:grid-cols-2'>
+                     <InputField
+                        id='firstName'
+                        label='First Name'
+                        placeholder='John'
+                        required
+                     />
+                     <InputField
+                        id='lastName'
+                        label='Last Name'
+                        placeholder='Doe'
+                        required
+                     />
+                  </div>
+                  <InputField
+                     id='email'
+                     label='Email'
+                     type='email'
+                     placeholder='john@example.com'
+                     required
+                  />
+                  <InputField
+                     id='phone'
+                     label='Phone (Optional)'
+                     type='tel'
+                     placeholder='+91 98765 43210'
+                  />
+                  <InputField
+                     id='company'
+                     label='Company (Optional)'
+                     placeholder='Your Company'
+                  />
                </div>
-            <InputField
-               id='company'
-               label='Company / Organization (Optional)'
-               icon={Building2}
-               placeholder='Company Name'
-            />
-         </FormSection>
-
-         {/* Payment Information */}
-         <FormSection title='Payment Information'>
-            <InputField
-               id='cardNumber'
-               label='Card Number'
-               icon={CreditCard}
-               placeholder='1234 5678 9012 3456'
-               required
-            />
-            <div className='grid gap-4 sm:grid-cols-2'>
-               <InputField
-                  id='expiry'
-                  label='Expiry Date'
-                  placeholder='MM/YY'
-                  required
-               />
-               <InputField
-                  id='cvc'
-                  label='CVC'
-                  placeholder='123'
-                  required
-               />
             </div>
-            <div className='flex items-start gap-3 rounded-lg bg-muted/30 p-4'>
-               <ShieldCheck className='mt-0.5 h-5 w-5 shrink-0 text-primary' />
-               <p className='text-xs text-muted-foreground'>
-                  Your payment information is secure and encrypted. We use Stripe for payment processing.
-               </p>
+
+            {/* Payment Information */}
+            <div className='space-y-6 border-t border-border pt-8'>
+               <h3 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
+                  Payment Method
+               </h3>
+               <div className='space-y-4'>
+                  <InputField
+                     id='cardNumber'
+                     label='Card Number'
+                     placeholder='1234 5678 9012 3456'
+                     required
+                  />
+                  <div className='grid gap-4 sm:grid-cols-2'>
+                     <InputField
+                        id='expiry'
+                        label='Expiry'
+                        placeholder='MM/YY'
+                        required
+                     />
+                     <InputField
+                        id='cvc'
+                        label='CVC'
+                        placeholder='123'
+                        required
+                     />
+                  </div>
+                  
+                  {/* Security Badge - Inline */}
+                  <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+                     <ShieldCheck className='h-4 w-4 text-primary' />
+                     <span>Secure payment powered by Stripe</span>
+                  </div>
+               </div>
             </div>
-         </FormSection>
 
-         {/* Submit Button */}
-         <Button
-            type='submit'
-            size='lg'
-            className='w-full text-base'
-            disabled={!selectedPlan || isProcessing}
-         >
-            {isProcessing
-               ? "Processing Payment..."
-               : selectedPlan
-               ? `Complete Purchase · ${selectedPlan.price}`
-               : "Select a plan to continue"}
-         </Button>
+            {/* Submit Button */}
+            <Button
+               type='submit'
+               size='lg'
+               className='w-full'
+               disabled={!selectedPlan || isProcessing}
+            >
+               {isProcessing
+                  ? "Processing..."
+                  : selectedPlan
+                  ? `Complete Purchase · ${selectedPlan.price}`
+                  : "Select a plan to continue"}
+            </Button>
 
-         <p className='text-center text-xs text-muted-foreground'>
-            By completing this purchase, you agree to our Terms of Service and Privacy Policy
-         </p>
-      </form>
+            <p className='text-center text-xs text-muted-foreground'>
+               By continuing, you agree to our Terms of Service
+            </p>
+         </form>
+      </div>
    );
 }
 
@@ -271,25 +280,10 @@ function ContactForm({
 // Reusable UI Components (DRY Principle)
 // ============================================================================
 
-interface FormSectionProps {
-   title: string;
-   children: React.ReactNode;
-}
-
-function FormSection({ title, children }: FormSectionProps) {
-   return (
-      <section className='space-y-4 rounded-lg border border-border bg-card p-6'>
-         <h2 className='text-lg font-semibold text-foreground'>{title}</h2>
-         <div className='space-y-4'>{children}</div>
-      </section>
-   );
-}
-
 interface InputFieldProps {
    id: string;
    label: string;
    type?: string;
-   icon?: React.ComponentType<{ className?: string }>;
    placeholder?: string;
    required?: boolean;
 }
@@ -298,7 +292,6 @@ function InputField({
    id,
    label,
    type = "text",
-   icon: Icon,
    placeholder,
    required,
 }: InputFieldProps) {
@@ -308,25 +301,19 @@ function InputField({
             {label}
             {required && <span className='ml-1 text-destructive'>*</span>}
          </label>
-         <div className='relative'>
-            {Icon && (
-               <Icon className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+         <input
+            id={id}
+            name={id}
+            type={type}
+            placeholder={placeholder}
+            required={required}
+            className={cn(
+               "w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm",
+               "text-foreground placeholder:text-muted-foreground",
+               "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20",
+               "transition-colors"
             )}
-            <input
-               id={id}
-               name={id}
-               type={type}
-               placeholder={placeholder}
-               required={required}
-               className={cn(
-                  "w-full rounded-md border border-border bg-background px-3 py-2 text-sm",
-                  "text-foreground placeholder:text-muted-foreground",
-                  "focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20",
-                  "transition-colors",
-                  Icon && "pl-10"
-               )}
-            />
-         </div>
+         />
       </div>
    );
 }
@@ -343,10 +330,10 @@ function MinimalPlanCard({ tier, slug, selected, onSelect }: MinimalPlanCardProp
       <label
          htmlFor={`plan-${slug}`}
          className={cn(
-            "block cursor-pointer rounded-lg border bg-card p-4 transition-all",
+            "block cursor-pointer rounded-lg border-2 bg-card p-4 transition-all",
             "hover:border-primary/50",
             selected
-               ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+               ? "border-primary bg-primary/5"
                : "border-border"
          )}
       >
@@ -362,14 +349,6 @@ function MinimalPlanCard({ tier, slug, selected, onSelect }: MinimalPlanCardProp
          <div className='flex items-center justify-between gap-3'>
             <div className='flex-1'>
                <div className='flex items-center gap-2'>
-                  <div className={cn(
-                     "h-4 w-4 rounded-full border-2 flex items-center justify-center transition-colors",
-                     selected ? "border-primary bg-primary" : "border-border"
-                  )}>
-                     {selected && (
-                        <div className='h-1.5 w-1.5 rounded-full bg-primary-foreground' />
-                     )}
-                  </div>
                   <h3 className='font-semibold text-foreground'>{tier.name}</h3>
                   {tier.highlighted && (
                      <span className='rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground'>
@@ -380,7 +359,7 @@ function MinimalPlanCard({ tier, slug, selected, onSelect }: MinimalPlanCardProp
                <p className='mt-1 text-xs text-muted-foreground line-clamp-1'>{tier.description}</p>
             </div>
             <div className='text-right'>
-               <p className='text-lg font-bold text-foreground'>{tier.price}</p>
+               <p className='text-xl font-bold text-foreground'>{tier.price}</p>
                <p className='text-xs text-muted-foreground'>
                   {tier.cadence || "Once"}
                </p>
@@ -418,105 +397,107 @@ function OrderSummary({
    ];
 
    return (
-      <div className='space-y-4 rounded-xl border border-border bg-card p-5 shadow-sm'>
-         <div>
-            <h2 className='text-lg font-semibold text-foreground'>Order Summary</h2>
-            {/* <p className='mt-1 text-sm text-muted-foreground'>{course.title}</p> */}
-         </div>
+      <div className='space-y-8'>
+         {/* Plan Selection & Course Info - Side by Side */}
+         <div className='grid gap-6 lg:grid-cols-2'>
+            {/* Left - Plan Selection */}
+            <div className='space-y-4'>
+               <div>
+                  <h2 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
+                     Choose Plan
+                  </h2>
+                  {/* <p className='mt-1 text-xs text-muted-foreground'>
+                     Select your preferred option
+                  </p> */}
+               </div>
+               <div className='space-y-3'>
+                  {planOptions.map(({ tier, slug }) => (
+                     <MinimalPlanCard
+                        key={slug}
+                        tier={tier}
+                        slug={slug}
+                        selected={slug === selectedPlanSlug}
+                        onSelect={() => onPlanSelect(slug)}
+                     />
+                  ))}
+                  {planOptions.length === 0 && (
+                     <div className='rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center text-xs text-muted-foreground'>
+                        Pricing options coming soon
+                     </div>
+                  )}
+               </div>
+            </div>
 
-         {/* Plan Selection - Moved to Top */}
-         <div className='space-y-3'>
-            <h3 className='text-sm font-semibold text-foreground'>Select Plan</h3>
-            {planOptions.map(({ tier, slug }) => (
-               <MinimalPlanCard
-                  key={slug}
-                  tier={tier}
-                  slug={slug}
-                  selected={slug === selectedPlanSlug}
-                  onSelect={() => onPlanSelect(slug)}
-               />
-            ))}
-            {planOptions.length === 0 && (
-               <div className='rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center text-xs text-muted-foreground'>
-                  Pricing options coming soon
+            {/* Right - Course Info */}
+            {selectedPlan && (
+               <div className='space-y-4'>
+                  <div>
+                     <h3 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
+                        Course Details
+                     </h3>
+                  </div>
+                  <div className='rounded-lg border border-border bg-card p-4'>
+                     <div className='flex items-start gap-3'>
+                        <span className='text-3xl'>{course.icon}</span>
+                        <div className='flex-1 min-w-0'>
+                           <h3 className='font-semibold text-foreground'>{course.title}</h3>
+                           <p className='mt-1 text-xs text-muted-foreground line-clamp-2'>
+                              {detail?.hero.description ?? course.description}
+                           </p>
+                        </div>
+                     </div>
+                  </div>
+                  
+                  {/* Course Metrics */}
+                  <div className='grid grid-cols-3 gap-3'>
+                     {metrics.slice(0, 3).map((metric) => (
+                        <div key={metric.label} className='text-center'>
+                           <p className='text-lg font-bold text-foreground'>{metric.value}</p>
+                           <p className='text-xs text-muted-foreground'>{metric.label}</p>
+                        </div>
+                     ))}
+                  </div>
                </div>
             )}
          </div>
 
          {/* Order Details - Dynamic based on selected plan */}
          {selectedPlan && (
-            <div className='space-y-4 border-t border-border pt-4'>
-               {/* Course Info Card */}
-               {/* <div className='rounded-lg bg-muted/30 p-4'>
-                  <div className='flex items-start gap-3'>
-                     <span className='text-3xl'>{course.icon}</span>
-                     <div className='flex-1'>
-                        <h3 className='font-semibold text-foreground'>{course.title}</h3>
-                        <p className='mt-1 text-xs text-muted-foreground line-clamp-2'>
-                           {detail?.hero.description ?? course.description}
-                        </p>
-                     </div>
-                  </div>
-               </div> */}
-
-               {/* Course Metrics - Dynamic Grid */}
-               {/* <div className='grid grid-cols-2 gap-2'>
-                  {metrics.slice(0, 4).map((metric) => (
-                     <div key={metric.label} className='rounded-lg border border-border bg-card p-3 text-center'>
-                        <p className='text-xs font-medium text-muted-foreground'>{metric.label}</p>
-                        <p className='mt-1 text-base font-bold text-foreground'>{metric.value}</p>
-                     </div>
-                  ))}
-               </div> */}
-
-               {/* What's Included in Plan */}
-               <div className='rounded-lg border border-border bg-card p-4'>
-                  <h3 className='mb-3 text-sm font-semibold text-foreground'>
-                     {selectedPlan.name} includes:
+            <>
+               {/* What's Included */}
+               <div className='space-y-4'>
+                  <h3 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
+                     What's Included
                   </h3>
-                  <ul className='space-y-2'>
-                     {selectedPlan.features.map((feature, index) => (
-                        <li
-                           key={feature}
-                           className='flex items-start gap-2 text-xs text-muted-foreground'
-                        >
-                           <CheckCircle2 className='mt-0.5 h-3.5 w-3.5 shrink-0 text-primary' />
-                           <span>{feature}</span>
-                        </li>
+                  <div className='space-y-2'>
+                     {selectedPlan.features.map((feature) => (
+                        <div key={feature} className='flex items-start gap-2.5'>
+                           <CheckCircle2 className='mt-0.5 h-4 w-4 shrink-0 text-primary' />
+                           <span className='text-sm text-foreground'>{feature}</span>
+                        </div>
                      ))}
-                  </ul>
+                  </div>
                </div>
 
-               {/* Pricing Breakdown */}
-               <div className='space-y-3 border-t border-border pt-4'>
-                  <div className='flex items-center justify-between text-sm'>
-                     <span className='text-muted-foreground'>Selected Plan:</span>
-                     <span className='font-semibold text-foreground'>{selectedPlan.name}</span>
+               {/* Total */}
+               <div className='space-y-3 border-t border-border pt-6'>
+                  <div className='flex items-center justify-between'>
+                     <span className='text-sm text-muted-foreground'>Subtotal</span>
+                     <span className='text-sm font-medium text-foreground'>{selectedPlan.price}</span>
                   </div>
-                  <div className='flex items-center justify-between text-sm'>
-                     <span className='text-muted-foreground'>Course:</span>
-                     <span className='font-medium text-foreground'>{course.title}</span>
+                  <div className='flex items-center justify-between'>
+                     <span className='text-base font-semibold text-foreground'>Total</span>
+                     <span className='text-2xl font-bold text-primary'>{selectedPlan.price}</span>
                   </div>
-                  <div className='flex items-center justify-between text-sm'>
-                     <span className='text-muted-foreground'>Price:</span>
-                     <span className='font-semibold text-foreground'>{selectedPlan.price}</span>
-                  </div>
-                  <div className='flex items-center justify-between rounded-lg bg-primary/10 p-3'>
-                     <span className='font-bold text-foreground'>Total Due:</span>
-                     <span className='text-2xl font-bold text-primary'>
-                        {selectedPlan.price}
-                     </span>
-                  </div>
-                  <div className='flex items-center justify-center gap-2 text-xs text-muted-foreground'>
-                     <CheckCircle2 className='h-3.5 w-3.5 text-primary' />
-                     <span>{selectedPlan.cadence || "One-time payment"} · Lifetime access</span>
-                  </div>
+                  <p className='text-xs text-center text-muted-foreground'>
+                     {selectedPlan.cadence || "One-time payment"} • Lifetime access included
+                  </p>
                </div>
-            </div>
+            </>
          )}
 
          {/* No Plan Selected State */}
-         {!selectedPlan && (
+         {!selectedPlan && planOptions.length > 0 && (
             <div className='rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center'>
                <p className='text-sm text-muted-foreground'>
                   Select a plan to see details
@@ -529,19 +510,13 @@ function OrderSummary({
 
 function TrustBadges() {
    return (
-      <div className='space-y-3 rounded-lg border border-border bg-card p-6'>
-         <div className='flex items-center gap-2'>
-            <ShieldCheck className='h-5 w-5 text-primary' />
-            <h3 className='font-semibold text-foreground'>Secure Checkout</h3>
-         </div>
-         <ul className='space-y-2'>
-            {TRUST_SIGNALS.map((signal) => (
-               <li key={signal} className='flex items-start gap-2 text-sm text-muted-foreground'>
-                  <CheckCircle2 className='mt-0.5 h-4 w-4 shrink-0 text-primary' />
-                  <span>{signal}</span>
-               </li>
-            ))}
-         </ul>
+      <div className='mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground'>
+         {TRUST_SIGNALS.map((signal) => (
+            <div key={signal} className='flex items-center gap-1.5'>
+               <CheckCircle2 className='h-3.5 w-3.5 text-primary' />
+               <span>{signal}</span>
+            </div>
+         ))}
       </div>
    );
 }
@@ -557,32 +532,54 @@ interface SuccessMessageProps {
 
 function SuccessMessage({ course, selectedPlan }: SuccessMessageProps) {
    return (
-      <div className='rounded-lg border border-border bg-card p-8 text-center'>
-         <div className='mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10'>
-            <CheckCircle2 className='h-8 w-8 text-primary' />
+      <div className='space-y-8'>
+         <div className='flex items-center justify-center'>
+            <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/10'>
+               <CheckCircle2 className='h-10 w-10 text-primary' />
+            </div>
          </div>
-         <h2 className='mb-2 text-2xl font-bold text-foreground'>
-            Payment Successful!
-         </h2>
-         <p className='mb-4 text-muted-foreground'>
-            Thank you for enrolling in {course.title}
-         </p>
-         {selectedPlan && (
-            <p className='mb-6 text-sm text-muted-foreground'>
-               Plan: <span className='font-medium text-foreground'>{selectedPlan.name}</span> ·{" "}
-               {selectedPlan.price}
+         
+         <div className='space-y-3 text-center'>
+            <h2 className='text-3xl font-bold text-foreground'>
+               Payment Successful!
+            </h2>
+            <p className='text-lg text-muted-foreground'>
+               Thank you for enrolling in {course.title}
             </p>
+         </div>
+
+         {selectedPlan && (
+            <div className='space-y-3 rounded-lg border border-border bg-card p-6'>
+               <h3 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
+                  Payment Details
+               </h3>
+               <div className='space-y-2 divide-y divide-border'>
+                  <div className='flex items-center justify-between py-2'>
+                     <span className='text-sm text-muted-foreground'>Plan</span>
+                     <span className='text-sm font-medium text-foreground'>{selectedPlan.name}</span>
+                  </div>
+                  <div className='flex items-center justify-between py-2'>
+                     <span className='text-sm text-muted-foreground'>Course</span>
+                     <span className='text-sm font-medium text-foreground'>{course.title}</span>
+                  </div>
+                  <div className='flex items-center justify-between py-2'>
+                     <span className='text-sm text-muted-foreground'>Amount Paid</span>
+                     <span className='text-lg font-bold text-primary'>{selectedPlan.price}</span>
+                  </div>
+               </div>
+            </div>
          )}
-         <div className='flex flex-col gap-3 sm:flex-row sm:justify-center'>
+
+         <div className='flex flex-col gap-3 sm:flex-row'>
             <Link
                href={`/docs/${course.id}`}
-               className='inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90'
+               className='flex-1 inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90'
             >
                Start Learning
             </Link>
             <Link
                href='/'
-               className='inline-flex items-center justify-center rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted'
+               className='flex-1 inline-flex items-center justify-center rounded-md border border-border bg-background px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted'
             >
                Back to Home
             </Link>
