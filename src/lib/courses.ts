@@ -116,6 +116,41 @@ export const courses: Course[] = [
          after: ["JavaScript mastery", "API integration", "Modern JS patterns"],
       },
    },
+   
+   {
+      id: "react",
+      title: "Project React",
+      description:
+         "Build modern, scalable web applications with React. Master components, hooks, state management, and production-ready development practices.",
+      shortDescription: "Create powerful web applications with React",
+      difficulty: "intermediate",
+      duration: "40 hours",
+      modules: 10,
+      prerequisites: ["javascript"],
+      project: "TaskFlow Pro - Task Management App",
+      technologies: ["React 18", "Hooks", "Context", "Router", "Performance"],
+      icon: "⚛️",
+      status: "available",
+      featured: true,
+      learningObjectives: [
+         "Master React components and JSX",
+         "Implement state management with hooks",
+         "Build production-ready applications",
+         "Optimize performance and user experience",
+      ],
+      skillLevel: {
+         before: [
+            "JavaScript proficiency",
+            "ES6+ knowledge",
+            "Basic web development",
+         ],
+         after: [
+            "React mastery",
+            "Component architecture",
+            "Modern development workflow",
+         ],
+      },
+   },
    {
       id: "react-new",
       title: "React Launchpad",
@@ -148,40 +183,6 @@ export const courses: Course[] = [
             "Confident React component authoring",
             "State and effect management basics",
             "API-driven UI implementation",
-         ],
-      },
-   },
-   {
-      id: "react",
-      title: "Project React",
-      description:
-         "Build modern, scalable web applications with React. Master components, hooks, state management, and production-ready development practices.",
-      shortDescription: "Create powerful web applications with React",
-      difficulty: "intermediate",
-      duration: "40 hours",
-      modules: 10,
-      prerequisites: ["javascript"],
-      project: "TaskFlow Pro - Task Management App",
-      technologies: ["React 18", "Hooks", "Context", "Router", "Performance"],
-      icon: "⚛️",
-      status: "available",
-      featured: true,
-      learningObjectives: [
-         "Master React components and JSX",
-         "Implement state management with hooks",
-         "Build production-ready applications",
-         "Optimize performance and user experience",
-      ],
-      skillLevel: {
-         before: [
-            "JavaScript proficiency",
-            "ES6+ knowledge",
-            "Basic web development",
-         ],
-         after: [
-            "React mastery",
-            "Component architecture",
-            "Modern development workflow",
          ],
       },
    },
