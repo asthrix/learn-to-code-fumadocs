@@ -151,41 +151,41 @@ export const courses: Course[] = [
          ],
       },
    },
-   {
-      id: "react-new",
-      title: "React Launchpad",
-      description:
-         "Build the StaySense listing experience from the ground up. Learn React fundamentals, state patterns, and API integration through a guided four-module journey.",
-      shortDescription:
-         "Ship the StaySense MVP while learning React step by step",
-      difficulty: "beginner",
-      duration: "28 hours",
-      modules: 4,
-      prerequisites: ["javascript"],
-      project: "StaySense Listing MVP",
-      technologies: ["React 18", "Vite", "Tailwind CSS", "Axios"],
-      icon: "🌱",
-      status: "available",
-      featured: true,
-      learningObjectives: [
-         "Bootstrap a modern React project with Vite and Tailwind",
-         "Compose reusable components and layouts for listings",
-         "Manage local state, filters, and user interactions",
-         "Integrate Axios with a mock API and deliver a polished MVP",
-      ],
-      skillLevel: {
-         before: [
-            "JavaScript fundamentals",
-            "Basic web development workflows",
-            "Comfort with npm tooling",
-         ],
-         after: [
-            "Confident React component authoring",
-            "State and effect management basics",
-            "API-driven UI implementation",
-         ],
-      },
-   },
+   // {
+   //    id: "react-new",
+   //    title: "React Launchpad",
+   //    description:
+   //       "Build the StaySense listing experience from the ground up. Learn React fundamentals, state patterns, and API integration through a guided four-module journey.",
+   //    shortDescription:
+   //       "Ship the StaySense MVP while learning React step by step",
+   //    difficulty: "beginner",
+   //    duration: "28 hours",
+   //    modules: 4,
+   //    prerequisites: ["javascript"],
+   //    project: "StaySense Listing MVP",
+   //    technologies: ["React 18", "Vite", "Tailwind CSS", "Axios"],
+   //    icon: "🌱",
+   //    status: "available",
+   //    featured: true,
+   //    learningObjectives: [
+   //       "Bootstrap a modern React project with Vite and Tailwind",
+   //       "Compose reusable components and layouts for listings",
+   //       "Manage local state, filters, and user interactions",
+   //       "Integrate Axios with a mock API and deliver a polished MVP",
+   //    ],
+   //    skillLevel: {
+   //       before: [
+   //          "JavaScript fundamentals",
+   //          "Basic web development workflows",
+   //          "Comfort with npm tooling",
+   //       ],
+   //       after: [
+   //          "Confident React component authoring",
+   //          "State and effect management basics",
+   //          "API-driven UI implementation",
+   //       ],
+   //    },
+   // },
    {
       id: "nextjs",
       title: "Next.js Full-Stack",
