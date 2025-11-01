@@ -79,7 +79,7 @@ import { Link } from 'react-router-dom';
 
 </Tabs>
 
-## Step 1: Update ListingCard
+## Step 1: Update PropertyCard
 
 Let's make listing cards clickable:
 
@@ -87,15 +87,15 @@ Let's make listing cards clickable:
 
 <Step>
 
-### Add Link to ListingCard
+### Add Link to PropertyCard
 
-Open `ListingCard.jsx` and import Link:
+Open `PropertyCard.jsx` and import Link:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 // [!code word:Link]
 import { Link } from 'react-router-dom'; // [!code ++]
 
-export default function ListingCard({ listing }) {
+export default function PropertyCard({ listing }) {
   return (
     <Link to={`/listing/${listing.id}`} className="block"> {/* [!code ++] */}
       <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
@@ -172,7 +172,7 @@ to={`/listing/${listing.id}`}  // → "/listing/999"
 
 Add hover effects to show cards are clickable:
 
-```jsx title="Enhanced ListingCard with Hover"
+```jsx title="Enhanced PropertyCard with Hover"
 // [!code word:hover]
 <Link to={`/listing/${listing.id}`} className="block group">
   <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">

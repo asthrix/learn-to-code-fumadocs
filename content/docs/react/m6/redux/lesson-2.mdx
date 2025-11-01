@@ -16,8 +16,8 @@ React Redux provides a `<Provider>` component that makes the Redux store availab
 <Provider store={store}>     ← Makes store available
   <App>                      ← Can access store
     <HomePage>               ← Can access store
-      <ListingCard>          ← Can access store
-      </ListingCard>
+      <PropertyCard>          ← Can access store
+      </PropertyCard>
     </HomePage>
   </App>
 </Provider>
@@ -179,7 +179,7 @@ App
          ├─ HomePage (can access store)
          │   ├─ ListingFilters (can access store)
          │   └─ ListingList (can access store)
-         │       └─ ListingCard (can access store)
+         │       └─ PropertyCard (can access store)
          ├─ ListingDetailsPage (can access store)
          └─ NotFoundPage (can access store)
 ```

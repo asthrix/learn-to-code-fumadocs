@@ -465,7 +465,7 @@ function ListingSkeleton() {
 ) : (
   <>
     {listings.map(listing => (
-      <ListingCard key={listing.id} listing={listing} />
+      <PropertyCard key={listing.id} listing={listing} />
     ))}
   </>
 )}
@@ -687,7 +687,7 @@ export default function usePaginatedListings(perPage = 6) {
 ```jsx title="src/pages/HomePage.jsx"
 import { RefreshCw } from 'lucide-react';
 import usePaginatedListings from '../hooks/usePaginatedListings';
-import ListingCard from '../components/ListingCard';
+import PropertyCard from '../components/PropertyCard';
 import Spinner from '../components/Spinner';
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -750,7 +750,7 @@ export default function HomePage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {listings.map(listing => (
-              <ListingCard key={listing.id} listing={listing} />
+              <PropertyCard key={listing.id} listing={listing} />
             ))}
           </div>
 

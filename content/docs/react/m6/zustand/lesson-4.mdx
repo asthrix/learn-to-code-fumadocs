@@ -201,7 +201,7 @@ Now use `fetchListings` in `HomePage`:
 ```jsx title="src/pages/HomePage.jsx"
 import { useEffect } from 'react';
 import useListingsStore from '@/state/useListingsStore';
-import ListingCard from '@/components/ListingCard';
+import PropertyCard from '@/components/PropertyCard';
 
 function HomePage() {
   // Select state
@@ -239,7 +239,7 @@ function HomePage() {
       <h1>Holiday Listings</h1>
       <div className="listings-grid">
         {items.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
+          <PropertyCard key={listing.id} listing={listing} />
         ))}
       </div>
     </div>

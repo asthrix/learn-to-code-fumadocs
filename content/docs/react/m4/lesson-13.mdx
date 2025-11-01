@@ -183,7 +183,7 @@ export default function SearchPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {listings.map(listing => (
-            <ListingCard key={listing.id} listing={listing} />
+            <PropertyCard key={listing.id} listing={listing} />
           ))}
         </div>
       )}
@@ -296,7 +296,7 @@ export default function FavoritesPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {listings.map(listing => (
             <div key={listing.id}>
-              <ListingCard listing={listing} />
+              <PropertyCard listing={listing} />
               <button
                 onClick={() => removeFavorite(listing.id)}
                 className="w-full mt-2 bg-red-100 text-red-600 py-2 rounded-lg hover:bg-red-200"
@@ -312,12 +312,12 @@ export default function FavoritesPage() {
 }
 ```
 
-**Step 3: Add Favorite Button to ListingCard**
+**Step 3: Add Favorite Button to PropertyCard**
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import { useFavorites } from '../hooks/useFavorites';
 
-export default function ListingCard({ listing }) {
+export default function PropertyCard({ listing }) {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const favorite = isFavorite(listing.id);
 

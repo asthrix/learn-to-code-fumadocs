@@ -90,20 +90,20 @@ Before you begin, make sure you have:
     };
     ```
     
-    3. Pass to ListingCard:
+    3. Pass to PropertyCard:
     
     ```jsx
-    <ListingCard 
+    <PropertyCard 
       listing={listing}
       isSaved={savedListings.includes(listing.id)}
       onToggleSave={toggleSaved}
     />
     ```
     
-    4. Update ListingCard with heart button:
+    4. Update PropertyCard with heart button:
     
     ```jsx
-    export function ListingCard({ listing, isSaved, onToggleSave }) {
+    export function PropertyCard({ listing, isSaved, onToggleSave }) {
       return (
         <div className="card">
           <button 
@@ -566,7 +566,7 @@ Before you begin, make sure you have:
     ```jsx
     // HomePage.jsx
     import { useState } from 'react';
-    import { ListingCard } from '../components/ListingCard';
+    import PropertyCard from '../components/PropertyCard';
     import { ListingFilters } from '../components/ListingFilters';
     
     export function HomePage() {
@@ -690,7 +690,7 @@ Before you begin, make sure you have:
               </div>
             ) : (
               sortedListings.map(listing => (
-                <ListingCard 
+                <PropertyCard 
                   key={listing.id} 
                   listing={listing}
                   isSaved={savedListings.includes(listing.id)}

@@ -362,7 +362,7 @@ export default listingsSlice.reducer;
 
 ### Component Integration Examples
 
-<Tabs items={['HomePage', 'FavoritesPage', 'Navbar', 'FavoriteButton', 'ListingCard']}>
+<Tabs items={['HomePage', 'FavoritesPage', 'Navbar', 'FavoriteButton', 'PropertyCard']}>
 
 <Tab value="HomePage">
 
@@ -434,13 +434,13 @@ export default HomePage;
 
 <Tab value="FavoritesPage">
 
-```jsx title="src/pages/ListingFavoritesPage.jsx"
+```jsx title="src/pages/FavoritesPage.jsx"
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import ListingList from '@/components/ListingList';
 
-function ListingFavoritesPage() {
+function FavoritesPage() {
   const items = useSelector((state) => state.listings.items);
   const favoriteIds = useSelector((state) => state.listings.favorites);
   
@@ -477,7 +477,7 @@ function ListingFavoritesPage() {
   );
 }
 
-export default ListingFavoritesPage;
+export default FavoritesPage;
 ```
 
 **Key points:**
@@ -595,13 +595,13 @@ export default ListingFavoriteButton;
 
 </Tab>
 
-<Tab value="ListingCard">
+<Tab value="PropertyCard">
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import { Link } from 'react-router-dom';
 import ListingFavoriteButton from './ListingFavoriteButton';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   return (
     <Link 
       to={`/listings/${listing.id}`}
@@ -628,7 +628,7 @@ function ListingCard({ listing }) {
   );
 }
 
-export default ListingCard;
+export default PropertyCard;
 ```
 
 **Key points:**
@@ -678,7 +678,7 @@ const favorites = useSelector((state) => state.listings.favorites);
 // - HomePage (show which are favorited)
 // - FavoritesPage (display favorited listings)
 // - Navbar (show count)
-// - ListingCard (show favorite status)
+// - PropertyCard (show favorite status)
 // - DetailsPage (show favorite status)
 ```
 
@@ -1087,7 +1087,7 @@ Here's what you built - a production-ready favorites system:
 ```
 User Flow:
 1. Browse listings on HomePage
-2. Click heart icon on ListingCard
+2. Click heart icon on PropertyCard
 3. Redux updates favorites array
 4. All components re-render:
    - Heart fills on clicked card ✅
@@ -1107,7 +1107,7 @@ Technical Implementation:
 - FavoritesPage component ✅
 - Navbar with counter ✅
 - FavoriteButton component ✅
-- Integrated in ListingCard ✅
+- Integrated in PropertyCard ✅
 - Complete routing ✅
 ```
 

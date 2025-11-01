@@ -170,16 +170,16 @@ export { Component, MemoizedComponent };
 
 </Accordions>
 
-## Real Example: ListingCard
+## Real Example: PropertyCard
 
-Let's optimize our `ListingCard`:
+Let's optimize our `PropertyCard`:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const ListingCard = React.memo(function ListingCard({ listing }) {
-  console.log('ListingCard rendered:', listing.id);
+const PropertyCard = React.memo(function PropertyCard({ listing }) {
+  console.log('PropertyCard rendered:', listing.id);
   
   return (
     <Link to={`/listings/${listing.id}`} className="block">
@@ -204,7 +204,7 @@ const ListingCard = React.memo(function ListingCard({ listing }) {
   );
 });
 
-export default ListingCard;
+export default PropertyCard;
 ```
 
 **Benefits:**
@@ -278,7 +278,7 @@ Let's optimize the list and card components:
 
 ```jsx title="src/components/ListingList.jsx"
 import React from 'react';
-import { ListingCard } from './ListingCard';
+import { PropertyCard } from './PropertyCard';
 
 const ListingList = React.memo(function ListingList({ listings }) {
   console.log('ListingList rendered with', listings.length, 'items');
@@ -294,7 +294,7 @@ const ListingList = React.memo(function ListingList({ listings }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {listings.map(listing => (
-        <ListingCard key={listing.id} listing={listing} />
+        <PropertyCard key={listing.id} listing={listing} />
       ))}
     </div>
   );
@@ -366,7 +366,7 @@ export function HomePage() {
 
 1. **useMemo** - Prevents recalculating filtered listings
 2. **useCallback** - Prevents recreating handler functions
-3. **React.memo** - Prevents re-rendering ListingFilters, ListingList, and ListingCards
+3. **React.memo** - Prevents re-rendering ListingFilters, ListingList, and PropertyCards
 
 Result: **Minimal re-renders!** ⚡
 

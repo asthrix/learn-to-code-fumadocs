@@ -11,14 +11,14 @@ Let's build a page to show all favorited listings! ⭐
 A `FavoritesPage` that:
 - Shows all favorited listings
 - Displays empty state when no favorites
-- Reuses `ListingCard` component
+- Reuses `PropertyCard` component
 - Updates in real-time when favorites change
 
 ## Step 1: Create the Page Component
 
 ```jsx title="src/pages/FavoritesPage.jsx"
 import useListingsStore from '@/state/useListingsStore';
-import ListingCard from '@/components/ListingCard';
+import PropertyCard from '@/components/PropertyCard';
 
 function FavoritesPage() {
   // Select items and favorites
@@ -56,7 +56,7 @@ function FavoritesPage() {
       ) : (
         <div className="listings-grid">
           {favoritedListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+            <PropertyCard key={listing.id} listing={listing} />
           ))}
         </div>
       )}
@@ -155,20 +155,20 @@ function FavoritesPage() {
 
 <Accordion title="Component Reusability">
 
-**We reuse `ListingCard`:**
+**We reuse `PropertyCard`:**
 
 ```jsx
 // In HomePage
-<ListingCard listing={listing} />
+<PropertyCard listing={listing} />
 
 // In FavoritesPage (same component!)
-<ListingCard listing={listing} />
+<PropertyCard listing={listing} />
 ```
 
-**How does ListingCard know if favorited?**
+**How does PropertyCard know if favorited?**
 
 ```jsx
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   // It checks the store directly!
   const favorites = useListingsStore((state) => state.favorites);
   const isFavorited = favorites.includes(listing.id);
@@ -194,7 +194,7 @@ Instead of filtering in the component, let's use the store's `getFavoritedItems`
 
 ```jsx title="src/pages/FavoritesPage.jsx (Improved)"
 import useListingsStore from '@/state/useListingsStore';
-import ListingCard from '@/components/ListingCard';
+import PropertyCard from '@/components/PropertyCard';
 
 function FavoritesPage() {
   // Use computed selector from store
@@ -227,7 +227,7 @@ function FavoritesPage() {
       ) : (
         <div className="listings-grid">
           {favoritedListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+            <PropertyCard key={listing.id} listing={listing} />
           ))}
         </div>
       )}
@@ -576,7 +576,7 @@ Perfect! FavoritesPage is complete. In the next lesson:
 
 ## Key Takeaways
 
-- ✅ **Reused ListingCard** - Same component in HomePage and FavoritesPage
+- ✅ **Reused PropertyCard** - Same component in HomePage and FavoritesPage
 - ✅ **Empty state** - Clear feedback when no favorites
 - ✅ **Real-time updates** - Removing favorite updates UI immediately
 - ✅ **Shared data** - No duplicate fetching or state

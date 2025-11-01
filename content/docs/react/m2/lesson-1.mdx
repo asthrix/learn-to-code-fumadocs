@@ -14,6 +14,21 @@ In Module 1, we built StaySense with hardcoded listings data. Now it's time to m
 
 ---
 
+## 📝 Data Structure Update
+
+Before we begin, note that our listing data structure has evolved:
+
+**Module 1 (Learning basics):**
+- Simple properties: `id`, `title`, `price`, `location`, `image`, `rating`
+
+**Module 2+ (Building real app):**
+- **Added:** `guests`, `bedrooms` (needed for booking functionality)
+- **Removed:** `rating` (we'll add a complete review system in Module 7)
+
+This is normal in real projects - data structures evolve as features grow! You don't need to change your Module 1 code. We're just expanding the data model for our booking app.
+
+---
+
 ## Why Do We Need State?
 
 Right now, our `HomePage` component has a static array of listings:
@@ -82,7 +97,7 @@ function Component() {
     
     ```jsx title="src/pages/HomePage.jsx"
     import { useState } from 'react'; // [!code ++]
-    import { ListingCard } from '../components/ListingCard';
+    import PropertyCard from '../components/PropertyCard';
     
     export function HomePage() {
       // Component code...
@@ -155,7 +170,7 @@ function Component() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {listings.map(listing => (
-              <ListingCard key={listing.id} listing={listing} />
+              <PropertyCard key={listing.id} listing={listing} />
             ))}
           </div>
         </div>
@@ -252,7 +267,7 @@ Here's your complete `HomePage` component with state:
 ```jsx title="src/pages/HomePage.jsx"
 // [!code word:useState]
 import { useState } from 'react';
-import { ListingCard } from '../components/ListingCard';
+import PropertyCard from '../components/PropertyCard';
 
 export function HomePage() {
   const [listings, setListings] = useState([ // [!code highlight]
@@ -294,7 +309,7 @@ export function HomePage() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {listings.map(listing => (
-          <ListingCard key={listing.id} listing={listing} />
+          <PropertyCard key={listing.id} listing={listing} />
         ))}
       </div>
     </div>

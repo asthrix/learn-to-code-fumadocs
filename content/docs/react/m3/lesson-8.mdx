@@ -427,20 +427,20 @@ Visual indicators help users see how many images there are and which one is acti
 
 </Steps>
 
-## Step 6: Integrate with ListingCard
+## Step 6: Integrate with PropertyCard
 
-Now let's use our carousel in the `ListingCard` component to display listing images!
+Now let's use our carousel in the `PropertyCard` component to display listing images!
 
 <Steps>
 
 <Step>
 
-### Update ListingCard
+### Update PropertyCard
 
-```jsx title="src/components/ListingCard.jsx" {2,10-15}
+```jsx title="src/components/PropertyCard.jsx" {2,10-15}
 // [!code ++]import ImageCarousel from './ImageCarousel';
 
-export default function ListingCard({ listing }) {
+export default function PropertyCard({ listing }) {
   const { title, location, price, rating, reviews, images } = listing;
 
   return (

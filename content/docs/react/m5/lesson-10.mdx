@@ -87,7 +87,7 @@ const handleSearch = useCallback((value) => {
 
 ```jsx
 // Only re-renders when props change
-const ListingCard = React.memo(function ListingCard({ listing }) {
+const PropertyCard = React.memo(function PropertyCard({ listing }) {
   return <div>{listing.title}</div>;
 });
 ```
@@ -223,7 +223,7 @@ function isAvailable(listing, from, to) {
 
 ```jsx title="src/components/ListingList.jsx"
 import React from 'react';
-import { ListingCard } from './ListingCard';
+import { PropertyCard } from './PropertyCard';
 
 // Memoized - doesn't re-render unless listings change
 const ListingList = React.memo(function ListingList({ listings }) {
@@ -238,7 +238,7 @@ const ListingList = React.memo(function ListingList({ listings }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {listings.map(listing => (
-        <ListingCard key={listing.id} listing={listing} />
+        <PropertyCard key={listing.id} listing={listing} />
       ))}
     </div>
   );
@@ -247,12 +247,12 @@ const ListingList = React.memo(function ListingList({ listings }) {
 export default ListingList;
 ```
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 // Memoized - only re-renders when listing prop changes
-const ListingCard = React.memo(function ListingCard({ listing }) {
+const PropertyCard = React.memo(function PropertyCard({ listing }) {
   return (
     <Link 
       to={`/listings/${listing.id}`}
@@ -275,7 +275,7 @@ const ListingCard = React.memo(function ListingCard({ listing }) {
   );
 });
 
-export default ListingCard;
+export default PropertyCard;
 ```
 
 ```jsx title="src/hooks/useFetch.js"

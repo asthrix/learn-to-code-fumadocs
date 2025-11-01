@@ -249,7 +249,7 @@ A filter bar with three main controls:
     
     ```jsx title="src/pages/HomePage.jsx"
     import { useState } from 'react';
-    import { ListingCard } from '../components/ListingCard';
+    import PropertyCard from '../components/PropertyCard';
     import { ListingFilters } from '../components/ListingFilters'; // [!code ++]
     
     export function HomePage() {
@@ -265,7 +265,7 @@ A filter bar with three main controls:
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {listings.map(listing => (
-              <ListingCard key={listing.id} listing={listing} />
+              <PropertyCard key={listing.id} listing={listing} />
             ))}
           </div>
         </div>

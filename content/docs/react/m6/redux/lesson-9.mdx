@@ -1,6 +1,6 @@
 ---
 title: "L9: Favorites Page"
-description: "Create the ListingFavoritesPage to display favorited listings"
+description: "Create the FavoritesPage to display favorited listings"
 ---
 
 
@@ -8,7 +8,7 @@ Let's create a dedicated page to display all favorited listings!
 
 ## What We're Building
 
-A `ListingFavoritesPage` that:
+A `FavoritesPage` that:
 
 1. Shows all favorited listings
 2. Handles empty state (no favorites)
@@ -20,18 +20,18 @@ A `ListingFavoritesPage` that:
 Create a new file:
 
 ```bash
-touch src/pages/ListingFavoritesPage.jsx
+touch src/pages/FavoritesPage.jsx
 ```
 
 ## Step 2: Build the Component
 
 Add the basic structure:
 
-```jsx title="src/pages/ListingFavoritesPage.jsx"
+```jsx title="src/pages/FavoritesPage.jsx"
 import { useSelector } from 'react-redux';
 import ListingList from '@/components/ListingList';
 
-function ListingFavoritesPage() {
+function FavoritesPage() {
   const items = useSelector((state) => state.listings.items);
   const favoriteIds = useSelector((state) => state.listings.favorites);
   
@@ -59,7 +59,7 @@ function ListingFavoritesPage() {
   );
 }
 
-export default ListingFavoritesPage;
+export default FavoritesPage;
 ```
 
 **What's happening here?**
@@ -260,12 +260,12 @@ export const selectFavoriteListings = (state) => {
 
 Then use it in the component:
 
-```jsx title="src/pages/ListingFavoritesPage.jsx"
+```jsx title="src/pages/FavoritesPage.jsx"
 import { useSelector } from 'react-redux';
 import { selectFavoriteListings } from '@/state/slices/listingsSlice';
 import ListingList from '@/components/ListingList';
 
-function ListingFavoritesPage() {
+function FavoritesPage() {
   const favoriteListings = useSelector(selectFavoriteListings);
   
   return (
@@ -287,7 +287,7 @@ function ListingFavoritesPage() {
   );
 }
 
-export default ListingFavoritesPage;
+export default FavoritesPage;
 ```
 
 **Cleaner!** The filter logic is now in the slice where it belongs.
@@ -296,13 +296,13 @@ export default ListingFavoritesPage;
 
 Let's make the empty state more helpful:
 
-```jsx title="src/pages/ListingFavoritesPage.jsx"
+```jsx title="src/pages/FavoritesPage.jsx"
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import ListingList from '@/components/ListingList';
 
-function ListingFavoritesPage() {
+function FavoritesPage() {
   const items = useSelector((state) => state.listings.items);
   const favoriteIds = useSelector((state) => state.listings.favorites);
   
@@ -339,7 +339,7 @@ function ListingFavoritesPage() {
   );
 }
 
-export default ListingFavoritesPage;
+export default FavoritesPage;
 ```
 
 **Enhanced empty state:**
@@ -354,11 +354,11 @@ export default ListingFavoritesPage;
 
 <Tab value="Inline Filter">
 
-```jsx title="src/pages/ListingFavoritesPage.jsx"
+```jsx title="src/pages/FavoritesPage.jsx"
 import { useSelector } from 'react-redux';
 import ListingList from '@/components/ListingList';
 
-function ListingFavoritesPage() {
+function FavoritesPage() {
   const items = useSelector((state) => state.listings.items);
   const favoriteIds = useSelector((state) => state.listings.favorites);
   
@@ -385,7 +385,7 @@ function ListingFavoritesPage() {
   );
 }
 
-export default ListingFavoritesPage;
+export default FavoritesPage;
 ```
 
 **Pros:**
@@ -397,12 +397,12 @@ export default ListingFavoritesPage;
 
 <Tab value="With Selector">
 
-```jsx title="src/pages/ListingFavoritesPage.jsx"
+```jsx title="src/pages/FavoritesPage.jsx"
 import { useSelector } from 'react-redux';
 import { selectFavoriteListings } from '@/state/slices/listingsSlice';
 import ListingList from '@/components/ListingList';
 
-function ListingFavoritesPage() {
+function FavoritesPage() {
   const favoriteListings = useSelector(selectFavoriteListings);
   
   return (
@@ -424,7 +424,7 @@ function ListingFavoritesPage() {
   );
 }
 
-export default ListingFavoritesPage;
+export default FavoritesPage;
 ```
 
 **Pros:**
@@ -446,13 +446,13 @@ export const selectFavoriteListings = (state) => {
 
 <Tab value="With Empty State">
 
-```jsx title="src/pages/ListingFavoritesPage.jsx"
+```jsx title="src/pages/FavoritesPage.jsx"
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import ListingList from '@/components/ListingList';
 
-function ListingFavoritesPage() {
+function FavoritesPage() {
   const items = useSelector((state) => state.listings.items);
   const favoriteIds = useSelector((state) => state.listings.favorites);
   
@@ -489,7 +489,7 @@ function ListingFavoritesPage() {
   );
 }
 
-export default ListingFavoritesPage;
+export default FavoritesPage;
 ```
 
 **Pros:**

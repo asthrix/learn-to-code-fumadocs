@@ -41,7 +41,7 @@ React components should be **pure functions** during rendering - they take props
 function Component() {
   // This runs during EVERY render!
   document.title = "My App"; // Side effect!
-  fetch("/api/data"); // Side effect!
+  fetch("/api/listings"); // Side effect!
   
   return <div>Component</div>;
 }
@@ -180,12 +180,12 @@ Track when your component renders and why:
 // [!code word:useEffect]
 import { useEffect } from 'react';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   useEffect(() => {
-    console.log('ListingCard mounted:', listing.id);
+    console.log('PropertyCard mounted:', listing.id);
     
     return () => {
-      console.log('ListingCard unmounting:', listing.id);
+      console.log('PropertyCard unmounting:', listing.id);
     };
   }, [listing.id]);
 

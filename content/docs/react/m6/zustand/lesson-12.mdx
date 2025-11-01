@@ -1,20 +1,20 @@
 ---
-title: "L12: Add Favorite Button to ListingCard"
-description: "Complete the ListingCard integration with FavoriteButton"
+title: "L12: Add Favorite Button to PropertyCard"
+description: "Complete the PropertyCard integration with FavoriteButton"
 ---
 
 
-Let's complete the ListingCard with our FavoriteButton! 🎨
+Let's complete the PropertyCard with our FavoriteButton! 🎨
 
-## Final ListingCard Component
+## Final PropertyCard Component
 
-Here's the complete, polished ListingCard:
+Here's the complete, polished PropertyCard:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import { Link } from 'react-router-dom';
 import FavoriteButton from '@/components/FavoriteButton';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   // Fallback for missing data
   const image = listing.media?.[0]?.url || '/placeholder.jpg';
   const imageAlt = listing.media?.[0]?.alt || listing.name;
@@ -67,7 +67,7 @@ function ListingCard({ listing }) {
   );
 }
 
-export default ListingCard;
+export default PropertyCard;
 ```
 
 ## Complete Styling
@@ -311,10 +311,10 @@ App
 │   └── FavoriteButton (count badge)
 └── Routes
     ├── HomePage
-    │   └── ListingCard (many)
+    │   └── PropertyCard (many)
     │       └── FavoriteButton
     └── FavoritesPage
-        └── ListingCard (filtered)
+        └── PropertyCard (filtered)
             └── FavoriteButton
 ```
 
@@ -327,7 +327,7 @@ App
 **How data flows:**
 
 ```
-User clicks FavoriteButton in ListingCard on HomePage
+User clicks FavoriteButton in PropertyCard on HomePage
 ↓
 FavoriteButton calls toggleFavorite(id)
 ↓
@@ -335,7 +335,7 @@ Zustand store updates: favorites = [1, 2, 3, 4]
 ↓
 All components using favorites re-render:
   - Navbar badge: "4"
-  - ListingCard buttons: Update ❤️/🤍
+  - PropertyCard buttons: Update ❤️/🤍
   - FavoritesPage: Shows 4 listings
 ↓
 UI synchronized everywhere!
@@ -463,7 +463,7 @@ color: #0369a1;  /* Blue on white */
 **Zustand only re-renders components that use changed data:**
 
 ```jsx
-// ListingCard
+// PropertyCard
 const isFavorited = favorites.includes(listing.id);
 // Re-renders when favorites changes ✅
 
@@ -525,7 +525,7 @@ function FavoritesPage() {
 
 ## What's Next?
 
-ListingCard is complete with FavoriteButton integration! In the final lesson:
+PropertyCard is complete with FavoriteButton integration! In the final lesson:
 
 1. **Module review** - Recap everything we built
 2. **Compare with Redux** - See the differences
@@ -533,12 +533,12 @@ ListingCard is complete with FavoriteButton integration! In the final lesson:
 4. **Next steps** - What to learn next
 
 <Callout type="success">
-**✅ Lesson Complete!** ListingCard fully integrated with FavoriteButton!
+**✅ Lesson Complete!** PropertyCard fully integrated with FavoriteButton!
 </Callout>
 
 ## Key Takeaways
 
-- ✅ **Complete integration** - FavoriteButton works in ListingCard
+- ✅ **Complete integration** - FavoriteButton works in PropertyCard
 - ✅ **Proper positioning** - Absolute positioning in top-right
 - ✅ **Hover effects** - Card lifts, image zooms
 - ✅ **Text clamping** - Consistent card heights
