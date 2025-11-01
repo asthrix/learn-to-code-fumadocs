@@ -91,7 +91,7 @@ App (15ms)
 ├─ HomePage (12ms)       [Yellow]
 │  ├─ Filters (1ms)      [Green]
 │  └─ ListingList (10ms) [Orange]
-│     └─ ListingCard × 100 (0.1ms each)
+│     └─ PropertyCard × 100 (0.1ms each)
 └─ Footer (1ms)          [Green]
 ```
 
@@ -133,7 +133,7 @@ export function HomePage() {
 **Profiler shows:**
 - Type "b" → HomePage: 45ms (Orange)
   - ListingList: 38ms (Orange)
-    - ListingCard × 1000: 0.038ms each (Red aggregate)
+    - PropertyCard × 1000: 0.038ms each (Red aggregate)
 - Type "e" → HomePage: 42ms (Orange)
   - ListingList: 35ms (Orange)
 - Type "a" → HomePage: 40ms (Orange)
@@ -180,7 +180,7 @@ const MemoizedList = React.memo(ListingList);
 - Type "b" → HomePage: 12ms (Yellow)
   - ListingFilters: 0ms (Gray - didn't render!)
   - ListingList: 10ms (Yellow)
-    - ListingCard × 200: 0.05ms each (Green - only new cards)
+    - PropertyCard × 200: 0.05ms each (Green - only new cards)
 - Type "e" → HomePage: 10ms (Yellow)
 - Type "a" → HomePage: 8ms (Green)
 
@@ -197,7 +197,7 @@ const MemoizedList = React.memo(ListingList);
 | HomePage | 45ms | 12ms | 73% faster |
 | ListingFilters | 2ms | 0ms (skipped) | 100% faster |
 | ListingList | 38ms | 10ms | 74% faster |
-| ListingCard (each) | Always renders | Only new ones | 80% fewer |
+| PropertyCard (each) | Always renders | Only new ones | 80% fewer |
 
 **Why:**
 1. **useMemo** - Prevents filter recalculation

@@ -209,7 +209,7 @@ const filtered = numbers.filter(num => num > 2 && num < 5);
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredListings.map(listing => ( // [!code highlight]
-              <ListingCard key={listing.id} listing={listing} />
+              <PropertyCard key={listing.id} listing={listing} />
             ))}
           </div>
         </div>
@@ -234,7 +234,7 @@ const filtered = numbers.filter(num => num > 2 && num < 5);
         </div> // [!code ++]
       ) : ( // [!code ++]
         filteredListings.map(listing => (
-          <ListingCard key={listing.id} listing={listing} />
+          <PropertyCard key={listing.id} listing={listing} />
         ))
       )} // [!code ++]
     </div>
@@ -274,7 +274,7 @@ Here's the complete `HomePage` with all filtering logic:
 ```jsx title="src/pages/HomePage.jsx"
 // [!code word:useState]
 import { useState } from 'react';
-import { ListingCard } from '../components/ListingCard';
+import PropertyCard from '../components/PropertyCard';
 import { ListingFilters } from '../components/ListingFilters';
 
 export function HomePage() {
@@ -369,7 +369,7 @@ export function HomePage() {
           </div>
         ) : (
           filteredListings.map(listing => (
-            <ListingCard key={listing.id} listing={listing} />
+            <PropertyCard key={listing.id} listing={listing} />
           ))
         )}
       </div>

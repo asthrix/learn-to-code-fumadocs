@@ -12,7 +12,7 @@ Right now, `HomePage` uses `useFetch` hook:
 
 ```jsx title="src/pages/HomePage.jsx (Current)"
 import useFetch from '@/hooks/useFetch';
-import ListingCard from '@/components/ListingCard';
+import PropertyCard from '@/components/PropertyCard';
 
 function HomePage() {
   const { data, isLoading, isError } = useFetch(
@@ -27,7 +27,7 @@ function HomePage() {
       <h1>Holiday Listings</h1>
       <div className="listings-grid">
         {data?.data?.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
+          <PropertyCard key={listing.id} listing={listing} />
         ))}
       </div>
     </div>
@@ -223,7 +223,7 @@ Now let's update `HomePage` to use Zustand:
 ```jsx title="src/pages/HomePage.jsx"
 import { useEffect, useState } from 'react';
 import useListingsStore from '@/state/useListingsStore';
-import ListingCard from '@/components/ListingCard';
+import PropertyCard from '@/components/PropertyCard';
 
 function HomePage() {
   // Select state
@@ -396,7 +396,7 @@ function HomePage() {
         ) : (
           <div className="listings-grid">
             {filteredItems.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
+              <PropertyCard key={listing.id} listing={listing} />
             ))}
           </div>
         )}
@@ -424,7 +424,7 @@ function HomePage() {
   return (
     <div>
       {data?.data?.map((listing) => (
-        <ListingCard key={listing.id} listing={listing} />
+        <PropertyCard key={listing.id} listing={listing} />
       ))}
     </div>
   );
@@ -460,7 +460,7 @@ function HomePage() {
     <div>
       <FilterForm />
       {filteredItems.map((listing) => (
-        <ListingCard key={listing.id} listing={listing} />
+        <PropertyCard key={listing.id} listing={listing} />
       ))}
     </div>
   );

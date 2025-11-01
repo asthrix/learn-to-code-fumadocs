@@ -260,14 +260,14 @@ import { store } from './state/store';
 
 </Tabs>
 
-## Real Example: ListingCard
+## Real Example: PropertyCard
 
-Let's use the store in `ListingCard` for favorites:
+Let's use the store in `PropertyCard` for favorites:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import useListingsStore from '@/state/useListingsStore';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   // Select favorites array
   const favorites = useListingsStore((state) => state.favorites);
   
@@ -293,7 +293,7 @@ function ListingCard({ listing }) {
   );
 }
 
-export default ListingCard;
+export default PropertyCard;
 ```
 
 **Look how simple!** 
@@ -327,14 +327,14 @@ function MyComponent() {
 **Changes to OTHER parts of the store don't cause re-renders!**
 
 ```jsx
-function ListingCard() {
+function PropertyCard() {
   const items = useListingsStore((state) => state.items);
   
   // In another component, user toggles favorite:
   toggleFavorite(5);
   // favorites array changed
   // But items didn't change
-  // ListingCard doesn't re-render! ✅
+  // PropertyCard doesn't re-render! ✅
 }
 ```
 
@@ -417,7 +417,7 @@ function ListingList() {
   return (
     <div>
       {items.map(item => (
-        <ListingCard key={item.id} listing={item} />
+        <PropertyCard key={item.id} listing={item} />
       ))}
     </div>
   );
@@ -485,7 +485,7 @@ function FavoritesList() {
   return (
     <div>
       {favoritedListings.map(listing => (
-        <ListingCard key={listing.id} listing={listing} />
+        <PropertyCard key={listing.id} listing={listing} />
       ))}
     </div>
   );

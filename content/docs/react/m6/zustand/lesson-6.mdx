@@ -430,20 +430,20 @@ return (
   <div>
     <h2>Your Favorites ({favoritedItems.length})</h2>
     {favoritedItems.map((item) => (
-      <ListingCard key={item.id} listing={item} />
+      <PropertyCard key={item.id} listing={item} />
     ))}
   </div>
 );
 ```
 
-## Add to ListingCard
+## Add to PropertyCard
 
-Let's add a favorite button to `ListingCard`:
+Let's add a favorite button to `PropertyCard`:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import useListingsStore from '@/state/useListingsStore';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   // Select favorites and action
   const favorites = useListingsStore((state) => state.favorites);
   const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
@@ -482,7 +482,7 @@ function ListingCard({ listing }) {
   );
 }
 
-export default ListingCard;
+export default PropertyCard;
 ```
 
 ## Styling the Favorite Button
@@ -617,7 +617,7 @@ Now when you view your listings:
 3. Store updates: favorites = [...favorites, 5]
    ↓
 4. All components selecting favorites re-render:
-   - ListingCard (button changes to ❤️)
+   - PropertyCard (button changes to ❤️)
    - FavoriteCount (shows "3 favorites")
    - FavoritesList (shows listing 5)
    ↓
@@ -633,7 +633,7 @@ Now when you view your listings:
 **With local state (❌ Bad):**
 
 ```jsx
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   const [isFavorited, setIsFavorited] = useState(false);
   
   // Problem 1: Each card has separate state
@@ -652,7 +652,7 @@ function ListingCard({ listing }) {
 **With Zustand (✅ Good):**
 
 ```jsx
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   const favorites = useListingsStore((state) => state.favorites);
   const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
   const isFavorited = favorites.includes(listing.id);
@@ -681,7 +681,7 @@ function ListingCard({ listing }) {
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleFavorite } from '@/state/slices/listingsSlice';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   // Get dispatch
   const dispatch = useDispatch();
   
@@ -706,7 +706,7 @@ function ListingCard({ listing }) {
 // Import one thing
 import useListingsStore from '@/state/useListingsStore';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   // Select state (simple)
   const favorites = useListingsStore((state) => state.favorites);
   
@@ -738,7 +738,7 @@ Perfect! Favorites are working. In the next lesson:
 1. **Create FavoritesPage** - Display favorited listings
 2. **Handle empty state** - When no favorites yet
 3. **Add remove functionality** - Unfavorite from list
-4. **Reuse ListingCard** - Same component, different context
+4. **Reuse PropertyCard** - Same component, different context
 
 <Callout type="success">
 **✅ Lesson Complete!** Favorites functionality is working!
@@ -751,6 +751,6 @@ Perfect! Favorites are working. In the next lesson:
 - ✅ **Immutable updates** - Creates new arrays for re-renders
 - ✅ **Selective re-renders** - Only components using favorites re-render
 - ✅ **Shared state** - All components see same favorites
-- ✅ **ListingCard enhanced** - Favorite button with animation
+- ✅ **PropertyCard enhanced** - Favorite button with animation
 - ✅ **Better than local state** - Global, persistent, shareable
 - ✅ **Simpler than Redux** - No dispatch, no Provider, just hooks

@@ -27,7 +27,7 @@ Zustand (German for "state") is a **small, fast, and scalable** state management
 // HomePage.jsx
 const [listings, setListings] = useState([]);
 
-// ListingCard.jsx
+// PropertyCard.jsx
 // ❌ Can't access listings here without prop drilling!
 
 // FavoritesPage.jsx
@@ -43,7 +43,7 @@ const useListingsStore = create((set) => ({
   setListings: (listings) => set({ listings })
 }));
 
-// HomePage.jsx, ListingCard.jsx, FavoritesPage.jsx
+// HomePage.jsx, PropertyCard.jsx, FavoritesPage.jsx
 const listings = useListingsStore((state) => state.listings);
 // ✅ Works everywhere! No prop drilling!
 ```

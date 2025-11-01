@@ -1,17 +1,17 @@
 ---
-title: "L14: Add to ListingCard"
-description: "Integrate the favorite button into ListingCard and ListingDetailsCard"
+title: "L14: Add to PropertyCard"
+description: "Integrate the favorite button into PropertyCard and ListingDetailsCard"
 ---
 
 
 Let's add the favorite button to our listing cards so users can favorite listings!
 
-## Current ListingCard Structure
+## Current PropertyCard Structure
 
-Our `ListingCard` component displays listing information:
+Our `PropertyCard` component displays listing information:
 
-```jsx title="src/components/ListingCard.jsx"
-function ListingCard({ listing }) {
+```jsx title="src/components/PropertyCard.jsx"
+function PropertyCard({ listing }) {
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
       <img 
@@ -35,10 +35,10 @@ We need to add the favorite button in the **top-right corner of the image**.
 
 Add the import at the top:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import ListingFavoriteButton from './ListingFavoriteButton';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
       <img 
@@ -60,10 +60,10 @@ function ListingCard({ listing }) {
 
 Wrap the image in a container with `relative` positioning:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import ListingFavoriteButton from './ListingFavoriteButton';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative">
@@ -89,10 +89,10 @@ function ListingCard({ listing }) {
 
 Add the button inside the relative container:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import ListingFavoriteButton from './ListingFavoriteButton';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative">
@@ -117,15 +117,15 @@ function ListingCard({ listing }) {
 
 **That's it!** The button now appears in the top-right corner! 🎉
 
-## Complete ListingCard Code
+## Complete PropertyCard Code
 
 Here's the complete updated component:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import { Link } from 'react-router-dom';
 import ListingFavoriteButton from './ListingFavoriteButton';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   return (
     <Link 
       to={`/listings/${listing.id}`}
@@ -152,7 +152,7 @@ function ListingCard({ listing }) {
   );
 }
 
-export default ListingCard;
+export default PropertyCard;
 ```
 
 ## Understanding the Positioning
@@ -373,11 +373,11 @@ export default ListingDetailsCard;
 
 For better visibility on all images:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import { Link } from 'react-router-dom';
 import ListingFavoriteButton from './ListingFavoriteButton';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   return (
     <Link 
       to={`/listings/${listing.id}`}
@@ -404,7 +404,7 @@ function ListingCard({ listing }) {
   );
 }
 
-export default ListingCard;
+export default PropertyCard;
 ```
 
 **Added:**

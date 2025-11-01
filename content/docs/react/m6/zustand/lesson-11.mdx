@@ -8,7 +8,7 @@ Let's create a dedicated FavoriteButton component! 🎯
 
 ## Why a Separate Component?
 
-**Current situation:** ListingCard has inline favorite button code.
+**Current situation:** PropertyCard has inline favorite button code.
 
 **Better approach:** Extract to reusable component!
 
@@ -194,15 +194,15 @@ const handleClick = (e) => {
 }
 ```
 
-## Step 3: Use in ListingCard
+## Step 3: Use in PropertyCard
 
-Now update `ListingCard` to use the new component:
+Now update `PropertyCard` to use the new component:
 
-```jsx title="src/components/ListingCard.jsx"
+```jsx title="src/components/PropertyCard.jsx"
 import { Link } from 'react-router-dom';
 import FavoriteButton from '@/components/FavoriteButton';
 
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   return (
     <div className="listing-card">
       <div className="listing-image">
@@ -234,7 +234,7 @@ function ListingCard({ listing }) {
   );
 }
 
-export default ListingCard;
+export default PropertyCard;
 ```
 
 ## Update Card Styling
@@ -270,7 +270,7 @@ export default ListingCard;
 **Use anywhere:**
 
 ```jsx
-// In ListingCard
+// In PropertyCard
 <FavoriteButton listingId={listing.id} size="medium" />
 
 // In ListingDetail page (large button)
@@ -439,10 +439,10 @@ export default FavoriteButton;
 
 <Tab value="Before (Inline)">
 
-**Inline in ListingCard:**
+**Inline in PropertyCard:**
 
 ```jsx
-function ListingCard({ listing }) {
+function PropertyCard({ listing }) {
   const favorites = useListingsStore((state) => state.favorites);
   const toggleFavorite = useListingsStore((state) => state.toggleFavorite);
   const isFavorited = favorites.includes(listing.id);
@@ -463,7 +463,7 @@ function ListingCard({ listing }) {
 
 **Issues:**
 - Can't reuse in other components
-- ListingCard has too many responsibilities
+- PropertyCard has too many responsibilities
 - Hard to test button separately
 
 </Tab>
@@ -486,8 +486,8 @@ function FavoriteButton({ listingId }) {
   );
 }
 
-// ListingCard.jsx
-function ListingCard({ listing }) {
+// PropertyCard.jsx
+function PropertyCard({ listing }) {
   return (
     <div className="listing-card">
       <FavoriteButton listingId={listing.id} />
@@ -499,7 +499,7 @@ function ListingCard({ listing }) {
 
 **Benefits:**
 - Reusable everywhere
-- ListingCard is simpler
+- PropertyCard is simpler
 - Easy to test
 - Easy to enhance
 
@@ -510,7 +510,7 @@ function ListingCard({ listing }) {
 **Why extract components?**
 
 **Single Responsibility:**
-- ListingCard → Display listing info
+- PropertyCard → Display listing info
 - FavoriteButton → Handle favoriting
 
 **Reusability:**
@@ -556,7 +556,7 @@ In the next lesson:
 
 ## Key Takeaways
 
-- ✅ **Extracted component** - Separated concerns from ListingCard
+- ✅ **Extracted component** - Separated concerns from PropertyCard
 - ✅ **Reusable** - Works in any component, any context
 - ✅ **Configurable** - Props for size, className
 - ✅ **Event handling** - preventDefault and stopPropagation
