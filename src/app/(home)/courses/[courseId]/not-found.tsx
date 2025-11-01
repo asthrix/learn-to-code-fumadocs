@@ -5,7 +5,7 @@ import { ArrowLeft, Home, Sparkles } from "lucide-react";
 import { useMemo } from "react";
 import { useParams, usePathname } from "next/navigation";
 
-import { CourseCard } from "@/components/courses/CourseCard";
+import { CourseCard } from "@/components/courses/catalog/CourseCard";
 import type { Course } from "@/lib/courses";
 import { courses } from "@/lib/courses";
 
@@ -104,7 +104,7 @@ export default function CourseNotFound() {
             <div className='mt-10 grid gap-6 md:grid-cols-2'>
                {highlightCourses.map((course) => (
                   <div key={course.id} className='relative h-full'>
-                     <CourseCard course={course} showProgress={false} />
+                     <CourseCard course={course} />
                   </div>
                ))}
             </div>

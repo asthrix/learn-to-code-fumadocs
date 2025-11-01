@@ -248,7 +248,7 @@ export const getCoursesByDifficulty = (
 
 export const getLearningPath = (): Course[] => {
    // Return courses in recommended learning order
-   return courses.sort((a, b) => {
+   return [...courses].sort((a, b) => {
       const order = [
          "html",
          "css",
