@@ -48,6 +48,23 @@
    line-clamp: 3;
 }
 
+@keyframes soft-pulse {
+   0%,
+   100% {
+      opacity: 1;
+      transform: scale(1);
+   }
+
+   50% {
+      opacity: 0.75;
+      transform: scale(1.02);
+   }
+}
+
+.animate-soft-pulse {
+   animation: soft-pulse 2s ease-in-out infinite;
+}
+
 
 :root {
   --background: oklch(1.0000 0 0);
