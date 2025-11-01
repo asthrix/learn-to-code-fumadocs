@@ -65,7 +65,7 @@ Let's build a reusable loading spinner:
 
 <Steps>
   <Step>
-    ### Create Spinner File
+    #### Create Spinner File
 
     ```jsx title="src/components/Spinner.jsx"
     export function Spinner({ size = 'medium', message = 'Loading...' }) {
@@ -107,7 +107,7 @@ Let's build a reusable loading spinner:
   </Step>
 
   <Step>
-    ### Understanding the Spinner
+    #### Understanding the Spinner
 
     **CSS Animation:**
 
@@ -141,7 +141,7 @@ Now let's use the spinner in our data fetching:
 
 <Steps>
   <Step>
-    ### Add isLoading State
+    #### Add isLoading State
 
     ```jsx title="src/pages/HomePage.jsx"
     // [!code word:useEffect]
@@ -191,7 +191,7 @@ Now let's use the spinner in our data fetching:
   </Step>
 
   <Step>
-    ### Add Conditional Rendering
+    #### Add Conditional Rendering
 
     ```jsx title="src/pages/HomePage.jsx (return statement)"
     export function HomePage() {
@@ -603,7 +603,7 @@ export function HomePage() {
 
 <Steps>
   <Step>
-    ### Test Normal Loading
+    #### Test Normal Loading
 
     1. Refresh the page
     2. You should see spinner for ~1.5 seconds
@@ -612,7 +612,7 @@ export function HomePage() {
   </Step>
 
   <Step>
-    ### Test Slow Network
+    #### Test Slow Network
 
     In your browser DevTools:
 
@@ -624,7 +624,7 @@ export function HomePage() {
   </Step>
 
   <Step>
-    ### Test Fast Network
+    #### Test Fast Network
 
     Update API to use zero delay:
 

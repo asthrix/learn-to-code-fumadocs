@@ -12,7 +12,7 @@ Let's review everything you've learned about React performance optimization and 
 
 <Step>
 
-### Custom Hooks (Lessons 1-3)
+#### Custom Hooks (Lessons 1-3)
 
 **Created useFetch hook** to eliminate duplicate code:
 
@@ -36,7 +36,7 @@ const { data, isLoading, error } = useFetch('/api/endpoint');
 
 <Step>
 
-### useMemo (Lessons 4-5)
+#### useMemo (Lessons 4-5)
 
 **Optimized expensive calculations:**
 
@@ -58,7 +58,7 @@ const filteredListings = useMemo(() => {
 
 <Step>
 
-### useCallback (Lesson 6)
+#### useCallback (Lesson 6)
 
 **Memoized callback functions:**
 
@@ -81,7 +81,7 @@ const handleSearch = useCallback((value) => {
 
 <Step>
 
-### React.memo (Lesson 7)
+#### React.memo (Lesson 7)
 
 **Prevented component re-renders:**
 
@@ -101,7 +101,7 @@ const PropertyCard = React.memo(function PropertyCard({ listing }) {
 
 <Step>
 
-### Performance Profiling (Lesson 8)
+#### Performance Profiling (Lesson 8)
 
 **Measured optimization impact:**
 
@@ -114,7 +114,7 @@ const PropertyCard = React.memo(function PropertyCard({ listing }) {
 
 <Step>
 
-### Caching (Lesson 9)
+#### Caching (Lesson 9)
 
 **Eliminated duplicate API requests:**
 
@@ -648,7 +648,7 @@ Now that you've mastered performance optimization, you're ready for:
 
 <Step>
 
-### Measure First, Optimize Second
+#### Measure First, Optimize Second
 
 Don't guess what's slow - use React DevTools Profiler to identify actual bottlenecks.
 
@@ -656,7 +656,7 @@ Don't guess what's slow - use React DevTools Profiler to identify actual bottlen
 
 <Step>
 
-### Optimize What Matters
+#### Optimize What Matters
 
 Focus on:
 - Expensive operations (> 5ms)
@@ -667,7 +667,7 @@ Focus on:
 
 <Step>
 
-### Use the Right Tool
+#### Use the Right Tool
 
 - **Custom hooks** - Reusable logic
 - **useMemo** - Expensive calculations
@@ -679,7 +679,7 @@ Focus on:
 
 <Step>
 
-### Don't Over-Optimize
+#### Don't Over-Optimize
 
 Premature optimization adds complexity. Only optimize when you have:
 - Measured performance problem

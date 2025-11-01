@@ -345,7 +345,7 @@ const formatted = useMemo(() => `$${price}`, [price]);
 
 <Step>
 
-### Always specify dependencies
+#### Always specify dependencies
 
 ```jsx
 // ✅ Good - all dependencies listed
@@ -363,7 +363,7 @@ const result = useMemo(() => {
 
 <Step>
 
-### Don't mutate dependencies
+#### Don't mutate dependencies
 
 ```jsx
 // ❌ Bad - mutating array
@@ -381,7 +381,7 @@ const sorted = useMemo(() => {
 
 <Step>
 
-### Keep memoized functions pure
+#### Keep memoized functions pure
 
 ```jsx
 // ❌ Bad - has side effects
@@ -401,7 +401,7 @@ const result = useMemo(() => {
 
 <Step>
 
-### Use for expensive operations only
+#### Use for expensive operations only
 
 ```jsx
 // ❌ Bad - simple operation

@@ -64,7 +64,7 @@ An async thunk automatically dispatches three actions:
 
 <Step>
 
-### Pending Action (Before API call)
+#### Pending Action (Before API call)
 
 ```jsx
 dispatch(fetchListings());
@@ -81,7 +81,7 @@ Use this to set loading state.
 
 <Step>
 
-### Fulfilled Action (Success)
+#### Fulfilled Action (Success)
 
 ```jsx
 // API returns data successfully
@@ -101,7 +101,7 @@ Use this to store the fetched data.
 
 <Step>
 
-### Rejected Action (Error)
+#### Rejected Action (Error)
 
 ```jsx
 // API call fails
@@ -355,7 +355,7 @@ When you dispatch `fetchListings()`:
 
 <Step>
 
-### Component Dispatches Thunk
+#### Component Dispatches Thunk
 
 ```jsx
 dispatch(fetchListings({ search: 'beach' }));
@@ -365,7 +365,7 @@ dispatch(fetchListings({ search: 'beach' }));
 
 <Step>
 
-### Pending Action Dispatched
+#### Pending Action Dispatched
 
 Redux automatically dispatches:
 
@@ -382,7 +382,7 @@ State updates to:
 
 <Step>
 
-### Async Function Executes
+#### Async Function Executes
 
 ```js
 const response = await api.get('/listings', {
@@ -397,7 +397,7 @@ API call happens, returns data.
 
 <Step>
 
-### Fulfilled Action Dispatched
+#### Fulfilled Action Dispatched
 
 Redux automatically dispatches:
 

@@ -78,7 +78,7 @@ Let's memoize the filtered listings so they only recalculate when dependencies c
 
 <Step>
 
-### Import useMemo
+#### Import useMemo
 
 ```jsx title="src/pages/HomePage.jsx" {1}
 import { useState, useMemo } from 'react';
@@ -89,7 +89,7 @@ import { useFetch } from '@/hooks/useFetch';
 
 <Step>
 
-### Wrap filtering logic in useMemo
+#### Wrap filtering logic in useMemo
 
 ```jsx title="src/pages/HomePage.jsx" {8-22}
 export function HomePage() {
@@ -128,7 +128,7 @@ export function HomePage() {
 
 <Step>
 
-### Test the optimization
+#### Test the optimization
 
 Add console.log to measure:
 
@@ -396,7 +396,7 @@ Use React DevTools Profiler:
 
 <Step>
 
-### Record without useMemo
+#### Record without useMemo
 
 1. Remove useMemo temporarily
 2. Open React DevTools → Profiler
@@ -409,7 +409,7 @@ Use React DevTools Profiler:
 
 <Step>
 
-### Record with useMemo
+#### Record with useMemo
 
 1. Add useMemo back
 2. Clear profiler
@@ -422,7 +422,7 @@ Use React DevTools Profiler:
 
 <Step>
 
-### Compare results
+#### Compare results
 
 Without useMemo: ~15ms per keystroke
 With useMemo: ~2ms per keystroke

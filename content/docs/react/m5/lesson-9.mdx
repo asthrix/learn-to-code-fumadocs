@@ -68,7 +68,7 @@ const cache = {
 
 <Step>
 
-### Create cache object
+#### Create cache object
 
 ```jsx title="src/hooks/useFetch.js" {4-9}
 import { useState, useEffect } from 'react';
@@ -92,7 +92,7 @@ Cache is outside the hook so it's shared across all components!
 
 <Step>
 
-### Check cache before fetching
+#### Check cache before fetching
 
 ```jsx title="src/hooks/useFetch.js" {10-20}
 export function useFetch(url) {
@@ -161,7 +161,7 @@ export function useFetch(url) {
 
 <Step>
 
-### Add cache inspection
+#### Add cache inspection
 
 ```jsx title="src/hooks/useFetch.js" {5-8}
 export function useFetch(url) {
@@ -626,7 +626,7 @@ console.log('Cache metrics:', getCacheMetrics());
 
 <Step>
 
-### Choose appropriate cache duration
+#### Choose appropriate cache duration
 
 ```jsx
 // Frequently changing data - short cache
@@ -643,7 +643,7 @@ useFetch('/constants', { cacheTime: 86400000 });  // 24 hours
 
 <Step>
 
-### Clear cache on mutations
+#### Clear cache on mutations
 
 ```jsx
 async function createListing(data) {
@@ -662,7 +662,7 @@ async function updateListing(id, changes) {
 
 <Step>
 
-### Monitor cache effectiveness
+#### Monitor cache effectiveness
 
 ```jsx
 // Log cache metrics periodically

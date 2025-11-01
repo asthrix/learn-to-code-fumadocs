@@ -79,7 +79,7 @@ Let's add the necessary imports and state management:
 
 <Step>
 
-### Import useState and useEffect
+#### Import useState and useEffect
 
 Update the imports in `ListingDetailsPage.jsx`:
 
@@ -118,7 +118,7 @@ Now let's fetch the listing data using the ID:
 
 <Step>
 
-### Add useEffect with Fetch Logic
+#### Add useEffect with Fetch Logic
 
 Add this useEffect after your state declarations:
 
@@ -182,7 +182,7 @@ export default function ListingDetailsPage() {
 
 <Step>
 
-### Understanding the Flow
+#### Understanding the Flow
 
 Let's trace what happens when you visit `/listing/42`:
 
@@ -218,7 +218,7 @@ Show a loading spinner while fetching:
 
 <Step>
 
-### Add Loading UI
+#### Add Loading UI
 
 Before the return statement, add loading check:
 
@@ -269,7 +269,7 @@ Show error message if listing not found:
 
 <Step>
 
-### Add Error UI
+#### Add Error UI
 
 After the loading check, add error handling:
 
@@ -344,7 +344,7 @@ Now update the UI to use the fetched listing data:
 
 <Step>
 
-### Replace Hardcoded Values
+#### Replace Hardcoded Values
 
 Update the return statement to use `listing` state:
 

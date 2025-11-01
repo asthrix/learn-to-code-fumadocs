@@ -356,7 +356,7 @@ const listingsSlice = createSlice({
 
 <Step>
 
-### createSlice Configuration
+#### createSlice Configuration
 
 ```js
 const listingsSlice = createSlice({
@@ -375,7 +375,7 @@ The `name` is used for:
 
 <Step>
 
-### toggleFavorite Reducer
+#### toggleFavorite Reducer
 
 ```js
 toggleFavorite: (state, action) => {
@@ -572,7 +572,7 @@ When you dispatch `toggleFavorite(123)`:
 
 <Step>
 
-### Action is Created
+#### Action is Created
 
 ```js
 dispatch(toggleFavorite(123));
@@ -583,7 +583,7 @@ dispatch(toggleFavorite(123));
 
 <Step>
 
-### Redux Calls Reducer
+#### Redux Calls Reducer
 
 ```js
 reducer(state, { type: 'listings/toggleFavorite', payload: 123 })
@@ -593,7 +593,7 @@ reducer(state, { type: 'listings/toggleFavorite', payload: 123 })
 
 <Step>
 
-### State is Updated
+#### State is Updated
 
 ```js
 // Before
@@ -607,7 +607,7 @@ reducer(state, { type: 'listings/toggleFavorite', payload: 123 })
 
 <Step>
 
-### Components Re-render
+#### Components Re-render
 
 All components using `useSelector(state => state.listings.favorites)` automatically re-render with the new state!
 

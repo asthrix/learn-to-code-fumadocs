@@ -590,7 +590,7 @@ Use React DevTools Profiler:
 
 <Step>
 
-### Enable Profiler
+#### Enable Profiler
 
 1. Install React DevTools extension
 2. Open DevTools → Profiler tab
@@ -600,7 +600,7 @@ Use React DevTools Profiler:
 
 <Step>
 
-### Interact with app
+#### Interact with app
 
 Type in search box, change filters, etc.
 
@@ -608,7 +608,7 @@ Type in search box, change filters, etc.
 
 <Step>
 
-### Stop and analyze
+#### Stop and analyze
 
 1. Click stop button (■)
 2. Review flamegraph
@@ -621,7 +621,7 @@ Type in search box, change filters, etc.
 
 <Step>
 
-### Compare before/after
+#### Compare before/after
 
 - Before: All components yellow on every keystroke
 - After: Most components gray, only affected ones render
@@ -636,7 +636,7 @@ Type in search box, change filters, etc.
 
 <Step>
 
-### Memoize leaf components first
+#### Memoize leaf components first
 
 ```jsx
 // Start here - most impact
@@ -653,7 +653,7 @@ const Page = React.memo(...);
 
 <Step>
 
-### Combine with useCallback/useMemo
+#### Combine with useCallback/useMemo
 
 ```jsx
 function Parent() {
@@ -668,7 +668,7 @@ function Parent() {
 
 <Step>
 
-### Measure before/after
+#### Measure before/after
 
 ```jsx
 // Add logging to memoized components

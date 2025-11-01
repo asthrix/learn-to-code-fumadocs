@@ -97,7 +97,7 @@ function Child({ value, onChange }) {
 
 <Steps>
   <Step>
-    ### Step 1: Move State to HomePage
+    #### Step 1: Move State to HomePage
     
     Cut the filter state from `ListingFilters` and paste it into `HomePage`:
     
@@ -139,7 +139,7 @@ function Child({ value, onChange }) {
   </Step>
   
   <Step>
-    ### Step 2: Pass State as Props to ListingFilters
+    #### Step 2: Pass State as Props to ListingFilters
     
     Pass the filter values down to `ListingFilters`:
     
@@ -176,7 +176,7 @@ function Child({ value, onChange }) {
   </Step>
   
   <Step>
-    ### Step 3: Pass Updater Functions as Props
+    #### Step 3: Pass Updater Functions as Props
     
     Pass the setter functions so `ListingFilters` can update the values:
     
@@ -197,7 +197,7 @@ function Child({ value, onChange }) {
   </Step>
   
   <Step>
-    ### Step 4: Update ListingFilters to Accept Props
+    #### Step 4: Update ListingFilters to Accept Props
     
     Modify `ListingFilters` to use props instead of local state:
     
@@ -243,7 +243,7 @@ function Child({ value, onChange }) {
   </Step>
   
   <Step>
-    ### Step 5: Update Input onChange Handlers
+    #### Step 5: Update Input onChange Handlers
     
     Connect inputs to the callback props:
     
@@ -287,7 +287,7 @@ function Child({ value, onChange }) {
   </Step>
   
   <Step>
-    ### Step 6: Test the Lifted State
+    #### Step 6: Test the Lifted State
     
     Add a debug display in `HomePage` to verify state is updating:
     

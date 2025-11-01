@@ -67,7 +67,7 @@ The simplest solution uses a boolean flag:
 
 <Steps>
   <Step>
-    ### Add Mounted Flag
+    #### Add Mounted Flag
 
     ```jsx title="src/pages/HomePage.jsx"
     // [!code word:useEffect]
@@ -146,7 +146,7 @@ controller.abort(); // Request is cancelled!
 
 <Steps>
   <Step>
-    ### Update API to Support AbortController
+    #### Update API to Support AbortController
 
     First, modify your API functions to accept an abort signal:
 
@@ -177,7 +177,7 @@ controller.abort(); // Request is cancelled!
   </Step>
 
   <Step>
-    ### Update HomePage with AbortController
+    #### Update HomePage with AbortController
 
     ```jsx title="src/pages/HomePage.jsx (Complete with AbortController)"
     // [!code word:useEffect]
@@ -562,7 +562,7 @@ useEffect(() => {
 
 <Steps>
   <Step>
-    ### Test Component Unmount
+    #### Test Component Unmount
 
     1. Start on HomePage (fetch begins)
     2. Quickly navigate to another page
@@ -572,7 +572,7 @@ useEffect(() => {
   </Step>
 
   <Step>
-    ### Test with React DevTools
+    #### Test with React DevTools
 
     Install React DevTools browser extension:
 
@@ -584,7 +584,7 @@ useEffect(() => {
   </Step>
 
   <Step>
-    ### Add Debug Logging
+    #### Add Debug Logging
 
     ```jsx title="Debug Cleanup"
     // [!code word:useEffect]
