@@ -1,4 +1,5 @@
 import { FeatureHighlight } from "@/lib/home-content";
+import { AnimatedBlob } from "../ui/AnimatedBlob";
 
 interface FeatureHighlightCardProps {
    feature: FeatureHighlight;
@@ -29,7 +30,7 @@ export function FeatureHighlightCard({
 
    return (
       <div className='group relative overflow-hidden rounded-2xl border border-border bg-card/90 p-6 transition hover:-translate-y-2 hover:border-primary/35 hover:bg-primary/10'>
-         <div className='absolute -right-10 -top-10 h-28 w-28 rounded-full bg-primary/15 transition group-hover:scale-125' />
+         <AnimatedBlob />
          <Icon className='h-5 w-5 text-primary' />
          <h3 className='mt-3 text-base font-semibold text-foreground'>
             {feature.title}
