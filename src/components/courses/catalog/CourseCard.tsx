@@ -27,15 +27,16 @@ export function CourseCard({ course }: CourseCardProps) {
    const isAvailable = course.status === "available";
 
    return (
-      <article className='group flex h-full flex-col rounded-2xl border border-border/70 bg-card/70 p-6 shadow-sm transition duration-200 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-lg'>
-         <div className='flex items-start justify-between gap-4'>
+      <article className='group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/70 p-6 shadow-sm transition duration-200 hover:-translate-y-1.5 hover:border-primary/40 hover:bg-primary/10 hover:shadow-lg'>
+         <div className='absolute -right-10 -top-10 h-28 w-28 rounded-full bg-primary/15 transition group-hover:scale-125' />
+         <div className='relative flex items-start justify-between gap-4'>
             <span className='inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-2xl transition group-hover:scale-105 group-hover:bg-primary/20'>
                {course.icon}
             </span>
             <StatusBadge status={course.status} />
          </div>
 
-         <div className='mt-6 flex flex-col gap-4'>
+         <div className='relative mt-6 flex flex-col gap-4'>
             <div className='space-y-2'>
                <h3 className='text-lg font-semibold text-foreground transition group-hover:text-primary'>
                   {course.title}
@@ -57,7 +58,7 @@ export function CourseCard({ course }: CourseCardProps) {
             </div>
          </div>
 
-         <div className='mt-auto pt-6'>
+         <div className='relative mt-auto pt-6'>
             {isAvailable ? (
                <Button
                   asChild

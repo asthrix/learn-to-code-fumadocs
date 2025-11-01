@@ -37,18 +37,19 @@ export function SpotlightCoursesSection({
                   <Link
                      key={course.id}
                      href={`/courses/${course.id}`}
-                     className='group relative flex h-full flex-col rounded-3xl border border-border bg-card p-6 shadow-[0_20px_40px_-25px_hsl(var(--color-primary)/0.3)] transition-transform duration-500 hover:-translate-y-4 hover:-rotate-1'
+                     className='group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-[0_20px_40px_-25px_hsl(var(--color-primary)/0.3)] transition hover:-translate-y-2 hover:border-primary/35 hover:bg-primary/10'
                   >
-                     <span className='inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary/25 text-2xl shadow-[inset_0_1px_2px_hsl(var(--color-primary)/0.15)] transition group-hover:scale-105'>
+                     <div className='absolute -right-10 -top-10 h-28 w-28 rounded-full bg-primary/15 transition group-hover:scale-125' />
+                     <span className='relative inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary/25 text-2xl shadow-[inset_0_1px_2px_hsl(var(--color-primary)/0.15)] transition group-hover:scale-105'>
                         {course.icon}
                      </span>
-                     <h3 className='mt-4 text-lg font-semibold text-foreground'>
+                     <h3 className='relative mt-4 text-lg font-semibold text-foreground'>
                         {course.title}
                      </h3>
-                     <p className='mt-2 flex-1 text-sm text-muted-foreground'>
+                     <p className='relative mt-2 flex-1 text-sm text-muted-foreground'>
                         {course.shortDescription}
                      </p>
-                     <div className='mt-6 flex items-center justify-between text-xs text-muted-foreground'>
+                     <div className='relative mt-6 flex items-center justify-between text-xs text-muted-foreground'>
                         <span className='inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 font-medium uppercase tracking-widest text-[10px] text-primary'>
                            {course.difficulty}
                         </span>
