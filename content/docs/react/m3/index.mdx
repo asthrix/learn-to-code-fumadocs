@@ -276,12 +276,12 @@ useEffect(() => {
 ```jsx
 // ❌ BAD - runs after every render, causes infinite loop
 useEffect(() => {
-   fetch('/api/data').then(data => setData(data));
+   fetch('/api/listings').then(data => setData(data));
 });
 
 // ✅ GOOD - runs once on mount
 useEffect(() => {
-   fetch('/api/data').then(data => setData(data));
+   fetch('/api/listings').then(data => setData(data));
 }, []);
 ```
 </Callout>

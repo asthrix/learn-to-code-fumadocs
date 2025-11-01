@@ -434,13 +434,13 @@ export default HomePage;
 
 <Tab value="FavoritesPage">
 
-```jsx title="src/pages/ListingFavoritesPage.jsx"
+```jsx title="src/pages/FavoritesPage.jsx"
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import ListingList from '@/components/ListingList';
 
-function ListingFavoritesPage() {
+function FavoritesPage() {
   const items = useSelector((state) => state.listings.items);
   const favoriteIds = useSelector((state) => state.listings.favorites);
   
@@ -477,7 +477,7 @@ function ListingFavoritesPage() {
   );
 }
 
-export default ListingFavoritesPage;
+export default FavoritesPage;
 ```
 
 **Key points:**
