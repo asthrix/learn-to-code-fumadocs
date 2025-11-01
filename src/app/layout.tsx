@@ -12,8 +12,8 @@ const appUrl =
 
 export const metadata: Metadata = {
    metadataBase: new URL(appUrl),
-   title: "TaskFlow Pro with React",
-   description: "Project-based React curriculum that ships TaskFlow Pro.",
+   title: "Learn to Code | Project-Based Web Development Courses",
+   description: "Master HTML, CSS, JavaScript, React, Next.js, and Tailwind CSS through hands-on project-based learning. Build real-world applications from scratch.",
 };
 
 const inter = Inter({
