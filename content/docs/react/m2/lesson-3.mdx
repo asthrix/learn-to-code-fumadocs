@@ -476,6 +476,59 @@ const handleDecrement = () => {
 
 ---
 
+## 🎯 Handler Naming Convention
+
+You'll notice we use two naming patterns for event handlers. This is a React community convention:
+
+### Internal Handlers: `handle*`
+
+Functions defined **inside** your component use `handle*`:
+
+```jsx
+function SearchBar() {
+  const handleClick = () => { ... };
+  const handleSubmit = () => { ... };
+  const handleChange = () => { ... };
+  
+  return <button onClick={handleClick}>Search</button>;
+}
+```
+
+### Prop Callbacks: `on*`
+
+Functions passed **as props from parent** use `on*`:
+
+```jsx
+function SearchBar({ onSearchChange, onSubmit }) {
+  return (
+    <form onSubmit={onSubmit}>
+      <input onChange={(e) => onSearchChange(e.target.value)} />
+    </form>
+  );
+}
+
+// Parent component:
+function HomePage() {
+  const handleSearchChange = (value) => {
+    console.log('Search:', value);
+  };
+  
+  return <SearchBar onSearchChange={handleSearchChange} />;
+}
+```
+
+**Why this pattern?**
+- `handle*` = "I handle this internally"
+- `on*` = "Call me when this happens" (callback prop)
+
+This convention helps you immediately understand:
+- Where the function is defined (internal vs passed as prop)
+- The flow of data and events in your component tree
+
+> **Note:** This is a convention, not a strict rule. The code works either way, but following conventions makes your code more readable to other React developers.
+
+---
+
 ## Common Mistakes to Avoid
 
 ### ❌ Mistake 1: Forgetting `value` Prop

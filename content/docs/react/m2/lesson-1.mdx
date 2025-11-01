@@ -14,6 +14,21 @@ In Module 1, we built StaySense with hardcoded listings data. Now it's time to m
 
 ---
 
+## 📝 Data Structure Update
+
+Before we begin, note that our listing data structure has evolved:
+
+**Module 1 (Learning basics):**
+- Simple properties: `id`, `title`, `price`, `location`, `image`, `rating`
+
+**Module 2+ (Building real app):**
+- **Added:** `guests`, `bedrooms` (needed for booking functionality)
+- **Removed:** `rating` (we'll add a complete review system in Module 7)
+
+This is normal in real projects - data structures evolve as features grow! You don't need to change your Module 1 code. We're just expanding the data model for our booking app.
+
+---
+
 ## Why Do We Need State?
 
 Right now, our `HomePage` component has a static array of listings:
