@@ -87,7 +87,7 @@ All those highlighted lines can be replaced with `useFetch`!
 
 <Step>
 
-### Import useFetch
+#### Import useFetch
 
 ```jsx title="src/pages/HomePage.jsx" {2}
 import { useState } from 'react';
@@ -104,7 +104,7 @@ We can remove `useEffect` and `api` imports - the hook handles those!
 
 <Step>
 
-### Replace fetch logic with useFetch
+#### Replace fetch logic with useFetch
 
 ```jsx title="src/pages/HomePage.jsx" {4}
 export function HomePage() {
@@ -134,7 +134,7 @@ export function HomePage() {
 
 <Step>
 
-### Handle null data case
+#### Handle null data case
 
 Since `useFetch` initializes `data` as `null`, we need to handle that:
 

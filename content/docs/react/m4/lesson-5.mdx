@@ -130,7 +130,7 @@ Let's update the `Router` component to include our dynamic route:
 
 <Step>
 
-### Update Router.jsx
+#### Update Router.jsx
 
 Open `Router.jsx` and add the new route:
 
@@ -162,7 +162,7 @@ export default function Router() {
 
 <Step>
 
-### Test the Route
+#### Test the Route
 
 Open your browser and manually type these URLs:
 
@@ -196,7 +196,7 @@ React Router follows this process when you navigate to a URL:
 
 <Step>
 
-### Step 1: Parse the URL
+#### Step 1: Parse the URL
 
 User navigates to `/listing/42`
 
@@ -208,7 +208,7 @@ React Router breaks it down:
 
 <Step>
 
-### Step 2: Check Each Route
+#### Step 2: Check Each Route
 
 React Router compares the URL against each route in order:
 
@@ -226,7 +226,7 @@ React Router compares the URL against each route in order:
 
 <Step>
 
-### Step 3: Render the Element
+#### Step 3: Render the Element
 
 Match found! Render the `ListingDetailsPage` component.
 
@@ -503,7 +503,7 @@ Right now, our dynamic route works, but the page doesn't use the ID from the URL
 
 <Step>
 
-### Lesson 6: Extract the ID
+#### Lesson 6: Extract the ID
 
 Use the `useParams` hook to get the `id` from the URL:
 
@@ -515,7 +515,7 @@ const { id } = useParams(); // id = "42" from /listing/42
 
 <Step>
 
-### Lesson 7: Fetch Data
+#### Lesson 7: Fetch Data
 
 Use the ID to fetch the correct listing from the API:
 
@@ -529,7 +529,7 @@ useEffect(() => {
 
 <Step>
 
-### Lesson 8: Display Data
+#### Lesson 8: Display Data
 
 Create a component to show the fetched listing details beautifully!
 
@@ -545,7 +545,7 @@ Here's how to verify your dynamic route is working:
 
 <Step>
 
-### Test Different IDs
+#### Test Different IDs
 
 Manually type these URLs in your browser:
 
@@ -562,7 +562,7 @@ All should render the `ListingDetailsPage` (with same hardcoded content).
 
 <Step>
 
-### Check the Browser Console
+#### Check the Browser Console
 
 Open DevTools (F12) and check for errors. You should see no errors.
 
@@ -570,7 +570,7 @@ Open DevTools (F12) and check for errors. You should see no errors.
 
 <Step>
 
-### Try Invalid Routes
+#### Try Invalid Routes
 
 Try a URL that doesn't match any route:
 

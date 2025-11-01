@@ -34,7 +34,7 @@ Let's start with a simple carousel component that displays images and tracks the
 
 <Step>
 
-### Create the Carousel Component File
+#### Create the Carousel Component File
 
 Create a new file for our carousel:
 
@@ -46,7 +46,7 @@ touch src/components/ImageCarousel.jsx
 
 <Step>
 
-### Build the Basic Structure
+#### Build the Basic Structure
 
 ```jsx title="src/components/ImageCarousel.jsx"
 // [!code word:useState]
@@ -97,7 +97,7 @@ Now let's add buttons to navigate between images manually.
 
 <Step>
 
-### Create Navigation Functions
+#### Create Navigation Functions
 
 ```jsx title="src/components/ImageCarousel.jsx" {8-20,33-54}
 // [!code word:useState]
@@ -182,7 +182,7 @@ Now for the exciting part! Let's make the carousel auto-play using `useEffect` a
 
 <Step>
 
-### Add Auto-Play Logic
+#### Add Auto-Play Logic
 
 ```jsx title="src/components/ImageCarousel.jsx" {2,7-21}
 // [!code word:useEffect]
@@ -227,7 +227,7 @@ export default function ImageCarousel({ images = [], autoPlayInterval = 3000 }) 
 
 <Step>
 
-### Understanding the Auto-Play Code
+#### Understanding the Auto-Play Code
 
 <Accordions>
 
@@ -318,7 +318,7 @@ Users should be able to pause auto-play by hovering over the carousel. Let's add
 
 <Step>
 
-### Track Hover State
+#### Track Hover State
 
 ```jsx title="src/components/ImageCarousel.jsx" {5,9-11,18-19,27-28}
 // [!code word:useEffect]
@@ -374,7 +374,7 @@ Visual indicators help users see how many images there are and which one is acti
 
 <Step>
 
-### Add Indicator Dots
+#### Add Indicator Dots
 
 ```jsx title="src/components/ImageCarousel.jsx" {11-33}
 // ... imports and component logic ...
@@ -435,7 +435,7 @@ Now let's use our carousel in the `PropertyCard` component to display listing im
 
 <Step>
 
-### Update PropertyCard
+#### Update PropertyCard
 
 ```jsx title="src/components/PropertyCard.jsx" {2,10-15}
 // [!code ++]import ImageCarousel from './ImageCarousel';
@@ -481,7 +481,7 @@ export default function PropertyCard({ listing }) {
 
 <Step>
 
-### Test It Out!
+#### Test It Out!
 
 Save your files and check the browser. You should now see:
 
@@ -721,7 +721,7 @@ const handleTouchEnd = () => {
 
 <Step>
 
-### Manual Testing Checklist
+#### Manual Testing Checklist
 
 Test these scenarios:
 
@@ -737,7 +737,7 @@ Test these scenarios:
 
 <Step>
 
-### Check for Memory Leaks
+#### Check for Memory Leaks
 
 Open React DevTools and watch for:
 

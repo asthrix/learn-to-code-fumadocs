@@ -111,16 +111,16 @@ Let's break down the mapping logic:
 
 <Steps>
    <Step> 
-   ### properties.map() Loop through each property in the array
+   #### properties.map() Loop through each property in the array
    </Step>
    <Step>
-      ### (property) => Each item is called `property` (you can name it anything)
+      #### (property) => Each item is called `property` (you can name it anything)
    </Step>
    <Step>
-      ### Return JSX For each property, return a `PropertyCard` component
+      #### Return JSX For each property, return a `PropertyCard` component
    </Step>
    <Step>
-      ### Pass Props Extract data from `property` object and pass as props
+      #### Pass Props Extract data from `property` object and pass as props
    </Step>
 </Steps>
 
@@ -244,7 +244,7 @@ export default HomePage;
 
 <Steps>
   <Step>
-    ### Imported PropertyList
+    #### Imported PropertyList
     
     ```jsx title="Import Statement"
     import PropertyList from '../components/PropertyList';
@@ -252,7 +252,7 @@ export default HomePage;
   </Step>
   
   <Step>
-    ### Passed the Entire Array
+    #### Passed the Entire Array
     
     ```jsx title="Passing Array Prop"
     <PropertyList properties={properties} />
@@ -262,7 +262,7 @@ export default HomePage;
   </Step>
   
   <Step>
-    ### Removed Individual Cards
+    #### Removed Individual Cards
     No more manual `<PropertyCard>` tags. PropertyList handles all of them!
   </Step>
 </Steps>

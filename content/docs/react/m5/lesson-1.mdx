@@ -184,7 +184,7 @@ Let's create a `useFetch` custom hook that handles all our data fetching logic!
 
 <Step>
 
-### Create hooks directory
+#### Create hooks directory
 
 First, create a new folder for your custom hooks:
 
@@ -199,7 +199,7 @@ This keeps all custom hooks organized in one place.
 
 <Step>
 
-### Import dependencies
+#### Import dependencies
 
 ```jsx title="src/hooks/useFetch.js"
 import { useState, useEffect } from 'react';
@@ -212,7 +212,7 @@ We need `useState` for state management, `useEffect` for side effects, and our `
 
 <Step>
 
-### Define the hook function
+#### Define the hook function
 
 ```jsx title="src/hooks/useFetch.js"
 import { useState, useEffect } from 'react';
@@ -230,7 +230,7 @@ export function useFetch(url) {
 
 <Step>
 
-### Add state variables
+#### Add state variables
 
 ```jsx title="src/hooks/useFetch.js"
 export function useFetch(url) {
@@ -253,7 +253,7 @@ Same three states we use everywhere:
 
 <Step>
 
-### Add fetch logic with useEffect
+#### Add fetch logic with useEffect
 
 ```jsx title="src/hooks/useFetch.js"
 export function useFetch(url) {
@@ -294,7 +294,7 @@ export function useFetch(url) {
 
 <Step>
 
-### Add AbortController cleanup
+#### Add AbortController cleanup
 
 ```jsx title="src/hooks/useFetch.js"
 export function useFetch(url) {

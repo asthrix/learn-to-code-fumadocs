@@ -159,7 +159,7 @@ export default listingsSlice.reducer;
 
 <Step>
 
-### Builder Pattern
+#### Builder Pattern
 
 ```js
 extraReducers: (builder) => {
@@ -181,7 +181,7 @@ We use **method chaining** to handle multiple cases cleanly.
 
 <Step>
 
-### Pending Case
+#### Pending Case
 
 ```js
 .addCase(fetchListings.pending, (state) => {
@@ -206,7 +206,7 @@ if (status === 'loading') return <Spinner />;
 
 <Step>
 
-### Fulfilled Case
+#### Fulfilled Case
 
 ```js
 .addCase(fetchListings.fulfilled, (state, action) => {
@@ -235,7 +235,7 @@ state.items = action.payload;  // ← Becomes this
 
 <Step>
 
-### Rejected Case
+#### Rejected Case
 
 ```js
 .addCase(fetchListings.rejected, (state, action) => {
@@ -268,7 +268,7 @@ Let's trace the complete state changes when fetching listings:
 
 <Step>
 
-### Initial State
+#### Initial State
 
 ```js
 {
@@ -283,7 +283,7 @@ Let's trace the complete state changes when fetching listings:
 
 <Step>
 
-### After Dispatch
+#### After Dispatch
 
 ```jsx
 dispatch(fetchListings());
@@ -304,7 +304,7 @@ Pending action fires:
 
 <Step>
 
-### After Success
+#### After Success
 
 Fulfilled action fires:
 
@@ -321,7 +321,7 @@ Fulfilled action fires:
 
 <Step>
 
-### After Error (Alternative)
+#### After Error (Alternative)
 
 If the API call failed, rejected action fires:
 
@@ -519,7 +519,7 @@ Let's verify everything works:
 
 <Step>
 
-### Open Redux DevTools
+#### Open Redux DevTools
 
 1. Open your app in browser
 2. Open DevTools (F12)
@@ -529,7 +529,7 @@ Let's verify everything works:
 
 <Step>
 
-### Dispatch Manually
+#### Dispatch Manually
 
 In the **Dispatch** section, manually dispatch:
 
@@ -554,7 +554,7 @@ Check state - you should see:
 
 <Step>
 
-### Dispatch Fulfilled
+#### Dispatch Fulfilled
 
 Now dispatch:
 

@@ -536,7 +536,7 @@ function Form() {
 
 <Step>
 
-### Use updater functions when possible
+#### Use updater functions when possible
 
 ```jsx
 // ✅ Good - no dependencies needed
@@ -554,7 +554,7 @@ const handleIncrement = useCallback(() => {
 
 <Step>
 
-### Combine with React.memo
+#### Combine with React.memo
 
 ```jsx
 // Only works well together
@@ -573,7 +573,7 @@ const MemoizedChild = React.memo(({ onClick }) => {
 
 <Step>
 
-### Include all dependencies
+#### Include all dependencies
 
 ```jsx
 // ✅ Correct

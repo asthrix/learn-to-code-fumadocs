@@ -62,7 +62,7 @@ Let's start with realistic listing data:
 
 <Steps>
   <Step>
-    ### Create the Data File
+    #### Create the Data File
 
     ```jsx title="src/api/data/listings.js"
     export const mockListings = [
@@ -218,7 +218,7 @@ Let's add utilities to simulate real network behavior:
 
 <Steps>
   <Step>
-    ### Create the Helpers File
+    #### Create the Helpers File
 
     ```jsx title="src/api/helpers.js"
     /**
@@ -296,7 +296,7 @@ Now let's create the actual API functions we'll call from our components:
 
 <Steps>
   <Step>
-    ### Create the Listings API
+    #### Create the Listings API
 
     ```jsx title="src/api/listings.js"
     import { mockListings } from './data/listings';
@@ -441,7 +441,7 @@ Let's create a central export point for all API functions:
 
 <Steps>
   <Step>
-    ### Create the API Index
+    #### Create the API Index
 
     ```jsx title="src/api/index.js"
     // Import all API modules
@@ -608,7 +608,7 @@ Let's verify everything works:
 
 <Steps>
   <Step>
-    ### Test in Browser Console
+    #### Test in Browser Console
 
     Open your browser console and try:
 
@@ -631,7 +631,7 @@ Let's verify everything works:
   </Step>
 
   <Step>
-    ### Test Individual Functions
+    #### Test Individual Functions
 
     ```javascript title="Test Different Functions"
     // Get single listing
@@ -650,7 +650,7 @@ Let's verify everything works:
   </Step>
 
   <Step>
-    ### Test Error Handling
+    #### Test Error Handling
 
     ```javascript title="Test Error Scenarios"
     try {

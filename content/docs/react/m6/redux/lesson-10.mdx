@@ -82,7 +82,7 @@ export default Navbar;
 
 <Step>
 
-### Imports
+#### Imports
 
 ```jsx
 import { Link } from 'react-router-dom';
@@ -98,7 +98,7 @@ import { Home, Heart } from 'lucide-react';
 
 <Step>
 
-### Get Favorite Count
+#### Get Favorite Count
 
 ```jsx
 const favoriteCount = useSelector((state) => state.listings.favorites.length);
@@ -117,7 +117,7 @@ Examples:
 
 <Step>
 
-### Navbar Container
+#### Navbar Container
 
 ```jsx
 <nav className="bg-white border-b border-gray-200">
@@ -139,7 +139,7 @@ Examples:
 
 <Step>
 
-### Logo/Brand Link
+#### Logo/Brand Link
 
 ```jsx
 <Link to="/" className="text-xl font-bold text-gray-900">
@@ -153,7 +153,7 @@ Clicking the logo takes you to the homepage!
 
 <Step>
 
-### Navigation Links
+#### Navigation Links
 
 ```jsx
 <div className="flex items-center space-x-6">
@@ -178,7 +178,7 @@ Clicking the logo takes you to the homepage!
 
 <Step>
 
-### Favorites Count Badge
+#### Favorites Count Badge
 
 ```jsx
 {favoriteCount > 0 && (
@@ -348,7 +348,7 @@ export default Navbar;
 
 <Step>
 
-### Import useLocation
+#### Import useLocation
 
 ```jsx
 import { Link, useLocation } from 'react-router-dom';
@@ -360,7 +360,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 <Step>
 
-### Get Current Location
+#### Get Current Location
 
 ```jsx
 const location = useLocation();
@@ -375,7 +375,7 @@ const location = useLocation();
 
 <Step>
 
-### Helper Function
+#### Helper Function
 
 ```jsx
 const isActive = (path) => location.pathname === path;
@@ -392,7 +392,7 @@ isActive('/favorites'); // true on favorites, false elsewhere
 
 <Step>
 
-### Conditional Styling
+#### Conditional Styling
 
 ```jsx
 className={`flex items-center space-x-2 ${

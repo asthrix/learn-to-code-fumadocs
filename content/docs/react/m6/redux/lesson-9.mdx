@@ -68,7 +68,7 @@ export default FavoritesPage;
 
 <Step>
 
-### Import Dependencies
+#### Import Dependencies
 
 ```jsx
 import { useSelector } from 'react-redux';
@@ -82,7 +82,7 @@ import ListingList from '@/components/ListingList';
 
 <Step>
 
-### Select State
+#### Select State
 
 ```jsx
 const items = useSelector((state) => state.listings.items);
@@ -97,7 +97,7 @@ We need both:
 
 <Step>
 
-### Filter Favorites
+#### Filter Favorites
 
 ```jsx
 const favoriteListings = items.filter((listing) =>
@@ -131,7 +131,7 @@ Only listings whose ID is in `favoriteIds` array!
 
 <Step>
 
-### Render Header
+#### Render Header
 
 ```jsx
 <h1 className="text-3xl font-bold mb-6">
@@ -145,7 +145,7 @@ Shows title with count: "Your Favorites (3)"
 
 <Step>
 
-### Handle Empty State
+#### Handle Empty State
 
 ```jsx
 {favoriteListings.length === 0 ? (
