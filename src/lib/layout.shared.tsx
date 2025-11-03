@@ -23,7 +23,7 @@ export function baseOptions(): BaseLayoutProps {
                   className="size-10 rounded-full border-border border"
                />
                <div className="flex flex-col">
-               <p className="group-hover:text-primary transition-colors duration-300 text-lg">Learn To Code</p>
+               <p className="group-hover:text-primary transition-colors duration-300 ">Learn To Code</p>
                   {/* <p className="text-[11px] text-muted-foreground">
                      Made by <b>Asthrix</b>
                   </p> */}
