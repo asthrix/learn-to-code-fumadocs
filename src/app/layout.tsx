@@ -1,7 +1,7 @@
 import "./global.css";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 import { ScrollToTop } from "@/components/ScrollToTop";
 
 const appUrl =
@@ -20,9 +20,16 @@ const inter = Inter({
    subsets: ["latin"],
 });
 
+const poppins = Poppins({
+   subsets: ["latin"],
+   weight: ["400", "500", "600", "700"],
+});
+
+
+
 export default function Layout({ children }: LayoutProps<"/">) {
    return (
-      <html lang='en' className={inter.className} suppressHydrationWarning>
+      <html lang='en' className={poppins.className} suppressHydrationWarning>
          <head>
             <link
                rel='apple-touch-icon'
