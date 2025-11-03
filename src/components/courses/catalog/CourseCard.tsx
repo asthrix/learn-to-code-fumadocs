@@ -65,7 +65,7 @@ export function CourseCard({ course }: CourseCardProps) {
                   asChild
                   className='w-full justify-center rounded-full px-5 py-2 text-sm font-semibold shadow-sm transition hover:shadow-md'
                >
-                  <Link href={`/docs/${course.id}`}>
+                  <Link href={`/courses/${course.id}`}>
                      Start course
                      <ArrowUpRight className='ml-2 h-4 w-4' aria-hidden='true' />
                   </Link>

@@ -1,72 +1,132 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, Sparkles, Rocket, Users, BookOpen } from "lucide-react";
 
-import { Accordions, Accordion } from "@/components/accordion";
+const features = [
+   {
+      icon: BookOpen,
+      title: "Structured Learning Path",
+      description: "Follow a clear roadmap from HTML fundamentals to production-ready React applications.",
+   },
+   {
+      icon: Rocket,
+      title: "Build Real Projects",
+      description: "Ship complete applications while learning—no more tutorial hell.",
+   },
+   {
+      icon: Users,
+      title: "Community Support",
+      description: "Join thousands of developers learning and building together.",
+   },
+];
 
-const ctaHighlights = [
-   {
-      id: "cta-path-start",
-      title: "Where should I begin?",
-      content:
-         "Kick off with the HTML track if you are brand new to front-end work. Already comfortable with markup? Jump straight into the React pathway and follow the guided checklists.",
-   },
-   {
-      id: "cta-what-you-ship",
-      title: "What will I ship?",
-      content:
-         "Every module advances a feature of TaskFlow Pro—from foundational layouts to full-stack workflows. Expect tangible progress and a production-ready deployment by the end.",
-   },
-   {
-      id: "cta-support",
-      title: "How do I stay unblocked?",
-      content:
-         "Each lesson includes validation checklists, and the built-in Fumadocs navigation keeps you oriented. Bring questions to the community channel when you need a nudge.",
-   },
+const stats = [
+   { value: "30+", label: "Hours of Content" },
+   { value: "90+", label: "Practical Lessons" },
+   { value: "5K+", label: "Active Learners" },
 ];
 
 export function FinalCtaSection() {
    return (
-      <section className='relative px-6 pb-28'>
-         <div className='mx-auto max-w-5xl overflow-hidden rounded-3xl border border-border bg-gradient-to-r from-primary/15 via-primary/10 to-secondary/15 p-10 text-center shadow-[0_25px_60px_-25px_hsl(var(--color-primary)/0.35)] backdrop-blur-sm md:p-16'>
-            <h2 className='text-3xl font-semibold text-foreground sm:text-4xl'>
-               Ready to launch your next build?
-            </h2>
-            <p className='mt-4 text-base text-muted-foreground md:text-lg'>
-               Join builders shipping real features every week. Start small with
-               HTML, or jump into the React track and deploy TaskFlow Pro
-               end-to-end.
-            </p>
-            <div className='mt-8 flex flex-wrap justify-center gap-4'>
-               <Link
-                  href='/docs/html'
-                  className='group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:-translate-y-1 hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background'
-               >
-                  Start with HTML Basics
-                  <ArrowUpRight className='h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1' />
-               </Link>
-               <Link
-                  href='/docs/react'
-                  className='group inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition hover:-translate-y-1 hover:bg-primary/10 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background'
-               >
-                  View the TaskFlow Pro roadmap
-                  <ArrowUpRight className='h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1' />
-               </Link>
-            </div>
-            <Accordions
-               type='single'
-               className='mt-10 text-left border border-border bg-card/90'
-            >
-               {ctaHighlights.map((item) => (
-                  <Accordion key={item.id} title={item.title} id={item.id}>
-                     <p className='text-sm leading-relaxed text-muted-foreground'>
-                        {item.content}
+      <section className='relative overflow-hidden px-4 py-24 sm:px-6 lg:px-8'>
+         {/* Background Elements */}
+         <div className='absolute inset-0 -z-10'>
+            <div className='absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl' />
+            <div className='absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-secondary/5 blur-3xl' />
+         </div>
+
+         <div className='mx-auto max-w-7xl'>
+            {/* Main CTA Card */}
+            <div className='relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card via-card to-muted/30 shadow-2xl'>
+               {/* Content Container */}
+               <div className='relative z-10 px-6 py-12 sm:px-12 sm:py-16 lg:px-16 lg:py-20'>
+                  {/* Badge */}
+                  <div className='mb-6 flex justify-center'>
+                     <div className='inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary'>
+                        <Sparkles className='h-4 w-4' />
+                        <span>Start Your Journey Today</span>
+                     </div>
+                  </div>
+
+                  {/* Heading */}
+                  <div className='text-center'>
+                     <h2 className='text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl'>
+                        Ready to Master Modern Web Development?
+                     </h2>
+                     <p className='mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg lg:text-xl'>
+                        Join our comprehensive learning platform and transform from beginner to professional developer with hands-on projects and expert guidance.
                      </p>
-                  </Accordion>
-               ))}
-            </Accordions>
-            <p className='mt-6 text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-               No fluff. Only shipping.
-            </p>
+                  </div>
+
+                  {/* CTAs */}
+                  <div className='mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row'>
+                     <Link
+                        href='/courses'
+                        className='group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-8 py-4 text-base font-semibold text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl sm:w-auto'
+                     >
+                        Explore All Courses
+                        <ArrowRight className='h-5 w-5 transition-transform group-hover:translate-x-1' />
+                     </Link>
+                     <Link
+                        href='/courses/react'
+                        className='group inline-flex w-full items-center justify-center gap-2 rounded-lg border-2 border-border bg-background px-8 py-4 text-base font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-muted sm:w-auto'
+                     >
+                        Start with React
+                        <ArrowRight className='h-5 w-5 transition-transform group-hover:translate-x-1' />
+                     </Link>
+                  </div>
+
+                  {/* Stats */}
+                  <div className='mt-16 grid grid-cols-3 gap-6 border-t border-border pt-12'>
+                     {stats.map((stat) => (
+                        <div key={stat.label} className='text-center'>
+                           <div className='text-3xl font-bold text-primary sm:text-4xl'>
+                              {stat.value}
+                           </div>
+                           <div className='mt-2 text-sm text-muted-foreground sm:text-base'>
+                              {stat.label}
+                           </div>
+                        </div>
+                     ))}
+                  </div>
+               </div>
+
+               {/* Features Grid */}
+               <div className='border-t border-border bg-muted/30 px-6 py-12 sm:px-12 lg:px-16'>
+                  <div className='grid gap-8 sm:grid-cols-3'>
+                     {features.map((feature) => {
+                        const Icon = feature.icon;
+                        return (
+                           <div key={feature.title} className='flex flex-col items-center text-center sm:items-start sm:text-left'>
+                              <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10'>
+                                 <Icon className='h-6 w-6 text-primary' />
+                              </div>
+                              <h3 className='text-lg font-semibold text-foreground'>
+                                 {feature.title}
+                              </h3>
+                              <p className='mt-2 text-sm text-muted-foreground'>
+                                 {feature.description}
+                              </p>
+                           </div>
+                        );
+                     })}
+                  </div>
+               </div>
+
+               {/* Bottom Tagline */}
+               <div className='border-t border-border bg-gradient-to-r from-primary/5 to-secondary/5 px-6 py-6'>
+                  <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
+                     <p className='text-sm font-medium text-muted-foreground'>
+                        💡 Learn by building • 🚀 Ship real projects • 🎓 Level up your skills
+                     </p>
+                     <Link
+                        href='/contact'
+                        className='text-sm font-medium text-primary transition-colors hover:text-primary/80'
+                     >
+                        Have questions? Get in touch →
+                     </Link>
+                  </div>
+               </div>
+            </div>
          </div>
       </section>
    );
