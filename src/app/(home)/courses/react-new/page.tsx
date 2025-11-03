@@ -1,30 +1,10 @@
-import { CourseDetailHeroSection } from "@/components/course-detail/CourseDetailHeroSection";
-import { CourseDifferentiatorsSection } from "@/components/course-detail/CourseDifferentiatorsSection";
-import { CourseModulesSection } from "@/components/course-detail/CourseModulesSection";
-import { CoursePricingSection } from "@/components/course-detail/CoursePricingSection";
-import { CourseTechnologySection } from "@/components/course-detail/CourseTechnologySection";
-import { CourseTestimonialsSection } from "@/components/course-detail/CourseTestimonialsSection";
+import { CourseDetailPage } from "@/components/course-detail/CourseDetailPage";
 import { newReactCourseDetail } from "@/lib/course-detail/react-new";
 
-export default function ReactLaunchpadCoursePage() {
-   const {
-      hero,
-      differentiators,
-      technology,
-      modules,
-      testimonials,
-      pricing,
-      slug,
-   } = newReactCourseDetail;
+// ============================================================================
+// React Launchpad Course Page (Refactored - DRY & SOLID Principles)
+// ============================================================================
 
-   return (
-      <main className='relative flex flex-1 flex-col bg-background text-foreground transition-colors'>
-         <CourseDetailHeroSection hero={hero} />
-         <CourseDifferentiatorsSection differentiators={differentiators} />
-         <CourseTechnologySection technology={technology} />
-         <CourseModulesSection modules={modules} courseSlug={slug} />
-         <CoursePricingSection pricing={pricing} />
-         <CourseTestimonialsSection testimonials={testimonials} />
-      </main>
-   );
+export default function ReactLaunchpadCoursePage() {
+   return <CourseDetailPage courseDetail={newReactCourseDetail} />;
 }

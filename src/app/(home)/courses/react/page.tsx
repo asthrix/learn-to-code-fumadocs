@@ -1,26 +1,19 @@
-import { CourseDetailHeroSection } from "@/components/course-detail/CourseDetailHeroSection";
-import { CourseDifferentiatorsSection } from "@/components/course-detail/CourseDifferentiatorsSection";
-import { CourseModulesSection } from "@/components/course-detail/CourseModulesSection";
-import { CoursePricingSection } from "@/components/course-detail/CoursePricingSection";
-import { CourseTechnologySection } from "@/components/course-detail/CourseTechnologySection";
-import { CourseTestimonialsSection } from "@/components/course-detail/CourseTestimonialsSection";
+import { CourseDetailPage } from "@/components/course-detail/CourseDetailPage";
 import { reactCourseDetail } from "@/lib/course-detail/react";
 
-export default function ReactCoursePage() {
-   const { hero, differentiators, technology, modules, testimonials, pricing } =
-      reactCourseDetail;
+// ============================================================================
+// React Course Page (Refactored - DRY & SOLID Principles)
+// ============================================================================
+// Before: 24 lines with repeated section imports and manual composition
+// After: 5 lines using template component
+//
+// Benefits:
+// - DRY: No code duplication across course variants
+// - SRP: Page only responsible for providing data
+// - OCP: Can extend CourseDetailPage without modifying this file
+// - Maintainability: Layout changes only need to be made in one place
+// ============================================================================
 
-   return (
-      <main className='relative flex flex-1 flex-col bg-background text-foreground transition-colors'>
-         <CourseDetailHeroSection hero={hero} />
-         <CourseDifferentiatorsSection differentiators={differentiators} />
-         <CourseTechnologySection technology={technology} />
-         <CourseModulesSection
-            modules={modules}
-            courseSlug={reactCourseDetail.slug}
-         />
-         <CoursePricingSection pricing={pricing} />
-         <CourseTestimonialsSection testimonials={testimonials} />
-      </main>
-   );
+export default function ReactCoursePage() {
+   return <CourseDetailPage courseDetail={reactCourseDetail} />;
 }

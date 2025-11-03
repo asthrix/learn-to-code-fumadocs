@@ -19,13 +19,16 @@ export function CourseTechnologySection({
 
    return (
       <section className='px-4 py-16 sm:px-6 lg:px-8'>
-         <div className='mx-auto max-w-6xl'>
+         <div className='mx-auto max-w-6xl space-y-12'>
             {/* Header */}
-            <header className='mb-12 text-center'>
-               <span className='mb-3 inline-block rounded-md bg-primary/10 px-3 py-1 text-xs font-medium text-primary'>
+            <header className=' space-y-6 text-center'>
+               {/* <span className='mb-3 inline-block rounded-md bg-primary/10 px-3 py-1 text-xs font-medium text-primary'>
+                  Technology Stack
+               </span> */}
+               <span className='inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-primary dark:border-primary/25 dark:bg-primary/15 '>
                   Technology Stack
                </span>
-               <h2 className='mb-4 text-3xl font-bold text-foreground sm:text-4xl'>
+               <h2 className=' text-3xl font-bold text-foreground sm:text-4xl'>
                   Tools & Technologies
                </h2>
                <p className='mx-auto max-w-2xl text-muted-foreground'>
@@ -33,7 +36,7 @@ export function CourseTechnologySection({
                </p>
                
                {/* Stats */}
-               <div className='mt-6 flex flex-wrap items-center justify-center gap-4 text-sm'>
+               <div className=' flex flex-wrap items-center justify-center gap-4 text-sm'>
                   <div className='flex items-center gap-2 text-muted-foreground'>
                      <span className='font-semibold text-foreground'>{totalStacks}</span>
                      Technology Groups

@@ -24,8 +24,8 @@ export function CourseDetailHeroSection({
 
          <div className='relative mx-auto max-w-6xl px-6 pb-24 pt-28 lg:px-8 lg:pb-32 lg:pt-40'>
             <div className='mx-auto max-w-5xl text-center'>
-               <span className='inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.32em] text-primary shadow-[0_18px_45px_-28px_hsl(var(--color-primary)/0.45)] backdrop-blur dark:border-primary/25 dark:bg-primary/15 dark:text-primary-foreground'>
-                  <Sparkles className='h-4 w-4 text-primary dark:text-primary-foreground' />
+               <span className='inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.32em] text-primary shadow-[0_18px_45px_-28px_hsl(var(--color-primary)/0.45)] backdrop-blur dark:border-primary/25 dark:bg-primary/15 dark:text-primary'>
+                  <Sparkles className='h-4 w-4 ' />
                   {hero.eyebrow}
                </span>
 
