@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { source } from "@/lib/source";
 
-const BASE_URL = "https://learntocodevs.vercel.app";
+const BASE_URL = "https://codetolearn.vercel.app";
 
 const staticRoutes: Array<{
    path: string;
