@@ -5,7 +5,7 @@
 
 export const SEO_CONFIG = {
    // Site Information
-   siteName: "Learn To Code",
+   siteName: "Code To Learn",
    siteUrl: "https://codetolearn.vercel.app",
    locale: "en_US",
    
@@ -23,7 +23,7 @@ export const SEO_CONFIG = {
       url: "/favicon_images/android-chrome-512x512.png",
       width: 512,
       height: 512,
-      alt: "Learn To Code Logo",
+      alt: "Code To Learn Logo",
    },
 } as const;
 
@@ -32,7 +32,7 @@ export const SEO_CONFIG = {
  */
 export const HOME_KEYWORDS = [
    // Primary
-   "learn to code",
+   "Code To Learn",
    "web development courses",
    "project based learning",
    

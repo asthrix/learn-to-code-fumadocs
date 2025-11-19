@@ -24,7 +24,7 @@ export async function generateMetadata({
 
    if (course?.id === "react") {
       return {
-         title: `${course.title} | Learn to Code`,
+         title: `${course.title} | Code To Learn`,
          description: reactCourseDetail.hero.description,
       };
    }
@@ -32,7 +32,7 @@ export async function generateMetadata({
    const displayName = course?.title ?? formatCourseName(courseId);
 
    return {
-      title: `${displayName} course coming soon | Learn to Code`,
+      title: `${displayName} course coming soon | Code To Learn`,
       description: `We're finishing the ${displayName} roadmap. Check out the available tracks while we wrap things up.`,
    };
 }

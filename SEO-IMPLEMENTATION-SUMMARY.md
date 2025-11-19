@@ -29,7 +29,7 @@
 #### ✅ 3. Homepage Enhanced Metadata
 **File:** `src/app/(home)/page.tsx`
 - Added dedicated metadata export with:
-  - Optimized title: "Learn to Code | Build Real Projects - HTML, CSS, React, Next.js"
+  - Optimized title: "Code To Learn | Build Real Projects - HTML, CSS, React, Next.js"
   - Enhanced description with stats (30+ hours, 90+ lessons, 5K+ learners)
   - Full Open Graph + Twitter Card implementation
   - Canonical URL
@@ -45,7 +45,7 @@
 #### ✅ 5. PWA Manifest Completion
 **File:** `public/favicon_images/site.webmanifest`
 - Added missing fields:
-  - `name`: "Learn To Code - Project-Based Web Development"
+  - `name`: "Code To Learn - Project-Based Web Development"
   - `short_name`: "LearnToCode"
   - `description`: Full value proposition
   - `categories`: ["education", "productivity", "developer tools"]
@@ -100,7 +100,7 @@ Created reusable schema components:
 Added targeted keyword arrays:
 
 - **Homepage Keywords (26 terms):**
-  - Primary: "learn to code", "web development courses", "project based learning"
+  - Primary: "Code To Learn", "web development courses", "project based learning"
   - Technologies: "HTML course", "CSS tutorial", "JavaScript course", "React tutorial", "Next.js course"
   - Projects: "airbnb clone tutorial", "booking app tutorial"
   - Audience: "beginner coding", "coding bootcamp alternative"
@@ -118,7 +118,7 @@ Added targeted keyword arrays:
 Created centralized config:
 ```typescript
 SEO_CONFIG = {
-   siteName: "Learn To Code"
+   siteName: "Code To Learn"
    siteUrl: "https://codetolearn.vercel.app"
    locale: "en_US"
    twitter: { handle, creator }

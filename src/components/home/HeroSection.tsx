@@ -28,7 +28,7 @@ export function HeroSection() {
             </div>
 
             <h1 className='text-5xl md:text-7xl font-bold text-primary-foreground dark:text-foreground mb-6 leading-tight'>
-               Learn to Code the
+               Code To Learn the
                <span className='block bg-gradient-to-r from-accent via-accent/80 to-secondary bg-clip-text text-transparent'>
                   Modern Web
                </span>
