@@ -46,6 +46,6 @@ resources:
 
 ## SEO & discovery
 
-- A dynamic sitemap is exposed at `https://learntocodevs.vercel.app/sitemap.xml`, powered by `src/app/sitemap.ts`. It automatically lists every statically generated docs page plus key marketing routes; redeploy to refresh entries after adding or renaming content.
-- Crawlers are guided through `https://learntocodevs.vercel.app/robots.txt`, defined in `src/app/robots.ts`, which points to the sitemap and keeps all routes crawlable.
+- A dynamic sitemap is exposed at `https://codetolearn.vercel.app/sitemap.xml`, powered by `src/app/sitemap.ts`. It automatically lists every statically generated docs page plus key marketing routes; redeploy to refresh entries after adding or renaming content.
+- Crawlers are guided through `https://codetolearn.vercel.app/robots.txt`, defined in `src/app/robots.ts`, which points to the sitemap and keeps all routes crawlable.
 - After deployments, submit the sitemap URL in Google Search Console → Sitemaps to trigger reindexing, and consider monitoring coverage reports there for validation.
