@@ -16,8 +16,8 @@ export const metadata: Metadata = {
    description:
       "Master HTML, CSS, JavaScript, React, Next.js, and Tailwind CSS through hands-on project-based learning. Build real-world applications from scratch.",
    verification: {
-      // google: "10K6YeY4nTrR98LwhZNIrZVyNNUQJVHidJyxeNU41jE", //vj.coder15@gmail.com
-      google: "9rvY3OG01Kk2JoEqY_D2jhhDdg-4FCEQ2IBZquZIFyw", //vj.developer15@gmail.com
+      google: "10K6YeY4nTrR98LwhZNIrZVyNNUQJVHidJyxeNU41jE", //vj.coder15@gmail.com
+      // google: "9rvY3OG01Kk2JoEqY_D2jhhDdg-4FCEQ2IBZquZIFyw", //vj.developer15@gmail.com
    },
 };
 
@@ -53,15 +53,15 @@ export default function Layout({ children }: LayoutProps<"/">) {
             />
             <link rel='manifest' href='/favicon_images/site.webmanifest' />
 
-            {/* <meta
-               name='google-site-verification'
-               content='10K6YeY4nTrR98LwhZNIrZVyNNUQJVHidJyxeNU41jE'
-            /> */}
-
             <meta
                name='google-site-verification'
-               content='9rvY3OG01Kk2JoEqY_D2jhhDdg-4FCEQ2IBZquZIFyw'
+               content='10K6YeY4nTrR98LwhZNIrZVyNNUQJVHidJyxeNU41jE'
             />
+
+            {/* <meta
+               name='google-site-verification'
+               content='9rvY3OG01Kk2JoEqY_D2jhhDdg-4FCEQ2IBZquZIFyw'
+            /> */}
          </head>
          <body className='flex flex-col min-h-screen'>
             <RootProvider>
