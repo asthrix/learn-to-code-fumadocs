@@ -1,7 +1,7 @@
 import "./global.css";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
-import {  Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { ScrollToTop } from "@/components/ScrollToTop";
 
 const appUrl =
@@ -13,7 +13,11 @@ const appUrl =
 export const metadata: Metadata = {
    metadataBase: new URL(appUrl),
    title: "Learn to Code | Project-Based Web Development Courses",
-   description: "Master HTML, CSS, JavaScript, React, Next.js, and Tailwind CSS through hands-on project-based learning. Build real-world applications from scratch.",
+   description:
+      "Master HTML, CSS, JavaScript, React, Next.js, and Tailwind CSS through hands-on project-based learning. Build real-world applications from scratch.",
+   verification: {
+      google: "10K6YeY4nTrR98LwhZNIrZVyNNUQJVHidJyxeNU41jE",
+   },
 };
 
 // const inter = Inter({
@@ -24,8 +28,6 @@ const poppins = Poppins({
    subsets: ["latin"],
    weight: ["400", "500", "600", "700"],
 });
-
-
 
 export default function Layout({ children }: LayoutProps<"/">) {
    return (
@@ -49,6 +51,11 @@ export default function Layout({ children }: LayoutProps<"/">) {
                href='/favicon_images/favicon-16x16.png'
             />
             <link rel='manifest' href='/favicon_images/site.webmanifest' />
+
+            <meta
+               name='google-site-verification'
+               content='10K6YeY4nTrR98LwhZNIrZVyNNUQJVHidJyxeNU41jE'
+            />
          </head>
          <body className='flex flex-col min-h-screen'>
             <RootProvider>
