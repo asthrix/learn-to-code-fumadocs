@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 
 // Enhanced Homepage Metadata for SEO
 export const metadata: Metadata = {
-   title: "Learn to Code | Build Real Projects - HTML, CSS, React, Next.js",
+   title: "Code To Learn | Build Real Projects - HTML, CSS, React, Next.js",
    description: "Project-based coding courses for HTML, CSS, JavaScript, React & Next.js. Build production apps like Airbnb clones. 30+ hours, 90+ lessons, 5K+ learners. Start free today!",
    keywords: HOME_KEYWORDS,
    
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
       locale: SEO_CONFIG.locale,
       url: getCanonicalUrl("/"),
       siteName: SEO_CONFIG.siteName,
-      title: "Learn to Code | Build Real Projects - HTML, CSS, React, Next.js",
+      title: "Code To Learn | Build Real Projects - HTML, CSS, React, Next.js",
       description: "Master web development through hands-on projects. Build a booking app like Airbnb while learning React, Next.js, and modern web technologies.",
       images: [
          {
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
    
    twitter: {
       card: "summary_large_image",
-      title: "Learn to Code | Build Real Projects",
+      title: "Code To Learn | Build Real Projects",
       description: "Project-based web development courses. Build real apps, deploy to production, and grow your portfolio.",
       creator: SEO_CONFIG.twitter.creator,
       site: SEO_CONFIG.twitter.handle,

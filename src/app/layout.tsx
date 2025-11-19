@@ -12,20 +12,20 @@ const appUrl =
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000");
 
-const siteTitle = "Learn to Code | Project-Based Web Development Courses";
+const siteTitle = "Code To Learn | Project-Based Web Development Courses";
 const siteDescription = "Master HTML, CSS, JavaScript, React, Next.js, and Tailwind CSS through hands-on project-based learning. Build real-world applications from scratch.";
 
 export const metadata: Metadata = {
    metadataBase: new URL(appUrl),
    title: {
       default: siteTitle,
-      template: "%s | Learn To Code",
+      template: "%s | Code To Learn",
    },
    description: siteDescription,
    keywords: HOME_KEYWORDS,
-   authors: [{ name: "Learn To Code" }],
-   creator: "Learn To Code",
-   publisher: "Learn To Code",
+   authors: [{ name: "Code To Learn" }],
+   creator: "Code To Learn",
+   publisher: "Code To Learn",
    
    // Open Graph
    openGraph: {

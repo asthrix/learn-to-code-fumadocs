@@ -160,7 +160,7 @@ export const creatorTimeline: CreatorMilestone[] = [
 //       impact: "Achieved 92% placement across APAC and North America within 90 days of graduation.",
 //    },
    {
-      title: "Founded Learn to Code",
+      title: "Founded Code To Learn",
       period: "2025-Present",
       description:
          "Built a modern, moduled platform empowering self-taught developers through production-ready curricula.",
