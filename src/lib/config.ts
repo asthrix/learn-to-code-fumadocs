@@ -10,6 +10,7 @@ interface AppConfig {
    };
 }
 
+export const BASE_URL = "https://codetolearn.vercel.app"
 // Global app configuration
 export const appConfig: AppConfig = {
    features: {
