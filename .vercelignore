@@ -1,0 +1,18 @@
+# Build artifacts
+.next/
+node_modules/
+
+# Documentation (not needed for runtime)
+MDX-docs/
+course-docs/
+notes/
+docs/roadmap-sh/
+docs/testing-report-docs/
+
+# Development files
+.vscode/
+.DS_Store
+*.log
+
+# Unused course structure
+course-structure/
