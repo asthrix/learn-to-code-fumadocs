@@ -6,9 +6,6 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
   
-  // Optimize builds
-  swcMinify: true,
-  
   // Reduce bundle size
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
