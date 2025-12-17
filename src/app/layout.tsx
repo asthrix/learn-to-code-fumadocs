@@ -139,8 +139,8 @@ export default function Layout({ children }: LayoutProps<"/">) {
             <RootProvider>
                <ScrollToTop />
                {children}
-               <Analytics />
             </RootProvider>
+            <Analytics />
          </body>
       </html>
    );
